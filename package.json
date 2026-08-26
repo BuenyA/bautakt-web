@@ -1,0 +1,16 @@
+{
+  "name": "bautakt-web",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:marketing": "npm run dev --workspace marketing",
+    "dev:web": "npm run dev --workspace web",
+    "build:marketing": "npm run build --workspace marketing",
+    "build:web": "npm run build --workspace web",
+    "lint:marketing": "npm run lint --workspace marketing",
+    "lint:web": "npm run lint --workspace web"
+  }
+}
