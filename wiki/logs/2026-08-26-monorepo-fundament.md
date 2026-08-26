@@ -69,10 +69,11 @@ Nicht gegen die Konfiguration, sondern gegen das Ergebnis:
 
 ## Was offen ist
 
-- **Anmeldung mit einem echten Konto** wurde nicht durchgeführt — dafür fehlten
-  Zugangsdaten. Damit ungetestet: App-Shell nach erfolgreichem Login, Sidebar-Filterung
-  nach Rechten, der Hard-Reload-Test auf `initializing`, der Nutzerwechsel-Test auf
-  `queryClient.clear()`.
+- **Anmeldung mit einem echten Konto: funktioniert** (vom Repo-Eigentümer bestätigt,
+  2026-08-26). Damit sind Client, Sitzung und der Weg in die App-Shell belegt.
+  Weiterhin ungetestet und einzeln nachzuholen: die Sidebar-Filterung nach Rechten,
+  der Hard-Reload-Test auf `initializing` und der Nutzerwechsel-Test auf
+  `queryClient.clear()` — Letzterer braucht zwei Konten im selben Browser.
 - **Passwort-Reset per Mail** ungetestet, solange die Redirect-Allowlist in Supabase
   nicht gesetzt ist.
 - **Vercel-Projekte** sind noch nicht angelegt. Damit auch der SPA-Rewrite ungetestet —
