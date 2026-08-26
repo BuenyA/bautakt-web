@@ -1,12 +1,20 @@
-import './index.css';
+import '@/lib/i18n';
+import '@/index.css';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { RouterProvider } from 'react-router';
 
-import App from './App.tsx';
+import { Providers } from '@/app/Providers';
+import { router } from '@/router';
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+if (!rootElement) throw new Error('#root nicht gefunden.');
+
+createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <Providers>
+      <RouterProvider router={router} />
+    </Providers>
   </StrictMode>,
 );

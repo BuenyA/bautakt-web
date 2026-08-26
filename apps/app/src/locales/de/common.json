@@ -1,0 +1,32 @@
+{
+  "app": { "name": "Bautakt" },
+  "action": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "back": "Zurück",
+    "retry": "Erneut versuchen",
+    "signOut": "Abmelden"
+  },
+  "state": {
+    "loading": "Wird geladen …",
+    "empty": "Nichts vorhanden",
+    "comingSoon": "Dieser Bereich wird gerade gebaut."
+  },
+  "nav": {
+    "orders": "Aufträge",
+    "customers": "Kunden",
+    "employees": "Mitarbeiter",
+    "finance": "Finanzen",
+    "calendar": "Kalender",
+    "notifications": "Benachrichtigungen",
+    "settings": "Einstellungen",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen",
+    "main": "Hauptnavigation"
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "description": "Diese Adresse gibt es nicht.",
+    "action": "Zur Übersicht"
+  }
+}

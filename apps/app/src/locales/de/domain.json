@@ -1,0 +1,6 @@
+{
+  "order": { "one": "Auftrag", "other": "Aufträge" },
+  "customer": { "one": "Kunde", "other": "Kunden" },
+  "employee": { "one": "Mitarbeiter", "other": "Mitarbeiter" },
+  "company": { "one": "Betrieb", "other": "Betriebe" }
+}

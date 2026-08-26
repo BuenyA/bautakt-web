@@ -1,0 +1,6 @@
+{
+  "required": "Dieses Feld wird benötigt.",
+  "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+  "passwordMin": "Das Passwort muss mindestens {{count}} Zeichen haben.",
+  "passwordMismatch": "Die Passwörter stimmen nicht überein."
+}

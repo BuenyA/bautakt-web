@@ -1,0 +1,15 @@
+{
+  "generic": "Da ist etwas schiefgelaufen. Bitte versuchen Sie es erneut.",
+  "network": "Keine Verbindung. Prüfen Sie Ihre Internetverbindung.",
+  "auth": {
+    "invalidCredentials": "E-Mail oder Passwort stimmt nicht.",
+    "emailNotConfirmed": "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse.",
+    "userAlreadyExists": "Zu dieser E-Mail-Adresse gibt es bereits ein Konto.",
+    "weakPassword": "Dieses Passwort ist zu schwach.",
+    "rateLimited": "Zu viele Versuche. Bitte warten Sie einen Moment."
+  },
+  "boundary": {
+    "title": "Unerwarteter Fehler",
+    "description": "Die Seite konnte nicht geladen werden."
+  }
+}
