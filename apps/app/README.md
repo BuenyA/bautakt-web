@@ -1,32 +1,20 @@
-# React + TypeScript + Vite
+# @bautakt/app
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Die Web-Anwendung von Bautakt (`app.bautakt.com`). Vite + React + React Router.
 
-Currently, two official plugins are available:
+Alle Befehle laufen aus der **Repo-Wurzel**, nicht aus diesem Ordner:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm run dev:app        # http://localhost:5173
+npm run build          # baut beide Apps
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Vor dem ersten Start eine `.env` aus `.env.example` anlegen.
+
+⚠️ **Die `vercel.json` ist nicht optional.** Ohne den Rewrite auf `index.html`
+liefert jeder direkte Aufruf einer Unterroute (z. B. ein Reload auf
+`/auftraege`) einen 404 von Vercel. Lokal faellt das nie auf, weil der
+Vite-Dev-Server ohnehin alles auf `index.html` leitet — der Fehler tritt
+ausschliesslich in Produktion auf.
+
+Architektur und Regeln stehen in der [AGENTS.md](../../AGENTS.md) der Repo-Wurzel.
