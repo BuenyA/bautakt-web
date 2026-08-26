@@ -11,17 +11,25 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace @bautakt/marketing & npm run dev --workspace @bautakt/app",
-    "dev:marketing": "npm run dev --workspace @bautakt/marketing",
-    "dev:app": "npm run dev --workspace @bautakt/app",
-    "build": "npm run build --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "dev": "turbo run dev",
+    "dev:marketing": "turbo run dev --filter=@bautakt/marketing",
+    "dev:app": "turbo run dev --filter=@bautakt/app",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "turbo run lint typecheck && prettier --check ."
   },
   "devDependencies": {
+    "@bautakt/eslint-config": "*",
+    "@bautakt/tsconfig": "*",
     "@types/node": "^22",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
+    "eslint": "^9.39.5",
+    "prettier": "^3.6.2",
+    "turbo": "^2.5.8",
     "typescript": "~5.9.3"
   }
 }

@@ -1,20 +1,21 @@
-import { useState, type FormEvent } from 'react'
-import './App.css'
+import './App.css';
 
-type AuthMode = 'sign-in' | 'sign-up'
+import { type FormEvent, useState } from 'react';
+
+type AuthMode = 'sign-in' | 'sign-up';
 
 function App() {
-  const [authMode, setAuthMode] = useState<AuthMode>('sign-in')
-  const [status, setStatus] = useState('')
+  const [authMode, setAuthMode] = useState<AuthMode>('sign-in');
+  const [status, setStatus] = useState('');
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+    event.preventDefault();
     setStatus(
       authMode === 'sign-in'
         ? 'Sign-in request submitted. Connect this form to your backend API.'
         : 'Account creation request submitted. Connect this form to your backend API.',
-    )
-  }
+    );
+  };
 
   return (
     <main className="auth-shell">
@@ -49,7 +50,13 @@ function App() {
           <input id="email" name="email" type="email" autoComplete="email" required />
 
           <label htmlFor="password">Password</label>
-          <input id="password" name="password" type="password" autoComplete="current-password" required />
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            required
+          />
 
           {authMode === 'sign-up' && (
             <>
@@ -72,7 +79,7 @@ function App() {
         {status && <p className="status">{status}</p>}
       </section>
     </main>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -2,11 +2,11 @@
 
 Monorepo für die Web-Seite von Bautakt.
 
-| Workspace | Zweck | Domain |
-|-----------|-------|--------|
-| `apps/marketing` | Marketing-Website (Next.js) | `bautakt.com` |
-| `apps/app` | Web-Anwendung (Vite + React) | `app.bautakt.com` |
-| `packages/*` | Geteilte Pakete (Supabase-Types, UI-Tokens, Configs) | — |
+| Workspace        | Zweck                                                | Domain            |
+| ---------------- | ---------------------------------------------------- | ----------------- |
+| `apps/marketing` | Marketing-Website (Next.js)                          | `bautakt.com`     |
+| `apps/app`       | Web-Anwendung (Vite + React)                         | `app.bautakt.com` |
+| `packages/*`     | Geteilte Pakete (Supabase-Types, UI-Tokens, Configs) | —                 |
 
 Die React-Native-App und das Supabase-Backend liegen im separaten Repo `bautakt-app`.
 

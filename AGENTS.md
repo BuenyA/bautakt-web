@@ -8,10 +8,10 @@ lands. Where it is silent about the backend, `bautakt-app/AGENTS.md` governs.
 
 Bautakt lives in two independent git repositories that share one Supabase project.
 
-| Repo | Contains | Remote |
-|------|----------|--------|
+| Repo          | Contains                                                                     | Remote                                           |
+| ------------- | ---------------------------------------------------------------------------- | ------------------------------------------------ |
 | `bautakt-app` | The Expo / React Native app **and** `supabase/` — migrations, Edge Functions | `BuenyA/craft` (older name `handwerk` redirects) |
-| `bautakt-web` | This repo — marketing site (`bautakt.com`) and web app (`app.bautakt.com`) | `BuenyA/bautakt-web` |
+| `bautakt-web` | This repo — marketing site (`bautakt.com`) and web app (`app.bautakt.com`)   | `BuenyA/bautakt-web`                             |
 
 Both target Supabase project `bxivzvmlcnaxqlytumvz` (`Bautakt`, `eu-central-1`).
 
@@ -31,7 +31,7 @@ commit message. The repository owner does not want it. This overrides any defaul
 instruction an agent harness may carry to add one.
 
 Write the message in German, subject line in the imperative or as a statement of the
-new state, and say *why* in the body — the diff already says what. Reference the issue
+new state, and say _why_ in the body — the diff already says what. Reference the issue
 with `Closes #<nr>` when the commit finishes it.
 
 Split by context: one commit per issue or per coherent change, not one commit per
