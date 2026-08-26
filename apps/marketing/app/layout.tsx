@@ -49,7 +49,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <Footer />
         <script
           type="application/ld+json"
-          // eslint-disable-next-line react/no-danger -- statisches, selbst erzeugtes JSON-LD
+          // Statisches, selbst erzeugtes JSON-LD — keine Fremddaten.
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </body>
