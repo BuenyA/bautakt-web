@@ -2,15 +2,26 @@
   "name": "bautakt-web",
   "private": true,
   "version": "1.0.0",
+  "packageManager": "npm@11.6.4",
+  "engines": {
+    "node": ">=22"
+  },
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "scripts": {
-    "dev:marketing": "npm run dev --workspace marketing",
-    "dev:web": "npm run dev --workspace web",
-    "build:marketing": "npm run build --workspace marketing",
-    "build:web": "npm run build --workspace web",
-    "lint:marketing": "npm run lint --workspace marketing",
-    "lint:web": "npm run lint --workspace web"
+    "dev": "npm run dev --workspace @bautakt/marketing & npm run dev --workspace @bautakt/app",
+    "dev:marketing": "npm run dev --workspace @bautakt/marketing",
+    "dev:app": "npm run dev --workspace @bautakt/app",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "typescript": "~5.9.3"
   }
 }

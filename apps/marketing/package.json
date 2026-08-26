@@ -1,12 +1,13 @@
 {
-  "name": "marketing",
+  "name": "@bautakt/marketing",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3000",
     "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "start": "next start --port 3000",
+    "lint": "eslint .",
+    "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "next": "16.3.3",
@@ -14,11 +15,7 @@
     "react-dom": "19.2.8"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.3.3",
-    "typescript": "^5"
+    "eslint-config-next": "16.3.3"
   }
 }
