@@ -1,30 +1,18 @@
-import styles from './page.module.css';
+import { Button, Card, CardContent, CardHeader, CardTitle } from '@bautakt/ui';
 
+/** Platzhalter. Wird in der naechsten Phase durch die echten Seiten ersetzt. */
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <p className={styles.eyebrow}>Bautakt</p>
-        <h1>Modern Construction Workflows, Built for Growing Teams.</h1>
-        <p>
-          Bautakt helps teams manage projects, timelines, and communication in one place. This
-          Next.js marketing app is ready for deployment on Vercel and can be connected to the
-          bautakt.com domain.
-        </p>
-        <div className={styles.ctas}>
-          <a className={styles.primary} href="https://bautakt.com" target="_blank" rel="noreferrer">
-            Visit bautakt.com
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://vercel.com"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Deploy on Vercel
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="flex min-h-svh items-center justify-center bg-background p-6">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle>Bautakt</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          <p className="text-sm text-muted-foreground">Fundament steht.</p>
+          <Button>Weiter</Button>
+        </CardContent>
+      </Card>
+    </main>
   );
 }

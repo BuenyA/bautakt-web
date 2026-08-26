@@ -11,14 +11,20 @@
     "preview": "vite preview --port 5173"
   },
   "dependencies": {
+    "@bautakt/core": "*",
+    "@bautakt/supabase": "*",
+    "@bautakt/ui": "*",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
     "@bautakt/eslint-config": "*",
     "@bautakt/tsconfig": "*",
+    "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "^6.1.0",
     "eslint": "^9",
+    "eslint-plugin-react-refresh": "^0.4.26",
+    "tailwindcss": "^4.3.3",
     "vite": "^8.2.2"
   }
 }

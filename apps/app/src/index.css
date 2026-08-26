@@ -1,19 +1,6 @@
-:root {
-  font-family:
-    Inter,
-    system-ui,
-    -apple-system,
-    Segoe UI,
-    Roboto,
-    sans-serif;
-  color: #101828;
-  background: #f4f6fb;
-}
+/* Design-Tokens und Tailwind. Kanonisch in packages/ui — siehe dortigen Dateikopf. */
+@import '@bautakt/ui/styles/theme.css';
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-}
+/* Quellen, die Tailwind nach Klassennamen durchsuchen muss. Ohne diese Zeile
+   sieht v4 die Komponenten in packages/ui nicht und laesst deren Klassen weg. */
+@source '../../../packages/ui/src';
