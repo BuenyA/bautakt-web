@@ -30,6 +30,11 @@ coverage/
 # Deployment
 .vercel
 
+# Die Supabase-CLI legt beim Generieren ein supabase/ mit Scratch-State an.
+# Dieses Repo besitzt das Schema nicht — Migrationen leben in bautakt-app.
+# Siehe AGENTS.md, Abschnitt "Repository relationship".
+/supabase/
+
 # Logs
 *.log
 npm-debug.log*
