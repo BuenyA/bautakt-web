@@ -1,11 +1,11 @@
-# @bautakt/app
+# @bautakt/webapp
 
 Die Web-Anwendung von Bautakt (`app.bautakt.com`). Vite + React + React Router.
 
 Alle Befehle laufen aus der **Repo-Wurzel**, nicht aus diesem Ordner:
 
 ```bash
-npm run dev:app        # http://localhost:5173
+npm run dev:webapp     # http://localhost:5173
 npm run build          # baut beide Apps
 ```
 

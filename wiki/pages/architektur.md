@@ -24,7 +24,7 @@ Der Preis — die Apps typechecken den Paketquelltext mit — ist in Wahrheit ei
 @bautakt/supabase    -> tsconfig
 @bautakt/ui          -> tsconfig
 apps/marketing       -> ui
-apps/app             -> ui, supabase, core
+apps/webapp          -> ui, supabase, core
 ```
 
 ⚠️ **`apps/marketing` hängt bewusst nicht an `@bautakt/supabase`.** Kein Client, kein
@@ -47,7 +47,7 @@ dem Agenten arbeiten, hat das konkrete Kosten — jeder rät den Stil aus der zu
 gelesenen Datei zusammen, und Formatierungsrauschen verdeckt im Review die eigentliche
 Änderung. Dasselbe Motiv steht hinter der erzwungenen Import-Sortierung.
 
-## Ordnerstruktur: feature-first in apps/app
+## Ordnerstruktur: feature-first in apps/webapp
 
 `bautakt-app` ist layer-first, und man sieht, was das kostet: `app/lib/` hat rund 60
 Einträge auf einer Ebene plus 49 Module unter `lib/supabase/`. „Alles zu Aufträgen"
@@ -63,5 +63,5 @@ für echte Querschnitte: `components/layout/`, `components/common/`, `lib/`.
 | Ort              | `@/*` zeigt auf                 |
 | ---------------- | ------------------------------- |
 | `apps/marketing` | eigene Wurzel (Next-Konvention) |
-| `apps/app`       | `./src/*`                       |
+| `apps/webapp`    | `./src/*`                       |
 | `bautakt-app`    | Projektwurzel                   |

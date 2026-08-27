@@ -5,7 +5,7 @@ Monorepo für die Web-Seite von Bautakt.
 | Workspace        | Zweck                                                | Domain            |
 | ---------------- | ---------------------------------------------------- | ----------------- |
 | `apps/marketing` | Marketing-Website (Next.js)                          | `bautakt.com`     |
-| `apps/app`       | Web-Anwendung (Vite + React)                         | `app.bautakt.com` |
+| `apps/webapp`    | Web-Anwendung (Vite + React)                         | `app.bautakt.com` |
 | `packages/*`     | Geteilte Pakete (Supabase-Types, UI-Tokens, Configs) | —                 |
 
 Die React-Native-App und das Supabase-Backend liegen im separaten Repo `bautakt-app`.
@@ -16,9 +16,9 @@ Alle Befehle laufen aus der Repo-Wurzel:
 
 ```bash
 npm install
-npm run dev            # marketing :3000, app :5173
+npm run dev            # marketing :3000, webapp :5173
 npm run dev:marketing
-npm run dev:app
+npm run dev:webapp
 ```
 
 ## Prüfen und Bauen
@@ -32,6 +32,6 @@ npm run build
 ## Deployment
 
 Beide Apps werden aus diesem Repo als zwei getrennte Vercel-Projekte deployt
-(Root Directory `apps/marketing` bzw. `apps/app`).
+(Root Directory `apps/marketing` bzw. `apps/webapp`).
 
 Agenten-Richtlinien stehen in [AGENTS.md](./AGENTS.md).

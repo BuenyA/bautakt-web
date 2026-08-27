@@ -10,7 +10,7 @@ export type BautaktClient = SupabaseClient<Database>;
  *
  * ⚠️ URL und Key werden als Argumente uebergeben. Diese Funktion liest bewusst
  * NIE selbst `process.env` oder `import.meta.env`: dasselbe Wertepaar heisst je
- * nach Konsument anders (`VITE_*` in apps/app, `NEXT_PUBLIC_*` in Next,
+ * nach Konsument anders (`VITE_*` in apps/webapp, `NEXT_PUBLIC_*` in Next,
  * `EXPO_PUBLIC_*` in bautakt-app). Ein geteiltes Paket kann das nicht wissen,
  * also entscheidet der Aufrufer.
  *
