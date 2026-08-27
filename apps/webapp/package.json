@@ -1,5 +1,5 @@
 {
-  "name": "@bautakt/app",
+  "name": "@bautakt/webapp",
   "version": "0.1.0",
   "private": true,
   "type": "module",

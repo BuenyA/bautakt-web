@@ -10,7 +10,7 @@ import base from './base.js';
  * react-refresh ist bewusst NICHT hier: das ist eine Vite-HMR-Regel und
  * verlangt, dass eine Datei ausser Komponenten nichts exportiert. Fuer ein
  * Bibliothekspaket ist das falsch (shadcn exportiert neben <Button> auch
- * buttonVariants). Die Regel steht deshalb nur in apps/app.
+ * buttonVariants). Die Regel steht deshalb nur in apps/webapp.
  *
  * Achtung bei react-hooks: `configs['recommended-latest']` ist in 7.1.1 trotz
  * des Namens noch eslintrc-geformt (plugins ist ein Array) und wird von der

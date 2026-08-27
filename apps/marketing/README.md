@@ -12,7 +12,7 @@ npm run build
 Hinweise:
 
 - Diese App hat bewusst **keinen Supabase-Client**. Auth lebt vollstaendig in
-  `apps/app`. Ein spaeteres Kontaktformular laeuft ueber einen Route Handler mit
+  `apps/webapp`. Ein spaeteres Kontaktformular laeuft ueber einen Route Handler mit
   serverseitigem Key, nie ueber den Browser.
 - Jeder Link auf die Web-App laeuft ueber `lib/site.ts`.
 - `typecheck` ist `next typegen && tsc --noEmit`. Next 16 injiziert Typen wie

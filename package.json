@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "dev:marketing": "turbo run dev --filter=@bautakt/marketing",
-    "dev:app": "turbo run dev --filter=@bautakt/app",
+    "dev:webapp": "turbo run dev --filter=@bautakt/webapp",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",

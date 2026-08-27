@@ -8,7 +8,7 @@ sucht man.
 
 _Festgestellt 2026-08-26._
 
-**Symptom:** `npm run build` in `apps/app` bricht ab mit „Cannot find native binding.
+**Symptom:** `npm run build` in `apps/webapp` bricht ab mit „Cannot find native binding.
 npm has a bug related to optional dependencies", verursacht durch
 `@rolldown/binding-win32-arm64-msvc`.
 
@@ -84,7 +84,7 @@ oder ein geteilter Link liefert Vercels 404. Lokal tritt das **nie** auf.
 Der Vite-Dev-Server leitet ohnehin alles auf `index.html`. Vercel tut das nur, wenn man
 es konfiguriert.
 
-**Lösung:** `apps/app/vercel.json` mit `rewrites` (nicht `redirects`) auf `/index.html`.
+**Lösung:** `apps/webapp/vercel.json` mit `rewrites` (nicht `redirects`) auf `/index.html`.
 Vercel liefert statische Dateien **vor** den Rewrites aus, der Catch-all verdeckt
 `/assets/*` also nicht — das nicht mit einem Negative-Lookahead „reparieren".
 
