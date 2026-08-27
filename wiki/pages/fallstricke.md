@@ -100,6 +100,61 @@ typegen`. Vor dem ersten Build existieren sie nicht.
 gehört ins Script, nicht in eine Notiz. Alternativ Nexts globale Typen gar nicht
 verwenden — `RootLayout` typt seine `children` deshalb explizit.
 
+## `??` fängt die leere Env-Variable nicht
+
+_Passiert 2026-08-27, beim allerersten Vercel-Build._
+
+**Symptom:** Der Marketing-Build bricht in Vercel ab mit
+`TypeError: Invalid URL … input: ''` an `new URL(SITE_URL)` in `app/layout.tsx`.
+Lokal baut dasselbe Commit sauber.
+
+`SITE_URL` stand als `process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bautakt.com'`
+da. Nullish-Coalescing greift aber nur bei `null` und `undefined` — **nicht beim
+leeren String**. Eine im Vercel-Dashboard angelegte, aber nicht befüllte Variable
+liefert genau den. Lokal existierte die Variable gar nicht, dort griff der
+Fallback also korrekt: der Fehler ist deshalb nur in Vercel sichtbar.
+
+**Lösung:** Env-Werte nie mit `??` absichern. Leer wie fehlend behandeln:
+
+```ts
+const trimmed = value?.trim();
+return trimmed ? trimmed : fallback;
+```
+
+Wo es keinen sinnvollen Standard gibt — `VITE_SUPABASE_URL` etwa —, gehört kein
+Fallback hin, sondern ein `throw` mit lesbarer Meldung. Sonst scheitert
+supabase-js tief im Inneren, das Deploy ist grün und die Seite weiß.
+
+⚠️ Beim Refactoring darauf achten, dass `process.env.NEXT_PUBLIC_*` bzw.
+`import.meta.env.VITE_*` **wörtlich** an der Aufrufstelle stehen bleibt. Beide
+Bundler ersetzen diesen Ausdruck statisch; ein dynamischer Zugriff über
+`process.env[name]` bliebe im Bundle leer. Als Funktions*argument* funktioniert
+die Ersetzung — das wurde für beide Apps am gebauten Bundle nachgeprüft, nicht
+am Quelltext.
+
+## Das Dev-Deployment landet bei Google
+
+**Symptom:** `bautakt-marketing.vercel.app` taucht in der Suche auf — mit
+Platzhalter-Preisen und halbfertigen Texten. Später konkurriert es mit der echten
+Domain um dieselben Inhalte.
+
+Ein Vercel-**Production**-Deployment ist auch ohne Custom Domain öffentlich und
+crawlbar. Nur _Preview_-Deployments bekommen automatisch `X-Robots-Tag: noindex`. Das
+ist der Unterschied, den man leicht überliest: „kein eigener Domainname" heißt nicht
+„nicht auffindbar".
+
+**Lösung:** Zwei Ebenen, siehe [deployment-vercel.md](deployment-vercel.md). Im Code
+gibt `IS_PRODUCTION_SITE` nur bei ausdrücklich auf `bautakt.com` gesetzter
+`NEXT_PUBLIC_SITE_URL` frei; alles andere liefert `Disallow: /` **und** `noindex`.
+
+⚠️ `Disallow` in der `robots.txt` ist **kein** `noindex`. Es verhindert das Crawlen,
+nicht das Indexieren einer von woanders verlinkten URL. Beides ist nötig, und die
+Prüfung des einen ersetzt die des anderen nicht.
+
+Die Freigabe hängt bewusst an der **rohen** Umgebungsvariablen, nicht an `SITE_URL`.
+Deren Fallback ist `https://bautakt.com` — er würde ein unkonfiguriertes Deployment als
+Produktion ausweisen und damit ausgerechnet im ungeklärten Fall freigeben.
+
 ## Env-Änderung in Vercel wirkt nicht
 
 **Symptom:** Der Wert von `VITE_SUPABASE_URL` wurde in Vercel geändert, die App nutzt

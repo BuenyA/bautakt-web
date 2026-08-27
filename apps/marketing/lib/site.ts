@@ -6,8 +6,78 @@
  * Komponente schreiben — sonst zeigen Preview-Deployments auf die Produktion.
  */
 
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bautakt.com';
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.bautakt.com';
+/**
+ * Faellt auf den Standard zurueck, wenn die Variable fehlt **oder leer ist**.
+ *
+ * ⚠️ Nicht durch `??` ersetzen. Nullish-Coalescing faengt nur `null` und
+ * `undefined` — nicht den leeren String. Genau den liefert aber eine Variable,
+ * die im Vercel-Dashboard angelegt, aber nicht befuellt wurde. Am 2026-08-27 hat
+ * das den ersten Production-Build abgebrochen: `new URL('')` wirft.
+ *
+ * Der Aufrufer muss `process.env.NEXT_PUBLIC_*` woertlich uebergeben. Next
+ * ersetzt diesen Ausdruck zur Build-Zeit statisch; ein dynamischer Zugriff wie
+ * `process.env[name]` wuerde im Browser-Bundle leer bleiben.
+ */
+function urlOrFallback(value: string | undefined, fallback: string): string {
+  const trimmed = value?.trim();
+  if (!trimmed) return fallback;
+
+  // Auch ein nicht-leerer Wert kann unbrauchbar sein. `bautakt.com` ohne Schema
+  // ist ein naheliegender Vertipper im Vercel-Formular — und `new URL()` wirft
+  // darauf genauso wie auf den leeren String. Der Build darf daran nicht
+  // scheitern, aber der Fehler muss im Build-Log sichtbar sein.
+  try {
+    void new URL(trimmed);
+    return trimmed;
+  } catch {
+    console.warn(
+      `[site] NEXT_PUBLIC_* enthaelt keine gueltige URL: "${trimmed}". ` +
+        `Fallback auf ${fallback}. Absolute URL mit Schema erwartet, z. B. https://bautakt.com`,
+    );
+    return fallback;
+  }
+}
+
+export const SITE_URL = urlOrFallback(process.env.NEXT_PUBLIC_SITE_URL, 'https://bautakt.com');
+export const APP_URL = urlOrFallback(process.env.NEXT_PUBLIC_APP_URL, 'https://app.bautakt.com');
+
+/** Der einzige Host, unter dem die Seite oeffentlich sichtbar sein soll. */
+const PRODUCTION_HOST = 'bautakt.com';
+
+/**
+ * Ob dieses Deployment die oeffentliche Produktionsseite ist.
+ *
+ * ⚠️ Steuert die Indexierung. Ein Vercel-**Production**-Deployment ist auch auf
+ * einer `.vercel.app`-Domain fuer Google erreichbar — nur *Preview*-Deployments
+ * bekommen automatisch `X-Robots-Tag: noindex`. Ohne diese Pruefung wuerde die
+ * Entwicklungsfassung mitsamt Platzhalter-Preisen indexiert und spaeter mit der
+ * echten Domain um dieselben Inhalte konkurrieren.
+ *
+ * ⚠️ Bewusst nicht gegen `SITE_URL` geprueft, sondern gegen die **rohe** Variable.
+ * Waere hier `SITE_URL` benutzt, wuerde dessen Fallback auf `bautakt.com` ein
+ * Deployment ohne gesetzte Variable als Produktion ausweisen und freigeben —
+ * also genau im unkonfigurierten Fall die unsichere Richtung waehlen.
+ *
+ * Indexierung ist deshalb eine ausdrueckliche Entscheidung: sie verlangt, dass
+ * `NEXT_PUBLIC_SITE_URL` explizit auf die Produktionsdomain gesetzt ist. Alles
+ * andere — fehlend, leer, unlesbar, fremde Domain — bedeutet „nicht
+ * indexieren". Dieselbe Richtung wie `hasPermission` in @bautakt/core: im
+ * Zweifel die geschlossene Variante.
+ *
+ * Die Kehrseite gehoert auf die Go-live-Checkliste: ohne gesetzte Variable
+ * bleibt auch die echte Seite auf `noindex`. Siehe wiki/pages/deployment-vercel.md.
+ */
+export const IS_PRODUCTION_SITE = ((): boolean => {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (!raw) return false;
+
+  try {
+    const { hostname } = new URL(raw);
+    return hostname === PRODUCTION_HOST || hostname === `www.${PRODUCTION_HOST}`;
+  } catch {
+    return false;
+  }
+})();
 
 export const LOGIN_URL = `${APP_URL}/login`;
 export const REGISTER_URL = `${APP_URL}/registrieren`;
