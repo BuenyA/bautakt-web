@@ -6,8 +6,25 @@
  * Komponente schreiben — sonst zeigen Preview-Deployments auf die Produktion.
  */
 
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bautakt.com';
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.bautakt.com';
+/**
+ * Faellt auf den Standard zurueck, wenn die Variable fehlt **oder leer ist**.
+ *
+ * ⚠️ Nicht durch `??` ersetzen. Nullish-Coalescing faengt nur `null` und
+ * `undefined` — nicht den leeren String. Genau den liefert aber eine Variable,
+ * die im Vercel-Dashboard angelegt, aber nicht befuellt wurde. Am 2026-08-27 hat
+ * das den ersten Production-Build abgebrochen: `new URL('')` wirft.
+ *
+ * Der Aufrufer muss `process.env.NEXT_PUBLIC_*` woertlich uebergeben. Next
+ * ersetzt diesen Ausdruck zur Build-Zeit statisch; ein dynamischer Zugriff wie
+ * `process.env[name]` wuerde im Browser-Bundle leer bleiben.
+ */
+function urlOrFallback(value: string | undefined, fallback: string): string {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : fallback;
+}
+
+export const SITE_URL = urlOrFallback(process.env.NEXT_PUBLIC_SITE_URL, 'https://bautakt.com');
+export const APP_URL = urlOrFallback(process.env.NEXT_PUBLIC_APP_URL, 'https://app.bautakt.com');
 
 export const LOGIN_URL = `${APP_URL}/login`;
 export const REGISTER_URL = `${APP_URL}/registrieren`;

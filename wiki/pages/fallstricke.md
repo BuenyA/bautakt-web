@@ -100,6 +100,38 @@ typegen`. Vor dem ersten Build existieren sie nicht.
 gehört ins Script, nicht in eine Notiz. Alternativ Nexts globale Typen gar nicht
 verwenden — `RootLayout` typt seine `children` deshalb explizit.
 
+## `??` fängt die leere Env-Variable nicht
+
+_Passiert 2026-08-27, beim allerersten Vercel-Build._
+
+**Symptom:** Der Marketing-Build bricht in Vercel ab mit
+`TypeError: Invalid URL … input: ''` an `new URL(SITE_URL)` in `app/layout.tsx`.
+Lokal baut dasselbe Commit sauber.
+
+`SITE_URL` stand als `process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bautakt.com'`
+da. Nullish-Coalescing greift aber nur bei `null` und `undefined` — **nicht beim
+leeren String**. Eine im Vercel-Dashboard angelegte, aber nicht befüllte Variable
+liefert genau den. Lokal existierte die Variable gar nicht, dort griff der
+Fallback also korrekt: der Fehler ist deshalb nur in Vercel sichtbar.
+
+**Lösung:** Env-Werte nie mit `??` absichern. Leer wie fehlend behandeln:
+
+```ts
+const trimmed = value?.trim();
+return trimmed ? trimmed : fallback;
+```
+
+Wo es keinen sinnvollen Standard gibt — `VITE_SUPABASE_URL` etwa —, gehört kein
+Fallback hin, sondern ein `throw` mit lesbarer Meldung. Sonst scheitert
+supabase-js tief im Inneren, das Deploy ist grün und die Seite weiß.
+
+⚠️ Beim Refactoring darauf achten, dass `process.env.NEXT_PUBLIC_*` bzw.
+`import.meta.env.VITE_*` **wörtlich** an der Aufrufstelle stehen bleibt. Beide
+Bundler ersetzen diesen Ausdruck statisch; ein dynamischer Zugriff über
+`process.env[name]` bliebe im Bundle leer. Als Funktions*argument* funktioniert
+die Ersetzung — das wurde für beide Apps am gebauten Bundle nachgeprüft, nicht
+am Quelltext.
+
 ## Env-Änderung in Vercel wirkt nicht
 
 **Symptom:** Der Wert von `VITE_SUPABASE_URL` wurde in Vercel geändert, die App nutzt

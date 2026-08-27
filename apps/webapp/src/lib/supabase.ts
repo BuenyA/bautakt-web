@@ -11,7 +11,30 @@ import { createBautaktClient } from '@bautakt/supabase';
  * Mobile-App EXPO_PUBLIC_* und in Next NEXT_PUBLIC_*. Deshalb nimmt
  * createBautaktClient die Werte als Argumente entgegen.
  */
+/**
+ * Erzwingt einen nicht-leeren Wert.
+ *
+ * ⚠️ Ein fehlender Wert darf hier keinen Fallback bekommen — es gibt keine
+ * sinnvolle Standard-Datenbank. Ohne diese Pruefung wuerde supabase-js tief im
+ * Inneren mit „supabaseUrl is required" scheitern: das Deploy waere gruen und
+ * die Seite weiss. Diese Meldung sagt stattdessen, was zu tun ist.
+ *
+ * Auf den leeren String pruefen, nicht nur auf `undefined`: eine im
+ * Vercel-Dashboard angelegte, aber nicht befuellte Variable liefert `''`. Genau
+ * das hat am 2026-08-27 den Marketing-Build abgebrochen.
+ */
+function requireEnv(name: string, value: string | undefined): string {
+  const trimmed = value?.trim();
+  if (!trimmed) {
+    throw new Error(
+      `${name} fehlt oder ist leer. In den Vercel-Projekteinstellungen setzen und ` +
+        'neu deployen — Vite ersetzt VITE_* zur Build-Zeit, ein Neustart genuegt nicht.',
+    );
+  }
+  return trimmed;
+}
+
 export const supabase = createBautaktClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY,
+  requireEnv('VITE_SUPABASE_URL', import.meta.env.VITE_SUPABASE_URL),
+  requireEnv('VITE_SUPABASE_ANON_KEY', import.meta.env.VITE_SUPABASE_ANON_KEY),
 );
