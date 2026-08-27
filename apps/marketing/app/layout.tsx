@@ -5,10 +5,18 @@ import type { ReactNode } from 'react';
 
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
-import { absoluteUrl, site, SITE_URL } from '@/lib/site';
+import { absoluteUrl, IS_PRODUCTION_SITE, site, SITE_URL } from '@/lib/site';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  /**
+   * ⚠️ Sperrt die Indexierung ausserhalb von bautakt.com. `robots.txt` allein
+   * genuegt nicht — `Disallow` verhindert das Crawlen, nicht das Indexieren.
+   *
+   * In Produktion bleibt das Feld leer, damit die Standardregeln gelten und die
+   * Rechtsseiten ihr eigenes `robots: { index: false }` weiterhin selbst setzen.
+   */
+  ...(IS_PRODUCTION_SITE ? {} : { robots: { index: false, follow: false } }),
   title: {
     default: `${site.name} — ${site.tagline}`,
     template: `%s | ${site.name}`,

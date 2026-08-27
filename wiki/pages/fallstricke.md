@@ -132,6 +132,29 @@ Bundler ersetzen diesen Ausdruck statisch; ein dynamischer Zugriff über
 die Ersetzung — das wurde für beide Apps am gebauten Bundle nachgeprüft, nicht
 am Quelltext.
 
+## Das Dev-Deployment landet bei Google
+
+**Symptom:** `bautakt-marketing.vercel.app` taucht in der Suche auf — mit
+Platzhalter-Preisen und halbfertigen Texten. Später konkurriert es mit der echten
+Domain um dieselben Inhalte.
+
+Ein Vercel-**Production**-Deployment ist auch ohne Custom Domain öffentlich und
+crawlbar. Nur _Preview_-Deployments bekommen automatisch `X-Robots-Tag: noindex`. Das
+ist der Unterschied, den man leicht überliest: „kein eigener Domainname" heißt nicht
+„nicht auffindbar".
+
+**Lösung:** Zwei Ebenen, siehe [deployment-vercel.md](deployment-vercel.md). Im Code
+gibt `IS_PRODUCTION_SITE` nur bei ausdrücklich auf `bautakt.com` gesetzter
+`NEXT_PUBLIC_SITE_URL` frei; alles andere liefert `Disallow: /` **und** `noindex`.
+
+⚠️ `Disallow` in der `robots.txt` ist **kein** `noindex`. Es verhindert das Crawlen,
+nicht das Indexieren einer von woanders verlinkten URL. Beides ist nötig, und die
+Prüfung des einen ersetzt die des anderen nicht.
+
+Die Freigabe hängt bewusst an der **rohen** Umgebungsvariablen, nicht an `SITE_URL`.
+Deren Fallback ist `https://bautakt.com` — er würde ein unkonfiguriertes Deployment als
+Produktion ausweisen und damit ausgerechnet im ungeklärten Fall freigeben.
+
 ## Env-Änderung in Vercel wirkt nicht
 
 **Symptom:** Der Wert von `VITE_SUPABASE_URL` wurde in Vercel geändert, die App nutzt
