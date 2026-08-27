@@ -1,5 +1,6 @@
 import './globals.css';
 
+import { Analytics } from '@vercel/analytics/next';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
@@ -52,6 +53,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           // Statisches, selbst erzeugtes JSON-LD — keine Fremddaten.
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <Analytics />
       </body>
     </html>
   );
