@@ -1,6 +1,6 @@
 # Auth im Web
 
-Die gesamte Anmeldung lebt in `apps/app`. Die Marketing-Seite hat keinen
+Die gesamte Anmeldung lebt in `apps/webapp`. Die Marketing-Seite hat keinen
 Supabase-Client und verlinkt nur auf `app.bautakt.com/login` — damit entfällt jede
 Cross-Domain-Sitzung.
 

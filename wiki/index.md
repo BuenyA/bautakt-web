@@ -27,9 +27,10 @@ verlinkt, nie kopiert.
 
 ## Protokolle
 
-| Datum      | Eintrag                                                          |
-| ---------- | ---------------------------------------------------------------- |
-| 2026-08-26 | [Fundament des Monorepos](logs/2026-08-26-monorepo-fundament.md) |
+| Datum      | Eintrag                                                                       |
+| ---------- | ----------------------------------------------------------------------------- |
+| 2026-08-26 | [Fundament des Monorepos](logs/2026-08-26-monorepo-fundament.md)              |
+| 2026-08-27 | [`apps/app` heißt jetzt `apps/webapp`](logs/2026-08-27-umbenennung-webapp.md) |
 
 ## Die drei wichtigsten Sätze
 

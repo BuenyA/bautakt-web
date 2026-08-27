@@ -66,7 +66,7 @@ references go by URL, never by bare `#<nr>` — that would resolve to the wrong 
 | Path                                          | Role                                              |
 | --------------------------------------------- | ------------------------------------------------- |
 | `apps/marketing`                              | Next.js 16, App Router — `bautakt.com`            |
-| `apps/app`                                    | Vite + React + React Router — `app.bautakt.com`   |
+| `apps/webapp`                                 | Vite + React + React Router — `app.bautakt.com`   |
 | `packages/supabase`                           | Generated `Database` types and the client factory |
 | `packages/core`                               | Permission and role model, plus the drift check   |
 | `packages/ui`                                 | Design tokens and shadcn components               |
@@ -77,9 +77,9 @@ references go by URL, never by bare `#<nr>` — that would resolve to the wrong 
 
 ```bash
 npm install            # from the repository root
-npm run dev            # marketing :3000, app :5173, in parallel
+npm run dev            # marketing :3000, webapp :5173, in parallel
 npm run dev:marketing
-npm run dev:app
+npm run dev:webapp
 npm run build          # both apps, through turbo
 npm run lint
 npm run typecheck
@@ -139,7 +139,7 @@ upside is no build orchestration, no stale `dist/`, and HMR across package bound
 @bautakt/supabase    -> tsconfig
 @bautakt/ui          -> tsconfig
 apps/marketing       -> ui
-apps/app             -> ui, supabase, core
+apps/webapp          -> ui, supabase, core
 ```
 
 ⚠️ **`apps/marketing` deliberately has no Supabase dependency.** No client, no key in
@@ -147,10 +147,10 @@ the marketing bundle, no auth surface on `bautakt.com`. A contact form later goe
 through a Next route handler with a server-side key, never the browser client.
 
 **Path aliases differ per app** because `paths` resolves relative to the declaring
-tsconfig: marketing maps `@/*` to its own root (Next convention), `apps/app` maps it to
-`./src/*`. Both differ from `bautakt-app`, where `@/*` is the project root.
+tsconfig: marketing maps `@/*` to its own root (Next convention), `apps/webapp` maps it
+to `./src/*`. Both differ from `bautakt-app`, where `@/*` is the project root.
 
-## `apps/app`
+## `apps/webapp`
 
 React Router in **data mode** (`createBrowserRouter`), not framework mode — that one
 brings a server build and contradicts static hosting.
@@ -244,7 +244,7 @@ Never hardcode a hex when a token exists. Use `bg-primary`, not `tokens.blue`.
 The same two Supabase values carry three different names depending on the consumer.
 This is a real footgun.
 
-| Value          | `apps/marketing`                              | `apps/app`               | `bautakt-app`                   |
+| Value          | `apps/marketing`                              | `apps/webapp`            | `bautakt-app`                   |
 | -------------- | --------------------------------------------- | ------------------------ | ------------------------------- |
 | Supabase URL   | _(not set — no client here)_                  | `VITE_SUPABASE_URL`      | `EXPO_PUBLIC_SUPABASE_URL`      |
 | Public key     | _(not set)_                                   | `VITE_SUPABASE_ANON_KEY` | `EXPO_PUBLIC_SUPABASE_ANON_KEY` |
@@ -270,19 +270,19 @@ specific than the root's `!.env.example` and wins, which is how
 
 Two Vercel projects out of this one repo.
 
-|                            | `bautakt-marketing`                                           | `bautakt-app-web`               |
-| -------------------------- | ------------------------------------------------------------- | ------------------------------- |
-| Root Directory             | `apps/marketing`                                              | `apps/app`                      |
-| Include files outside root | **on** — `packages/` live outside                             | **on**                          |
-| Build Command              | `cd ../.. && npx turbo run build --filter=@bautakt/marketing` | `… --filter=@bautakt/app`       |
-| Output Directory           | (default)                                                     | `dist`                          |
-| Ignored Build Step         | `npx turbo-ignore @bautakt/marketing`                         | `npx turbo-ignore @bautakt/app` |
-| Domain                     | `bautakt.com` (+ `www` redirect)                              | `app.bautakt.com`               |
+|                            | `bautakt-marketing`                                           | `bautakt-webapp`                   |
+| -------------------------- | ------------------------------------------------------------- | ---------------------------------- |
+| Root Directory             | `apps/marketing`                                              | `apps/webapp`                      |
+| Include files outside root | **on** — `packages/` live outside                             | **on**                             |
+| Build Command              | `cd ../.. && npx turbo run build --filter=@bautakt/marketing` | `… --filter=@bautakt/webapp`       |
+| Output Directory           | (default)                                                     | `dist`                             |
+| Ignored Build Step         | `npx turbo-ignore @bautakt/marketing`                         | `npx turbo-ignore @bautakt/webapp` |
+| Domain                     | `bautakt.com` (+ `www` redirect)                              | `app.bautakt.com`                  |
 
-The second project is called `bautakt-app-web`, not `bautakt-app` — that name belongs to
+The second project is called `bautakt-webapp`, not `bautakt-app` — that name belongs to
 the mobile repo.
 
-⚠️ **`apps/app/vercel.json` is not optional.** Without the rewrite to `index.html`, a
+⚠️ **`apps/webapp/vercel.json` is not optional.** Without the rewrite to `index.html`, a
 direct hit on any sub-route returns Vercel's 404. This never shows up locally, because
 the Vite dev server rewrites everything anyway. It is a production-only failure. Note
 it must be `rewrites`, not `redirects`, and that Vercel serves static files _before_
