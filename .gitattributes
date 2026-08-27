@@ -1,0 +1,18 @@
+# Zeilenenden im Repo immer LF. Verhindert, dass Windows-Arbeitskopien
+# CRLF-Rauschen in Diffs tragen, die auf Vercel (Linux) gebaut werden.
+* text=auto eol=lf
+
+# Binaerdateien nie anfassen
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+
+# Generierte Dateien aus Diffs und Sprachstatistik heraushalten
+package-lock.json  -diff linguist-generated
+database.types.ts  -diff linguist-generated

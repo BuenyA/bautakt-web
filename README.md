@@ -1,30 +1,37 @@
 # bautakt-web
 
-Monorepo with two initialized applications:
+Monorepo für die Web-Seite von Bautakt.
 
-- **Marketing website**: Next.js app in `/home/runner/work/bautakt-web/bautakt-web/apps/marketing`
-- **Bautakt web app**: React (Vite) app in `/home/runner/work/bautakt-web/bautakt-web/apps/web` with an authentication mode (sign-in/sign-up toggle)
+| Workspace        | Zweck                                                | Domain            |
+| ---------------- | ---------------------------------------------------- | ----------------- |
+| `apps/marketing` | Marketing-Website (Next.js)                          | `bautakt.com`     |
+| `apps/app`       | Web-Anwendung (Vite + React)                         | `app.bautakt.com` |
+| `packages/*`     | Geteilte Pakete (Supabase-Types, UI-Tokens, Configs) | —                 |
 
-## Local development
+Die React-Native-App und das Supabase-Backend liegen im separaten Repo `bautakt-app`.
 
-From repository root (`/home/runner/work/bautakt-web/bautakt-web`):
+## Entwicklung
+
+Alle Befehle laufen aus der Repo-Wurzel:
 
 ```bash
 npm install
+npm run dev            # marketing :3000, app :5173
 npm run dev:marketing
-npm run dev:web
+npm run dev:app
 ```
 
-## Build
+## Prüfen und Bauen
 
 ```bash
-npm run build:marketing
-npm run build:web
+npm run lint
+npm run typecheck
+npm run build
 ```
 
-## Vercel deployment + bautakt.com
+## Deployment
 
-1. Create a Vercel project for `apps/marketing` and deploy it.
-2. In Vercel project settings, add custom domain `bautakt.com`.
-3. Update DNS records with your domain provider as requested by Vercel.
-4. (Optional) Create a separate Vercel project for `apps/web` (for example, on `app.bautakt.com`).
+Beide Apps werden aus diesem Repo als zwei getrennte Vercel-Projekte deployt
+(Root Directory `apps/marketing` bzw. `apps/app`).
+
+Agenten-Richtlinien stehen in [AGENTS.md](./AGENTS.md).

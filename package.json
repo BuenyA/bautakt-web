@@ -2,15 +2,34 @@
   "name": "bautakt-web",
   "private": true,
   "version": "1.0.0",
+  "packageManager": "npm@11.6.4",
+  "engines": {
+    "node": ">=22"
+  },
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "scripts": {
-    "dev:marketing": "npm run dev --workspace marketing",
-    "dev:web": "npm run dev --workspace web",
-    "build:marketing": "npm run build --workspace marketing",
-    "build:web": "npm run build --workspace web",
-    "lint:marketing": "npm run lint --workspace marketing",
-    "lint:web": "npm run lint --workspace web"
+    "dev": "turbo run dev",
+    "dev:marketing": "turbo run dev --filter=@bautakt/marketing",
+    "dev:app": "turbo run dev --filter=@bautakt/app",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "turbo run lint typecheck && prettier --check ."
+  },
+  "devDependencies": {
+    "@bautakt/eslint-config": "*",
+    "@bautakt/tsconfig": "*",
+    "@types/node": "^22",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "eslint": "^9.39.5",
+    "prettier": "^3.6.2",
+    "turbo": "^2.5.8",
+    "typescript": "~5.9.3"
   }
 }

@@ -1,0 +1,190 @@
+/**
+ * Design-Tokens von Bautakt für das Web.
+ *
+ * Portiert aus bautakt-app/app/constants/theme.ts (Stand 2026-08-26). Die dort
+ * notierten WCAG-Kontrastwerte sind mitgenommen — sie sind der halbe Wert der
+ * Datei. Die Werte sind berechnet (relative Luminanz nach WCAG 2.1) und gelten
+ * gegen die jeweils genannte Fläche.
+ *
+ * ⚠️ Diese Datei ist für das Web kanonisch. Weicht etwas von bautakt-app ab,
+ * wird die Abweichung ZUERST dort behoben und dann hierher übernommen — nicht
+ * umgekehrt. Die Mobile-App ist älter und hat die Kontrastarbeit geleistet.
+ *
+ * Die Variablennamen folgen der Konvention von shadcn/ui, damit dessen
+ * Komponenten unverändert funktionieren. Bautakt-eigene Tokens stehen darunter.
+ */
+
+@import 'tailwindcss';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.625rem;
+
+  /* --- Flächen / Elevation --- */
+  --background: #ffffff;
+  --background-second: #f7f8fa;
+  --background-third: #eceff3;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --surface: #f4f6f8; /* minimal kühler, harmoniert mit dem blauen Primary */
+  --input: #f1f3f6; /* hebt sich bewusst von surface ab */
+  --border: #e4e7ec;
+  --border-strong: #cfd4dc;
+
+  /* --- Text --- */
+  --foreground: #111827; /* 17.74:1 auf background — AAA */
+  --card-foreground: #111827;
+  --popover-foreground: #111827;
+  --text-secondary: #374151; /* 10.31:1 — AAA */
+  --muted-foreground: #4b5563; /* 7.56:1 */
+  --text-subtle: #646d7a; /* war #9ca3af (2.54:1, FAIL) — jetzt 5.24:1 */
+  /* Bewusst schwach: ein Platzhalter darf sich nicht wie eingegebener Inhalt
+     lesen. 1.97:1 auf input. Siehe Hinweis am Dateiende. */
+  --text-placeholder: #a9b0ba;
+
+  /* --- Primary --- */
+  --primary: #0a66c2; /* 5.69:1 auf background */
+  --primary-foreground: #ffffff; /* 5.69:1 */
+  --accent: #e7f3ff; /* primary darauf: 5.05:1 */
+  --accent-foreground: #0a66c2;
+  --ring: #0a66c2;
+
+  /* --- Sekundär / Muted --- */
+  --secondary: #f4f6f8;
+  --secondary-foreground: #374151;
+  --muted: #f4f6f8;
+
+  /* --- Danger --- */
+  --destructive: #d82121; /* war #EF4444 (3.76:1, FAIL) — jetzt 5.05:1 auf card */
+  --destructive-foreground: #ffffff;
+  --destructive-solid: #dc2626; /* weißer Text darauf 4.83:1 */
+  --destructive-bg: #fff5f5; /* destructive darauf 4.72:1 */
+
+  /* --- Success --- */
+  --success: #15803d; /* war #16a34a (3.05:1, FAIL) — jetzt 5.02:1 */
+  --success-foreground: #ffffff;
+  --success-bg: #f0fdf4; /* success darauf: 4.79:1 */
+
+  /* --- Warnung --- */
+  --warning: #ff5c00;
+  --warning-bg: rgba(255, 92, 0, 0.08);
+  --warning-border: rgba(255, 92, 0, 0.2);
+}
+
+.dark {
+  /* --- Flächen / Elevation --- */
+  --background: #0d0e14;
+  --background-second: #12141c;
+  --background-third: #181b25;
+  --card: #212632; /* hebt sich klar von surface ab, ohne aufzuhellen */
+  --popover: #212632;
+  --surface: #1b1f29;
+  --input: #1b1f29; /* == surface, bewusst (wie im Light-Mode) */
+  --border: #272c38;
+  --border-strong: #3a4150;
+
+  /* --- Text --- */
+  --foreground: #f2f4f8; /* reines Weiß blendet auf Dunkel — 17.50:1, AAA */
+  --card-foreground: #f2f4f8;
+  --popover-foreground: #f2f4f8;
+  --text-secondary: #b7becc; /* 10.32:1 — AAA */
+  --muted-foreground: #949dae; /* war #5C5C5C (3.02:1, FAIL) — jetzt 7.06:1 */
+  --text-subtle: #868fa0; /* 5.92:1 */
+  --text-placeholder: #474e5c; /* 1.97:1 auf input, eingegebener Text 14.96:1 */
+
+  /* --- Primary --- */
+  --primary: #4fa3e3; /* #0a66c2 erreicht auf dark.background nur 3.39:1 — dieser Ton 7.05:1 */
+  --primary-foreground: #0d0e14; /* 7.05:1 */
+  --accent: #101f35; /* primary darauf: 6.05:1 */
+  --accent-foreground: #4fa3e3;
+  --ring: #4fa3e3;
+
+  /* --- Sekundär / Muted --- */
+  --secondary: #1b1f29;
+  --secondary-foreground: #b7becc;
+  --muted: #1b1f29;
+
+  /* --- Danger --- */
+  --destructive: #f25a5a; /* 5.86:1 auf background, 4.60:1 auf card */
+  --destructive-foreground: #ffffff;
+  --destructive-solid: #dc2626;
+  --destructive-bg: #2a1518;
+
+  /* --- Success --- */
+  --success: #4ade80;
+  --success-foreground: #0d0e14;
+  --success-bg: #10231a;
+
+  /* --- Warnung --- */
+  --warning: #ff5c00;
+  --warning-bg: rgba(255, 92, 0, 0.14);
+  --warning-border: rgba(255, 92, 0, 0.28);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-background-second: var(--background-second);
+  --color-background-third: var(--background-third);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-surface: var(--surface);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-solid: var(--destructive-solid);
+  --color-destructive-bg: var(--destructive-bg);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-bg: var(--success-bg);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-border: var(--warning-border);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-subtle: var(--text-subtle);
+  --color-text-placeholder: var(--text-placeholder);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/**
+ * Bewusste Abweichung von WCAG AA
+ *
+ * --text-placeholder liegt in beiden Modi bei ~2.0:1 und damit unter der
+ * AA-Schwelle von 4.5:1. Das ist eine bewusste Entscheidung: ein Platzhalter,
+ * der wie ein bereits eingegebener Wert aussieht, ist selbst ein
+ * Usability-Fehler. Abgemildert dadurch, dass jedes Feld ein sichtbares Label
+ * trägt — der Platzhalter ist Hinweis, nicht Beschriftung.
+ *
+ * Deshalb ausschließlich für Placeholder verwenden. Für echten Sekundärtext
+ * gehören --muted-foreground / --text-subtle her.
+ *
+ * --border / --border-strong liegen absichtlich unter AA: sie sind dekorative
+ * Trenner und nicht das alleinige Erkennungsmerkmal einer Komponente.
+ */

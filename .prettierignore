@@ -1,0 +1,11 @@
+node_modules
+dist
+build
+.next
+out
+.turbo
+coverage
+package-lock.json
+*.tsbuildinfo
+# Generiert — nie formatieren, sonst rauscht jede Neugenerierung im Diff
+packages/supabase/src/database.types.ts

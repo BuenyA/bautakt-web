@@ -1,0 +1,22 @@
+{
+  "name": "@bautakt/core",
+  "version": "0.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "check:permissions": "node --experimental-strip-types scripts/check-permission-drift.ts"
+  },
+  "devDependencies": {
+    "@bautakt/eslint-config": "*",
+    "@bautakt/tsconfig": "*",
+    "@supabase/supabase-js": "^2.100.1"
+  }
+}
