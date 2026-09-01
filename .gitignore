@@ -8,10 +8,12 @@ node_modules/
 !.yarn/releases
 !.yarn/versions
 
-# Env — niemals committen. Nur das Beispiel ist erlaubt.
+# Env — niemals committen. Ausnahme: Beispiel und die pre-go-live
+# Production-Alias-Datei der Marketing-App (nur oeffentliche URLs, keine Secrets).
 .env
 .env.*
 !.env.example
+!apps/marketing/.env.production
 
 # Build-Ausgaben
 .next/
