@@ -81,8 +81,13 @@ das Crawlen, nicht das Indexieren einer von woanders verlinkten URL.
 Die Codeebene existiert, damit die Absicherung eine Änderung an den Projekteinstellungen
 überlebt — und damit Hobby-Production ohne Custom Domain nicht bei Google landet.
 
-`NEXT_PUBLIC_SITE_URL` im Entwicklungsmodus trotzdem auf die `.vercel.app`-Adresse
-setzen — sonst zeigen Canonical-Tags und Sitemap auf eine Domain, die nichts ausliefert.
+`NEXT_PUBLIC_SITE_URL` im Entwicklungsmodus auf die `.vercel.app`-Adresse setzen
+(`https://bautakt-web-marketing.vercel.app`) — sonst zeigen Canonical-Tags und Sitemap
+auf eine Domain, die nichts ausliefert (historisch: IONOS-Parking unter `bautakt.com`).
+`apps/marketing/.env.production` und der `SITE_URL`-Fallback in `lib/site.ts` tragen
+denselben Alias, damit eine leere Dashboard-Variable den Parking-Canonical nicht
+wiederherstellt. `IS_PRODUCTION_SITE` liest weiterhin die **rohe** Env und bleibt
+auf dem Alias `false` (noindex).
 
 ### Go-live-Checkliste
 

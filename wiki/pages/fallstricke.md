@@ -154,8 +154,10 @@ nicht das Indexieren einer von woanders verlinkten URL. Meta und Header decken d
 die Prüfung des einen ersetzt die der anderen nicht.
 
 Die Freigabe hängt bewusst an der **rohen** Umgebungsvariablen, nicht an `SITE_URL`.
-Deren Fallback ist `https://bautakt.com` — er würde ein unkonfiguriertes Deployment als
-Produktion ausweisen und damit ausgerechnet im ungeklärten Fall freigeben.
+`SITE_URL` fällt pre-go-live auf den `.vercel.app`-Alias zurück (nicht auf
+`bautakt.com`, damit Canonicals nicht auf die IONOS-Parking-Seite zeigen). Wäre die
+Gate an `SITE_URL` gekoppelt, würde der Fallback die Freigabe steuern — die Absicht
+ist das Gegenteil: nur die explizit auf `bautakt.com` gesetzte Roh-Env gibt frei.
 
 ## Env-Änderung in Vercel wirkt nicht
 

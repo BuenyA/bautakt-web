@@ -38,7 +38,12 @@ function urlOrFallback(value: string | undefined, fallback: string): string {
   }
 }
 
-export const SITE_URL = urlOrFallback(process.env.NEXT_PUBLIC_SITE_URL, 'https://bautakt.com');
+// Pre-go-live-Fallback: Production-Alias, nicht bautakt.com (IONOS-Parking).
+// Go-live setzt NEXT_PUBLIC_SITE_URL=https://bautakt.com in Vercel + Redeploy.
+export const SITE_URL = urlOrFallback(
+  process.env.NEXT_PUBLIC_SITE_URL,
+  'https://bautakt-web-marketing.vercel.app',
+);
 export const APP_URL = urlOrFallback(process.env.NEXT_PUBLIC_APP_URL, 'https://app.bautakt.com');
 
 /** Der einzige Host, unter dem die Seite oeffentlich sichtbar sein soll. */
@@ -55,15 +60,16 @@ const PRODUCTION_HOST = 'bautakt.com';
  * reichen nicht — `next.config.ts` setzt deshalb zusaetzlich `X-Robots-Tag`.
  *
  * ⚠️ Bewusst nicht gegen `SITE_URL` geprueft, sondern gegen die **rohe** Variable.
- * Waere hier `SITE_URL` benutzt, wuerde dessen Fallback auf `bautakt.com` ein
- * Deployment ohne gesetzte Variable als Produktion ausweisen und freigeben —
- * also genau im unkonfigurierten Fall die unsichere Richtung waehlen.
+ * `SITE_URL` faellt pre-go-live auf den `.vercel.app`-Alias zurueck — der ist
+ * bewusst *nicht* die oeffentliche Domain. Wuerde hier `SITE_URL` benutzt, waere
+ * die Gate-Logik an den Fallback gekoppelt; die Freigabe muss aber nur greifen,
+ * wenn die **rohe** Env explizit auf `bautakt.com` / `www.bautakt.com` steht.
  *
  * Indexierung ist deshalb eine ausdrueckliche Entscheidung: sie verlangt, dass
  * `NEXT_PUBLIC_SITE_URL` explizit auf die Produktionsdomain gesetzt ist. Alles
- * andere — fehlend, leer, unlesbar, fremde Domain — bedeutet „nicht
- * indexieren". Dieselbe Richtung wie `hasPermission` in @bautakt/core: im
- * Zweifel die geschlossene Variante.
+ * andere — fehlend, leer, unlesbar, fremde Domain (inkl. `.vercel.app`) —
+ * bedeutet „nicht indexieren". Dieselbe Richtung wie `hasPermission` in
+ * @bautakt/core: im Zweifel die geschlossene Variante.
  *
  * Die Kehrseite gehoert auf die Go-live-Checkliste: ohne gesetzte Variable
  * bleibt auch die echte Seite auf `noindex`. Siehe wiki/pages/deployment-vercel.md.
