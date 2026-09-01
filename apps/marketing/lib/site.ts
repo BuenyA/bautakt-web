@@ -51,7 +51,8 @@ const PRODUCTION_HOST = 'bautakt.com';
  * einer `.vercel.app`-Domain fuer Google erreichbar — nur *Preview*-Deployments
  * bekommen automatisch `X-Robots-Tag: noindex`. Ohne diese Pruefung wuerde die
  * Entwicklungsfassung mitsamt Platzhalter-Preisen indexiert und spaeter mit der
- * echten Domain um dieselben Inhalte konkurrieren.
+ * echten Domain um dieselben Inhalte konkurrieren. Meta und robots.txt allein
+ * reichen nicht — `next.config.ts` setzt deshalb zusaetzlich `X-Robots-Tag`.
  *
  * ⚠️ Bewusst nicht gegen `SITE_URL` geprueft, sondern gegen die **rohe** Variable.
  * Waere hier `SITE_URL` benutzt, wuerde dessen Fallback auf `bautakt.com` ein

@@ -61,19 +61,25 @@ Nur _Preview_-Deployments bekommen automatisch `X-Robots-Tag: noindex`. Ohne Vor
 würde die Entwicklungsfassung mitsamt Platzhalter-Preisen indexiert und später mit der
 echten Domain um dieselben Inhalte konkurrieren.
 
-Zwei Ebenen, beide aktiv:
+Drei Code-Ebenen, gesteuert von `IS_PRODUCTION_SITE` (plus optional Vercel Authentication
+auf Plänen, die Production Protection erlauben — Hobby kann Production nicht dahinter
+legen):
 
-1. **Vercel → Settings → Deployment Protection → Vercel Authentication.** Sperrt das
-   gesamte Deployment hinter den Vercel-Login. Die eigentliche Antwort auf „noch nicht
-   öffentlich"; wirkt auch gegen alles, was keine Suchmaschine ist.
-2. **Im Code.** `IS_PRODUCTION_SITE` in `apps/marketing/lib/site.ts` gibt nur dann frei,
-   wenn `NEXT_PUBLIC_SITE_URL` **ausdrücklich** auf `bautakt.com` steht. Fehlend, leer,
-   unlesbar oder fremde Domain heißt `Disallow: /` in der `robots.txt` **und**
-   `noindex, nofollow` im Root-Layout. Beides zusammen, weil `Disallow` nur das Crawlen
-   verhindert, nicht das Indexieren einer von woanders verlinkten URL.
+1. **`robots.txt`** — `Disallow: /`, solange nicht Produktion.
+2. **Meta `robots`** im Root-Layout — `noindex, nofollow, nocache` plus explizites
+   `googleBot`. Rechtsseiten behalten ihr eigenes `robots: { index: false }`.
+3. **`X-Robots-Tag: noindex, nofollow, noarchive`** über `headers()` in
+   `apps/marketing/next.config.ts`. Greift auch auf `/robots.txt` und ausgeliefertes
+   HTML. Vercel setzt diesen Header automatisch nur auf _Preview_-Deployments; ein
+   Production-Alias auf `.vercel.app` braucht ihn aus dem Code.
+
+`IS_PRODUCTION_SITE` in `apps/marketing/lib/site.ts` gibt nur dann frei, wenn
+`NEXT_PUBLIC_SITE_URL` **ausdrücklich** auf `bautakt.com` steht. Fehlend, leer,
+unlesbar oder fremde Domain heißt alle drei Sperren. `Disallow` allein verhindert nur
+das Crawlen, nicht das Indexieren einer von woanders verlinkten URL.
 
 Die Codeebene existiert, damit die Absicherung eine Änderung an den Projekteinstellungen
-überlebt.
+überlebt — und damit Hobby-Production ohne Custom Domain nicht bei Google landet.
 
 `NEXT_PUBLIC_SITE_URL` im Entwicklungsmodus trotzdem auf die `.vercel.app`-Adresse
 setzen — sonst zeigen Canonical-Tags und Sitemap auf eine Domain, die nichts ausliefert.
@@ -91,8 +97,10 @@ echte Seite auf `noindex`.** Beim Schalten auf die eigene Domain deshalb der Rei
    Sitemap-Verweis stehen. Steht da `Disallow: /`, hat Schritt 2 oder 3 gefehlt.
 6. Im Quelltext der Startseite prüfen, dass **kein** `noindex` steht. Impressum,
    Datenschutz und AGB behalten ihr eigenes `noindex` — das ist Absicht.
+7. `curl -sI https://bautakt.com/` und `/robots.txt`: **kein** `x-robots-tag` mit
+   `noindex`. Solange der Header noch da ist, hat Schritt 2 oder 3 gefehlt.
 
-Schritt 5 und 6 gegen das ausgelieferte Ergebnis prüfen, nicht gegen die Einstellung.
+Schritt 5–7 gegen das ausgelieferte Ergebnis prüfen, nicht gegen die Einstellung.
 
 ## Supabase Auth
 

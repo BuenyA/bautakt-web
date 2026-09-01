@@ -143,13 +143,15 @@ crawlbar. Nur _Preview_-Deployments bekommen automatisch `X-Robots-Tag: noindex`
 ist der Unterschied, den man leicht überliest: „kein eigener Domainname" heißt nicht
 „nicht auffindbar".
 
-**Lösung:** Zwei Ebenen, siehe [deployment-vercel.md](deployment-vercel.md). Im Code
-gibt `IS_PRODUCTION_SITE` nur bei ausdrücklich auf `bautakt.com` gesetzter
-`NEXT_PUBLIC_SITE_URL` frei; alles andere liefert `Disallow: /` **und** `noindex`.
+**Lösung:** Drei Code-Ebenen, siehe [deployment-vercel.md](deployment-vercel.md). Im
+Code gibt `IS_PRODUCTION_SITE` nur bei ausdrücklich auf `bautakt.com` gesetzter
+`NEXT_PUBLIC_SITE_URL` frei; alles andere liefert `Disallow: /`, Meta-`noindex` **und**
+`X-Robots-Tag`. Vercel Authentication zusätzlich, wo der Plan Production Protection
+zulässt — Hobby kann Production nicht dahinter legen.
 
 ⚠️ `Disallow` in der `robots.txt` ist **kein** `noindex`. Es verhindert das Crawlen,
-nicht das Indexieren einer von woanders verlinkten URL. Beides ist nötig, und die
-Prüfung des einen ersetzt die des anderen nicht.
+nicht das Indexieren einer von woanders verlinkten URL. Meta und Header decken das ab;
+die Prüfung des einen ersetzt die der anderen nicht.
 
 Die Freigabe hängt bewusst an der **rohen** Umgebungsvariablen, nicht an `SITE_URL`.
 Deren Fallback ist `https://bautakt.com` — er würde ein unkonfiguriertes Deployment als

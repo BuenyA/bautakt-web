@@ -31,6 +31,7 @@ verlinkt, nie kopiert.
 | ---------- | ----------------------------------------------------------------------------- |
 | 2026-08-26 | [Fundament des Monorepos](logs/2026-08-26-monorepo-fundament.md)              |
 | 2026-08-27 | [`apps/app` heißt jetzt `apps/webapp`](logs/2026-08-27-umbenennung-webapp.md) |
+| 2026-09-01 | [X-Robots-Tag auf Marketing-Production](logs/2026-09-01-x-robots-tag.md)      |
 
 ## Die drei wichtigsten Sätze
 

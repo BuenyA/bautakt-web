@@ -7,8 +7,8 @@ import { absoluteUrl, IS_PRODUCTION_SITE } from '@/lib/site';
  *
  * Das allein reicht nicht: `Disallow` verhindert das *Crawlen*, nicht das
  * *Indexieren*. Eine von woanders verlinkte URL kann Google trotzdem in den
- * Index nehmen. Den zweiten Teil erledigt das Root-Layout mit
- * `robots: { index: false }`. Beide gehoeren zusammen.
+ * Index nehmen. Dazu kommen das Root-Layout (`noindex, nofollow, nocache`) und
+ * der `X-Robots-Tag`-Header in `next.config.ts`. Alle drei gehoeren zusammen.
  */
 export default function robots(): MetadataRoute.Robots {
   if (!IS_PRODUCTION_SITE) {
