@@ -12,11 +12,21 @@ export const metadata: Metadata = {
   /**
    * ⚠️ Sperrt die Indexierung ausserhalb von bautakt.com. `robots.txt` allein
    * genuegt nicht — `Disallow` verhindert das Crawlen, nicht das Indexieren.
+   * Der `X-Robots-Tag`-Header in `next.config.ts` ist die dritte Ebene.
    *
    * In Produktion bleibt das Feld leer, damit die Standardregeln gelten und die
    * Rechtsseiten ihr eigenes `robots: { index: false }` weiterhin selbst setzen.
    */
-  ...(IS_PRODUCTION_SITE ? {} : { robots: { index: false, follow: false } }),
+  ...(IS_PRODUCTION_SITE
+    ? {}
+    : {
+        robots: {
+          index: false,
+          follow: false,
+          nocache: true,
+          googleBot: { index: false, follow: false },
+        },
+      }),
   title: {
     default: `${site.name} — ${site.tagline}`,
     template: `%s | ${site.name}`,
