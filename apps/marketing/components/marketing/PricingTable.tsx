@@ -7,8 +7,9 @@ import { REGISTER_URL } from '@/lib/site';
 import { SectionHeading } from './SectionHeading';
 
 /**
- * Alle Pläne. Featured (Profi) mit Primary-Blau-Rahmen und Primary-CTA.
- * Basis/Betrieb: weiß mit Rahmen, Outline-CTA.
+ * Alle Pläne.
+ * Profi (featured): Primary #3B86E0, CTA „Kostenlos testen“.
+ * Basis/Betrieb: weiß, Rahmen anthrazit/grau, CTA „Loslegen“.
  */
 export function PricingTable() {
   return (
@@ -26,7 +27,7 @@ export function PricingTable() {
               className={cn(
                 plan.featured
                   ? 'border-primary shadow-md'
-                  : 'border-border bg-background shadow-none',
+                  : 'border-[#1C1F26]/25 bg-background shadow-none',
               )}
             >
               <CardHeader>
@@ -49,8 +50,14 @@ export function PricingTable() {
                     </li>
                   ))}
                 </ul>
-                <Button asChild variant={plan.featured ? 'default' : 'outline'}>
-                  <a href={REGISTER_URL}>{pricingCopy.ctaLabel}</a>
+                <Button
+                  asChild
+                  variant={plan.featured ? 'default' : 'outline'}
+                  className={cn(!plan.featured && 'border-[#1C1F26]/35 text-[#1C1F26]')}
+                >
+                  <a href={REGISTER_URL}>
+                    {plan.featured ? pricingCopy.featuredCtaLabel : pricingCopy.ctaLabel}
+                  </a>
                 </Button>
               </CardContent>
             </Card>

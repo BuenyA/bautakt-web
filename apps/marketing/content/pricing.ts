@@ -50,7 +50,10 @@ export const pricingCopy = {
   title: 'Pro Nutzer, monatlich kündbar',
   description: 'Sie zahlen nur für Mitarbeiter, die Bautakt tatsächlich nutzen.',
   allLinkLabel: 'Alle Preise',
+  /** Basis / Betrieb */
   ctaLabel: 'Loslegen',
+  /** Featured (Profi), Primary-CTA */
+  featuredCtaLabel: 'Kostenlos testen',
 } as const;
 
 /** Anzeige „Name: Preiszeile“, ohne Gedankenstrich. */

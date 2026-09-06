@@ -40,7 +40,7 @@ export function PricingFeatured() {
                 ))}
               </ul>
               <Button asChild>
-                <a href={REGISTER_URL}>{pricingCopy.ctaLabel}</a>
+                <a href={REGISTER_URL}>{pricingCopy.featuredCtaLabel}</a>
               </Button>
             </CardContent>
           </Card>
