@@ -19,4 +19,9 @@ export const faq: FaqItem[] = [
     question: 'Können wir Bautakt testen?',
     answer: 'Ja. Sie können ein Konto anlegen und den Betrieb unverbindlich einrichten.',
   },
+  {
+    question: 'Wie wird abgerechnet?',
+    answer:
+      'Pro Nutzer und Monat, auf Anfrage. Sie zahlen nur für Mitarbeiter, die Bautakt tatsächlich nutzen. Monatlich kündbar.',
+  },
 ];

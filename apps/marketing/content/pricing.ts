@@ -8,7 +8,7 @@ export type Plan = {
   featured?: boolean;
 };
 
-/** TODO: Preise noch nicht final — mit dem Vertrieb abstimmen, bevor die Seite live geht. */
+/** Preise bewusst ohne Euro-Beträge. Beträge folgen, wenn der Vertrieb sie freigibt. */
 export const plans: Plan[] = [
   {
     slug: 'basis',
@@ -47,3 +47,19 @@ export const plans: Plan[] = [
     ],
   },
 ];
+
+export const pricingCopy = {
+  eyebrow: 'Preise',
+  title: 'Pro Nutzer, monatlich kündbar',
+  description: 'Sie zahlen nur für Mitarbeiter, die Bautakt tatsächlich nutzen.',
+  allLinkLabel: 'Alle Preise',
+  ctaLabel: 'Loslegen',
+} as const;
+
+export function getFeaturedPlan(): Plan {
+  const featured = plans.find((plan) => plan.featured);
+  if (!featured) {
+    throw new Error('Kein Plan mit featured: true in content/pricing.ts');
+  }
+  return featured;
+}
