@@ -1,67 +1,62 @@
 /**
- * Dekoratives Phone+Plan-Mock für den Hero.
- * Kein echtes Produkt-Screenshot, nur eine stilisierte Silhouette.
+ * Phone-Mock für den Hero (Desktop-Referenz v4.4).
+ * Stilisiertes App-UI, kein echtes Screenshot-Asset.
  */
 export function HeroDevice() {
   return (
     <div
-      className="relative mx-auto mt-14 w-full max-w-lg animate-[hero-rise_0.7s_ease-out_0.15s_both]"
+      className="relative mx-auto flex w-full max-w-sm justify-center lg:max-w-none lg:justify-end"
       aria-hidden
     >
-      {/* Planungsfläche (hinter dem Phone) */}
-      <div className="absolute inset-x-8 top-6 bottom-0 rounded-2xl border border-border bg-background-second shadow-sm sm:inset-x-12">
-        <div className="flex flex-col gap-2 p-5 pt-8 sm:p-6 sm:pt-10">
-          <div className="h-2.5 w-24 rounded bg-border-strong/60" />
-          <div className="mt-2 grid grid-cols-4 gap-2">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-8 rounded-md bg-background"
-                style={{ opacity: 0.55 + (i % 3) * 0.12 }}
-              />
-            ))}
-          </div>
-          <div className="mt-3 h-2 w-32 rounded bg-border/80" />
-          <div className="h-2 w-20 rounded bg-border/60" />
-        </div>
-      </div>
-
-      {/* Phone */}
-      <div className="relative mx-auto w-[200px] sm:w-[220px]">
-        <div className="rounded-[1.75rem] border-[3px] border-[#1C1F26] bg-background shadow-lg">
-          <div className="mx-auto mt-2 h-1.5 w-16 rounded-full bg-[#1C1F26]/20" />
-          <div className="flex flex-col gap-3 px-3.5 pt-4 pb-5">
+      <div className="relative w-[240px] sm:w-[260px]">
+        <div className="rounded-[2rem] border-[5px] border-[#1C1F26] bg-background shadow-[0_24px_48px_-12px_rgba(28,31,38,0.28)]">
+          <div className="mx-auto mt-2.5 h-1.5 w-20 rounded-full bg-[#1C1F26]/15" />
+          <div className="flex flex-col gap-4 px-4 pt-4 pb-5">
+            {/* App-Header mit Signet */}
             <div className="flex items-center justify-between">
-              <div className="h-2 w-16 rounded bg-[#1C1F26]/25" />
-              <div className="h-5 w-5 rounded-full bg-primary/15" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/bautakt-signet.svg" alt="" width={28} height={28} className="h-7 w-7" />
+              <div className="size-7 rounded-full bg-background-third" />
             </div>
-            <div className="rounded-xl bg-accent p-3">
-              <div className="h-2 w-20 rounded bg-primary/40" />
-              <div className="mt-2 h-2 w-28 rounded bg-primary/20" />
-              <div className="mt-3 h-6 w-full rounded-md bg-primary/80" />
+
+            <div>
+              <p className="text-[0.65rem] font-medium text-text-subtle">Heute</p>
+              <p className="text-sm font-semibold text-[#1C1F26]">Dienstag, 20. Mai</p>
             </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2">
-                <div className="h-6 w-6 shrink-0 rounded-md bg-background-third" />
-                <div className="flex flex-1 flex-col gap-1">
-                  <div className="h-1.5 w-full rounded bg-[#1C1F26]/20" />
-                  <div className="h-1.5 w-2/3 rounded bg-[#1C1F26]/10" />
+
+            <div>
+              <p className="mb-2 text-[0.7rem] font-semibold text-[#1C1F26]">Laufende Aufträge</p>
+              <div className="flex flex-col gap-2">
+                <div className="rounded-xl border border-border bg-background-second px-3 py-2.5">
+                  <p className="text-xs font-medium text-[#1C1F26]">Kundenanbau Müller</p>
+                  <p className="mt-0.5 text-[0.65rem] text-text-subtle">In Arbeit</p>
+                </div>
+                <div className="rounded-xl border border-border px-3 py-2.5">
+                  <p className="text-xs font-medium text-[#1C1F26]">Sanierung Schmidt</p>
+                  <p className="mt-0.5 text-[0.65rem] text-text-subtle">Geplant</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2">
-                <div className="h-6 w-6 shrink-0 rounded-md bg-background-third" />
-                <div className="flex flex-1 flex-col gap-1">
-                  <div className="h-1.5 w-full rounded bg-[#1C1F26]/20" />
-                  <div className="h-1.5 w-1/2 rounded bg-[#1C1F26]/10" />
+            </div>
+
+            <div className="rounded-xl bg-accent px-3 py-3">
+              <p className="text-[0.7rem] font-semibold text-accent-foreground">Zeiterfassung</p>
+              <div className="mt-2 flex items-center gap-3">
+                <div className="relative flex size-12 items-center justify-center rounded-full border-[3px] border-primary/30 border-t-primary">
+                  <span className="text-[0.55rem] font-semibold text-primary">5h 30m</span>
+                </div>
+                <div>
+                  <p className="text-[0.65rem] text-text-secondary">von 8h</p>
+                  <p className="text-[0.65rem] font-medium text-[#1C1F26]">Kundenanbau Müller</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 opacity-70">
-                <div className="h-6 w-6 shrink-0 rounded-md bg-background-third" />
-                <div className="flex flex-1 flex-col gap-1">
-                  <div className="h-1.5 w-4/5 rounded bg-[#1C1F26]/15" />
-                  <div className="h-1.5 w-2/5 rounded bg-[#1C1F26]/10" />
-                </div>
-              </div>
+            </div>
+
+            {/* Bottom-Nav */}
+            <div className="mt-1 flex justify-between border-t border-border pt-3 text-[0.55rem] text-text-subtle">
+              <span className="font-semibold text-primary">Übersicht</span>
+              <span>Aufträge</span>
+              <span>Zeiten</span>
+              <span>Rechnungen</span>
             </div>
           </div>
         </div>

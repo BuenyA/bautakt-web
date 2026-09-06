@@ -9,7 +9,7 @@ import { Container } from './Container';
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur">
       <Container className="flex h-16 items-center justify-between gap-4">
         <Logo />
 
@@ -25,12 +25,15 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
-          {/* Anmelden nur im Header. Hero nutzt „Funktionen ansehen“. */}
-          <Button asChild variant="ghost" size="sm">
-            <a href={LOGIN_URL}>Anmelden</a>
-          </Button>
-          <Button asChild size="sm">
+        <div className="flex items-center gap-3">
+          {/* Anmelden nur im Header, als Textlink laut Desktop-Referenz. */}
+          <a
+            href={LOGIN_URL}
+            className="text-sm font-medium text-[#1C1F26] transition-colors hover:text-primary"
+          >
+            Anmelden
+          </a>
+          <Button asChild size="sm" className="rounded-full px-4">
             <a href={REGISTER_URL}>Kostenlos testen</a>
           </Button>
         </div>
