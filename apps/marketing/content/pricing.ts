@@ -1,8 +1,8 @@
 export type Plan = {
   slug: string;
   name: string;
-  price: string;
-  interval: string;
+  /** Preiszeile ohne Gedankenstrich, z. B. „auf Anfrage, pro Nutzer und Monat“. */
+  priceLine: string;
   description: string;
   features: string[];
   featured?: boolean;
@@ -13,16 +13,14 @@ export const plans: Plan[] = [
   {
     slug: 'basis',
     name: 'Basis',
-    price: 'auf Anfrage',
-    interval: 'pro Nutzer und Monat',
+    priceLine: 'auf Anfrage, pro Nutzer und Monat',
     description: 'Für kleine Betriebe, die Aufträge und Zeiten sauber erfassen wollen.',
     features: ['Aufträge und Kunden', 'Zeiterfassung', 'Material und Fotos', 'Mobile App'],
   },
   {
     slug: 'profi',
     name: 'Profi',
-    price: 'auf Anfrage',
-    interval: 'pro Nutzer und Monat',
+    priceLine: 'auf Anfrage, pro Nutzer und Monat',
     description: 'Für Betriebe, die auch abrechnen und planen.',
     features: [
       'Alles aus Basis',
@@ -36,8 +34,7 @@ export const plans: Plan[] = [
   {
     slug: 'betrieb',
     name: 'Betrieb',
-    price: 'auf Anfrage',
-    interval: 'individuell',
+    priceLine: 'auf Anfrage, individuell',
     description: 'Für größere Betriebe mit eigenen Anforderungen.',
     features: [
       'Alles aus Profi',
@@ -55,6 +52,11 @@ export const pricingCopy = {
   allLinkLabel: 'Alle Preise',
   ctaLabel: 'Loslegen',
 } as const;
+
+/** Anzeige „Name: Preiszeile“, ohne Gedankenstrich. */
+export function formatPlanPrice(plan: Plan): string {
+  return `${plan.name}: ${plan.priceLine}`;
+}
 
 export function getFeaturedPlan(): Plan {
   const featured = plans.find((plan) => plan.featured);

@@ -1,5 +1,5 @@
 export type TagesablaufStep = {
-  title: string;
+  /** Vollständiger Schritttext laut Spec, inkl. Punkte. */
   text: string;
 };
 
@@ -8,25 +8,10 @@ export const tagesablauf = {
   title: 'So läuft der Tag mit Bautakt',
   intro: 'Von der Anfrage bis zur bezahlten Rechnung. Ein System für Baustelle und Büro.',
   steps: [
-    {
-      title: 'Auftrag annehmen',
-      text: 'Kunde, Termin und Notizen an einer Stelle.',
-    },
-    {
-      title: 'Team einplanen',
-      text: 'Wer wann wohin. Klar für alle.',
-    },
-    {
-      title: 'Auf der Baustelle arbeiten',
-      text: 'Zeiten, Material und Fotos auch ohne Empfang.',
-    },
-    {
-      title: 'Angebot und Rechnung',
-      text: 'Aus dem Auftrag, ohne Abtippen.',
-    },
-    {
-      title: 'Überblick behalten',
-      text: 'Was offen ist, was bezahlt ist.',
-    },
+    { text: 'Auftrag annehmen. Kunde, Termin und Notizen an einer Stelle.' },
+    { text: 'Team einplanen. Wer wann wohin. Klar für alle.' },
+    { text: 'Auf der Baustelle arbeiten. Zeiten, Material und Fotos auch ohne Empfang.' },
+    { text: 'Angebot und Rechnung. Aus dem Auftrag, ohne Abtippen.' },
+    { text: 'Überblick behalten. Was offen ist, was bezahlt ist.' },
   ] satisfies TagesablaufStep[],
 } as const;

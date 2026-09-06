@@ -15,11 +15,7 @@ CTA-Band.
 ## SEO / Copy-Invarianten
 
 - H1: `Aufträge, Zeiten und Rechnungen im Takt.` (mit Punkt)
-- Dokumenttitel: `Bautakt | Aufträge, Zeiten und Rechnungen im Takt` (Pipe, ohne Punkt)
-- Keine Gedankenstriche (em/en) in sichtbarem Fließtext
-- Kein Kreditkarten-Hinweis
-- Preise: „auf Anfrage“
-- Hero-CTAs: Kostenlos testen → `/registrieren`, Funktionen ansehen → `/#funktionen`
-- Anmelden nur im Header → `/login`
+- Dokumenttitel: `Bautakt | Aufträge, Zeiten und Rechnungen im Takt.` (Pipe, mit Punkt)
+- Preise-Karten: `Name: auf Anfrage, …` (Komma, kein Gedankenstrich)
 
 `IS_PRODUCTION_SITE`, robots und Domain-Cutover unverändert.

@@ -1,7 +1,7 @@
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, cn } from '@bautakt/ui';
 
 import { Container } from '@/components/layout/Container';
-import { plans, pricingCopy } from '@/content/pricing';
+import { formatPlanPrice, plans, pricingCopy } from '@/content/pricing';
 import { REGISTER_URL } from '@/lib/site';
 
 import { SectionHeading } from './SectionHeading';
@@ -41,10 +41,7 @@ export function PricingTable() {
                 <CardDescription>{plan.description}</CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col gap-6">
-                <div>
-                  <p className="text-3xl font-semibold">{plan.price}</p>
-                  <p className="text-sm text-muted-foreground">{plan.interval}</p>
-                </div>
+                <p className="text-xl font-semibold tracking-tight">{formatPlanPrice(plan)}</p>
                 <ul className="flex flex-col gap-2">
                   {plan.features.map((feature) => (
                     <li key={feature} className="text-sm text-text-secondary">
