@@ -100,9 +100,9 @@ export const site = {
 
 /**
  * Titelzeile für Startseite, Open Graph und Twitter.
- * Pipe, kein Gedankenstrich. Mit abschließendem Punkt (laut Spec).
+ * Pipe, kein Gedankenstrich. OHNE abschließenden Punkt (SEO final).
  */
-export const siteTitle = `${site.name} | Aufträge, Zeiten und Rechnungen im Takt.` as const;
+export const siteTitle = `${site.name} | Aufträge, Zeiten und Rechnungen im Takt` as const;
 
 /** Absolute URL fuer canonical-Tags und die Sitemap. */
 export function absoluteUrl(path: string): string {
