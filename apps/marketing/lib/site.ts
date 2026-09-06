@@ -91,12 +91,18 @@ export const REGISTER_URL = `${APP_URL}/registrieren`;
 
 export const site = {
   name: 'Bautakt',
-  tagline: 'Auftraege, Zeiten und Rechnungen an einem Ort',
+  tagline: 'Aufträge, Zeiten und Rechnungen im Takt.',
   description:
-    'Bautakt buendelt Auftragsverwaltung, Zeiterfassung, Material und Rechnungsstellung fuer Handwerks- und Baubetriebe — auf der Baustelle wie im Buero.',
+    'Alles was Ihr Handwerksbetrieb auf der Baustelle und im Büro braucht. Übersichtlich, mobil und gemacht für den Takt.',
   locale: 'de_DE',
   supportEmail: 'support@bautakt.de',
 } as const;
+
+/**
+ * Titelzeile für Startseite, Open Graph und Twitter.
+ * Pipe, kein Gedankenstrich. OHNE abschließenden Punkt (SEO final).
+ */
+export const siteTitle = `${site.name} | Aufträge, Zeiten und Rechnungen im Takt` as const;
 
 /** Absolute URL fuer canonical-Tags und die Sitemap. */
 export function absoluteUrl(path: string): string {

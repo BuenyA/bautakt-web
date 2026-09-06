@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
-import { absoluteUrl, IS_PRODUCTION_SITE, site, SITE_URL } from '@/lib/site';
+import { absoluteUrl, IS_PRODUCTION_SITE, site, SITE_URL, siteTitle } from '@/lib/site';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
         },
       }),
   title: {
-    default: `${site.name} — ${site.tagline}`,
+    default: siteTitle,
     template: `%s | ${site.name}`,
   },
   description: site.description,
@@ -38,7 +38,12 @@ export const metadata: Metadata = {
     locale: site.locale,
     url: SITE_URL,
     siteName: site.name,
-    title: `${site.name} — ${site.tagline}`,
+    title: siteTitle,
+    description: site.description,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteTitle,
     description: site.description,
   },
 };

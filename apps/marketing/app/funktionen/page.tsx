@@ -6,14 +6,14 @@ import { FeatureGrid } from '@/components/marketing/FeatureGrid';
 export const metadata: Metadata = {
   title: 'Funktionen',
   description:
-    'Aufträge, Zeiterfassung, Material, Angebote und Rechnungen, Team und Planung — der Funktionsumfang von Bautakt.',
+    'Aufträge, Zeiterfassung, Material, Angebote und Rechnungen, Team und Planung. Der Funktionsumfang von Bautakt.',
   alternates: { canonical: '/funktionen' },
 };
 
 export default function FunktionenPage() {
   return (
     <>
-      <FeatureGrid />
+      <FeatureGrid variant="page" />
       <CtaSection />
     </>
   );

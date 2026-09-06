@@ -19,7 +19,7 @@ export const features: Feature[] = [
   {
     slug: 'zeiterfassung',
     title: 'Zeiterfassung',
-    summary: 'Zeiten werden dort erfasst, wo sie entstehen — auch ohne Empfang.',
+    summary: 'Zeiten werden dort erfasst, wo sie entstehen. Auch ohne Empfang.',
     details: [
       'Erfassung pro Mitarbeiter und Auftrag',
       'Zeiten für das Team eintragen',
@@ -63,3 +63,19 @@ export const features: Feature[] = [
     details: ['Einsatzplanung für das Team', 'Termine am Auftrag', 'Urlaub und Krankmeldungen'],
   },
 ];
+
+/** Texte für die Feature-Sektion und die /funktionen-Seite. */
+export const featuresCopy = {
+  section: {
+    eyebrow: 'Funktionen',
+    title: 'Alles, was ein Betrieb täglich braucht',
+    description:
+      'Von der Auftragsannahme bis zur bezahlten Rechnung. Ohne Zettel und ohne zweites System.',
+  },
+  page: {
+    title: 'Funktionen',
+    description:
+      'Alles, was ein Betrieb täglich braucht. Von der Auftragsannahme bis zur bezahlten Rechnung.',
+  },
+  allLinkLabel: 'Alle Funktionen',
+} as const;

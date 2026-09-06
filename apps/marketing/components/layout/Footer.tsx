@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { Logo } from '@/components/brand/Logo';
 import { legalNav, mainNav } from '@/content/nav';
 import { site } from '@/lib/site';
 
@@ -11,7 +12,7 @@ export function Footer() {
       <Container className="flex flex-col gap-8 py-12">
         <div className="flex flex-col gap-8 sm:flex-row sm:justify-between">
           <div className="max-w-xs">
-            <p className="text-lg font-semibold">{site.name}</p>
+            <Logo linked={false} />
             <p className="mt-2 text-sm text-muted-foreground">{site.tagline}</p>
           </div>
 

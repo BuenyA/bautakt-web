@@ -1,6 +1,27 @@
-/* Design-Tokens und Tailwind. Kanonisch in packages/ui — siehe dortigen Dateikopf. */
+/* Design-Tokens und Tailwind. Kanonisch in packages/ui — siehe dortigen Dateikopf.
+   Marketing überschreibt Primary auf Spec-Blau #3B86E0, ohne packages/ui (und damit
+   die Webapp) zu ändern. Blau ist für CTAs vorgesehen; Logo bleibt Anthrazit. */
 @import '@bautakt/ui/styles/theme.css';
 
 /* Quellen, die Tailwind nach Klassennamen durchsuchen muss. Ohne diese Zeile
    sieht v4 die Komponenten in packages/ui nicht und laesst deren Klassen weg. */
 @source '../../../packages/ui/src';
+
+:root {
+  --primary: #3b86e0;
+  --primary-foreground: #ffffff;
+  --accent: #e8f2fc;
+  --accent-foreground: #3b86e0;
+  --ring: #3b86e0;
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.6rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

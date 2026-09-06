@@ -33,6 +33,7 @@ verlinkt, nie kopiert.
 | 2026-08-27 | [`apps/app` heißt jetzt `apps/webapp`](logs/2026-08-27-umbenennung-webapp.md)       |
 | 2026-09-01 | [X-Robots-Tag auf Marketing-Production](logs/2026-09-01-x-robots-tag.md)            |
 | 2026-09-01 | [SITE_URL auf Vercel-Alias (pre-go-live)](logs/2026-09-01-site-url-vercel-alias.md) |
+| 2026-09-06 | [Marketing Design Spec v4.4](logs/2026-09-06-marketing-design-spec-v44.md)          |
 
 ## Die drei wichtigsten Sätze
 
