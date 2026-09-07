@@ -10,6 +10,9 @@ import { RegisterPage } from '@/features/auth/pages/RegisterPage';
 import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { PublicOnlyRoute } from '@/features/auth/PublicOnlyRoute';
+import { CustomersListPage } from '@/features/customers/pages/CustomersListPage';
+import { OrderDetailPage } from '@/features/orders/pages/OrderDetailPage';
+import { OrdersListPage } from '@/features/orders/pages/OrdersListPage';
 import { HOME_ROUTE, routes } from '@/lib/routes';
 
 /**
@@ -46,27 +49,46 @@ export const router = createBrowserRouter([
             element: <AppShell />,
             children: [
               { index: true, element: <Navigate to={HOME_ROUTE} replace /> },
-              { path: routes.orders, element: <PlaceholderPage titleKey="common:nav.orders" /> },
               {
-                path: routes.customers,
-                element: <PlaceholderPage titleKey="common:nav.customers" />,
+                path: routes.overview,
+                element: <PlaceholderPage titleKey="common:nav.overview" />,
+              },
+              { path: routes.orders, element: <OrdersListPage /> },
+              { path: `${routes.orders}/:id`, element: <OrderDetailPage /> },
+              {
+                path: routes.assignments,
+                element: <PlaceholderPage titleKey="common:nav.assignments" />,
               },
               {
-                path: routes.employees,
-                element: <PlaceholderPage titleKey="common:nav.employees" />,
-              },
-              { path: routes.finance, element: <PlaceholderPage titleKey="common:nav.finance" /> },
-              {
-                path: routes.calendar,
-                element: <PlaceholderPage titleKey="common:nav.calendar" />,
+                path: routes.times,
+                element: <PlaceholderPage titleKey="common:nav.times" />,
               },
               {
-                path: routes.notifications,
-                element: <PlaceholderPage titleKey="common:nav.notifications" />,
+                path: routes.invoices,
+                element: <PlaceholderPage titleKey="common:nav.invoices" />,
               },
+              { path: routes.customers, element: <CustomersListPage /> },
               {
                 path: routes.settings,
                 element: <PlaceholderPage titleKey="common:nav.settings" />,
+              },
+
+              // Alte Pfade umleiten, damit Bookmarks nicht leer laufen.
+              {
+                path: routes.legacyEmployees,
+                element: <Navigate to={routes.settings} replace />,
+              },
+              {
+                path: routes.legacyFinance,
+                element: <Navigate to={routes.invoices} replace />,
+              },
+              {
+                path: routes.legacyCalendar,
+                element: <Navigate to={routes.assignments} replace />,
+              },
+              {
+                path: routes.legacyNotifications,
+                element: <Navigate to={HOME_ROUTE} replace />,
               },
             ],
           },

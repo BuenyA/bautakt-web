@@ -16,12 +16,26 @@ export type NavItem = {
   permission?: PermissionKey;
 };
 
+/**
+ * Kanonische Top-Nav IA (Wave 1). Keine Slash-Doppel-Labels.
+ * Angebote sitzen als Filter unter Auftraege; Mitarbeiter/Rollen/Einladungen
+ * unter Einstellungen; Kalender unter Einsaetze; Benachrichtigungen sind die
+ * Topbar-Glocke, kein Nav-Eintrag.
+ */
 export const navItems: NavItem[] = [
+  { to: routes.overview, labelKey: 'common:nav.overview' },
   { to: routes.orders, labelKey: 'common:nav.orders' },
-  { to: routes.customers, labelKey: 'common:nav.customers', permission: 'canManageCustomers' },
-  { to: routes.employees, labelKey: 'common:nav.employees', permission: 'canManageEmployees' },
-  { to: routes.finance, labelKey: 'common:nav.finance', permission: 'canViewCompanyFinance' },
-  { to: routes.calendar, labelKey: 'common:nav.calendar' },
-  { to: routes.notifications, labelKey: 'common:nav.notifications' },
+  { to: routes.assignments, labelKey: 'common:nav.assignments' },
+  { to: routes.times, labelKey: 'common:nav.times' },
+  {
+    to: routes.invoices,
+    labelKey: 'common:nav.invoices',
+    permission: 'canUseBillingModule',
+  },
+  {
+    to: routes.customers,
+    labelKey: 'common:nav.customers',
+    permission: 'canManageCustomers',
+  },
   { to: routes.settings, labelKey: 'common:nav.settings' },
 ];
