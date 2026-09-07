@@ -122,8 +122,12 @@ return trimmed ? trimmed : fallback;
 ```
 
 Wo es keinen sinnvollen Standard gibt — `VITE_SUPABASE_URL` etwa —, gehört kein
-Fallback hin, sondern ein `throw` mit lesbarer Meldung. Sonst scheitert
-supabase-js tief im Inneren, das Deploy ist grün und die Seite weiß.
+Fallback hin. Früher warf `requireEnv` im Modulkopf von `apps/webapp/src/lib/supabase.ts`
+beim Import. Das Deploy war grün, die Seite weiß: der `throw` lief, bevor React
+mountete, und die Console-Meldung sah niemand. Seit 2026-09 liefert
+`supabaseBootError` die Meldung, und `main.tsx` rendert eine BootError-Seite
+statt der App. Der Client entsteht nur, wenn die Werte stehen; ein Zugriff trotz
+Fehler wirft weiterhin — aber mit UI davor.
 
 ⚠️ Beim Refactoring darauf achten, dass `process.env.NEXT_PUBLIC_*` bzw.
 `import.meta.env.VITE_*` **wörtlich** an der Aufrufstelle stehen bleibt. Beide
@@ -131,6 +135,22 @@ Bundler ersetzen diesen Ausdruck statisch; ein dynamischer Zugriff über
 `process.env[name]` bliebe im Bundle leer. Als Funktions*argument* funktioniert
 die Ersetzung — das wurde für beide Apps am gebauten Bundle nachgeprüft, nicht
 am Quelltext.
+
+## Weisse Produktionsseite ohne sichtbaren Fehler
+
+_Festgestellt 2026-09, bautakt-webapp Production._
+
+**Symptom:** `https://app.bautakt.com` (oder der Vercel-Alias) liefert eine weisse
+Seite. Kein React-Baum, oft nur ein ungelesener Console-Fehler.
+
+`VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` fehlten oder waren leer **zur
+Build-Zeit**. Vite hatte `undefined` bzw. `''` inline. Der frühere
+`requireEnv`-Throw im Import von `supabase.ts` stoppte den Start, bevor
+`createRoot(...).render` lief.
+
+**Lösung (Code):** Kein Throw im Modulkopf. `supabaseBootError` + BootError-Seite
+in `main.tsx`. **Lösung (Ops):** Variablen im Vercel-Projekt `bautakt-webapp`
+setzen und **neu deployen** — siehe [deployment-vercel.md](deployment-vercel.md).
 
 ## Das Dev-Deployment landet bei Google
 
