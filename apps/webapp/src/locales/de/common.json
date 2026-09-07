@@ -13,13 +13,15 @@
     "comingSoon": "Dieser Bereich wird gerade gebaut."
   },
   "nav": {
+    "overview": "Übersicht",
     "orders": "Aufträge",
+    "assignments": "Einsätze",
+    "times": "Zeiten",
+    "invoices": "Rechnungen",
     "customers": "Kunden",
-    "employees": "Mitarbeiter",
-    "finance": "Finanzen",
-    "calendar": "Kalender",
-    "notifications": "Benachrichtigungen",
     "settings": "Einstellungen",
+    "notifications": "Benachrichtigungen",
+    "notificationsComingSoon": "Benachrichtigungen folgen in einer späteren Welle.",
     "openMenu": "Menü öffnen",
     "closeMenu": "Menü schließen",
     "main": "Hauptnavigation"

@@ -16,7 +16,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   );
 
   return (
-    <nav aria-label={t('common:nav.main')} className="flex flex-col gap-1">
+    <nav aria-label={t('common:nav.main')} className="flex flex-col gap-0.5">
       {visible.map((item) => (
         <NavLink
           key={item.to}

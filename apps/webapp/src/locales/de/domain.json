@@ -2,5 +2,65 @@
   "order": { "one": "Auftrag", "other": "Aufträge" },
   "customer": { "one": "Kunde", "other": "Kunden" },
   "employee": { "one": "Mitarbeiter", "other": "Mitarbeiter" },
-  "company": { "one": "Betrieb", "other": "Betriebe" }
+  "company": { "one": "Betrieb", "other": "Betriebe" },
+  "orderStatus": {
+    "quote": "Angebot",
+    "active": "Aktiv",
+    "finished": "Abgeschlossen",
+    "declined": "Abgelehnt"
+  },
+  "orders": {
+    "listTitle": "Aufträge",
+    "listDescription": "Aufträge und Angebote Ihres Betriebs.",
+    "detailTitle": "Auftrag",
+    "detailDescription": "Stammdaten und Status.",
+    "filtersLabel": "Auftragsfilter",
+    "filterAll": "Alle",
+    "filterQuotes": "Angebote",
+    "columns": {
+      "name": "Bezeichnung",
+      "customer": "Kunde",
+      "status": "Status",
+      "start": "Beginn",
+      "end": "Ende"
+    },
+    "fields": {
+      "customer": "Kunde",
+      "address": "Adresse",
+      "start": "Beginn",
+      "end": "Ende",
+      "contractSum": "Auftragssumme",
+      "costCenter": "Kostenstelle",
+      "created": "Angelegt"
+    },
+    "noCustomer": "Kein Kunde",
+    "noDate": "Offen",
+    "emptyTitle": "Noch keine Aufträge",
+    "emptyDescription": "Sobald Aufträge angelegt sind, erscheinen sie hier.",
+    "emptyQuotesTitle": "Noch keine Angebote",
+    "emptyQuotesDescription": "Angebote mit Status Angebot erscheinen in diesem Filter.",
+    "loadErrorTitle": "Aufträge konnten nicht geladen werden",
+    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+    "notFoundTitle": "Auftrag nicht gefunden",
+    "notFoundDescription": "Dieser Auftrag existiert nicht oder ist für Sie nicht sichtbar."
+  },
+  "customers": {
+    "listTitle": "Kunden",
+    "listDescription": "Kundenstamm Ihres Betriebs.",
+    "columns": {
+      "name": "Name",
+      "number": "Kundennummer",
+      "city": "Ort",
+      "email": "E-Mail",
+      "phone": "Telefon"
+    },
+    "unnamed": "Ohne Namen",
+    "noNumber": "Keine Nummer",
+    "noCity": "Kein Ort",
+    "noContact": "Nicht hinterlegt",
+    "emptyTitle": "Noch keine Kunden",
+    "emptyDescription": "Sobald Kunden angelegt sind, erscheinen sie hier.",
+    "loadErrorTitle": "Kunden konnten nicht geladen werden",
+    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
+  }
 }

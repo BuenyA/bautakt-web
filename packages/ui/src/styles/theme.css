@@ -70,6 +70,11 @@
   --warning: #ff5c00;
   --warning-bg: rgba(255, 92, 0, 0.08);
   --warning-border: rgba(255, 92, 0, 0.2);
+
+  /* --- Shell --- */
+  /* Alias auf bestehende Flaeche, kein neues Primaer. Wave-1-Sidebar. */
+  --sidebar: var(--background-second);
+  --sidebar-foreground: var(--foreground);
 }
 
 .dark {
@@ -120,6 +125,10 @@
   --warning: #ff5c00;
   --warning-bg: rgba(255, 92, 0, 0.14);
   --warning-border: rgba(255, 92, 0, 0.28);
+
+  /* --- Shell --- */
+  --sidebar: var(--background-second);
+  --sidebar-foreground: var(--foreground);
 }
 
 @theme inline {
@@ -150,6 +159,8 @@
   --color-warning: var(--warning);
   --color-warning-bg: var(--warning-bg);
   --color-warning-border: var(--warning-border);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-input: var(--input);

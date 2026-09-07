@@ -12,16 +12,23 @@ export const routes = {
   forgotPassword: '/passwort-vergessen',
   resetPassword: '/passwort-zuruecksetzen',
 
-  // Geschuetzt
+  // Geschuetzt — kanonische Top-Nav IA (Wave 1)
+  overview: '/uebersicht',
   orders: '/auftraege',
   order: (id: string) => `/auftraege/${id}`,
+  assignments: '/einsaetze',
+  times: '/zeiten',
+  invoices: '/rechnungen',
   customers: '/kunden',
-  employees: '/mitarbeiter',
-  finance: '/finanzen',
-  calendar: '/kalender',
-  notifications: '/benachrichtigungen',
+  customer: (id: string) => `/kunden/${id}`,
   settings: '/einstellungen',
+
+  // Alte Pfade: Redirects bleiben, bis Bookmarks und Mails umgezogen sind.
+  legacyEmployees: '/mitarbeiter',
+  legacyFinance: '/finanzen',
+  legacyCalendar: '/kalender',
+  legacyNotifications: '/benachrichtigungen',
 } as const;
 
 /** Startseite nach dem Anmelden. */
-export const HOME_ROUTE = routes.orders;
+export const HOME_ROUTE = routes.overview;

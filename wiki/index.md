@@ -24,6 +24,7 @@ verlinkt, nie kopiert.
 | [auth-web.md](pages/auth-web.md)                           | Sitzung, Guards, Passwort-Reset und die Abweichungen zur App. |
 | [berechtigungen-im-web.md](pages/berechtigungen-im-web.md) | Die 33 Rechte, drei Durchsetzungsebenen, Drift-Check.         |
 | [deployment-vercel.md](pages/deployment-vercel.md)         | Zwei Projekte aus einem Repo, der SPA-Rewrite, Env-Präfixe.   |
+| [webapp-shell.md](pages/webapp-shell.md)                   | Shell-Layout, kanonische Top-Nav IA, Listen-Muster.           |
 
 ## Protokolle
 
@@ -34,6 +35,7 @@ verlinkt, nie kopiert.
 | 2026-09-01 | [X-Robots-Tag auf Marketing-Production](logs/2026-09-01-x-robots-tag.md)            |
 | 2026-09-01 | [SITE_URL auf Vercel-Alias (pre-go-live)](logs/2026-09-01-site-url-vercel-alias.md) |
 | 2026-09-06 | [Marketing Design Spec v4.4](logs/2026-09-06-marketing-design-spec-v44.md)          |
+| 2026-09-07 | [Wave 1: Shell, Aufträge, Kunden](logs/2026-09-07-wave1-shell-auftraege-kunden.md)  |
 
 ## Die drei wichtigsten Sätze
 
