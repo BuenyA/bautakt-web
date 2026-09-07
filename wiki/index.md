@@ -28,14 +28,15 @@ verlinkt, nie kopiert.
 
 ## Protokolle
 
-| Datum      | Eintrag                                                                             |
-| ---------- | ----------------------------------------------------------------------------------- |
-| 2026-08-26 | [Fundament des Monorepos](logs/2026-08-26-monorepo-fundament.md)                    |
-| 2026-08-27 | [`apps/app` heißt jetzt `apps/webapp`](logs/2026-08-27-umbenennung-webapp.md)       |
-| 2026-09-01 | [X-Robots-Tag auf Marketing-Production](logs/2026-09-01-x-robots-tag.md)            |
-| 2026-09-01 | [SITE_URL auf Vercel-Alias (pre-go-live)](logs/2026-09-01-site-url-vercel-alias.md) |
-| 2026-09-06 | [Marketing Design Spec v4.4](logs/2026-09-06-marketing-design-spec-v44.md)          |
-| 2026-09-07 | [Wave 1: Shell, Aufträge, Kunden](logs/2026-09-07-wave1-shell-auftraege-kunden.md)  |
+| Datum      | Eintrag                                                                                         |
+| ---------- | ----------------------------------------------------------------------------------------------- |
+| 2026-08-26 | [Fundament des Monorepos](logs/2026-08-26-monorepo-fundament.md)                                |
+| 2026-08-27 | [`apps/app` heißt jetzt `apps/webapp`](logs/2026-08-27-umbenennung-webapp.md)                   |
+| 2026-09-01 | [X-Robots-Tag auf Marketing-Production](logs/2026-09-01-x-robots-tag.md)                        |
+| 2026-09-01 | [SITE_URL auf Vercel-Alias (pre-go-live)](logs/2026-09-01-site-url-vercel-alias.md)             |
+| 2026-09-06 | [Marketing Design Spec v4.4](logs/2026-09-06-marketing-design-spec-v44.md)                      |
+| 2026-09-07 | [APP_URL auf Webapp-Vercel-Alias (pre-Domain-Cutover)](logs/2026-09-07-app-url-vercel-alias.md) |
+| 2026-09-07 | [Wave 1: Shell, Aufträge, Kunden](logs/2026-09-07-wave1-shell-auftraege-kunden.md)              |
 
 ## Die drei wichtigsten Sätze
 

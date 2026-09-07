@@ -44,7 +44,13 @@ export const SITE_URL = urlOrFallback(
   process.env.NEXT_PUBLIC_SITE_URL,
   'https://bautakt-web-marketing.vercel.app',
 );
-export const APP_URL = urlOrFallback(process.env.NEXT_PUBLIC_APP_URL, 'https://app.bautakt.com');
+// Pre-Domain-Cutover-Fallback: Webapp-Vercel-Alias, nicht app.bautakt.com
+// (Domain noch nicht verknuepft — sonst tote CTA-Links). Go-live setzt
+// NEXT_PUBLIC_APP_URL=https://app.bautakt.com in Vercel + Redeploy.
+export const APP_URL = urlOrFallback(
+  process.env.NEXT_PUBLIC_APP_URL,
+  'https://bautakt-webapp.vercel.app',
+);
 
 /** Der einzige Host, unter dem die Seite oeffentlich sichtbar sein soll. */
 const PRODUCTION_HOST = 'bautakt.com';
