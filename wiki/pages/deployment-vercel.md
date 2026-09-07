@@ -47,9 +47,25 @@ Redeploy, keinen Neustart.
 `NEXT_PUBLIC_APP_URL` in Preview-Deployments auf die Preview-App zeigen lassen, sonst
 verlinken Previews in die Produktion.
 
-Ein fehlender, leerer oder unbrauchbarer Wert bricht den Build **nicht** ab — er fällt
-auf den Standard zurück und schreibt bei einem unbrauchbaren Wert eine Warnung ins
-Build-Log. Warum das nicht immer so war, steht in [fallstricke.md](fallstricke.md).
+### Webapp: `VITE_SUPABASE_*` sind Pflicht
+
+Ohne `VITE_SUPABASE_URL` und `VITE_SUPABASE_ANON_KEY` (nicht leer) im Projekt
+`bautakt-webapp` baut Vite trotzdem — und inlined `undefined`. Früher war die
+Seite dann weiss; seit 2026-09 zeigt `apps/webapp` eine BootError-Seite mit der
+Anweisung zum Redeploy. Mit gesetzten Werten verhält sich der Client wie zuvor.
+
+Owner-Checkliste, wenn die BootError-Seite erscheint:
+
+1. `VITE_SUPABASE_URL=https://bxivzvmlcnaxqlytumvz.supabase.co`
+2. `VITE_SUPABASE_ANON_KEY=sb_publishable_…` (aus dem Supabase-Dashboard)
+3. Production **neu deployen** (Vite inlined zur Build-Zeit)
+4. Supabase Auth → Redirect-Allowlist: `https://bautakt-webapp.vercel.app/**`
+   (zusätzlich zu `https://app.bautakt.com/**` und `http://localhost:5173/**`)
+
+Marketing: ein fehlender, leerer oder unbrauchbarer Wert für Site-/App-URL bricht
+den Build **nicht** ab — er fällt auf den Standard zurück und schreibt bei einem
+unbrauchbaren Wert eine Warnung ins Build-Log. Warum das nicht immer so war,
+steht in [fallstricke.md](fallstricke.md).
 
 ## Entwicklungsmodus: hosten, ohne öffentlich zu sein
 
@@ -113,7 +129,7 @@ URL Configuration muss enthalten:
 
 - Site URL: `https://app.bautakt.com`
 - Redirect-Allowlist: `https://app.bautakt.com/**`, `http://localhost:5173/**`,
-  `https://bautakt-webapp-*.vercel.app/**`
+  `https://bautakt-webapp.vercel.app/**`, `https://bautakt-webapp-*.vercel.app/**`
 
 ⚠️ Beide Repos teilen dieses eine Projekt. Eine Änderung der Site URL wirkt in die
 geteilten E-Mail-Templates, die die Mobile-App ebenfalls nutzt. Vorher die Templates
