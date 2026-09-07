@@ -105,6 +105,13 @@ denselben Alias, damit eine leere Dashboard-Variable den Parking-Canonical nicht
 wiederherstellt. `IS_PRODUCTION_SITE` liest weiterhin die **rohe** Env und bleibt
 auf dem Alias `false` (noindex).
 
+Dasselbe Muster gilt für `NEXT_PUBLIC_APP_URL` / `APP_URL` (Stand 2026-09-07,
+pre-Domain-Cutover): Fallback und `.env.production` zeigen auf
+`https://bautakt-webapp.vercel.app`, weil `app.bautakt.com` noch nicht verknüpft ist.
+Marketing-CTAs (`LOGIN_URL`, `REGISTER_URL`) bauen weiter `/login` und `/registrieren`
+darauf — die Webapp-Routen sind deutsch. Eine gesetzte `NEXT_PUBLIC_APP_URL` gewinnt
+weiter über den Fallback. `IS_PRODUCTION_SITE` / noindex bleiben davon unberührt.
+
 ### Go-live-Checkliste
 
 ⚠️ Die Kehrseite der Absicherung: **ohne gesetzte `NEXT_PUBLIC_SITE_URL` bleibt auch die
@@ -112,16 +119,20 @@ echte Seite auf `noindex`.** Beim Schalten auf die eigene Domain deshalb der Rei
 
 1. Domain `bautakt.com` (+ `www`-Redirect) im Vercel-Projekt hinterlegen.
 2. `NEXT_PUBLIC_SITE_URL` auf `https://bautakt.com` setzen.
-3. **Redeploy** — Next ersetzt `NEXT_PUBLIC_*` zur Build-Zeit.
-4. Deployment Protection abschalten.
-5. `https://bautakt.com/robots.txt` aufrufen: dort muss `Allow: /` und der
-   Sitemap-Verweis stehen. Steht da `Disallow: /`, hat Schritt 2 oder 3 gefehlt.
-6. Im Quelltext der Startseite prüfen, dass **kein** `noindex` steht. Impressum,
+3. Domain `app.bautakt.com` im Webapp-Projekt hinterlegen und
+   `NEXT_PUBLIC_APP_URL` auf `https://app.bautakt.com` setzen (sonst bleiben
+   Marketing-CTAs auf dem Webapp-Vercel-Alias).
+4. **Redeploy** beider Projekte — Next ersetzt `NEXT_PUBLIC_*` zur Build-Zeit.
+5. Deployment Protection abschalten.
+6. `https://bautakt.com/robots.txt` aufrufen: dort muss `Allow: /` und der
+   Sitemap-Verweis stehen. Steht da `Disallow: /`, hat Schritt 2 oder 4 gefehlt.
+7. Im Quelltext der Startseite prüfen, dass **kein** `noindex` steht. Impressum,
    Datenschutz und AGB behalten ihr eigenes `noindex` — das ist Absicht.
-7. `curl -sI https://bautakt.com/` und `/robots.txt`: **kein** `x-robots-tag` mit
-   `noindex`. Solange der Header noch da ist, hat Schritt 2 oder 3 gefehlt.
+8. `curl -sI https://bautakt.com/` und `/robots.txt`: **kein** `x-robots-tag` mit
+   `noindex`. Solange der Header noch da ist, hat Schritt 2 oder 4 gefehlt.
+9. Marketing-CTAs prüfen: Login/Registrieren zeigen auf `https://app.bautakt.com/…`.
 
-Schritt 5–7 gegen das ausgelieferte Ergebnis prüfen, nicht gegen die Einstellung.
+Schritt 6–9 gegen das ausgelieferte Ergebnis prüfen, nicht gegen die Einstellung.
 
 ## Supabase Auth
 
