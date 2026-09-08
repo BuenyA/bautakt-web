@@ -1,7 +1,8 @@
 # Webapp-Shell und Navigation
 
 Wie die angemeldete Oberfläche in `apps/webapp` aufgebaut ist und welche
-Informationsarchitektur gilt. Stand Wave 1 (2026-09-07).
+Informationsarchitektur gilt. Stand Wave 2 Demo (2026-09-08): Einsätze/Zeiten
+read-first ergänzt.
 
 ## Layout
 
@@ -35,5 +36,10 @@ Shell nutzt die bestehenden `@bautakt/ui`-Tokens (Mobile-Port, Primary `#0a66c2`
 
 ## Datenabfragen
 
-`useOrders` / `useOrder` / `useCustomers` starten den `queryKey` mit `companyId`.
-UI-Gating bleibt Führung; RLS bleibt die Grenze.
+`useOrders` / `useOrder` / `useCustomers` / `useAssignments` / `useAssignment` /
+`useTimeEntries` starten den `queryKey` mit `companyId`. UI-Gating bleibt Führung;
+RLS bleibt die Grenze.
+
+Einsätze und Zeiten sind read-first (Liste; Einsätze zusätzlich Detail). Schreib-
+Flows und Kalender-Grid fehlen bewusst. `calendar_events` sind nicht in der
+Einsatzliste — eigene Tabelle, anderer Zuschnitt.

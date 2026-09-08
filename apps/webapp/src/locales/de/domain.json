@@ -62,5 +62,61 @@
     "emptyDescription": "Sobald Kunden angelegt sind, erscheinen sie hier.",
     "loadErrorTitle": "Kunden konnten nicht geladen werden",
     "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
+  },
+  "assignments": {
+    "listTitle": "Einsätze",
+    "listDescription": "Geplante Einsätze Ihres Betriebs.",
+    "detailTitle": "Einsatz",
+    "detailDescription": "Zeitraum, Auftrag und zugewiesene Mitarbeiter.",
+    "filtersLabel": "Zeitraumfilter",
+    "filterAll": "Alle",
+    "filterThisWeek": "Diese Woche",
+    "columns": {
+      "period": "Zeitraum",
+      "order": "Auftrag",
+      "employees": "Mitarbeiter",
+      "note": "Notiz"
+    },
+    "fields": {
+      "period": "Zeitraum",
+      "order": "Auftrag",
+      "employees": "Mitarbeiter",
+      "note": "Notiz",
+      "created": "Angelegt"
+    },
+    "noOrder": "Kein Auftrag",
+    "noEmployees": "Keine Zuweisung",
+    "noNote": "Keine Notiz",
+    "unnamedEmployee": "Ohne Namen",
+    "emptyTitle": "Noch keine Einsätze",
+    "emptyDescription": "Sobald Einsätze geplant sind, erscheinen sie hier.",
+    "emptyWeekTitle": "Keine Einsätze in dieser Woche",
+    "emptyWeekDescription": "In der aktuellen Kalenderwoche sind keine Einsätze geplant.",
+    "loadErrorTitle": "Einsätze konnten nicht geladen werden",
+    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+    "notFoundTitle": "Einsatz nicht gefunden",
+    "notFoundDescription": "Dieser Einsatz existiert nicht oder ist für Sie nicht sichtbar."
+  },
+  "times": {
+    "listTitle": "Zeiten",
+    "listDescription": "Erfasste Arbeitszeiten Ihres Betriebs.",
+    "columns": {
+      "employee": "Mitarbeiter",
+      "order": "Auftrag",
+      "start": "Beginn",
+      "end": "Ende",
+      "break": "Pause",
+      "duration": "Dauer",
+      "note": "Notiz"
+    },
+    "noEmployee": "Unbekannt",
+    "noOrder": "Kein Auftrag",
+    "noEnd": "Offen",
+    "noNote": "Keine Notiz",
+    "breakMinutes": "{{count}} Min.",
+    "emptyTitle": "Noch keine Zeiten",
+    "emptyDescription": "Sobald Zeiten erfasst sind, erscheinen sie hier.",
+    "loadErrorTitle": "Zeiten konnten nicht geladen werden",
+    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
   }
 }
