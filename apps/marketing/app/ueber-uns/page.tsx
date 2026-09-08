@@ -1,33 +1,42 @@
 import type { Metadata } from 'next';
 
-import { Container } from '@/components/layout/Container';
-import { SectionHeading } from '@/components/marketing/SectionHeading';
-
+import { ContactStrip, PageIntro } from '@/components/cinema/Interior';
+import { ScenicMedia } from '@/components/cinema/ScenicMedia';
+import { t } from '@/lib/i18n';
 export const metadata: Metadata = {
-  title: 'Über uns',
-  description:
-    'Bautakt entsteht mit Handwerks- und Baubetrieben. Weniger Zettel, mehr Takt im Betrieb.',
+  title: t('site:about.label'),
+  description: t('site:about.intro'),
   alternates: { canonical: '/ueber-uns' },
 };
-
-export default function UeberUnsPage() {
+export default function AboutPage() {
+  const principles = t('site:about.principles', { returnObjects: true }) as {
+    title: string;
+    body: string;
+  }[];
   return (
-    <section className="py-20">
-      <Container>
-        <SectionHeading title="Über uns" />
-        <div className="mx-auto mt-12 flex max-w-2xl flex-col gap-4 text-muted-foreground">
-          <p>
-            Bautakt entsteht aus der Zusammenarbeit mit Handwerks- und Baubetrieben, die ihre
-            Aufträge, Zeiten und Rechnungen bislang über Zettel, Tabellen und mehrere Programme
-            verteilt haben.
-          </p>
-          <p>
-            Ziel ist eine Software, die auf der Baustelle genauso funktioniert wie im Büro. Auch
-            dann, wenn gerade kein Netz da ist.
-          </p>
-          <p>Weniger Zettel. Weniger Doppelarbeit. Mehr Takt im Betrieb.</p>
-        </div>
-      </Container>
-    </section>
+    <div className="interior">
+      <PageIntro
+        label={t('site:about.label')}
+        title={t('site:about.title')}
+        description={t('site:about.intro')}
+      />
+      <div className="about-image">
+        <ScenicMedia scene="intro" />
+      </div>
+      <section className="about-statement">
+        <h2>{t('site:about.heading')}</h2>
+        <p>{t('site:about.body')}</p>
+      </section>
+      <section className="principles">
+        {principles.map((item, i) => (
+          <article key={item.title}>
+            <small>0{i + 1}</small>
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+          </article>
+        ))}
+      </section>
+      <ContactStrip>{t('site:about.cta')}</ContactStrip>
+    </div>
   );
 }

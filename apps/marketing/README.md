@@ -1,22 +1,20 @@
-# @bautakt/marketing
+# Neue Marketing-Website
 
-Die Marketing-Website von Bautakt (`bautakt.com`). Next.js 16, App Router.
+Aus dem Repository-Root starten: `npm run dev:marketing`.
+Vorschau unter http://localhost:3000, Gestaltungsprobe unter /design.
 
-Alle Befehle laufen aus der **Repo-Wurzel**:
+Alle visuellen Komponenten liegen neu unter `components/cinema/`, sämtliche Texte
+im deutschen i18next-Katalog `content/de.ts`. Keine alten Seitenkomponenten verwenden.
+Auch SEO-Texte dürfen keine Wortspiele mit dem Produktnamen enthalten.
 
-```bash
-npm run dev:marketing   # http://localhost:3000
-npm run build
-```
+Medienkonfiguration: `content/media.ts`. Aktuell keine Personenbilder: Der Inhaber
+verlangt eine neue Produktion mit erfahrenen Arbeitern um 48–60 Jahre. Diese ist
+wegen fehlenden Higgsfield-Credits blockiert. Bis dahin abstrakte Hintergründe.
+Aktuelle Prompts und Produktionshinweise: `design/`.
 
-Hinweise:
+Die Produktansicht zeigt bewusst nur interaktive Beispieldaten. Keine Supabase-
+Verbindung. Kontakt bereitet E-Mails vor; es wird nichts automatisch versendet.
+Originale Markenassets und gemeinsame Design-Tokens bleiben die Markenquelle.
 
-- Diese App hat bewusst **keinen Supabase-Client**. Auth lebt vollstaendig in
-  `apps/webapp`. Ein spaeteres Kontaktformular laeuft ueber einen Route Handler mit
-  serverseitigem Key, nie ueber den Browser.
-- Jeder Link auf die Web-App laeuft ueber `lib/site.ts`.
-- `typecheck` ist `next typegen && tsc --noEmit`. Next 16 injiziert Typen wie
-  `LayoutProps` aus `.next/types`; ohne vorherigen typegen scheitert `tsc` auf
-  einem frischen Clone.
-
-Architektur und Regeln stehen in der [AGENTS.md](../../AGENTS.md) der Repo-Wurzel.
+Vor Abschluss `npm run check` und `npm run build` im Repository-Root ausführen.
+Browserprüfungen für Desktop, Mobilgeräte, Unterseiten und CTA-Ziele durchführen.

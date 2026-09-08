@@ -26,3 +26,6 @@ CTA-Band.
 - Anmelden nur im Header → `/login`
 
 `IS_PRODUCTION_SITE`, robots und Domain-Cutover unverändert.
+
+> Seit 2026-09-08 historisch: Die neue [Marketing-Story](../pages/marketing-story.md)
+> ersetzt Homepage-Reihenfolge, H1 und lokale Primary-Überschreibung dieser Spec.

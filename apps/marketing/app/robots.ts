@@ -1,22 +1,16 @@
 import type { MetadataRoute } from 'next';
 
 import { absoluteUrl, IS_PRODUCTION_SITE } from '@/lib/site';
-
-/**
- * ⚠️ Ausserhalb von bautakt.com wird alles gesperrt — siehe `IS_PRODUCTION_SITE`.
- *
- * Das allein reicht nicht: `Disallow` verhindert das *Crawlen*, nicht das
- * *Indexieren*. Eine von woanders verlinkte URL kann Google trotzdem in den
- * Index nehmen. Dazu kommen das Root-Layout (`noindex, nofollow, nocache`) und
- * der `X-Robots-Tag`-Header in `next.config.ts`. Alle drei gehoeren zusammen.
- */
+/** Vorschau und Rechtstext-Gerüste werden nicht freigegeben. */
 export default function robots(): MetadataRoute.Robots {
-  if (!IS_PRODUCTION_SITE) {
-    return { rules: { userAgent: '*', disallow: '/' } };
-  }
-
-  return {
-    rules: { userAgent: '*', allow: '/' },
-    sitemap: absoluteUrl('/sitemap.xml'),
-  };
+  return IS_PRODUCTION_SITE
+    ? {
+        rules: {
+          userAgent: '*',
+          allow: '/',
+          disallow: ['/design', '/impressum', '/datenschutz', '/agb'],
+        },
+        sitemap: absoluteUrl('/sitemap.xml'),
+      }
+    : { rules: { userAgent: '*', disallow: '/' } };
 }

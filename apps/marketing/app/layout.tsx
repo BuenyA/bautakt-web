@@ -3,78 +3,39 @@ import './globals.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
-import { Footer } from '@/components/layout/Footer';
-import { Header } from '@/components/layout/Header';
-import { absoluteUrl, IS_PRODUCTION_SITE, site, SITE_URL, siteTitle } from '@/lib/site';
+import { Colophon, Masthead } from '@/components/cinema/SiteFrame';
+import { media } from '@/content/media';
+import { t } from '@/lib/i18n';
+import { IS_PRODUCTION_SITE, SITE_URL } from '@/lib/site';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  /**
-   * ⚠️ Sperrt die Indexierung ausserhalb von bautakt.com. `robots.txt` allein
-   * genuegt nicht — `Disallow` verhindert das Crawlen, nicht das Indexieren.
-   * Der `X-Robots-Tag`-Header in `next.config.ts` ist die dritte Ebene.
-   *
-   * In Produktion bleibt das Feld leer, damit die Standardregeln gelten und die
-   * Rechtsseiten ihr eigenes `robots: { index: false }` weiterhin selbst setzen.
-   */
-  ...(IS_PRODUCTION_SITE
-    ? {}
-    : {
-        robots: {
-          index: false,
-          follow: false,
-          nocache: true,
-          googleBot: { index: false, follow: false },
-        },
-      }),
-  title: {
-    default: siteTitle,
-    template: `%s | ${site.name}`,
-  },
-  description: site.description,
+  title: { default: t('site:seo.title'), template: t('site:seo.template') },
+  description: t('site:seo.description'),
   alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
-    locale: site.locale,
-    url: SITE_URL,
-    siteName: site.name,
-    title: siteTitle,
-    description: site.description,
+    locale: 'de_DE',
+    title: t('site:seo.title'),
+    description: t('site:seo.description'),
+    ...(media.intro.poster ? { images: [{ url: media.intro.poster }] } : {}),
   },
   twitter: {
     card: 'summary_large_image',
-    title: siteTitle,
-    description: site.description,
+    title: t('site:seo.title'),
+    description: t('site:seo.description'),
   },
+  ...(!IS_PRODUCTION_SITE ? { robots: { index: false, follow: false, nocache: true } } : {}),
 };
-
-/**
- * Bewusst mit explizit getypten children statt mit Nexts globalem
- * LayoutProps<"/">: dieser Typ wird erst von `next typegen` erzeugt, ein
- * frischer Clone koennte sonst vor dem ersten Build nicht typechecken.
- */
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: site.name,
-    applicationCategory: 'BusinessApplication',
-    description: site.description,
-    url: absoluteUrl('/'),
-    offers: { '@type': 'Offer', priceCurrency: 'EUR' },
-  };
-
+export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <html lang="de" suppressHydrationWarning>
-      <body className="min-h-svh antialiased">
-        <Header />
-        {children}
-        <Footer />
-        <script
-          type="application/ld+json"
-          // Statisches, selbst erzeugtes JSON-LD — keine Fremddaten.
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+    <html lang="de">
+      <body>
+        <Masthead />
+        <main id="hauptinhalt" tabIndex={-1}>
+          {children}
+        </main>
+        <Colophon />
       </body>
     </html>
   );

@@ -53,3 +53,8 @@ verlinkt, nie kopiert.
 3. **Der Client darf nie enger validieren als der Server akzeptiert.** Sonst sperrt die
    Oberfläche Eingaben aus, die fachlich erlaubt sind — und niemand findet den Grund im
    Backend.
+
+## Marketing-Story
+
+- [Cinematische Marketing-Story](pages/marketing-story.md)
+- [2026-09-08: Neuaufbau](logs/2026-09-08-marketing-scroll-story.md)

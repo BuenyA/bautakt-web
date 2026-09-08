@@ -1,19 +1,18 @@
-import { Button } from '@bautakt/ui';
 import Link from 'next/link';
 
-import { Container } from '@/components/layout/Container';
-
-export default function NotFound() {
+import { PageIntro } from '@/components/cinema/Interior';
+import { t } from '@/lib/i18n';
+export default function MissingPage() {
   return (
-    <section className="py-32">
-      <Container className="flex flex-col items-center text-center">
-        <p className="text-sm font-medium text-primary">404</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Seite nicht gefunden</h1>
-        <p className="mt-4 text-muted-foreground">Diese Adresse gibt es nicht (mehr).</p>
-        <Button asChild className="mt-8">
-          <Link href="/">Zur Startseite</Link>
-        </Button>
-      </Container>
-    </section>
+    <div className="interior missing-page">
+      <PageIntro
+        label={t('site:missing.label')}
+        title={t('site:missing.title')}
+        description={t('site:missing.body')}
+      />
+      <Link className="solid-link" href="/">
+        {t('site:action.back')} ↗
+      </Link>
+    </div>
   );
 }

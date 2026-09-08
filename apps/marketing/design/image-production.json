@@ -1,0 +1,38 @@
+{
+  "status": "blocked_no_credits",
+  "provider": "Higgsfield",
+  "model": "nano_banana_pro",
+  "aspect_ratio": "16:9",
+  "resolution": "2k",
+  "character": "The people must look like experienced tradesmen on a real German building site: ages 48 to 60, natural Central European appearance, weathered faces, forehead lines, grey at the temples, strong ordinary builds, practical short hair or salt-and-pepper stubble, no polished young fashion models. Main foreman is about 54, short salt-and-pepper hair, slightly lined face, short grey stubble, white work helmet, worn charcoal work jacket and functional high-visibility vest. Real German workwear and appropriate protective equipment, authentic rather than caricature. No flags, national symbols, costumes, text or logos.",
+  "style": "Cinematic documentary 35mm film still, realistic German residential building site, natural anatomy and hands, subtle film texture, carefully composed architectural light. Landscape 16:9 with clean darker left half for HTML copy and workers in center-right, portrait crop remains readable. No captions or graphic interfaces.",
+  "scenes": [
+    {
+      "id": "intro",
+      "referenceFrom": null,
+      "prompt": "The people must look like experienced tradesmen on a real German building site: ages 48 to 60, natural Central European appearance, weathered faces, forehead lines, grey at the temples, strong ordinary builds, practical short hair or salt-and-pepper stubble, no polished young fashion models. Main foreman is about 54, short salt-and-pepper hair, slightly lined face, short grey stubble, white work helmet, worn charcoal work jacket and functional high-visibility vest. Real German workwear and appropriate protective equipment, authentic rather than caricature. No flags, national symbols, costumes, text or logos.\n\nCinematic documentary 35mm film still, realistic German residential building site, natural anatomy and hands, subtle film texture, carefully composed architectural light. Landscape 16:9 with clean darker left half for HTML copy and workers in center-right, portrait crop remains readable. No captions or graphic interfaces.\n\nPositive opening. Golden morning light on an orderly German construction site. Main foreman and a colleague standing confidently together looking at the ongoing work, tablet held at his side. Experienced calm pride in good work, no chaos, no frustration. Raw concrete columns, organised scaffolding, residential buildings and crane beyond. Wide architectural composition and spectacular but natural light."
+    },
+    {
+      "id": "chaos",
+      "referenceFrom": "intro",
+      "prompt": "The people must look like experienced tradesmen on a real German building site: ages 48 to 60, natural Central European appearance, weathered faces, forehead lines, grey at the temples, strong ordinary builds, practical short hair or salt-and-pepper stubble, no polished young fashion models. Main foreman is about 54, short salt-and-pepper hair, slightly lined face, short grey stubble, white work helmet, worn charcoal work jacket and functional high-visibility vest. Real German workwear and appropriate protective equipment, authentic rather than caricature. No flags, national symbols, costumes, text or logos.\n\nCinematic documentary 35mm film still, realistic German residential building site, natural anatomy and hands, subtle film texture, carefully composed architectural light. Landscape 16:9 with clean darker left half for HTML copy and workers in center-right, portrait crop remains readable. No captions or graphic interfaces.\n\nSame main foreman and same location, a hectic day before the organised outcome. Phone at his ear, mildly frustrated face, rough planning desk with loose papers and rolled plans, a paper catching a gust of wind, colleague searching for the right drawing in background. Cool overcast light. Frustration with the situation, no ridicule of any person, no danger."
+    },
+    {
+      "id": "clarity",
+      "referenceFrom": "intro",
+      "prompt": "The people must look like experienced tradesmen on a real German building site: ages 48 to 60, natural Central European appearance, weathered faces, forehead lines, grey at the temples, strong ordinary builds, practical short hair or salt-and-pepper stubble, no polished young fashion models. Main foreman is about 54, short salt-and-pepper hair, slightly lined face, short grey stubble, white work helmet, worn charcoal work jacket and functional high-visibility vest. Real German workwear and appropriate protective equipment, authentic rather than caricature. No flags, national symbols, costumes, text or logos.\n\nCinematic documentary 35mm film still, realistic German residential building site, natural anatomy and hands, subtle film texture, carefully composed architectural light. Landscape 16:9 with clean darker left half for HTML copy and workers in center-right, portrait crop remains readable. No captions or graphic interfaces.\n\nSame main foreman and same construction location. Medium close shot with hands and rugged tablet visible, he looks down at tablet with a quiet relieved half smile. Phone away, posture relaxed. Warm light returning from right. Clear experiential contrast to uncertainty, no exaggerated grin."
+    },
+    {
+      "id": "finish",
+      "referenceFrom": "intro",
+      "prompt": "The people must look like experienced tradesmen on a real German building site: ages 48 to 60, natural Central European appearance, weathered faces, forehead lines, grey at the temples, strong ordinary builds, practical short hair or salt-and-pepper stubble, no polished young fashion models. Main foreman is about 54, short salt-and-pepper hair, slightly lined face, short grey stubble, white work helmet, worn charcoal work jacket and functional high-visibility vest. Real German workwear and appropriate protective equipment, authentic rather than caricature. No flags, national symbols, costumes, text or logos.\n\nCinematic documentary 35mm film still, realistic German residential building site, natural anatomy and hands, subtle film texture, carefully composed architectural light. Landscape 16:9 with clean darker left half for HTML copy and workers in center-right, portrait crop remains readable. No captions or graphic interfaces.\n\nSame main foreman with two similarly experienced colleagues, all around 48 to 60, small in the right background of a newly finished modest contemporary German brick and concrete residential building. Golden late afternoon, tidy paved courtyard, complete facade, no unfinished construction. Team relaxed talking after work, helmets in hands. Architecture and warm earned calm are the main subjects."
+    }
+  ],
+  "video": {
+    "model": "cinematic_studio_3_0",
+    "duration": 5,
+    "resolution": "720p",
+    "generate_audio": false,
+    "instruction": "Erst alle Standbilder prüfen, dann je Szene ein kurzer Loop mit dem zugehörigen Bild als start_image. Für nahtlose Übergänge den tatsächlichen Endframe als nächsten Startframe verwenden."
+  }
+}
