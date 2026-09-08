@@ -1,7 +1,8 @@
 # Webapp-Shell und Navigation
 
 Wie die angemeldete Oberfläche in `apps/webapp` aufgebaut ist und welche
-Informationsarchitektur gilt. Stand Wave 1 (2026-09-07).
+Informationsarchitektur gilt. Stand Wave 2 Demo (2026-09-08): Einsätze/Zeiten
+read-first ergänzt.
 
 ## Layout
 
