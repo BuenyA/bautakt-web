@@ -35,5 +35,10 @@ Shell nutzt die bestehenden `@bautakt/ui`-Tokens (Mobile-Port, Primary `#0a66c2`
 
 ## Datenabfragen
 
-`useOrders` / `useOrder` / `useCustomers` starten den `queryKey` mit `companyId`.
-UI-Gating bleibt Führung; RLS bleibt die Grenze.
+`useOrders` / `useOrder` / `useCustomers` / `useAssignments` / `useAssignment` /
+`useTimeEntries` starten den `queryKey` mit `companyId`. UI-Gating bleibt Führung;
+RLS bleibt die Grenze.
+
+Einsätze und Zeiten sind read-first (Liste; Einsätze zusätzlich Detail). Schreib-
+Flows und Kalender-Grid fehlen bewusst. `calendar_events` sind nicht in der
+Einsatzliste — eigene Tabelle, anderer Zuschnitt.

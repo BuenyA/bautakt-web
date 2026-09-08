@@ -38,6 +38,7 @@ verlinkt, nie kopiert.
 | 2026-09-07 | [Wave 1: Shell, Aufträge, Kunden](logs/2026-09-07-wave1-shell-auftraege-kunden.md)              |
 | 2026-09-07 | [APP_URL auf Webapp-Vercel-Alias (pre-Domain-Cutover)](logs/2026-09-07-app-url-vercel-alias.md) |
 | 2026-09-07 | [Weisse Webapp bei fehlenden VITE_*-Env](logs/2026-09-07-webapp-boot-env-error.md)              |
+| 2026-09-08 | [Wave 2 Demo: Einsätze und Zeiten](logs/2026-09-08-wave2-einsaetze-zeiten.md)                   |
 
 ## Die drei wichtigsten Sätze
 

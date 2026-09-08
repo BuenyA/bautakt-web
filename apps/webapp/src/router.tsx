@@ -4,6 +4,8 @@ import { ErrorBoundaryPage } from '@/components/common/ErrorBoundaryPage';
 import { NotFoundPage } from '@/components/common/NotFoundPage';
 import { PlaceholderPage } from '@/components/common/PlaceholderPage';
 import { AppShell } from '@/components/layout/AppShell';
+import { AssignmentDetailPage } from '@/features/assignments/pages/AssignmentDetailPage';
+import { AssignmentsListPage } from '@/features/assignments/pages/AssignmentsListPage';
 import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { RegisterPage } from '@/features/auth/pages/RegisterPage';
@@ -13,6 +15,7 @@ import { PublicOnlyRoute } from '@/features/auth/PublicOnlyRoute';
 import { CustomersListPage } from '@/features/customers/pages/CustomersListPage';
 import { OrderDetailPage } from '@/features/orders/pages/OrderDetailPage';
 import { OrdersListPage } from '@/features/orders/pages/OrdersListPage';
+import { TimesListPage } from '@/features/times/pages/TimesListPage';
 import { HOME_ROUTE, routes } from '@/lib/routes';
 
 /**
@@ -55,14 +58,9 @@ export const router = createBrowserRouter([
               },
               { path: routes.orders, element: <OrdersListPage /> },
               { path: `${routes.orders}/:id`, element: <OrderDetailPage /> },
-              {
-                path: routes.assignments,
-                element: <PlaceholderPage titleKey="common:nav.assignments" />,
-              },
-              {
-                path: routes.times,
-                element: <PlaceholderPage titleKey="common:nav.times" />,
-              },
+              { path: routes.assignments, element: <AssignmentsListPage /> },
+              { path: `${routes.assignments}/:id`, element: <AssignmentDetailPage /> },
+              { path: routes.times, element: <TimesListPage /> },
               {
                 path: routes.invoices,
                 element: <PlaceholderPage titleKey="common:nav.invoices" />,

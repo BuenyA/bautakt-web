@@ -17,6 +17,7 @@ export const routes = {
   orders: '/auftraege',
   order: (id: string) => `/auftraege/${id}`,
   assignments: '/einsaetze',
+  assignment: (id: string) => `/einsaetze/${id}`,
   times: '/zeiten',
   invoices: '/rechnungen',
   customers: '/kunden',
