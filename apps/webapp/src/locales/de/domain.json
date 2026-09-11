@@ -57,19 +57,26 @@
       "phone": "Telefon"
     },
     "fields": {
-      "name": "Name",
+      "displayName": "Anzeigename",
+      "type": "Typ",
       "number": "Kundennummer",
-      "city": "Ort",
       "address": "Adresse",
       "email": "E-Mail",
       "phone": "Telefon",
+      "notes": "Notiz",
       "created": "Angelegt"
+    },
+    "types": {
+      "b2b": "Geschäftskunde",
+      "b2c": "Privatkunde"
     },
     "unnamed": "Ohne Namen",
     "noNumber": "Keine Nummer",
     "noCity": "Kein Ort",
     "noAddress": "Keine Adresse",
     "noContact": "Nicht hinterlegt",
+    "noType": "Nicht hinterlegt",
+    "noNotes": "Keine Notiz",
     "emptyTitle": "Noch keine Kunden",
     "emptyDescription": "Sobald Kunden angelegt sind, erscheinen sie hier.",
     "loadErrorTitle": "Kunden konnten nicht geladen werden",

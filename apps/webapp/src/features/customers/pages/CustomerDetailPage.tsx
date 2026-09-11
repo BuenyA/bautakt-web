@@ -16,9 +16,21 @@ function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid gap-1 sm:grid-cols-[12rem_1fr] sm:gap-4">
       <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="text-sm text-foreground">{value}</dd>
+      <dd className="text-sm text-foreground whitespace-pre-wrap">{value}</dd>
     </div>
   );
+}
+
+function formatAddress(parts: {
+  street_address: string;
+  postal_code: string;
+  city: string;
+  country: string;
+}): string {
+  const street = parts.street_address.trim();
+  const cityLine = [parts.postal_code.trim(), parts.city.trim()].filter(Boolean).join(' ');
+  const country = parts.country.trim();
+  return [street, cityLine, country].filter(Boolean).join('\n');
 }
 
 export function CustomerDetailPage() {
@@ -74,9 +86,13 @@ export function CustomerDetailPage() {
   }
 
   const name = customerDisplayName(data);
-  const address = [data.street_address, [data.postal_code, data.city].filter(Boolean).join(' ')]
-    .filter(Boolean)
-    .join(', ');
+  const typeLabel = data.customer_type.trim()
+    ? t(`domain:customers.types.${data.customer_type}`, {
+        defaultValue: data.customer_type.trim(),
+      })
+    : '';
+  const address = formatAddress(data);
+  const notes = data.notes.trim();
 
   return (
     <div className="flex flex-col gap-6">
@@ -92,16 +108,16 @@ export function CustomerDetailPage() {
 
       <dl className="flex max-w-3xl flex-col gap-4 rounded-lg border border-border bg-card p-4 sm:p-6">
         <DetailRow
-          label={t('domain:customers.fields.name')}
+          label={t('domain:customers.fields.displayName')}
           value={name || t('domain:customers.unnamed')}
+        />
+        <DetailRow
+          label={t('domain:customers.fields.type')}
+          value={typeLabel || t('domain:customers.noType')}
         />
         <DetailRow
           label={t('domain:customers.fields.number')}
           value={data.customer_number || t('domain:customers.noNumber')}
-        />
-        <DetailRow
-          label={t('domain:customers.fields.city')}
-          value={data.city || t('domain:customers.noCity')}
         />
         <DetailRow
           label={t('domain:customers.fields.address')}
@@ -114,6 +130,10 @@ export function CustomerDetailPage() {
         <DetailRow
           label={t('domain:customers.fields.phone')}
           value={data.phone || t('domain:customers.noContact')}
+        />
+        <DetailRow
+          label={t('domain:customers.fields.notes')}
+          value={notes || t('domain:customers.noNotes')}
         />
         <DetailRow
           label={t('domain:customers.fields.created')}
