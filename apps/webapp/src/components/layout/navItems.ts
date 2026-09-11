@@ -17,10 +17,12 @@ export type NavItem = {
 };
 
 /**
- * Kanonische Top-Nav IA (Wave 1). Keine Slash-Doppel-Labels.
- * Angebote sitzen als Filter unter Auftraege; Mitarbeiter/Rollen/Einladungen
- * unter Einstellungen; Kalender unter Einsaetze; Benachrichtigungen sind die
- * Topbar-Glocke, kein Nav-Eintrag.
+ * Sichtbare Demo-Nav (GF 10.10.2026): Übersicht · Aufträge · Einsätze · Zeiten · Kunden.
+ * Rechnungen und Einstellungen bleiben als Platzhalter-Routen erreichbar, aber
+ * nicht in der Nav. HOME bleibt `/uebersicht`.
+ *
+ * Angebote sitzen als Filter unter Auftraege; Kalender spaeter unter Einsaetze;
+ * Benachrichtigungen sind die Topbar-Glocke, kein Nav-Eintrag.
  */
 export const navItems: NavItem[] = [
   { to: routes.overview, labelKey: 'common:nav.overview' },
@@ -28,14 +30,8 @@ export const navItems: NavItem[] = [
   { to: routes.assignments, labelKey: 'common:nav.assignments' },
   { to: routes.times, labelKey: 'common:nav.times' },
   {
-    to: routes.invoices,
-    labelKey: 'common:nav.invoices',
-    permission: 'canUseBillingModule',
-  },
-  {
     to: routes.customers,
     labelKey: 'common:nav.customers',
     permission: 'canManageCustomers',
   },
-  { to: routes.settings, labelKey: 'common:nav.settings' },
 ];

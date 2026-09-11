@@ -95,6 +95,17 @@ export function AssignmentsListPage() {
               ? t('domain:assignments.emptyWeekDescription')
               : t('domain:assignments.emptyDescription')
           }
+          action={
+            filter === 'week' ? (
+              <button
+                type="button"
+                className="text-sm font-medium text-primary hover:underline"
+                onClick={() => setFilter('all')}
+              >
+                {t('domain:assignments.emptyWeekShowAll')}
+              </button>
+            ) : undefined
+          }
         />
       ) : (
         <div className="overflow-x-auto rounded-lg border border-border">

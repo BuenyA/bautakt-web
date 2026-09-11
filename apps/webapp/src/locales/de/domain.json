@@ -47,6 +47,8 @@
   "customers": {
     "listTitle": "Kunden",
     "listDescription": "Kundenstamm Ihres Betriebs.",
+    "detailTitle": "Kunde",
+    "detailDescription": "Stammdaten des Kunden.",
     "columns": {
       "name": "Name",
       "number": "Kundennummer",
@@ -54,14 +56,33 @@
       "email": "E-Mail",
       "phone": "Telefon"
     },
+    "fields": {
+      "displayName": "Anzeigename",
+      "type": "Typ",
+      "number": "Kundennummer",
+      "address": "Adresse",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "notes": "Notiz",
+      "created": "Angelegt"
+    },
+    "types": {
+      "b2b": "Geschäftskunde",
+      "b2c": "Privatkunde"
+    },
     "unnamed": "Ohne Namen",
     "noNumber": "Keine Nummer",
     "noCity": "Kein Ort",
+    "noAddress": "Keine Adresse",
     "noContact": "Nicht hinterlegt",
+    "noType": "Nicht hinterlegt",
+    "noNotes": "Keine Notiz",
     "emptyTitle": "Noch keine Kunden",
     "emptyDescription": "Sobald Kunden angelegt sind, erscheinen sie hier.",
     "loadErrorTitle": "Kunden konnten nicht geladen werden",
-    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
+    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+    "notFoundTitle": "Kunde nicht gefunden",
+    "notFoundDescription": "Dieser Kunde existiert nicht oder ist für Sie nicht sichtbar."
   },
   "assignments": {
     "listTitle": "Einsätze",
@@ -91,7 +112,8 @@
     "emptyTitle": "Noch keine Einsätze",
     "emptyDescription": "Sobald Einsätze geplant sind, erscheinen sie hier.",
     "emptyWeekTitle": "Keine Einsätze in dieser Woche",
-    "emptyWeekDescription": "In der aktuellen Kalenderwoche sind keine Einsätze geplant.",
+    "emptyWeekDescription": "In der aktuellen Kalenderwoche sind keine Einsätze geplant. Wechseln Sie zu „Alle“, um alle Einsätze zu sehen.",
+    "emptyWeekShowAll": "Alle Einsätze anzeigen",
     "loadErrorTitle": "Einsätze konnten nicht geladen werden",
     "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
     "notFoundTitle": "Einsatz nicht gefunden",
