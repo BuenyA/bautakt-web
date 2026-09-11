@@ -1,8 +1,10 @@
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { routes } from '@/lib/routes';
 
 import { customerDisplayName, useCustomers } from '../useCustomers';
 
@@ -55,8 +57,13 @@ export function CustomersListPage() {
                 const name = customerDisplayName(customer);
                 return (
                   <tr key={customer.id} className="border-t border-border hover:bg-surface/60">
-                    <td className="px-4 py-3 font-medium text-foreground">
-                      {name || t('domain:customers.unnamed')}
+                    <td className="px-4 py-3">
+                      <Link
+                        to={routes.customer(customer.id)}
+                        className="font-medium text-foreground hover:text-primary hover:underline"
+                      >
+                        {name || t('domain:customers.unnamed')}
+                      </Link>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
                       {customer.customer_number || t('domain:customers.noNumber')}

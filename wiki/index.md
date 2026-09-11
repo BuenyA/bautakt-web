@@ -25,6 +25,7 @@ verlinkt, nie kopiert.
 | [berechtigungen-im-web.md](pages/berechtigungen-im-web.md) | Die 33 Rechte, drei Durchsetzungsebenen, Drift-Check.         |
 | [deployment-vercel.md](pages/deployment-vercel.md)         | Zwei Projekte aus einem Repo, der SPA-Rewrite, Env-Präfixe.   |
 | [webapp-shell.md](pages/webapp-shell.md)                   | Shell-Layout, kanonische Top-Nav IA, Listen-Muster.           |
+| [demo-gf-2026-10-10.md](pages/demo-gf-2026-10-10.md)       | Klickpfad GF-Demo 10.10.2026 (Spahrbau, read-first).          |
 
 ## Protokolle
 
@@ -39,6 +40,7 @@ verlinkt, nie kopiert.
 | 2026-09-07 | [APP_URL auf Webapp-Vercel-Alias (pre-Domain-Cutover)](logs/2026-09-07-app-url-vercel-alias.md) |
 | 2026-09-07 | [Weisse Webapp bei fehlenden VITE_*-Env](logs/2026-09-07-webapp-boot-env-error.md)              |
 | 2026-09-08 | [Wave 2 Demo: Einsätze und Zeiten](logs/2026-09-08-wave2-einsaetze-zeiten.md)                   |
+| 2026-09-11 | [Demo-GF-Lücken geschlossen](logs/2026-09-11-demo-gf-luecken.md)                                |
 
 ## Die drei wichtigsten Sätze
 

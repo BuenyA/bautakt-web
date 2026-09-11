@@ -1,8 +1,8 @@
 # Webapp-Shell und Navigation
 
 Wie die angemeldete Oberfläche in `apps/webapp` aufgebaut ist und welche
-Informationsarchitektur gilt. Stand Wave 2 Demo (2026-09-08): Einsätze/Zeiten
-read-first ergänzt.
+Informationsarchitektur gilt. Stand Demo-GF-Lücken (2026-09-11): Kunden-Detail
+read-first ergänzt; Wochenfilter-Empty mit Wechsel zu „Alle“.
 
 ## Layout
 
@@ -36,10 +36,12 @@ Shell nutzt die bestehenden `@bautakt/ui`-Tokens (Mobile-Port, Primary `#0a66c2`
 
 ## Datenabfragen
 
-`useOrders` / `useOrder` / `useCustomers` / `useAssignments` / `useAssignment` /
-`useTimeEntries` starten den `queryKey` mit `companyId`. UI-Gating bleibt Führung;
-RLS bleibt die Grenze.
+`useOrders` / `useOrder` / `useCustomers` / `useCustomer` / `useAssignments` /
+`useAssignment` / `useTimeEntries` starten den `queryKey` mit `companyId`.
+UI-Gating bleibt Führung; RLS bleibt die Grenze.
 
-Einsätze und Zeiten sind read-first (Liste; Einsätze zusätzlich Detail). Schreib-
-Flows und Kalender-Grid fehlen bewusst. `calendar_events` sind nicht in der
-Einsatzliste — eigene Tabelle, anderer Zuschnitt.
+Aufträge, Einsätze und Kunden sind read-first (Liste + Detail). Zeiten nur Liste.
+Schreib-Flows und Kalender-Grid fehlen bewusst. `calendar_events` sind nicht in
+der Einsatzliste — eigene Tabelle, anderer Zuschnitt.
+
+Demo-Klickpfad: [demo-gf-2026-10-10.md](demo-gf-2026-10-10.md).

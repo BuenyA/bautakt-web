@@ -12,6 +12,7 @@ import { RegisterPage } from '@/features/auth/pages/RegisterPage';
 import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { PublicOnlyRoute } from '@/features/auth/PublicOnlyRoute';
+import { CustomerDetailPage } from '@/features/customers/pages/CustomerDetailPage';
 import { CustomersListPage } from '@/features/customers/pages/CustomersListPage';
 import { OrderDetailPage } from '@/features/orders/pages/OrderDetailPage';
 import { OrdersListPage } from '@/features/orders/pages/OrdersListPage';
@@ -66,6 +67,7 @@ export const router = createBrowserRouter([
                 element: <PlaceholderPage titleKey="common:nav.invoices" />,
               },
               { path: routes.customers, element: <CustomersListPage /> },
+              { path: `${routes.customers}/:id`, element: <CustomerDetailPage /> },
               {
                 path: routes.settings,
                 element: <PlaceholderPage titleKey="common:nav.settings" />,
