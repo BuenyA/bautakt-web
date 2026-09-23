@@ -311,5 +311,60 @@
     "saved": "Zahlung gebucht.",
     "saveError": "Zahlung konnte nicht gebucht werden.",
     "dunningLevel": "Mahnstufe {{level}} versendet."
+  },
+  "expenses": {
+    "title": "Ausgaben",
+    "description": "Eingangsrechnungen und sonstige Kosten des Betriebs.",
+    "tabIncoming": "Eingangsrechnungen",
+    "tabExpenses": "Sonstige Ausgaben",
+    "columns": {
+      "number": "Nummer",
+      "vendor": "Lieferant",
+      "date": "Datum",
+      "due": "Fällig",
+      "gross": "Brutto",
+      "title": "Bezeichnung",
+      "category": "Kategorie",
+      "net": "Netto"
+    },
+    "calculatory": "Kalkulatorisch",
+    "overdue_one": "{{count}} Tag überfällig",
+    "overdue_other": "{{count}} Tage überfällig",
+    "emptyIncomingTitle": "Keine Eingangsrechnungen",
+    "emptyIncomingDescription": "Sobald Lieferantenrechnungen erfasst sind, erscheinen sie hier.",
+    "emptyExpensesTitle": "Keine Ausgaben erfasst",
+    "emptyExpensesDescription": "Gemeinkosten und sonstige Belege erscheinen hier."
+  },
+  "dunning": {
+    "title": "Mahnwesen",
+    "description": "Überfällige Belege und ihre bisherige Mahnstufe.",
+    "columns": {
+      "level": "Mahnstufe"
+    },
+    "noNotice": "Nicht gemahnt",
+    "levelLabel": "{{level}}. Mahnung",
+    "createAction": "{{level}}. Mahnung",
+    "confirmTitle": "{{level}}. Mahnung anlegen?",
+    "confirmDescription": "Für {{number}} über {{amount}}. Eine Mahnung lässt sich nicht zurücknehmen.",
+    "confirmAction": "Mahnung anlegen",
+    "created": "{{level}}. Mahnung angelegt.",
+    "createError": "Mahnung konnte nicht angelegt werden",
+    "emptyTitle": "Nichts zu mahnen",
+    "emptyDescription": "Kein Beleg ist über seine Fälligkeit hinaus offen."
+  },
+  "reports": {
+    "title": "Auswertungen",
+    "description": "Umsatz und Ausgaben im Zeitverlauf.",
+    "lastMonths": "Letzte {{count}} Monate",
+    "revenueTitle": "Umsatz je Monat",
+    "expenseTitle": "Ausgaben je Monat",
+    "byCustomer": "Umsatz je Kunde",
+    "columns": {
+      "customer": "Kunde",
+      "documents": "Belege",
+      "revenue": "Umsatz"
+    },
+    "noData": "Keine Daten im Zeitraum",
+    "noDataDescription": "Für diesen Zeitraum sind keine Belege erfasst."
   }
 }

@@ -34,6 +34,14 @@ export {
   vatByRateGroups,
 } from './money';
 export {
+  type DatedAmount,
+  formatMonthShort,
+  type MonthlyPoint,
+  monthlyRevenue,
+  monthlyTotals,
+  monthRange,
+} from './monthly';
+export {
   AGING_BUCKET_ORDER,
   type AgingBucket,
   agingBucket,

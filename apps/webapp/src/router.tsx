@@ -15,11 +15,14 @@ import { PublicOnlyRoute } from '@/features/auth/PublicOnlyRoute';
 import { RequirePermission } from '@/features/company/RequirePermission';
 import { CustomerDetailPage } from '@/features/customers/pages/CustomerDetailPage';
 import { CustomersListPage } from '@/features/customers/pages/CustomersListPage';
+import { DunningPage } from '@/features/finance/pages/DunningPage';
+import { ExpensesPage } from '@/features/finance/pages/ExpensesPage';
 import { InvoiceDetailPage } from '@/features/finance/pages/InvoiceDetailPage';
 import { InvoicePrintPage } from '@/features/finance/pages/InvoicePrintPage';
 import { InvoicesListPage } from '@/features/finance/pages/InvoicesListPage';
 import { QuotesListPage } from '@/features/finance/pages/QuotesListPage';
 import { ReceivablesPage } from '@/features/finance/pages/ReceivablesPage';
+import { ReportsPage } from '@/features/finance/pages/ReportsPage';
 import { OrderDetailPage } from '@/features/orders/pages/OrderDetailPage';
 import { OrdersListPage } from '@/features/orders/pages/OrdersListPage';
 import { OverviewPage } from '@/features/overview/pages/OverviewPage';
@@ -124,7 +127,7 @@ export const router = createBrowserRouter([
                 path: routes.expenses,
                 element: (
                   <RequirePermission anyOf={['canViewCompanyFinance', 'canManageOverheadCosts']}>
-                    <PlaceholderPage titleKey="common:nav.expenses" />
+                    <ExpensesPage />
                   </RequirePermission>
                 ),
               },
@@ -132,7 +135,7 @@ export const router = createBrowserRouter([
                 path: routes.dunning,
                 element: (
                   <RequirePermission anyOf={['canUseBillingModule', 'canViewCompanyFinance']}>
-                    <PlaceholderPage titleKey="common:nav.dunning" />
+                    <DunningPage />
                   </RequirePermission>
                 ),
               },
@@ -140,7 +143,7 @@ export const router = createBrowserRouter([
                 path: routes.reports,
                 element: (
                   <RequirePermission anyOf={['canViewCompanyFinance']}>
-                    <PlaceholderPage titleKey="common:nav.reports" />
+                    <ReportsPage />
                   </RequirePermission>
                 ),
               },
