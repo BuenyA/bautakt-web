@@ -15,6 +15,8 @@ import { PublicOnlyRoute } from '@/features/auth/PublicOnlyRoute';
 import { RequirePermission } from '@/features/company/RequirePermission';
 import { CustomerDetailPage } from '@/features/customers/pages/CustomerDetailPage';
 import { CustomersListPage } from '@/features/customers/pages/CustomersListPage';
+import { InvoiceDetailPage } from '@/features/finance/pages/InvoiceDetailPage';
+import { InvoicePrintPage } from '@/features/finance/pages/InvoicePrintPage';
 import { InvoicesListPage } from '@/features/finance/pages/InvoicesListPage';
 import { QuotesListPage } from '@/features/finance/pages/QuotesListPage';
 import { ReceivablesPage } from '@/features/finance/pages/ReceivablesPage';
@@ -58,6 +60,16 @@ export const router = createBrowserRouter([
       {
         element: <ProtectedRoute />,
         children: [
+          // Druckansicht bewusst ausserhalb der Shell: auf Papier gehoert kein
+          // Menue. Der Schutz durch ProtectedRoute bleibt.
+          {
+            path: `${routes.invoices}/:id/druck`,
+            element: (
+              <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
+                <InvoicePrintPage />
+              </RequirePermission>
+            ),
+          },
           {
             element: <AppShell />,
             children: [
@@ -89,6 +101,14 @@ export const router = createBrowserRouter([
                 element: (
                   <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
                     <InvoicesListPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: `${routes.invoices}/:id`,
+                element: (
+                  <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
+                    <InvoiceDetailPage />
                   </RequirePermission>
                 ),
               },

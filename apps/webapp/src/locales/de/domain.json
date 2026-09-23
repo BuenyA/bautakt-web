@@ -192,7 +192,42 @@
     "emptyTitle": "Noch keine Rechnungen",
     "emptyDescription": "Sobald Rechnungen ausgestellt sind, erscheinen sie hier.",
     "loadErrorTitle": "Belege konnten nicht geladen werden",
-    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
+    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+    "detailTitle": "Rechnung",
+    "draftTitle": "Entwurf",
+    "details": "Angaben",
+    "lines": "Positionen",
+    "noLines": "Keine Positionen erfasst.",
+    "lineColumns": {
+      "title": "Position",
+      "quantity": "Menge",
+      "unitPrice": "Einzelpreis",
+      "tax": "USt.",
+      "net": "Netto"
+    },
+    "net": "Netto",
+    "vat": "Umsatzsteuer",
+    "vatAt": "Umsatzsteuer {{rate}} %",
+    "gross": "Brutto",
+    "paid": "Bereits gezahlt",
+    "open": "Offen",
+    "openAmount": "Offen: {{amount}}",
+    "serviceDate": "Leistungsdatum",
+    "paymentTerm": "Zahlungsziel",
+    "buyerReference": "Referenz des Kunden",
+    "notes": "Notizen",
+    "days_one": "{{count}} Tag",
+    "days_other": "{{count}} Tage",
+    "recipient": "Rechnung an",
+    "taxNumber": "Steuernummer",
+    "vatId": "USt-IdNr.",
+    "smallBusinessNote": "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
+    "print": "Druckansicht",
+    "finalize": "Festschreiben",
+    "finalizeSuccess": "Beleg festgeschrieben und nummeriert.",
+    "finalizeError": "Festschreiben nicht möglich",
+    "notFoundTitle": "Beleg nicht gefunden",
+    "notFoundDescription": "Dieser Beleg existiert nicht oder ist für Sie nicht sichtbar."
   },
   "quotes": {
     "listTitle": "Angebote",
@@ -249,5 +284,32 @@
     "tasksEmpty": "Nichts offen — alles erledigt.",
     "noFinanceTitle": "Keine Kennzahlen sichtbar",
     "noFinanceDescription": "Für die Zahlen des Betriebs fehlt dir die Berechtigung. Deine Aufträge, Einsätze und Zeiten findest du in der Seitenleiste."
+  },
+  "documentType": {
+    "invoice": "Rechnung",
+    "partial_invoice": "Abschlagsrechnung",
+    "final_invoice": "Schlussrechnung",
+    "quote": "Angebot"
+  },
+  "payments": {
+    "title": "Zahlungen",
+    "add": "Zahlung erfassen",
+    "empty": "Noch keine Zahlung gebucht.",
+    "amount": "Betrag",
+    "skonto": "Skonto",
+    "paidAt": "Zahlungsdatum",
+    "method": "Zahlungsweg",
+    "note": "Notiz",
+    "methods": {
+      "bank_transfer": "Überweisung",
+      "cash": "Bar",
+      "card": "Karte",
+      "other": "Sonstiges"
+    },
+    "openHint": "Offen sind noch {{amount}}.",
+    "amountInvalid": "Bitte einen Betrag größer als 0 eingeben.",
+    "saved": "Zahlung gebucht.",
+    "saveError": "Zahlung konnte nicht gebucht werden.",
+    "dunningLevel": "Mahnstufe {{level}} versendet."
   }
 }

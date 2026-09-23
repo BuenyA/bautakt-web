@@ -29,6 +29,7 @@ export const routes = {
   quote: (id: string) => `/angebote/${id}`,
   invoices: '/rechnungen',
   invoice: (id: string) => `/rechnungen/${id}`,
+  invoicePrint: (id: string) => `/rechnungen/${id}/druck`,
   receivables: '/offene-posten',
   expenses: '/ausgaben',
   dunning: '/mahnwesen',

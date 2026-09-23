@@ -2,12 +2,13 @@ import { eurosToMinor, formatMoney } from '@bautakt/finance';
 import { DataTable, type DataTableColumn, Tabs, TabsList, TabsTrigger } from '@bautakt/ui';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { formatDate } from '@/lib/format';
+import { routes } from '@/lib/routes';
 
 import { DocumentStatusBadge } from '../DocumentStatusBadge';
 import {
@@ -61,6 +62,7 @@ function matchesFilter(document: SalesDocumentListRow, filter: StatusFilter): bo
 export function InvoicesListPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = filterFromSearch(searchParams.get('status'));
   const { data, isLoading, isError, refetch } = useSalesDocuments(INVOICE_TYPE_LIST);
@@ -81,9 +83,13 @@ export function InvoicesListPage() {
         accessorKey: 'document_number',
         header: t('domain:invoices.columns.number'),
         cell: ({ row }) => (
-          <span className="text-foreground font-medium whitespace-nowrap">
+          <Link
+            to={routes.invoice(row.original.id)}
+            className="text-foreground hover:text-primary font-medium whitespace-nowrap hover:underline"
+            onClick={(event) => event.stopPropagation()}
+          >
             {row.original.document_number || t('domain:invoices.noNumber')}
-          </span>
+          </Link>
         ),
       },
       {
@@ -171,6 +177,7 @@ export function InvoicesListPage() {
         isLoading={isLoading}
         labels={labels}
         exportFileName="rechnungen"
+        onRowClick={(document) => void navigate(routes.invoice(document.id))}
         toolbar={
           <Tabs value={filter} onValueChange={setFilter}>
             <TabsList aria-label={t('domain:invoices.filtersLabel')}>
