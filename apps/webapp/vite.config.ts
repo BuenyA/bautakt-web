@@ -11,6 +11,14 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
+    /**
+     * ⚠️ Ohne diese Zeile bekommt eine Abhaengigkeit, die ueber `packages/ui`
+     * hereinkommt (z. B. sonner), eine ZWEITE React-Instanz — sichtbar als
+     * „Cannot read properties of null (reading 'useState')" und weisser Seite.
+     * Im Monorepo aufloesen beide Pfade auf dieselbe Datei nur, wenn man es
+     * hier erzwingt.
+     */
+    dedupe: ['react', 'react-dom'],
   },
   server: {
     port: 5173,

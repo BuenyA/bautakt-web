@@ -2,6 +2,7 @@ import { Button } from '@bautakt/ui';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 
+import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
@@ -10,16 +11,6 @@ import { routes } from '@/lib/routes';
 
 import { OrderStatusBadge } from '../OrderStatusBadge';
 import { useOrder } from '../useOrder';
-
-function DetailRow({ label, value }: { label: string; value: string }) {
-  if (!value) return null;
-  return (
-    <div className="grid gap-1 sm:grid-cols-[12rem_1fr] sm:gap-4">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="text-sm text-foreground">{value}</dd>
-    </div>
-  );
-}
 
 export function OrderDetailPage() {
   const { t } = useTranslation();
@@ -102,7 +93,7 @@ export function OrderDetailPage() {
         </p>
       ) : null}
 
-      <dl className="flex max-w-3xl flex-col gap-4 rounded-lg border border-border bg-card p-4 sm:p-6">
+      <DetailCard className="max-w-3xl">
         <DetailRow
           label={t('domain:orders.fields.customer')}
           value={data.customer_label || t('domain:orders.noCustomer')}
@@ -116,7 +107,7 @@ export function OrderDetailPage() {
         />
         <DetailRow label={t('domain:orders.fields.costCenter')} value={data.cost_center_label} />
         <DetailRow label={t('domain:orders.fields.created')} value={formatDate(data.created_at)} />
-      </dl>
+      </DetailCard>
     </div>
   );
 }

@@ -1,6 +1,14 @@
 /* Design-Tokens und Tailwind. Kanonisch in packages/ui — siehe dortigen Dateikopf. */
 @import '@bautakt/ui/styles/theme.css';
 
+/* Animationsklassen (`animate-in`, `slide-in-from-*`), die die Radix-Bauteile
+   ueber `data-state` ansteuern. Ohne diese Zeile klappen Sheet und Menue ohne
+   Uebergang auf. */
+@import 'tw-animate-css';
+
+/* Icon-Schrift der Mobile-App — gleiche Symbole am Handy und am Rechner. */
+@import '@bautakt/ui/icons/uicons.css';
+
 /* Quellen, die Tailwind nach Klassennamen durchsuchen muss. Ohne diese Zeile
    sieht v4 die Komponenten in packages/ui nicht und laesst deren Klassen weg. */
 @source '../../../packages/ui/src';

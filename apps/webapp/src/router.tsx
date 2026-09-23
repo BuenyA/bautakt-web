@@ -12,6 +12,7 @@ import { RegisterPage } from '@/features/auth/pages/RegisterPage';
 import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { PublicOnlyRoute } from '@/features/auth/PublicOnlyRoute';
+import { RequirePermission } from '@/features/company/RequirePermission';
 import { CustomerDetailPage } from '@/features/customers/pages/CustomerDetailPage';
 import { CustomersListPage } from '@/features/customers/pages/CustomersListPage';
 import { OrderDetailPage } from '@/features/orders/pages/OrderDetailPage';
@@ -28,6 +29,10 @@ import { HOME_ROUTE, routes } from '@/lib/routes';
  *
  * Die Guards sind Komponenten und keine Loader. Loader laufen ausserhalb von
  * React und koennen den AuthProvider-Context nicht lesen.
+ *
+ * Die Bereiche, deren Inhalt noch entsteht, haengen bereits als Platzhalter im
+ * Baum — samt Rechte-Waechter. So laesst sich die Navigation vollstaendig
+ * pruefen, bevor die Seiten da sind.
  */
 export const router = createBrowserRouter([
   {
@@ -57,39 +62,123 @@ export const router = createBrowserRouter([
                 path: routes.overview,
                 element: <PlaceholderPage titleKey="common:nav.overview" />,
               },
+
+              // --- Arbeit ---
               { path: routes.orders, element: <OrdersListPage /> },
               { path: `${routes.orders}/:id`, element: <OrderDetailPage /> },
               { path: routes.assignments, element: <AssignmentsListPage /> },
               { path: `${routes.assignments}/:id`, element: <AssignmentDetailPage /> },
+              {
+                path: routes.calendar,
+                element: <PlaceholderPage titleKey="common:nav.calendar" />,
+              },
               { path: routes.times, element: <TimesListPage /> },
+
+              // --- Finanzen ---
+              {
+                path: routes.quotes,
+                element: (
+                  <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
+                    <PlaceholderPage titleKey="common:nav.quotes" />
+                  </RequirePermission>
+                ),
+              },
               {
                 path: routes.invoices,
-                element: <PlaceholderPage titleKey="common:nav.invoices" />,
+                element: (
+                  <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
+                    <PlaceholderPage titleKey="common:nav.invoices" />
+                  </RequirePermission>
+                ),
               },
+              {
+                path: routes.receivables,
+                element: (
+                  <RequirePermission anyOf={['canViewCompanyFinance']}>
+                    <PlaceholderPage titleKey="common:nav.receivables" />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.expenses,
+                element: (
+                  <RequirePermission anyOf={['canViewCompanyFinance', 'canManageOverheadCosts']}>
+                    <PlaceholderPage titleKey="common:nav.expenses" />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.dunning,
+                element: (
+                  <RequirePermission anyOf={['canUseBillingModule', 'canViewCompanyFinance']}>
+                    <PlaceholderPage titleKey="common:nav.dunning" />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.reports,
+                element: (
+                  <RequirePermission anyOf={['canViewCompanyFinance']}>
+                    <PlaceholderPage titleKey="common:nav.reports" />
+                  </RequirePermission>
+                ),
+              },
+
+              // --- Team ---
+              {
+                path: routes.employees,
+                element: (
+                  <RequirePermission anyOf={['canManageEmployees']}>
+                    <PlaceholderPage titleKey="common:nav.employees" />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.absences,
+                element: (
+                  <RequirePermission anyOf={['canManageAbsences']}>
+                    <PlaceholderPage titleKey="common:nav.absences" />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.payroll,
+                element: (
+                  <RequirePermission anyOf={['canViewWageCosts', 'canManageRates']}>
+                    <PlaceholderPage titleKey="common:nav.payroll" />
+                  </RequirePermission>
+                ),
+              },
+
+              // --- Stammdaten ---
               { path: routes.customers, element: <CustomersListPage /> },
               { path: `${routes.customers}/:id`, element: <CustomerDetailPage /> },
+              {
+                path: routes.catalog,
+                element: (
+                  <RequirePermission anyOf={['canManageCatalog']}>
+                    <PlaceholderPage titleKey="common:nav.catalog" />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.costCenters,
+                element: (
+                  <RequirePermission anyOf={['canManageCostCenters']}>
+                    <PlaceholderPage titleKey="common:nav.costCenters" />
+                  </RequirePermission>
+                ),
+              },
+
               {
                 path: routes.settings,
                 element: <PlaceholderPage titleKey="common:nav.settings" />,
               },
 
               // Alte Pfade umleiten, damit Bookmarks nicht leer laufen.
-              {
-                path: routes.legacyEmployees,
-                element: <Navigate to={routes.settings} replace />,
-              },
-              {
-                path: routes.legacyFinance,
-                element: <Navigate to={routes.invoices} replace />,
-              },
-              {
-                path: routes.legacyCalendar,
-                element: <Navigate to={routes.assignments} replace />,
-              },
-              {
-                path: routes.legacyNotifications,
-                element: <Navigate to={HOME_ROUTE} replace />,
-              },
+              // `/mitarbeiter` und `/kalender` sind inzwischen eigene Bereiche.
+              { path: routes.legacyFinance, element: <Navigate to={routes.invoices} replace /> },
+              { path: routes.legacyNotifications, element: <Navigate to={HOME_ROUTE} replace /> },
             ],
           },
         ],

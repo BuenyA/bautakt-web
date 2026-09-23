@@ -1,22 +1,21 @@
-import { cn } from '@bautakt/ui';
+import { Badge } from '@bautakt/ui';
 import { useTranslation } from 'react-i18next';
 
 const KNOWN_STATUSES = ['quote', 'active', 'finished', 'declined'] as const;
 
 export type OrderStatus = (typeof KNOWN_STATUSES)[number] | string;
 
-function statusTone(status: string): string {
+/** Farbe folgt der Bedeutung, nicht dem Geschmack — dieselben Toene wie in der App. */
+function statusVariant(status: string) {
   switch (status) {
     case 'quote':
-      return 'bg-accent text-accent-foreground';
+      return 'accent' as const;
     case 'active':
-      return 'bg-success-bg text-success';
-    case 'finished':
-      return 'bg-surface text-muted-foreground';
+      return 'success' as const;
     case 'declined':
-      return 'bg-destructive-bg text-destructive';
+      return 'destructive' as const;
     default:
-      return 'bg-surface text-muted-foreground';
+      return 'muted' as const;
   }
 }
 
@@ -25,14 +24,5 @@ export function OrderStatusBadge({ status }: { status: string }) {
   const known = (KNOWN_STATUSES as readonly string[]).includes(status);
   const label = known ? t(`domain:orderStatus.${status}`) : status;
 
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium',
-        statusTone(status),
-      )}
-    >
-      {label}
-    </span>
-  );
+  return <Badge variant={statusVariant(status)}>{label}</Badge>;
 }

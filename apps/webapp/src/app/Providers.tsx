@@ -1,9 +1,11 @@
+import { Toaster } from '@bautakt/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 
 import { AuthProvider } from '@/features/auth/AuthProvider';
 
 import { queryClient } from './queryClient';
+import { ThemeProvider } from './ThemeProvider';
 
 /**
  * Reihenfolge zaehlt: AuthProvider liegt INNERHALB des QueryClientProvider,
@@ -12,7 +14,10 @@ import { queryClient } from './queryClient';
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>{children}</AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>{children}</AuthProvider>
+        <Toaster />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

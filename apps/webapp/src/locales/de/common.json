@@ -5,21 +5,59 @@
     "cancel": "Abbrechen",
     "back": "Zurück",
     "retry": "Erneut versuchen",
-    "signOut": "Abmelden"
+    "signOut": "Abmelden",
+    "search": "Suchen …",
+    "export": "CSV-Export",
+    "columns": "Spalten"
   },
   "state": {
     "loading": "Wird geladen …",
     "empty": "Nichts vorhanden",
     "comingSoon": "Dieser Bereich wird gerade gebaut."
   },
+  "theme": {
+    "label": "Darstellung",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "Wie das System"
+  },
+  "table": {
+    "of": "von",
+    "rows": "Einträge",
+    "previous": "Zurück",
+    "next": "Weiter"
+  },
+  "forbidden": {
+    "title": "Kein Zugriff",
+    "description": "Für diesen Bereich fehlt dir die Berechtigung. Wende dich an die Geschäftsführung, wenn du sie brauchst.",
+    "action": "Zur Übersicht"
+  },
   "nav": {
+    "groups": {
+      "work": "Arbeit",
+      "finance": "Finanzen",
+      "team": "Team",
+      "masterData": "Stammdaten"
+    },
     "overview": "Übersicht",
     "orders": "Aufträge",
     "assignments": "Einsätze",
+    "calendar": "Kalender",
     "times": "Zeiten",
+    "quotes": "Angebote",
     "invoices": "Rechnungen",
+    "receivables": "Offene Posten",
+    "expenses": "Ausgaben",
+    "dunning": "Mahnwesen",
+    "reports": "Auswertungen",
+    "employees": "Mitarbeiter",
+    "absences": "Abwesenheiten",
+    "payroll": "Lohn",
     "customers": "Kunden",
+    "catalog": "Katalog",
+    "costCenters": "Kostenstellen",
     "settings": "Einstellungen",
+    "detail": "Detail",
     "notifications": "Benachrichtigungen",
     "notificationsComingSoon": "Benachrichtigungen folgen in einer späteren Welle.",
     "openMenu": "Menü öffnen",

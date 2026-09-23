@@ -12,22 +12,46 @@ export const routes = {
   forgotPassword: '/passwort-vergessen',
   resetPassword: '/passwort-zuruecksetzen',
 
-  // Geschuetzt — kanonische Top-Nav IA (Wave 1)
+  // Geschuetzt — Bereiche wie in der Handy-App benannt, am Desktop aber flach
+  // nebeneinander statt in einem Hub verschachtelt.
   overview: '/uebersicht',
+
+  // Arbeit
   orders: '/auftraege',
   order: (id: string) => `/auftraege/${id}`,
   assignments: '/einsaetze',
   assignment: (id: string) => `/einsaetze/${id}`,
+  calendar: '/kalender',
   times: '/zeiten',
+
+  // Finanzen
+  quotes: '/angebote',
+  quote: (id: string) => `/angebote/${id}`,
   invoices: '/rechnungen',
+  invoice: (id: string) => `/rechnungen/${id}`,
+  receivables: '/offene-posten',
+  expenses: '/ausgaben',
+  dunning: '/mahnwesen',
+  reports: '/auswertungen',
+
+  // Team
+  employees: '/mitarbeiter',
+  employee: (id: string) => `/mitarbeiter/${id}`,
+  absences: '/abwesenheiten',
+  payroll: '/lohn',
+
+  // Stammdaten
   customers: '/kunden',
   customer: (id: string) => `/kunden/${id}`,
+  catalog: '/katalog',
+  costCenters: '/kostenstellen',
+
   settings: '/einstellungen',
 
   // Alte Pfade: Redirects bleiben, bis Bookmarks und Mails umgezogen sind.
-  legacyEmployees: '/mitarbeiter',
+  // `/mitarbeiter`, `/finanzen` und `/kalender` sind inzwischen echte Seiten;
+  // uebrig bleibt, was keinen eigenen Bereich bekommen hat.
   legacyFinance: '/finanzen',
-  legacyCalendar: '/kalender',
   legacyNotifications: '/benachrichtigungen',
 } as const;
 
