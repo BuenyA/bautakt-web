@@ -15,8 +15,12 @@ import { PublicOnlyRoute } from '@/features/auth/PublicOnlyRoute';
 import { RequirePermission } from '@/features/company/RequirePermission';
 import { CustomerDetailPage } from '@/features/customers/pages/CustomerDetailPage';
 import { CustomersListPage } from '@/features/customers/pages/CustomersListPage';
+import { InvoicesListPage } from '@/features/finance/pages/InvoicesListPage';
+import { QuotesListPage } from '@/features/finance/pages/QuotesListPage';
+import { ReceivablesPage } from '@/features/finance/pages/ReceivablesPage';
 import { OrderDetailPage } from '@/features/orders/pages/OrderDetailPage';
 import { OrdersListPage } from '@/features/orders/pages/OrdersListPage';
+import { OverviewPage } from '@/features/overview/pages/OverviewPage';
 import { TimesListPage } from '@/features/times/pages/TimesListPage';
 import { HOME_ROUTE, routes } from '@/lib/routes';
 
@@ -58,10 +62,7 @@ export const router = createBrowserRouter([
             element: <AppShell />,
             children: [
               { index: true, element: <Navigate to={HOME_ROUTE} replace /> },
-              {
-                path: routes.overview,
-                element: <PlaceholderPage titleKey="common:nav.overview" />,
-              },
+              { path: routes.overview, element: <OverviewPage /> },
 
               // --- Arbeit ---
               { path: routes.orders, element: <OrdersListPage /> },
@@ -79,7 +80,7 @@ export const router = createBrowserRouter([
                 path: routes.quotes,
                 element: (
                   <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
-                    <PlaceholderPage titleKey="common:nav.quotes" />
+                    <QuotesListPage />
                   </RequirePermission>
                 ),
               },
@@ -87,7 +88,7 @@ export const router = createBrowserRouter([
                 path: routes.invoices,
                 element: (
                   <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
-                    <PlaceholderPage titleKey="common:nav.invoices" />
+                    <InvoicesListPage />
                   </RequirePermission>
                 ),
               },
@@ -95,7 +96,7 @@ export const router = createBrowserRouter([
                 path: routes.receivables,
                 element: (
                   <RequirePermission anyOf={['canViewCompanyFinance']}>
-                    <PlaceholderPage titleKey="common:nav.receivables" />
+                    <ReceivablesPage />
                   </RequirePermission>
                 ),
               },

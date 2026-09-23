@@ -1,8 +1,20 @@
 {
-  "order": { "one": "Auftrag", "other": "Aufträge" },
-  "customer": { "one": "Kunde", "other": "Kunden" },
-  "employee": { "one": "Mitarbeiter", "other": "Mitarbeiter" },
-  "company": { "one": "Betrieb", "other": "Betriebe" },
+  "order": {
+    "one": "Auftrag",
+    "other": "Aufträge"
+  },
+  "customer": {
+    "one": "Kunde",
+    "other": "Kunden"
+  },
+  "employee": {
+    "one": "Mitarbeiter",
+    "other": "Mitarbeiter"
+  },
+  "company": {
+    "one": "Betrieb",
+    "other": "Betriebe"
+  },
   "orderStatus": {
     "quote": "Angebot",
     "active": "Aktiv",
@@ -140,5 +152,102 @@
     "emptyDescription": "Sobald Zeiten erfasst sind, erscheinen sie hier.",
     "loadErrorTitle": "Zeiten konnten nicht geladen werden",
     "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
+  },
+  "documentStatus": {
+    "draft": "Entwurf",
+    "issued": "Ausgestellt",
+    "sent": "Versendet",
+    "partially_paid": "Teilzahlung",
+    "paid": "Bezahlt",
+    "overdue": "Überfällig",
+    "cancelled": "Storniert"
+  },
+  "agingBucket": {
+    "not_due": "Nicht fällig",
+    "1_30": "1–30 Tage",
+    "31_60": "31–60 Tage",
+    "61_90": "61–90 Tage",
+    "90_plus": "Über 90 Tage"
+  },
+  "invoices": {
+    "listTitle": "Rechnungen",
+    "listDescription": "Ausgangsrechnungen Ihres Betriebs.",
+    "filtersLabel": "Rechnungsfilter",
+    "filterAll": "Alle",
+    "filterOpen": "Offen",
+    "filterOverdue": "Überfällig",
+    "filterDrafts": "Entwürfe",
+    "filterPaid": "Bezahlt",
+    "columns": {
+      "number": "Nummer",
+      "customer": "Kunde",
+      "status": "Status",
+      "issueDate": "Rechnungsdatum",
+      "dueDate": "Fällig",
+      "gross": "Brutto"
+    },
+    "noNumber": "Ohne Nummer",
+    "noCustomer": "Kein Kunde",
+    "notIssued": "Nicht ausgestellt",
+    "emptyTitle": "Noch keine Rechnungen",
+    "emptyDescription": "Sobald Rechnungen ausgestellt sind, erscheinen sie hier.",
+    "loadErrorTitle": "Belege konnten nicht geladen werden",
+    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
+  },
+  "quotes": {
+    "listTitle": "Angebote",
+    "listDescription": "Angebote Ihres Betriebs.",
+    "columns": {
+      "number": "Nummer",
+      "customer": "Kunde",
+      "status": "Status",
+      "issueDate": "Datum",
+      "gross": "Brutto"
+    },
+    "emptyTitle": "Noch keine Angebote",
+    "emptyDescription": "Sobald Angebote geschrieben sind, erscheinen sie hier."
+  },
+  "receivables": {
+    "title": "Offene Posten",
+    "description": "Was der Betrieb noch zu bekommen hat, nach Alter der Forderung.",
+    "bucketsLabel": "Altersklassen",
+    "filterAll": "Alle",
+    "totalOpen": "Offene Forderungen",
+    "totalOverdue": "Davon überfällig",
+    "documentCount_one": "{{count}} Beleg",
+    "documentCount_other": "{{count}} Belege",
+    "days_one": "{{count}} Tag",
+    "days_other": "{{count}} Tage",
+    "notDue": "Nicht fällig",
+    "columns": {
+      "number": "Nummer",
+      "due": "Fällig",
+      "daysOverdue": "Überfällig",
+      "paid": "Bezahlt",
+      "open": "Offen"
+    },
+    "emptyTitle": "Keine offenen Posten",
+    "emptyDescription": "In dieser Altersklasse steht nichts aus."
+  },
+  "overview": {
+    "title": "Übersicht",
+    "description": "Was offen ist und was heute ansteht.",
+    "openReceivables": "Offene Forderungen",
+    "overdue": "Überfällig",
+    "revenueMonth": "Umsatz laufender Monat",
+    "drafts": "Entwürfe",
+    "draftsNote": "Noch nicht ausgestellt",
+    "noPreviousMonth": "Kein Vormonat zum Vergleich",
+    "versusPreviousMonth": "{{value}} zum Vormonat",
+    "tasksTitle": "Was liegt an",
+    "taskDunnable_one": "{{count}} Beleg ist mahnfähig",
+    "taskDunnable_other": "{{count}} Belege sind mahnfähig",
+    "taskDrafts_one": "{{count}} Entwurf ist nicht versendet",
+    "taskDrafts_other": "{{count}} Entwürfe sind nicht versendet",
+    "taskIncoming_one": "{{count}} Eingangsrechnung wird diese Woche fällig",
+    "taskIncoming_other": "{{count}} Eingangsrechnungen werden diese Woche fällig",
+    "tasksEmpty": "Nichts offen — alles erledigt.",
+    "noFinanceTitle": "Keine Kennzahlen sichtbar",
+    "noFinanceDescription": "Für die Zahlen des Betriebs fehlt dir die Berechtigung. Deine Aufträge, Einsätze und Zeiten findest du in der Seitenleiste."
   }
 }
