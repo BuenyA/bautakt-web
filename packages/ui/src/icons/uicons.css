@@ -1,0 +1,44 @@
+/**
+ * Einbindung der Flaticon-Uicon-Schriften fuer das Web.
+ *
+ * Die drei TTF-Dateien liegen in `./fonts` und sind aus bautakt-app kopiert
+ * (siehe Kopf von `glyphMap.ts`). `font-display: block` ist Absicht: ein
+ * kurzer Leerraum ist besser als eine Sekunde lang Ersatzzeichen dort, wo ein
+ * Symbol stehen soll.
+ *
+ * ℹ️ Lizenz: Flaticon-Uicons. Im kostenlosen Plan ist die Namensnennung
+ * Pflicht, im Premium-Plan nicht. Gilt fuer das Web genauso wie fuer die App.
+ */
+
+@font-face {
+  font-family: 'uicons-regular-rounded';
+  src: url('./fonts/uicons-regular-rounded.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'uicons-bold-rounded';
+  src: url('./fonts/uicons-bold-rounded.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'uicons-solid-rounded';
+  src: url('./fonts/uicons-solid-rounded.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+.bautakt-uicon {
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
