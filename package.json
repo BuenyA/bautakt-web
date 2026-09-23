@@ -19,7 +19,8 @@
     "typecheck": "turbo run typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "turbo run lint typecheck && prettier --check ."
+    "check": "turbo run lint typecheck test && prettier --check .",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "@bautakt/eslint-config": "*",

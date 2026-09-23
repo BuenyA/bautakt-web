@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@bautakt/core": "*",
+    "@bautakt/finance": "*",
     "@bautakt/supabase": "*",
     "@bautakt/ui": "*",
     "@hookform/resolvers": "^5.9.1",
