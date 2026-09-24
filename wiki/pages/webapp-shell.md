@@ -116,8 +116,15 @@ sondern den Hinweis auf Storno und Gutschrift.
 `DEFAULT gen_random_uuid()` — beim Anlegen muss der Client die `id` mitgeben
 (siehe [fallstricke.md](fallstricke.md)).
 
+Gebaut sind: Zahlung, Kunde, Zeiteintrag, Abwesenheit, Ausgabe, Mitarbeiter,
+Mahnung (mit Gebühr und Verzugszinsen) und der Beleg-Editor.
+
 ## Offen
 
-Zeiteintrag und Abwesenheit anlegen, Mitarbeiter bearbeiten, Ausgaben erfassen,
-Mahnungen mit Gebühr und Verzugszinsen, Bearbeiten der Firmenstammdaten und der
-E-Mail-Versand von Belegen (dafür fehlt die Edge Function in `bautakt-app`).
+- **Firmenstammdaten bearbeiten** — bewusst offen, siehe Abschnitt Schreiben.
+- **E-Mail-Versand von Belegen** — dafür fehlt die Edge Function in
+  `bautakt-app` (`finance-document-send` liefert 501). Bis dahin ist die
+  Druckansicht der Weg zum Kunden.
+- **Einladung von Mitarbeitern in die App** — läuft weiter über das Handy.
+- **Katalog und Kostenstellen pflegen** — bisher nur lesend.
+- **Mobilansicht** ist gebaut, aber noch nicht an einem echten Gerät geprüft.
