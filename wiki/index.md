@@ -44,6 +44,7 @@ verlinkt, nie kopiert.
 | 2026-09-11 | [Demo-GF-Lücken geschlossen](logs/2026-09-11-demo-gf-luecken.md)                                |
 | 2026-09-24 | [Web-Light-Primary auf Marketing-Blau](logs/2026-09-24-web-primary-marketing-blau.md)           |
 | 2026-09-24 | [Auftragsfotos nur lesend](logs/2026-09-24-auftragsfotos.md)                                    |
+| 2026-09-24 | [Dark Mode v2 und Sidebar-Scrollbar](logs/2026-09-24-dark-mode-v2.md)                           |
 
 ## Die drei wichtigsten Sätze
 
