@@ -13,6 +13,7 @@ import { routes } from '@/lib/routes';
 import { OrderNotes } from '../OrderNotes';
 import { OrderPhotos } from '../OrderPhotos';
 import { OrderStatusBadge } from '../OrderStatusBadge';
+import { OrderTimes } from '../OrderTimes';
 import { useOrder } from '../useOrder';
 
 export function OrderDetailPage() {
@@ -116,6 +117,7 @@ export function OrderDetailPage() {
 
       <OrderPhotos orderId={data.id} />
       <OrderNotes orderId={data.id} />
+      <OrderTimes orderId={data.id} />
     </div>
   );
 }

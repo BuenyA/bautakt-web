@@ -73,6 +73,14 @@
       "loadErrorTitle": "Notizen konnten nicht geladen werden",
       "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
       "editedAt": "Geändert {{date}}"
+    },
+    "times": {
+      "title": "Zeiten",
+      "all": "Alle Zeiten",
+      "emptyTitle": "Noch keine Zeiten",
+      "emptyDescription": "Erfasste Zeiten zu diesem Auftrag erscheinen hier.",
+      "loadErrorTitle": "Zeiten konnten nicht geladen werden",
+      "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
     }
   },
   "customers": {
@@ -169,6 +177,12 @@
     "breakMinutes": "{{count}} Min.",
     "emptyTitle": "Noch keine Zeiten",
     "emptyDescription": "Sobald Zeiten erfasst sind, erscheinen sie hier.",
+    "emptyForOrderTitle": "Keine Zeiten für diesen Auftrag",
+    "emptyForOrderDescription": "Für diesen Auftrag sind noch keine Zeiten erfasst.",
+    "clearOrderFilter": "Alle Aufträge",
+    "filteredDescription": "Nur die Zeiten dieses Auftrags.",
+    "filteredOnOrder": "Nur die Zeiten für {{order}}.",
+    "openOrder": "Zum Auftrag",
     "loadErrorTitle": "Zeiten konnten nicht geladen werden",
     "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
   },

@@ -5,6 +5,10 @@
  * Nie einen Pfad als Zeichenkette in eine Komponente schreiben — sonst findet
  * eine Umbenennung nie alle Stellen.
  */
+
+/** Query auf `/zeiten`, der die Liste auf eine `order_id` filtert. */
+export const timesOrderParam = 'order';
+
 export const routes = {
   // Oeffentlich
   login: '/login',
@@ -23,6 +27,11 @@ export const routes = {
   assignment: (id: string) => `/einsaetze/${id}`,
   calendar: '/kalender',
   times: '/zeiten',
+  /**
+   * Zeitenliste, eingeschraenkt auf einen Auftrag.
+   * Parametername steht in `timesOrderParam` — die Liste liest denselben Namen.
+   */
+  timesForOrder: (orderId: string) => `/zeiten?${timesOrderParam}=${encodeURIComponent(orderId)}`,
 
   // Finanzen
   quotes: '/angebote',
