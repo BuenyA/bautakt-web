@@ -83,8 +83,17 @@ das sind Bauteile der Primitives, keine Bautakt-Symbole.
 
 Hell/Dunkel über `ThemeProvider` (Klasse `dark` am `<html>`, Wahl im
 localStorage, Standard: Systemeinstellung). Die Farbwerte sind die Tokens aus
-`packages/ui/src/styles/theme.css`; dort kamen nur die `--sidebar-*`-Namen dazu,
-die shadcn erwartet, als Aliase auf bestehende Werte.
+`packages/ui/src/styles/theme.css`. Die `--sidebar-*`-Namen sind Aliase auf
+bestehende Flächen, kein eigenes Primary.
+
+Dark (Stand 2026-09-24, Dark Mode v2) ist eine kühle Graublau-Stufe:
+Hintergrund `#0F1115`, Sidebar `#161A22`, Surface `#1A1F28`, Card `#1E2430`.
+Primary im Dark bleibt `#4FA3E3`. Light ist davon getrennt.
+
+Die Sidebar scrollt in `SidebarContent` (`data-sidebar="content"`,
+`overflow-y-auto`). Nur dieses Element bekommt den schmalen Scrollbar (6px,
+Thumb `--border-strong`, Track transparent). Der Wrapper trägt
+`overflow-hidden`; die übrige Seite behält den Browser-Scrollbar.
 
 ## Datenabfragen
 

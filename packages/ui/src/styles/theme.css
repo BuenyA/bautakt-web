@@ -12,6 +12,11 @@
  * und Ring folgen dem Marketing-Blau #3B86E0 / #E8F2FC. Dark-Primary bleibt
  * #4FA3E3. Die Mobile-App zieht das Light-Primary in einem eigenen PR nach.
  *
+ * Ausnahme, datiert 2026-09-24: die Dark-Flächen unten sind Dark Mode v2
+ * (kühle Graublau-Neutrale). Sie weichen bewusst vom älteren Violettstich in
+ * bautakt-app ab und gelten hier, bis die Mobile-Palette nachzieht.
+ * Dark-Primary bleibt #4fa3e3.
+ *
  * Die Variablennamen folgen der Konvention von shadcn/ui, damit dessen
  * Komponenten unverändert funktionieren. Bautakt-eigene Tokens stehen darunter.
  */
@@ -91,47 +96,50 @@
 }
 
 .dark {
+  /* Dark Mode v2 (2026-09-24): kühle Graublau-Neutrale. Sichtbare Stufen:
+     background, Sidebar (second), surface, third, card. Kein Violettstich. */
+
   /* --- Flächen / Elevation --- */
-  --background: #0d0e14;
-  --background-second: #12141c;
-  --background-third: #181b25;
-  --card: #212632; /* hebt sich klar von surface ab, ohne aufzuhellen */
-  --popover: #212632;
-  --surface: #1b1f29;
-  --input: #1b1f29; /* == surface, bewusst (wie im Light-Mode) */
-  --border: #272c38;
-  --border-strong: #3a4150;
+  --background: #0f1115;
+  --background-second: #161a22; /* Sidebar */
+  --background-third: #1c212b;
+  --card: #1e2430; /* eine Stufe über surface */
+  --popover: #1e2430;
+  --surface: #1a1f28;
+  --input: #1a1f28; /* == surface, bewusst (wie im Light-Mode) */
+  --border: #2a3140;
+  --border-strong: #3d4656;
 
   /* --- Text --- */
-  --foreground: #f2f4f8; /* reines Weiß blendet auf Dunkel — 17.50:1, AAA */
-  --card-foreground: #f2f4f8;
-  --popover-foreground: #f2f4f8;
-  --text-secondary: #b7becc; /* 10.32:1 — AAA */
-  --muted-foreground: #949dae; /* war #5C5C5C (3.02:1, FAIL) — jetzt 7.06:1 */
-  --text-subtle: #868fa0; /* 5.92:1 */
-  --text-placeholder: #474e5c; /* 1.97:1 auf input, eingegebener Text 14.96:1 */
+  --foreground: #f0f2f5; /* reines Weiß blendet auf Dunkel — 16.85:1 auf background, AAA */
+  --card-foreground: #f0f2f5;
+  --popover-foreground: #f0f2f5;
+  --text-secondary: #a8b0bd; /* 8.65:1 auf background — AAA */
+  --muted-foreground: #8b93a3; /* 6.12:1 auf background, 5.04:1 auf card */
+  --text-subtle: #6f7787; /* 4.20:1 auf background — unter AA 4.5:1 für Fließtext */
+  --text-placeholder: #4a5160; /* 2.08:1 auf input, eingegebener Text 14.74:1 */
 
   /* --- Primary --- */
-  --primary: #4fa3e3; /* Light-Primary #3b86e0 auf dark.background 5.20:1; dieser Ton 7.05:1 */
-  --primary-foreground: #0d0e14; /* 7.05:1 */
-  --accent: #101f35; /* primary darauf: 6.05:1 */
+  --primary: #4fa3e3; /* Light-Primary #3b86e0 auf diesem Hintergrund 5.10:1 — dieser Ton 6.91:1 */
+  --primary-foreground: #0f1115; /* 6.91:1 auf primary */
+  --accent: #152536; /* primary darauf: 5.69:1 */
   --accent-foreground: #4fa3e3;
   --ring: #4fa3e3;
 
   /* --- Sekundär / Muted --- */
-  --secondary: #1b1f29;
-  --secondary-foreground: #b7becc;
-  --muted: #1b1f29;
+  --secondary: #1a1f28;
+  --secondary-foreground: #a8b0bd;
+  --muted: #1a1f28;
 
   /* --- Danger --- */
-  --destructive: #f25a5a; /* 5.86:1 auf background, 4.60:1 auf card */
-  --destructive-foreground: #ffffff;
+  --destructive: #f87171; /* 6.83:1 auf background, 5.62:1 auf card */
+  --destructive-foreground: #0f1115; /* 6.83:1 auf destructive; Weiß darauf nur 2.77:1 */
   --destructive-solid: #dc2626;
   --destructive-bg: #2a1518;
 
   /* --- Success --- */
   --success: #4ade80;
-  --success-foreground: #0d0e14;
+  --success-foreground: #0f1115; /* 10.84:1 auf success */
   --success-bg: #10231a;
 
   /* --- Warnung --- */
@@ -209,6 +217,35 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/**
+ * Sidebar-Scrollbar. Nur die scrollende Inhaltsregion (`SidebarContent`,
+ * `data-sidebar="content"` mit overflow-y-auto) — nicht die Seite und nicht
+ * der Sidebar-Wrapper, der `overflow-hidden` trägt.
+ * Firefox: thin + Farbe. WebKit: 6px, Track transparent, Thumb --border-strong.
+ */
+[data-sidebar='content'] {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+[data-sidebar='content']::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+[data-sidebar='content']::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-sidebar='content']::-webkit-scrollbar-thumb {
+  background-color: var(--border-strong);
+  border-radius: 999px;
+}
+
+[data-sidebar='content']::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted-foreground);
 }
 
 /**
