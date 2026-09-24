@@ -6,9 +6,11 @@
  * Datei. Die Werte sind berechnet (relative Luminanz nach WCAG 2.1) und gelten
  * gegen die jeweils genannte Fläche.
  *
- * ⚠️ Diese Datei ist für das Web kanonisch. Weicht etwas von bautakt-app ab,
- * wird die Abweichung ZUERST dort behoben und dann hierher übernommen — nicht
- * umgekehrt. Die Mobile-App ist älter und hat die Kontrastarbeit geleistet.
+ * ⚠️ Diese Datei ist für das Web kanonisch. Flächen, Text und Statusfarben
+ * weichen nicht von bautakt-app ab: dort zuerst ändern, dann hierher holen.
+ * Ausnahme (Stand 2026-09-24): Light-Primary, Accent-Fläche, Accent-Foreground
+ * und Ring folgen dem Marketing-Blau #3B86E0 / #E8F2FC. Dark-Primary bleibt
+ * #4FA3E3. Die Mobile-App zieht das Light-Primary in einem eigenen PR nach.
  *
  * Die Variablennamen folgen der Konvention von shadcn/ui, damit dessen
  * Komponenten unverändert funktionieren. Bautakt-eigene Tokens stehen darunter.
@@ -44,11 +46,14 @@
   --text-placeholder: #a9b0ba;
 
   /* --- Primary --- */
-  --primary: #0a66c2; /* 5.69:1 auf background */
-  --primary-foreground: #ffffff; /* 5.69:1 */
-  --accent: #e7f3ff; /* primary darauf: 5.05:1 */
-  --accent-foreground: #0a66c2;
-  --ring: #0a66c2;
+  /* Light = Marketing / Spec v4.4. Gemessen 2026-09-24 (WCAG 2.1): #3B86E0
+     auf #ffffff 3.70:1 — unter AA für normalen Text (4.5:1), über 3:1 für
+     große Schrift und UI-Komponenten. Auf der Accent-Fläche 3.27:1. */
+  --primary: #3b86e0; /* 3.70:1 auf background */
+  --primary-foreground: #ffffff; /* 3.70:1 */
+  --accent: #e8f2fc; /* primary darauf: 3.27:1 */
+  --accent-foreground: #3b86e0;
+  --ring: #3b86e0;
 
   /* --- Sekundär / Muted --- */
   --secondary: #f4f6f8;
@@ -107,7 +112,7 @@
   --text-placeholder: #474e5c; /* 1.97:1 auf input, eingegebener Text 14.96:1 */
 
   /* --- Primary --- */
-  --primary: #4fa3e3; /* #0a66c2 erreicht auf dark.background nur 3.39:1 — dieser Ton 7.05:1 */
+  --primary: #4fa3e3; /* Light-Primary #3b86e0 auf dark.background 5.20:1; dieser Ton 7.05:1 */
   --primary-foreground: #0d0e14; /* 7.05:1 */
   --accent: #101f35; /* primary darauf: 6.05:1 */
   --accent-foreground: #4fa3e3;

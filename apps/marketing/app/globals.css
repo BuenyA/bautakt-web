@@ -1,6 +1,7 @@
 /* Design-Tokens und Tailwind. Kanonisch in packages/ui — siehe dortigen Dateikopf.
-   Marketing überschreibt Primary auf Spec-Blau #3B86E0, ohne packages/ui (und damit
-   die Webapp) zu ändern. Blau ist für CTAs vorgesehen; Logo bleibt Anthrazit. */
+   Diese :root-Werte wiederholen das Light-Primary #3B86E0, damit Marketing auf
+   Spec-Blau bleibt, falls packages/ui später abweicht. Blau ist für CTAs
+   vorgesehen; Logo bleibt Anthrazit. */
 @import '@bautakt/ui/styles/theme.css';
 
 /* Quellen, die Tailwind nach Klassennamen durchsuchen muss. Ohne diese Zeile

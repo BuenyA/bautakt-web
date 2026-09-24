@@ -7,6 +7,7 @@
  * laeuft. In Komponenten also `bg-primary`, nicht `tokens.blue`.
  *
  * Portiert aus bautakt-app/app/constants/theme.ts (Stand 2026-08-26).
+ * `blue` folgt dem Web-Light-Primary #3B86E0 (Stand 2026-09-24).
  */
 
 /**
@@ -15,7 +16,7 @@
  * 2.15:1. Fuer Text/Icons stattdessen die semantischen Tokens verwenden.
  */
 export const statusFills = {
-  blue: '#0a66c2',
+  blue: '#3B86E0',
   red: '#EF4444',
   green: '#26A85A',
   yellow: '#F59E0B',
