@@ -2,6 +2,7 @@ import {
   Avatar,
   AvatarFallback,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -54,10 +55,10 @@ function BrandHeader() {
   const collapsed = state === 'collapsed' && !isMobile;
 
   return (
-    <SidebarHeader className="h-14 justify-center">
+    <SidebarHeader className={cn('h-14 justify-center', collapsed && 'items-center px-0')}>
       <Link
         to={HOME_ROUTE}
-        className="flex items-center gap-2 px-1"
+        className={cn('flex items-center rounded-md', collapsed ? 'justify-center' : 'px-2.5')}
         aria-label={t('common:app.name')}
       >
         {collapsed ? <BautaktSignet className="size-7" /> : <BautaktLogo />}
@@ -80,7 +81,7 @@ function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <SidebarMenuButton size="lg" tooltip={email} className="gap-2">
+        <SidebarMenuButton size="lg" tooltip={email}>
           <Avatar className="size-7">
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>

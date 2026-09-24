@@ -51,6 +51,7 @@ verlinkt, nie kopiert.
 | 2026-09-24 | [Auftragsnotizen nur lesend](logs/2026-09-24-auftragsnotizen.md)                                |
 | 2026-09-24 | [Auftragszeiten nur lesend](logs/2026-09-24-auftragszeiten.md)                                  |
 | 2026-09-24 | [Auftrag aus der Liste anlegen](logs/2026-09-24-auftrag-anlegen.md)                             |
+| 2026-09-24 | [Sidebar-Optik Expo Docs](logs/2026-09-24-sidebar-expo-docs.md)                                 |
 
 ## Die drei wichtigsten Sätze
 
