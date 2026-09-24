@@ -228,7 +228,13 @@
     "finalizeError": "Festschreiben nicht möglich",
     "notFoundTitle": "Beleg nicht gefunden",
     "notFoundDescription": "Dieser Beleg existiert nicht oder ist für Sie nicht sichtbar.",
-    "new": "Neue Rechnung"
+    "new": "Neue Rechnung",
+    "blockersTitle": "Vor dem Festschreiben fehlt noch etwas",
+    "blockers": {
+      "serviceDate": "Das Leistungsdatum fehlt. Es steht auf jeder Rechnung und ist Pflicht.",
+      "sellerTaxId": "Dem Betrieb fehlt Steuernummer und USt-IdNr. Ohne eine der beiden ist die Rechnung nach EN16931 nicht gültig."
+    },
+    "toSettings": "Zur Einrichtung"
   },
   "quotes": {
     "listTitle": "Angebote",
@@ -303,10 +309,11 @@
     "method": "Zahlungsweg",
     "note": "Notiz",
     "methods": {
-      "bank_transfer": "Überweisung",
+      "transfer": "Überweisung",
       "cash": "Bar",
       "card": "Karte",
-      "other": "Sonstiges"
+      "other": "Sonstiges",
+      "skonto": "Skonto"
     },
     "openHint": "Offen sind noch {{amount}}.",
     "amountInvalid": "Bitte einen Betrag größer als 0 eingeben.",
@@ -400,17 +407,23 @@
       "status": "Status"
     },
     "types": {
-      "vacation": "Urlaub",
-      "sick": "Krank",
-      "special": "Sonderurlaub",
-      "unpaid": "Unbezahlt",
-      "training": "Fortbildung"
+      "urlaub": "Urlaub",
+      "krankheit": "Krankheit",
+      "kind_krank": "Kind krank",
+      "weiterbildung": "Weiterbildung",
+      "pruefung": "Prüfung",
+      "sonderurlaub": "Sonderurlaub",
+      "unbezahlter_urlaub": "Unbezahlter Urlaub",
+      "mutterschutz_elternzeit": "Mutterschutz / Elternzeit",
+      "arztbesuch": "Arztbesuch",
+      "unentschuldigt": "Unentschuldigt",
+      "sonstiges": "Sonstiges"
     },
     "status": {
-      "pending": "Offen",
-      "approved": "Genehmigt",
-      "rejected": "Abgelehnt",
-      "cancelled": "Zurückgezogen"
+      "ausstehend": "Ausstehend",
+      "genehmigt": "Genehmigt",
+      "abgelehnt": "Abgelehnt",
+      "storniert": "Storniert"
     },
     "filterAll": "Alle",
     "filterPending": "Offen",
@@ -521,7 +534,9 @@
     "saveError": "Entwurf konnte nicht gespeichert werden",
     "lockedTitle": "Beleg ist festgeschrieben",
     "lockedDescription": "Ein festgeschriebener Beleg lässt sich nicht mehr ändern. Für eine Korrektur wird eine Storno- oder Gutschrift erstellt.",
-    "toDocument": "Zum Beleg"
+    "toDocument": "Zum Beleg",
+    "serviceDateRequired": "Bitte das Leistungsdatum angeben — ohne es lässt sich die Rechnung später nicht festschreiben.",
+    "serviceDateRequiredLabel": "Leistungsdatum *"
   },
   "customerForm": {
     "newTitle": "Neuer Kunde",
@@ -556,7 +571,7 @@
   },
   "absenceForm": {
     "title": "Abwesenheit eintragen",
-    "description": "Wird als offener Antrag angelegt und separat genehmigt.",
+    "description": "Wird sofort als genehmigt eingetragen — du entscheidest hier selbst. Offene Anträge kommen aus der Handy-App.",
     "start": "Von",
     "end": "Bis",
     "employeeRequired": "Bitte einen Mitarbeiter wählen.",

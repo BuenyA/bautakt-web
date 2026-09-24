@@ -23,11 +23,13 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
+import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
 import { DocumentStatusBadge } from '../DocumentStatusBadge';
 import { PaymentSheet } from '../PaymentSheet';
+import { useFinalizeBlockers } from '../useFinalizeBlockers';
 import { useFinanceAccess } from '../useFinanceAccess';
 import {
   openMinorOf,
@@ -44,6 +46,7 @@ export function InvoiceDetailPage() {
   const { data, isError, refetch } = document;
   const isLoading = useCompanyListLoading(document);
   const finalize = useFinalizeDocument(id);
+  const { blockers } = useFinalizeBlockers(data);
   const [paymentOpen, setPaymentOpen] = useState(false);
 
   if (isLoading) {
@@ -98,7 +101,7 @@ export function InvoiceDetailPage() {
       // Die Datenbank prueft Pflichtangaben (u. a. Steuernummer des Betriebs)
       // und lehnt sonst ab. Ihre Meldung ist praeziser als jeder Text hier.
       toast.error(t('domain:invoices.finalizeError'), {
-        description: error instanceof Error ? error.message : undefined,
+        description: readableDbError(error) ?? undefined,
       });
     }
   }
@@ -133,7 +136,11 @@ export function InvoiceDetailPage() {
             ) : null}
 
             {access.canWriteSalesDocuments && isDraft ? (
-              <Button size="sm" disabled={finalize.isPending} onClick={() => void onFinalize()}>
+              <Button
+                size="sm"
+                disabled={finalize.isPending || blockers.length > 0}
+                onClick={() => void onFinalize()}
+              >
                 <Uicon name="badge-check" size={16} />
                 {t('domain:invoices.finalize')}
               </Button>
@@ -148,6 +155,22 @@ export function InvoiceDetailPage() {
           </div>
         }
       />
+
+      {isDraft && blockers.length > 0 ? (
+        <div className="border-warning-border bg-warning-bg text-text-secondary flex flex-col gap-1 rounded-lg border p-4 text-sm">
+          <span className="text-foreground font-medium">{t('domain:invoices.blockersTitle')}</span>
+          <ul className="list-inside list-disc">
+            {blockers.map((blocker) => (
+              <li key={blocker}>{t(`domain:invoices.blockers.${blocker}`)}</li>
+            ))}
+          </ul>
+          {blockers.includes('sellerTaxId') ? (
+            <Link to={routes.settings} className="text-primary mt-1 font-medium hover:underline">
+              {t('domain:invoices.toSettings')}
+            </Link>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="flex flex-wrap items-center gap-3">
         <DocumentStatusBadge status={data.status} />

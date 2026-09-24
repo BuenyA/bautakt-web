@@ -23,11 +23,11 @@ import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useMembership } from '@/features/company/useMembership';
+import { readableDbError } from '@/lib/dbErrors';
 import { supabase } from '@/lib/supabase';
 
+import { ABSENCE_TYPES } from './absenceValues';
 import { useEmployees } from './useEmployees';
-
-const ABSENCE_TYPES = ['vacation', 'sick', 'special', 'unpaid', 'training'] as const;
 
 /**
  * Abwesenheit eintragen.
@@ -37,9 +37,11 @@ const ABSENCE_TYPES = ['vacation', 'sick', 'special', 'unpaid', 'training'] as c
  * selbst. Die Id erwartet sie als Parameter — `absences` hat kein Default
  * (siehe wiki/pages/fallstricke.md).
  *
- * Genehmigt wird getrennt davon, in der Liste. Beides in einem Schritt zu
- * erledigen waere bequem, verwischt aber, dass Antrag und Entscheidung zwei
- * Vorgaenge sind.
+ * ⚠️ Die Funktion legt die Abwesenheit direkt als `genehmigt` an, nicht als
+ * offenen Antrag: wer sie hier eintraegt, hat `canManageAbsences` und ist damit
+ * selbst die entscheidende Stelle. Offene Antraege entstehen in der Handy-App.
+ * Das Formular sagt das auch — sonst wartet jemand auf eine Genehmigung, die
+ * schon erteilt ist.
  */
 function useCreateAbsence() {
   const queryClient = useQueryClient();
@@ -92,7 +94,7 @@ function AbsenceForm({ onDone }: { onDone: () => void }) {
   const ids = { start: useId(), end: useId(), note: useId() };
 
   const [employmentId, setEmploymentId] = useState('');
-  const [type, setType] = useState<string>('vacation');
+  const [type, setType] = useState<string>('urlaub');
   const [startDate, setStartDate] = useState(todayIso);
   const [endDate, setEndDate] = useState(todayIso);
   const [note, setNote] = useState('');
@@ -117,7 +119,7 @@ function AbsenceForm({ onDone }: { onDone: () => void }) {
       toast.success(t('domain:absenceForm.saved'));
       onDone();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : t('domain:absenceForm.saveError'));
+      setError(readableDbError(caught) ?? t('domain:absenceForm.saveError'));
     }
   }
 

@@ -29,6 +29,7 @@ import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useMembership } from '@/features/company/useMembership';
+import { readableDbError } from '@/lib/dbErrors';
 import { supabase } from '@/lib/supabase';
 
 const VAT_RATES = ['19', '7', '0'] as const;
@@ -158,7 +159,7 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
       toast.success(t('domain:expenseForm.saved'));
       onDone();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : t('domain:expenseForm.saveError'));
+      setError(readableDbError(caught) ?? t('domain:expenseForm.saveError'));
     }
   }
 

@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useMembership } from '@/features/company/useMembership';
 import { useOrders } from '@/features/orders/useOrders';
 import { useEmployees } from '@/features/team/useEmployees';
+import { readableDbError } from '@/lib/dbErrors';
 import { supabase } from '@/lib/supabase';
 
 import { type TimeEntryDraft, toTimestamp } from './timeEntryDraft';
@@ -126,7 +127,7 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
       toast.success(t('domain:timeForm.saved'));
       onDone();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : t('domain:timeForm.saveError'));
+      setError(readableDbError(caught) ?? t('domain:timeForm.saveError'));
     }
   }
 

@@ -21,9 +21,19 @@ import {
 import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { readableDbError } from '@/lib/dbErrors';
+
 import { useAddPayment } from './useSalesDocument';
 
-const METHODS = ['bank_transfer', 'cash', 'card', 'other'] as const;
+/**
+ * ⚠️ Die Werte muessen der Check-Regel von `payments.method` entsprechen:
+ * `cash`, `transfer`, `card`, `other`, `skonto`. „bank_transfer" gibt es dort
+ * nicht — die Datenbank haette jede Zahlung abgelehnt.
+ *
+ * `skonto` fehlt bewusst in der Auswahl: Skonto hat im Formular ein eigenes
+ * Betragsfeld und ist keine Zahlungsart.
+ */
+const METHODS = ['transfer', 'cash', 'card', 'other'] as const;
 
 /**
  * Zahlungseingang erfassen.
@@ -84,7 +94,7 @@ function PaymentForm({
   );
   const [skonto, setSkonto] = useState('');
   const [paidAt, setPaidAt] = useState(todayIso);
-  const [method, setMethod] = useState<string>('bank_transfer');
+  const [method, setMethod] = useState<string>('transfer');
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -108,7 +118,7 @@ function PaymentForm({
       toast.success(t('domain:payments.saved'));
       onDone();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : t('domain:payments.saveError'));
+      setError(readableDbError(caught) ?? t('domain:payments.saveError'));
     }
   }
 

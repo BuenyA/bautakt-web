@@ -25,6 +25,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { customerDisplayName, useCustomers } from '@/features/customers/useCustomers';
+import { readableDbError } from '@/lib/dbErrors';
 import { routes } from '@/lib/routes';
 
 import {
@@ -77,6 +78,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const existingLoading = useCompanyListLoading(existing);
 
   const [state, setState] = useState<EditorState | null>(id ? null : initialState(type));
+  const [error, setError] = useState<string | null>(null);
 
   // Beim Bearbeiten: sobald der Beleg geladen ist, einmal in den Formularzustand
   // uebernehmen. Danach gehoert der Zustand dem Formular.
@@ -148,13 +150,23 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
   async function onSave() {
     if (!state) return;
+
+    // ⚠️ Das Leistungsdatum ist bei Rechnungen Pflicht: ohne es lehnt
+    // `finalize_sales_document` das Festschreiben ab. Lieber hier melden als
+    // den Beleg fertig tippen lassen und erst am Ende scheitern.
+    if (state.type === 'invoice' && !state.serviceDate) {
+      setError(t('domain:editor.serviceDateRequired'));
+      return;
+    }
+
+    setError(null);
     try {
       const savedId = await save.mutateAsync(state);
       toast.success(t('domain:editor.saved'));
       void navigate(routes.invoice(savedId));
     } catch (error) {
       toast.error(t('domain:editor.saveError'), {
-        description: error instanceof Error ? error.message : undefined,
+        description: readableDbError(error) ?? undefined,
       });
     }
   }
@@ -177,6 +189,12 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
           </div>
         }
       />
+
+      {error ? (
+        <p className="border-destructive/30 bg-destructive-bg text-destructive rounded-lg border p-3 text-sm">
+          {error}
+        </p>
+      ) : null}
 
       <Card>
         <CardHeader>
@@ -211,7 +229,11 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
             onChange={(value) => update({ issueDate: value })}
           />
           <DateField
-            label={t('domain:invoices.serviceDate')}
+            label={
+              state.type === 'invoice'
+                ? t('domain:editor.serviceDateRequiredLabel')
+                : t('domain:invoices.serviceDate')
+            }
             value={state.serviceDate}
             onChange={(value) => update({ serviceDate: value })}
           />

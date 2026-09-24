@@ -19,20 +19,20 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
+import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
 
 import { AbsenceSheet } from '../AbsenceSheet';
+import { ABSENCE_TYPES, PENDING_STATUS } from '../absenceValues';
 import { type AbsenceRow, useAbsences, useApproveAbsence } from '../useAbsences';
-
-const KNOWN_TYPES = ['vacation', 'sick', 'special', 'unpaid', 'training'] as const;
 
 function statusVariant(status: string) {
   switch (status) {
-    case 'approved':
+    case 'genehmigt':
       return 'success' as const;
-    case 'rejected':
+    case 'abgelehnt':
       return 'destructive' as const;
-    case 'pending':
+    case 'ausstehend':
       return 'warning' as const;
     default:
       return 'muted' as const;
@@ -53,7 +53,9 @@ export function AbsencesPage() {
 
   const rows = useMemo(
     () =>
-      filter === 'pending' ? (data ?? []).filter((row) => row.status === 'pending') : (data ?? []),
+      filter === 'pending'
+        ? (data ?? []).filter((row) => row.status === PENDING_STATUS)
+        : (data ?? []),
     [data, filter],
   );
 
@@ -66,7 +68,7 @@ export function AbsencesPage() {
         toast.success(t('domain:absences.approved'));
       } catch (error) {
         toast.error(t('domain:absences.approveError'), {
-          description: error instanceof Error ? error.message : undefined,
+          description: readableDbError(error) ?? undefined,
         });
       }
     },
@@ -90,7 +92,7 @@ export function AbsencesPage() {
         accessorKey: 'type',
         header: t('domain:absences.columns.type'),
         cell: ({ row }) =>
-          (KNOWN_TYPES as readonly string[]).includes(row.original.type)
+          (ABSENCE_TYPES as readonly string[]).includes(row.original.type)
             ? t(`domain:absences.types.${row.original.type}`)
             : row.original.type,
       },
@@ -131,7 +133,7 @@ export function AbsencesPage() {
         id: 'action',
         header: '',
         cell: ({ row }) =>
-          canManage && row.original.status === 'pending' ? (
+          canManage && row.original.status === PENDING_STATUS ? (
             <span className="flex justify-end">
               <Button
                 variant="outline"

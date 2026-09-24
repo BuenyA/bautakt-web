@@ -21,6 +21,7 @@ import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useMembership } from '@/features/company/useMembership';
+import { readableDbError } from '@/lib/dbErrors';
 import { supabase } from '@/lib/supabase';
 
 import type { EmployeeDraft } from './employeeDraft';
@@ -146,7 +147,7 @@ function EmployeeForm({ initial, onDone }: { initial: EmployeeDraft; onDone: () 
       toast.success(t('domain:employeeForm.saved'));
       onDone();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : t('domain:employeeForm.saveError'));
+      setError(readableDbError(caught) ?? t('domain:employeeForm.saveError'));
     }
   }
 

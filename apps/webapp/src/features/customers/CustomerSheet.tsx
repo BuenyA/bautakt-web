@@ -22,6 +22,7 @@ import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useMembership } from '@/features/company/useMembership';
+import { readableDbError } from '@/lib/dbErrors';
 import { supabase } from '@/lib/supabase';
 
 import type { CustomerDraft } from './customerDraft';
@@ -135,7 +136,7 @@ function CustomerForm({ initial, onDone }: { initial: CustomerDraft; onDone: () 
       toast.success(t('domain:customerForm.saved'));
       onDone();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : t('domain:customerForm.saveError'));
+      setError(readableDbError(caught) ?? t('domain:customerForm.saveError'));
     }
   }
 

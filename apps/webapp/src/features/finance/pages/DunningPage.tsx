@@ -29,6 +29,7 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
+import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
@@ -92,7 +93,7 @@ export function DunningPage() {
       // Der Dialog bleibt im Fehlerfall offen: sonst waeren die eingetippte
       // Gebuehr und die Zinsen weg, und der Nutzer muesste raten, was schieflief.
       toast.error(t('domain:dunning.createError'), {
-        description: error instanceof Error ? error.message : undefined,
+        description: readableDbError(error) ?? undefined,
       });
     }
   }
