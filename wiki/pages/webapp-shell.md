@@ -92,8 +92,32 @@ Jeder `queryKey` beginnt mit `companyId`. Fertig angebunden: Aufträge, Einsätz
 Zeiten, Kunden, Verkaufsbelege (`sales_documents`), Zahlungen, Eingangsrechnungen
 und Mahnungen. Geld- und Kennzahlenlogik liegt in `@bautakt/finance`.
 
+## Schreiben
+
+Zwei Muster, bewusst getrennt:
+
+- **Seitenpanel (Sheet)** für kurze Formulare — Zahlung erfassen, Kunde anlegen.
+  Die Liste dahinter bleibt sichtbar. Das Formular wird nur gemountet, solange
+  das Panel offen ist, und startet damit jedes Mal frisch; sonst steht beim
+  nächsten Öffnen die vorige Eingabe da und verleitet zur Doppelbuchung.
+- **Eigene Seite** für Belege mit Positionen (`DocumentEditorPage`). Eine
+  Positionsliste mit Menge, Einzelpreis, Rabatt und Steuersatz braucht die volle
+  Breite.
+
+Was die Datenbank besser weiß, macht die Datenbank: die Belegnummer vergibt
+`finalize_sales_document`, die Genehmigung einer Abwesenheit `approve_absence`.
+Beide tragen Prüfungen, die ein direktes `update` umginge.
+
+⚠️ Bearbeitet werden nur Entwürfe. `enforce_sales_document_immutability` sperrt
+festgeschriebene Belege; der Editor zeigt für sie keinen Speichern-Knopf,
+sondern den Hinweis auf Storno und Gutschrift.
+
+⚠️ `customers`, `absences`, `articles` und `cost_centers` haben **kein**
+`DEFAULT gen_random_uuid()` — beim Anlegen muss der Client die `id` mitgeben
+(siehe [fallstricke.md](fallstricke.md)).
+
 ## Offen
 
-Schreib-Flows (Sheet für kurze Formulare, eigene Seite für Belege mit
-Positionen), Belegdetail samt Druckansicht, Ausgaben, Mahnwesen, Auswertungen,
-Team, Katalog, Kostenstellen und Einrichtung sind Platzhalter-Routen.
+Zeiteintrag und Abwesenheit anlegen, Mitarbeiter bearbeiten, Ausgaben erfassen,
+Mahnungen mit Gebühr und Verzugszinsen, Bearbeiten der Firmenstammdaten und der
+E-Mail-Versand von Belegen (dafür fehlt die Edge Function in `bautakt-app`).
