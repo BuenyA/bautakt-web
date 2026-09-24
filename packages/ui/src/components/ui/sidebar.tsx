@@ -1,3 +1,5 @@
+'use client';
+
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { PanelLeftIcon } from 'lucide-react';
@@ -12,6 +14,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tool
 
 /**
  * Sidebar-Bausatz nach shadcn/ui.
+ *
+ * ⚠️ `'use client'` steht hier und in allen Komponenten mit Hooks, Context oder
+ * Radix-Primitiven, weil `apps/marketing` (Next App Router) aus derselben
+ * Sammel-Datei importiert. Ohne die Kennzeichnung landen sie im Server-Graph,
+ * und dort fehlen client-seitige Exporte — `react-hook-form` etwa liefert unter
+ * der `react-server`-Bedingung kein `Controller`, und der Marketing-Build
+ * bricht ab. Vite ignoriert die Zeile, sie kostet also nichts.
  *
  * Zustand (auf/zu) landet in einem Cookie und nicht im localStorage: so steht
  * er beim ersten Render schon fest und die Leiste springt nach dem Laden nicht
