@@ -297,7 +297,11 @@
     "invoice": "Rechnung",
     "partial_invoice": "Abschlagsrechnung",
     "final_invoice": "Schlussrechnung",
-    "quote": "Angebot"
+    "quote": "Angebot",
+    "order_confirmation": "Auftragsbestätigung",
+    "delivery_note": "Lieferschein",
+    "credit_note": "Gutschrift",
+    "cancellation": "Storno"
   },
   "payments": {
     "title": "Zahlungen",
