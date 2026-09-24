@@ -81,6 +81,18 @@
       "emptyDescription": "Erfasste Zeiten zu diesem Auftrag erscheinen hier.",
       "loadErrorTitle": "Zeiten konnten nicht geladen werden",
       "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
+    },
+    "create": {
+      "action": "Auftrag anlegen",
+      "title": "Auftrag anlegen",
+      "description": "Wird als aktiver Auftrag angelegt und ist danach auch in der Handy-App sichtbar.",
+      "street": "Straße und Hausnummer",
+      "postalCode": "PLZ",
+      "city": "Ort",
+      "notes": "Beschreibung",
+      "nameRequired": "Bitte eine Bezeichnung angeben — sonst ist der Auftrag in der Liste nicht zu finden.",
+      "saved": "Auftrag angelegt.",
+      "saveError": "Auftrag konnte nicht angelegt werden."
     }
   },
   "customers": {

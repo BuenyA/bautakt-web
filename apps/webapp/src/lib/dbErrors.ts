@@ -25,14 +25,37 @@ const MESSAGES: Record<string, string> = {
     'Dem Betrieb fehlt Steuernummer und USt-IdNr. Ohne eine der beiden ist die Rechnung nach EN16931 nicht gültig.',
 };
 
+function messageOf(error: unknown): string {
+  if (typeof error === 'string') return error;
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === 'object' && 'message' in error) {
+    const message = error.message;
+    if (typeof message === 'string') return message;
+  }
+  return '';
+}
+
+function codeOf(error: unknown): string {
+  if (error && typeof error === 'object' && 'code' in error && typeof error.code === 'string') {
+    return error.code;
+  }
+  return '';
+}
+
 /** Lesbare Meldung zu einem Fehler; `null`, wenn es nichts Brauchbares gibt. */
 export function readableDbError(error: unknown): string | null {
-  const raw = error instanceof Error ? error.message : typeof error === 'string' ? error : '';
-  if (!raw) return null;
+  const raw = messageOf(error);
+  if (!raw && !codeOf(error)) return null;
+
+  // PostgREST meldet eine abgelehnte RLS-Policy als 42501, ohne den
+  // maschinenlesbaren Code `FORBIDDEN`, den die Trigger werfen.
+  if (codeOf(error) === '42501' || /row-level security policy/i.test(raw)) {
+    return MESSAGES.FORBIDDEN;
+  }
 
   for (const [code, message] of Object.entries(MESSAGES)) {
     // Die Codes stehen teils mit Doppelpunkt und Nachsatz in der Meldung.
     if (raw.includes(code)) return message;
   }
-  return raw;
+  return raw || null;
 }

@@ -28,7 +28,8 @@ verlinkt, nie kopiert.
 | [auftragsfotos.md](pages/auftragsfotos.md)                 | Read-only Fotogalerie auf der Auftragsdetailseite.            |
 | [auftragsnotizen.md](pages/auftragsnotizen.md)             | Read-only Notizen auf der Auftragsdetailseite.                |
 | [auftragszeiten.md](pages/auftragszeiten.md)               | Read-only Zeiten auf der Auftragsdetailseite.                 |
-| [demo-gf-2026-10-10.md](pages/demo-gf-2026-10-10.md)       | Klickpfad GF-Demo 10.10.2026 (Spahrbau, read-first).          |
+| [auftrag-anlegen.md](pages/auftrag-anlegen.md)             | Auftrag aus der Liste anlegen, dieselbe `orders`-Zeile.       |
+| [demo-gf-2026-10-10.md](pages/demo-gf-2026-10-10.md)       | Klickpfad GF-Demo 10.10.2026 (Spahrbau).                      |
 
 ## Protokolle
 
@@ -49,6 +50,7 @@ verlinkt, nie kopiert.
 | 2026-09-24 | [Dark Mode v2 und Sidebar-Scrollbar](logs/2026-09-24-dark-mode-v2.md)                           |
 | 2026-09-24 | [Auftragsnotizen nur lesend](logs/2026-09-24-auftragsnotizen.md)                                |
 | 2026-09-24 | [Auftragszeiten nur lesend](logs/2026-09-24-auftragszeiten.md)                                  |
+| 2026-09-24 | [Auftrag aus der Liste anlegen](logs/2026-09-24-auftrag-anlegen.md)                             |
 
 ## Die drei wichtigsten Sätze
 

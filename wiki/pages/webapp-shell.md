@@ -105,10 +105,11 @@ und Mahnungen. Geld- und Kennzahlenlogik liegt in `@bautakt/finance`.
 
 Zwei Muster, bewusst getrennt:
 
-- **Seitenpanel (Sheet)** für kurze Formulare — Zahlung erfassen, Kunde anlegen.
-  Die Liste dahinter bleibt sichtbar. Das Formular wird nur gemountet, solange
-  das Panel offen ist, und startet damit jedes Mal frisch; sonst steht beim
-  nächsten Öffnen die vorige Eingabe da und verleitet zur Doppelbuchung.
+- **Seitenpanel (Sheet)** für kurze Formulare — Zahlung erfassen, Kunde anlegen,
+  Auftrag anlegen. Die Liste dahinter bleibt sichtbar. Das Formular wird nur
+  gemountet, solange das Panel offen ist, und startet damit jedes Mal frisch;
+  sonst steht beim nächsten Öffnen die vorige Eingabe da und verleitet zur
+  Doppelbuchung.
 - **Eigene Seite** für Belege mit Positionen (`DocumentEditorPage`). Eine
   Positionsliste mit Menge, Einzelpreis, Rabatt und Steuersatz braucht die volle
   Breite.
@@ -121,12 +122,13 @@ Beide tragen Prüfungen, die ein direktes `update` umginge.
 festgeschriebene Belege; der Editor zeigt für sie keinen Speichern-Knopf,
 sondern den Hinweis auf Storno und Gutschrift.
 
-⚠️ `customers`, `absences`, `articles` und `cost_centers` haben **kein**
+⚠️ `orders`, `customers`, `absences`, `articles` und `cost_centers` haben **kein**
 `DEFAULT gen_random_uuid()` — beim Anlegen muss der Client die `id` mitgeben
-(siehe [fallstricke.md](fallstricke.md)).
+(siehe [fallstricke.md](fallstricke.md)). Die vollständige Liste steht dort.
 
-Gebaut sind: Zahlung, Kunde, Zeiteintrag, Abwesenheit, Ausgabe, Mitarbeiter,
-Mahnung (mit Gebühr und Verzugszinsen) und der Beleg-Editor.
+Gebaut sind: Zahlung, Kunde, Auftrag, Zeiteintrag, Abwesenheit, Ausgabe,
+Mitarbeiter, Mahnung (mit Gebühr und Verzugszinsen) und der Beleg-Editor.
+Auftrag anlegen: [auftrag-anlegen.md](auftrag-anlegen.md).
 
 ## Offen
 
