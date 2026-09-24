@@ -84,12 +84,13 @@ export function DunningPage() {
         interestAmount: fromMinorUnits(parseMoneyInput(interest) ?? 0),
       });
       toast.success(t('domain:dunning.created', { level: nextLevel }));
+      setPending(null);
     } catch (error) {
+      // Der Dialog bleibt im Fehlerfall offen: sonst waeren die eingetippte
+      // Gebuehr und die Zinsen weg, und der Nutzer muesste raten, was schieflief.
       toast.error(t('domain:dunning.createError'), {
         description: error instanceof Error ? error.message : undefined,
       });
-    } finally {
-      setPending(null);
     }
   }
 
