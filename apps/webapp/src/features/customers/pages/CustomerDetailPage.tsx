@@ -1,25 +1,21 @@
-import { Button } from '@bautakt/ui';
+import { Button, Uicon } from '@bautakt/ui';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 
+import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
+import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import { type CustomerDraft, draftFromCustomer } from '../customerDraft';
+import { CustomerSheet } from '../CustomerSheet';
 import { useCustomer } from '../useCustomer';
 import { customerDisplayName } from '../useCustomers';
-
-function DetailRow({ label, value }: { label: string; value: string }) {
-  if (!value) return null;
-  return (
-    <div className="grid gap-1 sm:grid-cols-[12rem_1fr] sm:gap-4">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="text-sm text-foreground whitespace-pre-wrap">{value}</dd>
-    </div>
-  );
-}
 
 function formatAddress(parts: {
   street_address: string;
@@ -36,7 +32,11 @@ function formatAddress(parts: {
 export function CustomerDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
-  const { data, isLoading, isError, refetch } = useCustomer(id);
+  const canManage = usePermission('canManageCustomers');
+  const [draft, setDraft] = useState<CustomerDraft | null>(null);
+  const customer = useCustomer(id);
+  const { data, isError, refetch } = customer;
+  const isLoading = useCompanyListLoading(customer);
 
   if (isLoading) {
     return (
@@ -100,13 +100,21 @@ export function CustomerDetailPage() {
         title={name || t('domain:customers.unnamed')}
         description={t('domain:customers.detailDescription')}
         actions={
-          <Button asChild variant="outline" size="sm">
-            <Link to={routes.customers}>{t('common:action.back')}</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link to={routes.customers}>{t('common:action.back')}</Link>
+            </Button>
+            {canManage ? (
+              <Button size="sm" onClick={() => setDraft(draftFromCustomer(data))}>
+                <Uicon name="pencil" size={16} />
+                {t('common:action.edit')}
+              </Button>
+            ) : null}
+          </div>
         }
       />
 
-      <dl className="flex max-w-3xl flex-col gap-4 rounded-lg border border-border bg-card p-4 sm:p-6">
+      <DetailCard className="max-w-3xl">
         <DetailRow
           label={t('domain:customers.fields.displayName')}
           value={name || t('domain:customers.unnamed')}
@@ -139,7 +147,13 @@ export function CustomerDetailPage() {
           label={t('domain:customers.fields.created')}
           value={formatDate(data.created_at)}
         />
-      </dl>
+      </DetailCard>
+
+      <CustomerSheet
+        draft={draft}
+        open={draft !== null}
+        onOpenChange={(open) => !open && setDraft(null)}
+      />
     </div>
   );
 }

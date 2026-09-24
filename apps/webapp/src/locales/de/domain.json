@@ -1,8 +1,20 @@
 {
-  "order": { "one": "Auftrag", "other": "Aufträge" },
-  "customer": { "one": "Kunde", "other": "Kunden" },
-  "employee": { "one": "Mitarbeiter", "other": "Mitarbeiter" },
-  "company": { "one": "Betrieb", "other": "Betriebe" },
+  "order": {
+    "one": "Auftrag",
+    "other": "Aufträge"
+  },
+  "customer": {
+    "one": "Kunde",
+    "other": "Kunden"
+  },
+  "employee": {
+    "one": "Mitarbeiter",
+    "other": "Mitarbeiter"
+  },
+  "company": {
+    "one": "Betrieb",
+    "other": "Betriebe"
+  },
   "orderStatus": {
     "quote": "Angebot",
     "active": "Aktiv",
@@ -140,5 +152,455 @@
     "emptyDescription": "Sobald Zeiten erfasst sind, erscheinen sie hier.",
     "loadErrorTitle": "Zeiten konnten nicht geladen werden",
     "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
+  },
+  "documentStatus": {
+    "draft": "Entwurf",
+    "issued": "Ausgestellt",
+    "sent": "Versendet",
+    "partially_paid": "Teilzahlung",
+    "paid": "Bezahlt",
+    "overdue": "Überfällig",
+    "cancelled": "Storniert"
+  },
+  "agingBucket": {
+    "not_due": "Nicht fällig",
+    "1_30": "1–30 Tage",
+    "31_60": "31–60 Tage",
+    "61_90": "61–90 Tage",
+    "90_plus": "Über 90 Tage"
+  },
+  "invoices": {
+    "listTitle": "Rechnungen",
+    "listDescription": "Ausgangsrechnungen Ihres Betriebs.",
+    "filtersLabel": "Rechnungsfilter",
+    "filterAll": "Alle",
+    "filterOpen": "Offen",
+    "filterOverdue": "Überfällig",
+    "filterDrafts": "Entwürfe",
+    "filterPaid": "Bezahlt",
+    "columns": {
+      "number": "Nummer",
+      "customer": "Kunde",
+      "status": "Status",
+      "issueDate": "Rechnungsdatum",
+      "dueDate": "Fällig",
+      "gross": "Brutto"
+    },
+    "noNumber": "Ohne Nummer",
+    "noCustomer": "Kein Kunde",
+    "notIssued": "Nicht ausgestellt",
+    "emptyTitle": "Noch keine Rechnungen",
+    "emptyDescription": "Sobald Rechnungen ausgestellt sind, erscheinen sie hier.",
+    "loadErrorTitle": "Belege konnten nicht geladen werden",
+    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+    "detailTitle": "Rechnung",
+    "draftTitle": "Entwurf",
+    "details": "Angaben",
+    "lines": "Positionen",
+    "noLines": "Keine Positionen erfasst.",
+    "lineColumns": {
+      "title": "Position",
+      "quantity": "Menge",
+      "unitPrice": "Einzelpreis",
+      "tax": "USt.",
+      "net": "Netto"
+    },
+    "net": "Netto",
+    "vat": "Umsatzsteuer",
+    "vatAt": "Umsatzsteuer {{rate}} %",
+    "gross": "Brutto",
+    "paid": "Bereits gezahlt",
+    "open": "Offen",
+    "openAmount": "Offen: {{amount}}",
+    "serviceDate": "Leistungsdatum",
+    "paymentTerm": "Zahlungsziel",
+    "buyerReference": "Referenz des Kunden",
+    "notes": "Notizen",
+    "days_one": "{{count}} Tag",
+    "days_other": "{{count}} Tage",
+    "recipient": "Rechnung an",
+    "taxNumber": "Steuernummer",
+    "vatId": "USt-IdNr.",
+    "smallBusinessNote": "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
+    "print": "Druckansicht",
+    "finalize": "Festschreiben",
+    "finalizeSuccess": "Beleg festgeschrieben und nummeriert.",
+    "finalizeError": "Festschreiben nicht möglich",
+    "notFoundTitle": "Beleg nicht gefunden",
+    "notFoundDescription": "Dieser Beleg existiert nicht oder ist für Sie nicht sichtbar.",
+    "new": "Neue Rechnung",
+    "blockersTitle": "Vor dem Festschreiben fehlt noch etwas",
+    "blockers": {
+      "serviceDate": "Das Leistungsdatum fehlt. Es steht auf jeder Rechnung und ist Pflicht.",
+      "sellerTaxId": "Dem Betrieb fehlt Steuernummer und USt-IdNr. Ohne eine der beiden ist die Rechnung nach EN16931 nicht gültig."
+    },
+    "toSettings": "Zur Einrichtung"
+  },
+  "quotes": {
+    "listTitle": "Angebote",
+    "listDescription": "Angebote Ihres Betriebs.",
+    "columns": {
+      "number": "Nummer",
+      "customer": "Kunde",
+      "status": "Status",
+      "issueDate": "Datum",
+      "gross": "Brutto"
+    },
+    "emptyTitle": "Noch keine Angebote",
+    "emptyDescription": "Sobald Angebote geschrieben sind, erscheinen sie hier.",
+    "new": "Neues Angebot"
+  },
+  "receivables": {
+    "title": "Offene Posten",
+    "description": "Was der Betrieb noch zu bekommen hat, nach Alter der Forderung.",
+    "bucketsLabel": "Altersklassen",
+    "filterAll": "Alle",
+    "totalOpen": "Offene Forderungen",
+    "totalOverdue": "Davon überfällig",
+    "documentCount_one": "{{count}} Beleg",
+    "documentCount_other": "{{count}} Belege",
+    "days_one": "{{count}} Tag",
+    "days_other": "{{count}} Tage",
+    "notDue": "Nicht fällig",
+    "columns": {
+      "number": "Nummer",
+      "due": "Fällig",
+      "daysOverdue": "Überfällig",
+      "paid": "Bezahlt",
+      "open": "Offen"
+    },
+    "emptyTitle": "Keine offenen Posten",
+    "emptyDescription": "In dieser Altersklasse steht nichts aus."
+  },
+  "overview": {
+    "title": "Übersicht",
+    "description": "Was offen ist und was heute ansteht.",
+    "openReceivables": "Offene Forderungen",
+    "overdue": "Überfällig",
+    "revenueMonth": "Umsatz laufender Monat",
+    "drafts": "Entwürfe",
+    "draftsNote": "Noch nicht ausgestellt",
+    "noPreviousMonth": "Kein Vormonat zum Vergleich",
+    "versusPreviousMonth": "{{value}} zum Vormonat",
+    "tasksTitle": "Was liegt an",
+    "taskDunnable_one": "{{count}} Beleg ist mahnfähig",
+    "taskDunnable_other": "{{count}} Belege sind mahnfähig",
+    "taskDrafts_one": "{{count}} Entwurf ist nicht versendet",
+    "taskDrafts_other": "{{count}} Entwürfe sind nicht versendet",
+    "taskIncoming_one": "{{count}} Eingangsrechnung wird diese Woche fällig",
+    "taskIncoming_other": "{{count}} Eingangsrechnungen werden diese Woche fällig",
+    "tasksEmpty": "Nichts offen — alles erledigt.",
+    "noFinanceTitle": "Keine Kennzahlen sichtbar",
+    "noFinanceDescription": "Für die Zahlen des Betriebs fehlt dir die Berechtigung. Deine Aufträge, Einsätze und Zeiten findest du in der Seitenleiste."
+  },
+  "documentType": {
+    "invoice": "Rechnung",
+    "partial_invoice": "Abschlagsrechnung",
+    "final_invoice": "Schlussrechnung",
+    "quote": "Angebot",
+    "order_confirmation": "Auftragsbestätigung",
+    "delivery_note": "Lieferschein",
+    "credit_note": "Gutschrift",
+    "cancellation": "Storno"
+  },
+  "payments": {
+    "title": "Zahlungen",
+    "add": "Zahlung erfassen",
+    "empty": "Noch keine Zahlung gebucht.",
+    "amount": "Betrag",
+    "skonto": "Skonto",
+    "paidAt": "Zahlungsdatum",
+    "method": "Zahlungsweg",
+    "note": "Notiz",
+    "methods": {
+      "transfer": "Überweisung",
+      "cash": "Bar",
+      "card": "Karte",
+      "other": "Sonstiges",
+      "skonto": "Skonto"
+    },
+    "openHint": "Offen sind noch {{amount}}.",
+    "amountInvalid": "Bitte einen Betrag größer als 0 eingeben.",
+    "saved": "Zahlung gebucht.",
+    "saveError": "Zahlung konnte nicht gebucht werden.",
+    "dunningLevel": "Mahnstufe {{level}} versendet."
+  },
+  "expenses": {
+    "title": "Ausgaben",
+    "description": "Eingangsrechnungen und sonstige Kosten des Betriebs.",
+    "tabIncoming": "Eingangsrechnungen",
+    "tabExpenses": "Sonstige Ausgaben",
+    "columns": {
+      "number": "Nummer",
+      "vendor": "Lieferant",
+      "date": "Datum",
+      "due": "Fällig",
+      "gross": "Brutto",
+      "title": "Bezeichnung",
+      "category": "Kategorie",
+      "net": "Netto"
+    },
+    "calculatory": "Kalkulatorisch",
+    "overdue_one": "{{count}} Tag überfällig",
+    "overdue_other": "{{count}} Tage überfällig",
+    "emptyIncomingTitle": "Keine Eingangsrechnungen",
+    "emptyIncomingDescription": "Sobald Lieferantenrechnungen erfasst sind, erscheinen sie hier.",
+    "emptyExpensesTitle": "Keine Ausgaben erfasst",
+    "emptyExpensesDescription": "Gemeinkosten und sonstige Belege erscheinen hier."
+  },
+  "dunning": {
+    "title": "Mahnwesen",
+    "description": "Überfällige Belege und ihre bisherige Mahnstufe.",
+    "columns": {
+      "level": "Mahnstufe"
+    },
+    "noNotice": "Nicht gemahnt",
+    "levelLabel": "{{level}}. Mahnung",
+    "createAction": "{{level}}. Mahnung",
+    "confirmTitle": "{{level}}. Mahnung anlegen?",
+    "confirmDescription": "Für {{number}} über {{amount}}. Eine Mahnung lässt sich nicht zurücknehmen.",
+    "confirmAction": "Mahnung anlegen",
+    "created": "{{level}}. Mahnung angelegt.",
+    "createError": "Mahnung konnte nicht angelegt werden",
+    "emptyTitle": "Nichts zu mahnen",
+    "emptyDescription": "Kein Beleg ist über seine Fälligkeit hinaus offen.",
+    "fee": "Mahngebühr",
+    "interest": "Verzugszinsen"
+  },
+  "reports": {
+    "title": "Auswertungen",
+    "description": "Umsatz und Ausgaben im Zeitverlauf.",
+    "lastMonths": "Letzte {{count}} Monate",
+    "revenueTitle": "Umsatz je Monat",
+    "expenseTitle": "Ausgaben je Monat",
+    "byCustomer": "Umsatz je Kunde",
+    "columns": {
+      "customer": "Kunde",
+      "documents": "Belege",
+      "revenue": "Umsatz"
+    },
+    "noData": "Keine Daten im Zeitraum",
+    "noDataDescription": "Für diesen Zeitraum sind keine Belege erfasst."
+  },
+  "employees": {
+    "title": "Mitarbeiter",
+    "description": "Beschäftigte des Betriebs.",
+    "columns": {
+      "name": "Name",
+      "role": "Rolle",
+      "jobTitle": "Tätigkeit",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "since": "Seit"
+    },
+    "unnamed": "Ohne Namen",
+    "former": "Ausgeschieden",
+    "emptyTitle": "Keine Mitarbeiter",
+    "emptyDescription": "Sobald Beschäftigte angelegt sind, erscheinen sie hier.",
+    "loadErrorTitle": "Mitarbeiter konnten nicht geladen werden",
+    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
+  },
+  "absences": {
+    "title": "Abwesenheiten",
+    "description": "Urlaub, Krankheit und sonstige Ausfälle.",
+    "columns": {
+      "employee": "Mitarbeiter",
+      "type": "Art",
+      "period": "Zeitraum",
+      "days": "Kalendertage",
+      "status": "Status"
+    },
+    "types": {
+      "urlaub": "Urlaub",
+      "krankheit": "Krankheit",
+      "kind_krank": "Kind krank",
+      "weiterbildung": "Weiterbildung",
+      "pruefung": "Prüfung",
+      "sonderurlaub": "Sonderurlaub",
+      "unbezahlter_urlaub": "Unbezahlter Urlaub",
+      "mutterschutz_elternzeit": "Mutterschutz / Elternzeit",
+      "arztbesuch": "Arztbesuch",
+      "unentschuldigt": "Unentschuldigt",
+      "sonstiges": "Sonstiges"
+    },
+    "status": {
+      "ausstehend": "Ausstehend",
+      "genehmigt": "Genehmigt",
+      "abgelehnt": "Abgelehnt",
+      "storniert": "Storniert"
+    },
+    "filterAll": "Alle",
+    "filterPending": "Offen",
+    "approve": "Genehmigen",
+    "approved": "Abwesenheit genehmigt.",
+    "approveError": "Genehmigung nicht möglich",
+    "emptyTitle": "Keine Abwesenheiten",
+    "emptyDescription": "Es liegt nichts vor."
+  },
+  "payroll": {
+    "title": "Lohn",
+    "description": "Stundensätze: was berechnet wird und was die Stunde kostet.",
+    "columns": {
+      "target": "Gilt für",
+      "validFrom": "Gültig ab",
+      "billing": "Verrechnungssatz",
+      "cost": "Kostensatz"
+    },
+    "companyWide": "Ganzer Betrieb",
+    "scopes": {
+      "company": "Betrieb",
+      "role": "Rolle",
+      "employment": "Person",
+      "order": "Auftrag"
+    },
+    "emptyTitle": "Keine Stundensätze hinterlegt",
+    "emptyDescription": "Ohne Sätze lassen sich Lohnkosten nicht auswerten."
+  },
+  "catalog": {
+    "title": "Katalog",
+    "description": "Artikel und Material des Betriebs.",
+    "columns": {
+      "title": "Artikel",
+      "unit": "Einheit",
+      "purchase": "Einkauf",
+      "sale": "Verkauf",
+      "stock": "Bestand",
+      "location": "Lagerort"
+    },
+    "inactive": "Inaktiv",
+    "emptyTitle": "Kein Artikel im Katalog",
+    "emptyDescription": "Angelegte Artikel erscheinen hier."
+  },
+  "costCenters": {
+    "title": "Kostenstellen",
+    "description": "Gliederung für Aufträge und Auswertungen.",
+    "columns": {
+      "code": "Nummer",
+      "name": "Bezeichnung"
+    },
+    "emptyTitle": "Keine Kostenstellen",
+    "emptyDescription": "Ohne Kostenstellen lassen sich Kosten nicht zuordnen."
+  },
+  "settings": {
+    "title": "Einrichtung",
+    "description": "Stammdaten des Betriebs und seine Rollen.",
+    "company": "Betrieb",
+    "tax": "Steuer",
+    "invoicing": "Rechnungsstellung",
+    "roles": "Rollen",
+    "name": "Name",
+    "address": "Anschrift",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "tradeRegister": "Handelsregister",
+    "bank": "Bank",
+    "smallBusiness": "Kleinunternehmer",
+    "smallBusinessYes": "Ja (§ 19 UStG)",
+    "smallBusinessNo": "Nein",
+    "invoicePrefix": "Nummernkreis",
+    "nextNumber": "Nächste Rechnungsnummer",
+    "noRoles": "Keine Rollen angelegt.",
+    "editHint": "Diese Angaben stehen auf jedem Beleg und sind nach dem Festschreiben unveränderlich. Bearbeitet werden sie bis auf Weiteres in der Handy-App, wo die Prüfungen dafür bereits sitzen."
+  },
+  "calendar": {
+    "title": "Kalender",
+    "description": "Einsätze im Monatsüberblick.",
+    "previous": "Voriger Monat",
+    "next": "Nächster Monat",
+    "today": "Heute",
+    "more_one": "{{count}} weiterer",
+    "more_other": "{{count}} weitere"
+  },
+  "editor": {
+    "title": "Beleg",
+    "editTitle": "Entwurf bearbeiten",
+    "newTitle": {
+      "invoice": "Neue Rechnung",
+      "quote": "Neues Angebot"
+    },
+    "draftHint": "Wird als Entwurf gespeichert. Die Nummer vergibt erst das Festschreiben.",
+    "head": "Kopfdaten",
+    "texts": "Texte",
+    "intro": "Einleitung",
+    "footer": "Schlusstext",
+    "kind": "Art",
+    "unit": "Einheit",
+    "discount": "Rabatt %",
+    "kinds": {
+      "labor": "Arbeit",
+      "material": "Material",
+      "other": "Sonstiges",
+      "text": "Textzeile"
+    },
+    "addLine": "Position hinzufügen",
+    "removeLine": "Position entfernen",
+    "saved": "Entwurf gespeichert.",
+    "saveError": "Entwurf konnte nicht gespeichert werden",
+    "lockedTitle": "Beleg ist festgeschrieben",
+    "lockedDescription": "Ein festgeschriebener Beleg lässt sich nicht mehr ändern. Für eine Korrektur wird eine Storno- oder Gutschrift erstellt.",
+    "toDocument": "Zum Beleg",
+    "serviceDateRequired": "Bitte das Leistungsdatum angeben — ohne es lässt sich die Rechnung später nicht festschreiben.",
+    "serviceDateRequiredLabel": "Leistungsdatum *"
+  },
+  "customerForm": {
+    "newTitle": "Neuer Kunde",
+    "editTitle": "Kunde bearbeiten",
+    "description": "Stammdaten für Aufträge und Rechnungen.",
+    "type": "Art",
+    "types": {
+      "b2b": "Firma",
+      "b2c": "Privat"
+    },
+    "companyName": "Firmenname",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "street": "Straße und Hausnummer",
+    "postalCode": "PLZ",
+    "notes": "Notizen",
+    "nameRequired": "Bitte einen Namen angeben — sonst ist der Kunde in der Liste nicht zu finden.",
+    "saved": "Kunde gespeichert.",
+    "saveError": "Kunde konnte nicht gespeichert werden."
+  },
+  "timeForm": {
+    "newTitle": "Zeit nachtragen",
+    "editTitle": "Zeiteintrag bearbeiten",
+    "description": "Für Mitarbeiter, die auf der Baustelle nicht gestempelt haben.",
+    "choose": "Bitte wählen",
+    "date": "Datum",
+    "break": "Pause (Min.)",
+    "orderRequired": "Bitte einen Auftrag wählen.",
+    "endBeforeStart": "Das Ende liegt vor dem Beginn. Einträge über Mitternacht trägt die Handy-App ein.",
+    "saved": "Zeiteintrag gespeichert.",
+    "saveError": "Zeiteintrag konnte nicht gespeichert werden."
+  },
+  "absenceForm": {
+    "title": "Abwesenheit eintragen",
+    "description": "Wird sofort als genehmigt eingetragen — du entscheidest hier selbst. Offene Anträge kommen aus der Handy-App.",
+    "start": "Von",
+    "end": "Bis",
+    "employeeRequired": "Bitte einen Mitarbeiter wählen.",
+    "endBeforeStart": "Das Ende liegt vor dem Beginn.",
+    "saved": "Abwesenheit eingetragen.",
+    "saveError": "Abwesenheit konnte nicht eingetragen werden."
+  },
+  "expenseForm": {
+    "title": "Ausgabe erfassen",
+    "description": "Gemeinkosten, Material und sonstige Belege.",
+    "vatRate": "USt-Satz",
+    "titleRequired": "Bitte eine Bezeichnung angeben.",
+    "categoryRequired": "Bitte eine Kategorie wählen.",
+    "amountRequired": "Bitte einen Nettobetrag größer als 0 angeben.",
+    "saved": "Ausgabe erfasst.",
+    "saveError": "Ausgabe konnte nicht gespeichert werden."
+  },
+  "employeeForm": {
+    "newTitle": "Neuer Mitarbeiter",
+    "editTitle": "Mitarbeiter bearbeiten",
+    "description": "Stammdaten und Rolle im Betrieb.",
+    "nameRequired": "Bitte einen Namen angeben.",
+    "roleRequired": "Bitte eine Rolle wählen.",
+    "inviteHint": "Wird ohne Benutzerkonto angelegt. Die Einladung in die App läuft separat über die Handy-App.",
+    "saved": "Mitarbeiter gespeichert.",
+    "saveError": "Mitarbeiter konnte nicht gespeichert werden."
   }
 }

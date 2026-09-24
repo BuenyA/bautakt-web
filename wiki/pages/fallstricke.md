@@ -217,3 +217,41 @@ Trotz des Namens ist `configs['recommended-latest']` in 7.1.1 noch eslintrc-gefo
 (`plugins` ist ein Array).
 
 **Lösung:** Die Flat-Variante liegt unter `configs.flat['recommended-latest']`.
+
+## 22 Tabellen vergeben ihre `id` nicht selbst
+
+_Gefunden 2026-09-23 beim Kundenformular im Web._
+
+**Symptom:** `insert` schlägt fehl, weil `id` fehlt — obwohl es bei anderen Tabellen
+ohne `id` funktioniert. Die generierten Types sagen es ebenfalls: `id` ist dort im
+`Insert`-Typ Pflicht statt optional.
+
+Das ist kein Versehen, sondern Folge des Offline-First-Ansatzes der Handy-App: diese
+Datensätze entstehen ohne Verbindung und tragen ihre Id schon vor dem Sync. Betroffen
+sind durchweg die Tabellen, in die das Handy auf der Baustelle schreibt.
+
+_Stand 2026-09-24, 22 Tabellen ohne `DEFAULT gen_random_uuid()`:_ `absences`,
+`articles`, `calendar_events`, `checklist_items`, `checklists`, `cost_centers`,
+`customers`, `daily_reports`, `notes`, `notifications`, `order_document_categories`,
+`order_documents`, `order_images`, `order_issue_attachments`, `order_issues`,
+`order_materials`, `order_notes`, `orders`, `personal_notes`, `profiles`,
+`time_entries`, `work_assignments`.
+
+Die Finanztabellen (`sales_documents`, `sales_document_lines`, `payments`,
+`dunning_notices`, `expenses`, `incoming_invoices`) und `employments` haben dagegen
+ein Default.
+
+**Prüfen statt raten** — die Liste veraltet:
+
+```sql
+select c.table_name from information_schema.columns c
+join information_schema.tables t
+  on t.table_schema = c.table_schema and t.table_name = c.table_name
+ and t.table_type = 'BASE TABLE'
+where c.table_schema = 'public' and c.column_name = 'id' and c.column_default is null
+order by c.table_name;
+```
+
+**Lösung:** Beim Anlegen `id: crypto.randomUUID()` mitgeben. **Nicht** in der
+Datenbank ein Default nachrüsten — das wäre eine Schemaänderung, und die gehört
+ohnehin nach `bautakt-app`.

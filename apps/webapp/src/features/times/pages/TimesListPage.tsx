@@ -1,95 +1,172 @@
+import { Button, DataTable, type DataTableColumn, Uicon } from '@bautakt/ui';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
-import { PageSpinner } from '@/components/common/PageSpinner';
+import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
+import { usePermission } from '@/features/company/usePermission';
 import { formatDateTime, formatNetDuration } from '@/lib/format';
 
-import { useTimeEntries } from '../useTimeEntries';
+import { emptyTimeEntry, type TimeEntryDraft } from '../timeEntryDraft';
+import { TimeEntrySheet } from '../TimeEntrySheet';
+import { type TimeEntryListRow, useTimeEntries } from '../useTimeEntries';
 
 export function TimesListPage() {
   const { t } = useTranslation();
-  const { data, isLoading, isError, refetch } = useTimeEntries();
+  const labels = useDataTableLabels();
+  const canTrackForTeam = usePermission('canTrackTimeForTeam');
+  const [draft, setDraft] = useState<TimeEntryDraft | null>(null);
+  const entries = useTimeEntries();
+  const { data, isError, refetch } = entries;
 
-  return (
-    <div className="flex flex-col gap-6">
-      <PageHeader
-        title={t('domain:times.listTitle')}
-        description={t('domain:times.listDescription')}
-      />
+  const isLoading = useCompanyListLoading(entries);
 
-      {isLoading ? (
-        <PageSpinner />
-      ) : isError ? (
+  const columns = useMemo<DataTableColumn<TimeEntryListRow>[]>(
+    () => [
+      {
+        accessorKey: 'employee_name',
+        header: t('domain:times.columns.employee'),
+        cell: ({ row }) => (
+          <span className="text-foreground font-medium">
+            {row.original.employee_name || t('domain:times.noEmployee')}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'order_name',
+        header: t('domain:times.columns.order'),
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">
+            {row.original.order_name || t('domain:times.noOrder')}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'started_at',
+        header: t('domain:times.columns.start'),
+        cell: ({ row }) => (
+          <span className="text-muted-foreground whitespace-nowrap">
+            {formatDateTime(row.original.started_at)}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'ended_at',
+        header: t('domain:times.columns.end'),
+        cell: ({ row }) => (
+          <span className="text-muted-foreground whitespace-nowrap">
+            {row.original.ended_at
+              ? formatDateTime(row.original.ended_at)
+              : t('domain:times.noEnd')}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'break_minutes',
+        header: t('domain:times.columns.break'),
+        cell: ({ row }) => (
+          <span className="text-muted-foreground">
+            {t('domain:times.breakMinutes', { count: row.original.break_minutes })}
+          </span>
+        ),
+      },
+      {
+        id: 'duration',
+        // Sortiert nach der Nettodauer in Minuten, nicht nach dem Text: sonst
+        // stuende „10:00 Std." vor „9:00 Std.".
+        accessorFn: (row) => netMinutes(row),
+        header: t('domain:times.columns.duration'),
+        cell: ({ row }) => (
+          <span className="text-muted-foreground whitespace-nowrap">
+            {formatNetDuration(
+              row.original.started_at,
+              row.original.ended_at,
+              row.original.break_minutes,
+            ) || t('domain:times.noEnd')}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'note',
+        header: t('domain:times.columns.note'),
+        cell: ({ row }) => (
+          <span className="text-muted-foreground block max-w-xs truncate">
+            {row.original.note.trim() || t('domain:times.noNote')}
+          </span>
+        ),
+      },
+    ],
+    [t],
+  );
+
+  if (isError) {
+    return (
+      <div className="flex flex-col gap-6">
+        <PageHeader
+          title={t('domain:times.listTitle')}
+          description={t('domain:times.listDescription')}
+        />
         <EmptyState
           title={t('domain:times.loadErrorTitle')}
           description={t('domain:times.loadErrorDescription')}
           action={
             <button
               type="button"
-              className="text-sm font-medium text-primary hover:underline"
+              className="text-primary cursor-pointer text-sm font-medium hover:underline"
               onClick={() => void refetch()}
             >
               {t('common:action.retry')}
             </button>
           }
         />
-      ) : !data?.length ? (
-        <EmptyState
-          title={t('domain:times.emptyTitle')}
-          description={t('domain:times.emptyDescription')}
-        />
-      ) : (
-        <div className="overflow-x-auto rounded-lg border border-border">
-          <table className="w-full min-w-[48rem] text-left text-sm">
-            <thead className="bg-surface text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3 font-medium">{t('domain:times.columns.employee')}</th>
-                <th className="px-4 py-3 font-medium">{t('domain:times.columns.order')}</th>
-                <th className="px-4 py-3 font-medium">{t('domain:times.columns.start')}</th>
-                <th className="px-4 py-3 font-medium">{t('domain:times.columns.end')}</th>
-                <th className="px-4 py-3 font-medium">{t('domain:times.columns.break')}</th>
-                <th className="px-4 py-3 font-medium">{t('domain:times.columns.duration')}</th>
-                <th className="px-4 py-3 font-medium">{t('domain:times.columns.note')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((entry) => {
-                const duration = formatNetDuration(
-                  entry.started_at,
-                  entry.ended_at,
-                  entry.break_minutes,
-                );
-                return (
-                  <tr key={entry.id} className="border-t border-border hover:bg-surface/60">
-                    <td className="px-4 py-3 font-medium text-foreground">
-                      {entry.employee_name || t('domain:times.noEmployee')}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {entry.order_name || t('domain:times.noOrder')}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {formatDateTime(entry.started_at)}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {entry.ended_at ? formatDateTime(entry.ended_at) : t('domain:times.noEnd')}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {t('domain:times.breakMinutes', { count: entry.break_minutes })}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {duration || t('domain:times.noEnd')}
-                    </td>
-                    <td className="max-w-xs truncate px-4 py-3 text-muted-foreground">
-                      {entry.note.trim() || t('domain:times.noNote')}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title={t('domain:times.listTitle')}
+        description={t('domain:times.listDescription')}
+        actions={
+          canTrackForTeam ? (
+            <Button size="sm" onClick={() => setDraft(emptyTimeEntry())}>
+              <Uicon name="plus" size={16} />
+              {t('domain:timeForm.newTitle')}
+            </Button>
+          ) : null
+        }
+      />
+
+      <DataTable
+        columns={columns}
+        data={data ?? []}
+        isLoading={isLoading}
+        labels={labels}
+        exportFileName="zeiten"
+        empty={
+          <EmptyState
+            title={t('domain:times.emptyTitle')}
+            description={t('domain:times.emptyDescription')}
+          />
+        }
+      />
+
+      <TimeEntrySheet
+        draft={draft}
+        open={draft !== null}
+        onOpenChange={(open) => !open && setDraft(null)}
+      />
     </div>
   );
+}
+
+function netMinutes(row: TimeEntryListRow): number {
+  if (!row.ended_at) return 0;
+  const start = new Date(row.started_at).getTime();
+  const end = new Date(row.ended_at).getTime();
+  if (Number.isNaN(start) || Number.isNaN(end)) return 0;
+  return Math.max(0, Math.round((end - start) / 60_000) - (row.break_minutes ?? 0));
 }

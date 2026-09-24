@@ -1,6 +1,53 @@
 /* Design-Tokens und Tailwind. Kanonisch in packages/ui — siehe dortigen Dateikopf. */
 @import '@bautakt/ui/styles/theme.css';
 
+/* Animationsklassen (`animate-in`, `slide-in-from-*`), die die Radix-Bauteile
+   ueber `data-state` ansteuern. Ohne diese Zeile klappen Sheet und Menue ohne
+   Uebergang auf. */
+@import 'tw-animate-css';
+
+/* Icon-Schrift der Mobile-App — gleiche Symbole am Handy und am Rechner. */
+@import '@bautakt/ui/icons/uicons.css';
+
 /* Quellen, die Tailwind nach Klassennamen durchsuchen muss. Ohne diese Zeile
    sieht v4 die Komponenten in packages/ui nicht und laesst deren Klassen weg. */
 @source '../../../packages/ui/src';
+
+/**
+ * Druckansicht.
+ *
+ * ⚠️ Der Beleg ist immer hell, auch wenn die Anwendung im Dunkelmodus laeuft:
+ * sonst druckt der Browser eine schwarze Seite mit weisser Schrift — einmal
+ * unlesbar auf Papier und einmal eine leere Tonerkartusche. Die Tokens werden
+ * deshalb im Druckbereich auf die hellen Werte zurueckgesetzt, statt den
+ * Dunkelmodus global abzuschalten (das wuerde auch die Anwendung umschalten).
+ */
+.bautakt-print {
+  color-scheme: light;
+  --background: #ffffff;
+  --card: #ffffff;
+  --foreground: #111827;
+  --text-secondary: #374151;
+  --muted-foreground: #4b5563;
+  --text-subtle: #646d7a;
+  --border: #e4e7ec;
+  --border-strong: #cfd4dc;
+  --warning: #b34000;
+}
+
+@media print {
+  @page {
+    margin: 18mm;
+  }
+
+  html,
+  body {
+    background: #ffffff;
+  }
+
+  /* Hintergruende und Rahmen sollen mitdrucken, nicht wegoptimiert werden. */
+  .bautakt-print {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

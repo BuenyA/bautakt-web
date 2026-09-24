@@ -18,6 +18,9 @@
     "typecheck": {
       "outputs": []
     },
+    "test": {
+      "outputs": []
+    },
     "format:check": {
       "outputs": []
     }

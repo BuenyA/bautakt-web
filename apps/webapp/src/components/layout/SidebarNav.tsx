@@ -1,39 +1,64 @@
-import { hasPermission } from '@bautakt/core';
-import { cn } from '@bautakt/ui';
+import {
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  Uicon,
+} from '@bautakt/ui';
 import { useTranslation } from 'react-i18next';
-import { NavLink } from 'react-router';
+import { NavLink, useLocation } from 'react-router';
 
 import { useMembership } from '@/features/company/useMembership';
 
-import { navItems } from './navItems';
+import { maySee, navGroups } from './navItems';
 
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const { t } = useTranslation();
   const { data: membership } = useMembership();
+  const { pathname } = useLocation();
 
-  const visible = navItems.filter(
-    (item) => !item.permission || hasPermission(membership?.permissions, item.permission),
-  );
+  const visibleGroups = navGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => maySee(item, membership?.permissions)),
+    }))
+    // Eine Gruppe ohne sichtbare Eintraege verschwindet samt Ueberschrift —
+    // eine leere Ueberschrift „Finanzen" waere ein Hinweis auf etwas, das der
+    // Angemeldete nicht aufrufen kann.
+    .filter((group) => group.items.length > 0);
 
   return (
-    <nav aria-label={t('common:nav.main')} className="flex flex-col gap-0.5">
-      {visible.map((item) => (
-        <NavLink
-          key={item.to}
-          to={item.to}
-          onClick={onNavigate}
-          className={({ isActive }) =>
-            cn(
-              'rounded-md px-3 py-2 text-sm transition-colors',
-              isActive
-                ? 'bg-accent font-medium text-accent-foreground'
-                : 'text-muted-foreground hover:bg-surface hover:text-foreground',
-            )
-          }
-        >
-          {t(item.labelKey)}
-        </NavLink>
+    <>
+      {visibleGroups.map((group, index) => (
+        <SidebarGroup key={group.labelKey ?? `group-${index}`}>
+          {group.labelKey ? <SidebarGroupLabel>{t(group.labelKey)}</SidebarGroupLabel> : null}
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {group.items.map((item) => (
+                <SidebarMenuItem key={item.to}>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={t(item.labelKey)}
+                    isActive={isActive(pathname, item.to)}
+                  >
+                    <NavLink to={item.to} onClick={onNavigate}>
+                      <Uicon name={item.icon} size={18} />
+                      <span>{t(item.labelKey)}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       ))}
-    </nav>
+    </>
   );
+}
+
+/** Auch die Detailseite haelt ihren Bereich in der Leiste markiert. */
+function isActive(pathname: string, to: string): boolean {
+  return pathname === to || pathname.startsWith(`${to}/`);
 }

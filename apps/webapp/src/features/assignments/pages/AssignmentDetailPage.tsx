@@ -2,28 +2,22 @@ import { Button } from '@bautakt/ui';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 
+import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { formatDate, formatDateTimeRange } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
 import { useAssignment } from '../useAssignment';
 
-function DetailRow({ label, value }: { label: string; value: string }) {
-  if (!value) return null;
-  return (
-    <div className="grid gap-1 sm:grid-cols-[12rem_1fr] sm:gap-4">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="text-sm text-foreground">{value}</dd>
-    </div>
-  );
-}
-
 export function AssignmentDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
-  const { data, isLoading, isError, refetch } = useAssignment(id);
+  const assignment = useAssignment(id);
+  const { data, isError, refetch } = assignment;
+  const isLoading = useCompanyListLoading(assignment);
 
   if (isLoading) {
     return (
@@ -104,7 +98,7 @@ export function AssignmentDetailPage() {
         <p className="max-w-3xl text-sm text-text-secondary whitespace-pre-wrap">{data.note}</p>
       ) : null}
 
-      <dl className="flex max-w-3xl flex-col gap-4 rounded-lg border border-border bg-card p-4 sm:p-6">
+      <DetailCard className="max-w-3xl">
         <DetailRow label={t('domain:assignments.fields.period')} value={period} />
         <DetailRow
           label={t('domain:assignments.fields.order')}
@@ -119,7 +113,7 @@ export function AssignmentDetailPage() {
           label={t('domain:assignments.fields.created')}
           value={formatDate(data.created_at)}
         />
-      </dl>
+      </DetailCard>
     </div>
   );
 }
