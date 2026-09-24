@@ -13,16 +13,19 @@ Zweifel: dichte Tabellen und Tastaturbedienung schlagen große Touch-Ziele.
 ## Layout
 
 `SidebarProvider` / `Sidebar` / `SidebarInset` aus `@bautakt/ui` (shadcn).
-Desktop: Sidebar links (16rem, eingeklappt 3,25rem Icon-Spalte), Topbar (56px)
+Desktop: Sidebar links (240px, eingeklappt 64px Icon-Spalte), Topbar (56px)
 mit Trigger, Brotkrumen, Firmenname und Glocke. Unter 1024px wird die Leiste ein
-Overlay-Drawer.
+Overlay-Drawer. Innen 12px horizontal, 8px unter dem Logo, 2px zwischen den
+Einträgen, Mindesthöhe 40px. Icons 18px, Abstand zum Label 10px.
 
-Einklappen über den Trigger, die Rail am Rand oder `Strg`/`Cmd`+`B`. Der Zustand
-steht in einem Cookie (`bautakt_sidebar_state`), **nicht** im localStorage:
-so steht er beim ersten Render fest und die Leiste springt nach dem Laden nicht
-von breit auf schmal.
+Einklappen über den Trigger in der Topbar, den Kreis an der rechten Kante
+(Hit-Fläche 32px, sichtbarer Kreis 28px, halb über der Border, Chevron) oder
+`Strg`/`Cmd`+`B`. Der Zustand steht in einem Cookie (`bautakt_sidebar_state`),
+**nicht** im localStorage: so steht er beim ersten Render fest und die Leiste
+springt nach dem Laden nicht von breit auf schmal.
 
-Eingeklappt bleiben die Icons stehen und zeigen den Namen als Tooltip. Bewusst
+Eingeklappt bleiben die Icons stehen und zeigen den Namen als Tooltip. Die
+Active-Pill wird dabei ein 40px-Quadrat mit Radius 8px um das Icon. Bewusst
 nicht „ganz ausblenden": am Desktop verliert man damit die Anzeige, wo man ist.
 
 ## Navigation
@@ -83,8 +86,24 @@ das sind Bauteile der Primitives, keine Bautakt-Symbole.
 
 Hell/Dunkel über `ThemeProvider` (Klasse `dark` am `<html>`, Wahl im
 localStorage, Standard: Systemeinstellung). Die Farbwerte sind die Tokens aus
-`packages/ui/src/styles/theme.css`. Die `--sidebar-*`-Namen sind Aliase auf
-bestehende Flächen, kein eigenes Primary.
+`packages/ui/src/styles/theme.css`.
+
+Die `--sidebar-*`-Tokens sind seit 2026-09-24 eigene Werte (Expo-Docs-Optik),
+keine Aliase auf `--accent` oder `--background-second`. Die Light-Sidebar ist
+`#FFFFFF`. Der aktive Eintrag ist eine graue Pill (`#F3F4F6`, Dark `#1E2430`,
+Radius 8px, Schrift 600) — nie ein Primary-Fill. Idle-Text ist
+`--text-secondary` (`#374151` / Dark `#A8B0BD`). Hover im Light ist dieselbe
+Fläche wie Active; im Dark die Surface `#1A1F28` (`--sidebar-accent-hover`).
+Primary (`--sidebar-primary` / `--sidebar-ring`, `#3B86E0` / Dark `#4FA3E3`)
+bleibt dem Fokus-Ring (2px, Offset 2px) und Badge-Zahlen vorbehalten.
+
+⚠️ `--sidebar-accent` nicht wieder auf `--accent` legen. Das war der
+Wave-1-Stand und färbt den aktiven Eintrag blau (`#E8F2FC` mit Vordergrund
+`#3B86E0`).
+
+Sektionsüberschriften (Arbeit, Finanzen, Team, Stammdaten) sind 12px / 600,
+Title Case, Farbe `--text-subtle`. Kein Uppercase. Sie sind nur Beschriftung
+der bestehenden Einträge, keine zusätzlichen Routen.
 
 Dark (Stand 2026-09-24, Dark Mode v2) ist eine kühle Graublau-Stufe:
 Hintergrund `#0F1115`, Sidebar `#161A22`, Surface `#1A1F28`, Card `#1E2430`.
@@ -93,7 +112,9 @@ Primary im Dark bleibt `#4FA3E3`. Light ist davon getrennt.
 Die Sidebar scrollt in `SidebarContent` (`data-sidebar="content"`,
 `overflow-y-auto`). Nur dieses Element bekommt den schmalen Scrollbar (6px,
 Thumb `--border-strong`, Track transparent). Der Wrapper trägt
-`overflow-hidden`; die übrige Seite behält den Browser-Scrollbar.
+`overflow-hidden`; die übrige Seite behält den Browser-Scrollbar. Die
+Collapse-Kontrolle (`SidebarRail`) wird deshalb aus dem Wrapper gehoben,
+sonst schneidet `overflow-hidden` den Kreis auf der Border ab.
 
 ## Datenabfragen
 
