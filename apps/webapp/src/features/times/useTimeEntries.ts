@@ -53,18 +53,23 @@ function mapTimeEntryRow(row: TimeEntryQueryRow): TimeEntryListRow {
 }
 
 /**
- * Zeiteintraege des aktiven Betriebs. queryKey beginnt mit companyId (Mandant).
- * RLS filtert auf eigene bzw. team-/finanzsichtbare Zeilen.
+ * Zeiteintraege des aktiven Betriebs, optional auf einen Auftrag.
+ *
+ * queryKey beginnt mit companyId (Mandant). Das dritte Segment ist die
+ * `order_id` oder `'all'`, damit die Auftragsliste und die Betriebsliste
+ * nicht denselben Cache teilen. RLS filtert auf eigene bzw. team-/finanzsichtbare
+ * Zeilen. Neueste zuerst — das trifft den Index
+ * `time_entries_order_id_started_at_idx` `(order_id, started_at desc)`.
  */
-export function useTimeEntries() {
+export function useTimeEntries(orderId?: string) {
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
 
   return useQuery({
-    queryKey: ['timeEntries', companyId],
+    queryKey: ['timeEntries', companyId, orderId ?? 'all'],
     enabled: Boolean(companyId),
     queryFn: async (): Promise<TimeEntryListRow[]> => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('time_entries')
         .select(
           `
@@ -83,8 +88,13 @@ export function useTimeEntries() {
           profiles ( first_name, last_name )
         `,
         )
-        .eq('company_id', companyId!)
-        .order('started_at', { ascending: false });
+        .eq('company_id', companyId!);
+
+      if (orderId) {
+        query = query.eq('order_id', orderId);
+      }
+
+      const { data, error } = await query.order('started_at', { ascending: false });
 
       if (error) throw error;
       return ((data as TimeEntryQueryRow[] | null) ?? []).map(mapTimeEntryRow);

@@ -27,6 +27,7 @@ verlinkt, nie kopiert.
 | [webapp-shell.md](pages/webapp-shell.md)                   | Shell-Layout, kanonische Top-Nav IA, Listen-Muster.           |
 | [auftragsfotos.md](pages/auftragsfotos.md)                 | Read-only Fotogalerie auf der Auftragsdetailseite.            |
 | [auftragsnotizen.md](pages/auftragsnotizen.md)             | Read-only Notizen auf der Auftragsdetailseite.                |
+| [auftragszeiten.md](pages/auftragszeiten.md)               | Read-only Zeiten auf der Auftragsdetailseite.                 |
 | [demo-gf-2026-10-10.md](pages/demo-gf-2026-10-10.md)       | Klickpfad GF-Demo 10.10.2026 (Spahrbau, read-first).          |
 
 ## Protokolle
@@ -47,6 +48,7 @@ verlinkt, nie kopiert.
 | 2026-09-24 | [Auftragsfotos nur lesend](logs/2026-09-24-auftragsfotos.md)                                    |
 | 2026-09-24 | [Dark Mode v2 und Sidebar-Scrollbar](logs/2026-09-24-dark-mode-v2.md)                           |
 | 2026-09-24 | [Auftragsnotizen nur lesend](logs/2026-09-24-auftragsnotizen.md)                                |
+| 2026-09-24 | [Auftragszeiten nur lesend](logs/2026-09-24-auftragszeiten.md)                                  |
 
 ## Die drei wichtigsten Sätze
 
