@@ -1,4 +1,5 @@
-import { Button } from '@bautakt/ui';
+import { Button, Uicon } from '@bautakt/ui';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 
@@ -6,9 +7,12 @@ import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import { type CustomerDraft, draftFromCustomer } from '../customerDraft';
+import { CustomerSheet } from '../CustomerSheet';
 import { useCustomer } from '../useCustomer';
 import { customerDisplayName } from '../useCustomers';
 
@@ -27,6 +31,8 @@ function formatAddress(parts: {
 export function CustomerDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+  const canManage = usePermission('canManageCustomers');
+  const [draft, setDraft] = useState<CustomerDraft | null>(null);
   const { data, isLoading, isError, refetch } = useCustomer(id);
 
   if (isLoading) {
@@ -91,9 +97,17 @@ export function CustomerDetailPage() {
         title={name || t('domain:customers.unnamed')}
         description={t('domain:customers.detailDescription')}
         actions={
-          <Button asChild variant="outline" size="sm">
-            <Link to={routes.customers}>{t('common:action.back')}</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link to={routes.customers}>{t('common:action.back')}</Link>
+            </Button>
+            {canManage ? (
+              <Button size="sm" onClick={() => setDraft(draftFromCustomer(data))}>
+                <Uicon name="pencil" size={16} />
+                {t('common:action.edit')}
+              </Button>
+            ) : null}
+          </div>
         }
       />
 
@@ -131,6 +145,12 @@ export function CustomerDetailPage() {
           value={formatDate(data.created_at)}
         />
       </DetailCard>
+
+      <CustomerSheet
+        draft={draft}
+        open={draft !== null}
+        onOpenChange={(open) => !open && setDraft(null)}
+      />
     </div>
   );
 }

@@ -217,3 +217,23 @@ Trotz des Namens ist `configs['recommended-latest']` in 7.1.1 noch eslintrc-gefo
 (`plugins` ist ein Array).
 
 **Lösung:** Die Flat-Variante liegt unter `configs.flat['recommended-latest']`.
+
+## Vier Tabellen vergeben ihre `id` nicht selbst
+
+_Gefunden 2026-09-23 beim Kundenformular im Web._
+
+**Symptom:** `insert` schlägt fehl, weil `id` fehlt — obwohl es bei anderen Tabellen
+ohne `id` funktioniert. Die generierten Types sagen es ebenfalls: `id` ist dort im
+`Insert`-Typ Pflicht statt optional.
+
+Ohne `DEFAULT gen_random_uuid()` sind (Stand 2026-09-23): `customers`, `absences`,
+`articles`, `cost_centers`. Alle anderen Tabellen, in die die Webapp schreibt
+(`sales_documents`, `sales_document_lines`, `payments`, `dunning_notices`,
+`expenses`, `employments`), haben ein Default.
+
+Das ist kein Versehen, sondern Folge des Offline-First-Ansatzes der Handy-App: dort
+entstehen diese Datensätze ohne Verbindung und tragen ihre Id schon vor dem Sync.
+
+**Lösung:** Beim Anlegen `id: crypto.randomUUID()` mitgeben. **Nicht** in der
+Datenbank ein Default nachrüsten — das wäre eine Schemaänderung, und die gehört
+ohnehin nach `bautakt-app`.

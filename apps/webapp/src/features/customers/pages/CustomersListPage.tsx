@@ -1,19 +1,24 @@
-import { DataTable, type DataTableColumn } from '@bautakt/ui';
-import { useMemo } from 'react';
+import { Button, DataTable, type DataTableColumn, Uicon } from '@bautakt/ui';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { usePermission } from '@/features/company/usePermission';
 import { routes } from '@/lib/routes';
 
+import { type CustomerDraft, emptyCustomer } from '../customerDraft';
+import { CustomerSheet } from '../CustomerSheet';
 import { customerDisplayName, type CustomerListRow, useCustomers } from '../useCustomers';
 
 export function CustomersListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const labels = useDataTableLabels();
+  const canManage = usePermission('canManageCustomers');
+  const [draft, setDraft] = useState<CustomerDraft | null>(null);
   const { data, isLoading, isError, refetch } = useCustomers();
 
   const columns = useMemo<DataTableColumn<CustomerListRow>[]>(
@@ -101,6 +106,14 @@ export function CustomersListPage() {
       <PageHeader
         title={t('domain:customers.listTitle')}
         description={t('domain:customers.listDescription')}
+        actions={
+          canManage ? (
+            <Button size="sm" onClick={() => setDraft(emptyCustomer())}>
+              <Uicon name="plus" size={16} />
+              {t('domain:customerForm.newTitle')}
+            </Button>
+          ) : null
+        }
       />
 
       <DataTable
@@ -116,6 +129,12 @@ export function CustomersListPage() {
             description={t('domain:customers.emptyDescription')}
           />
         }
+      />
+
+      <CustomerSheet
+        draft={draft}
+        open={draft !== null}
+        onOpenChange={(open) => !open && setDraft(null)}
       />
     </div>
   );

@@ -520,5 +520,24 @@
     "lockedTitle": "Beleg ist festgeschrieben",
     "lockedDescription": "Ein festgeschriebener Beleg lässt sich nicht mehr ändern. Für eine Korrektur wird eine Storno- oder Gutschrift erstellt.",
     "toDocument": "Zum Beleg"
+  },
+  "customerForm": {
+    "newTitle": "Neuer Kunde",
+    "editTitle": "Kunde bearbeiten",
+    "description": "Stammdaten für Aufträge und Rechnungen.",
+    "type": "Art",
+    "types": {
+      "b2b": "Firma",
+      "b2c": "Privat"
+    },
+    "companyName": "Firmenname",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "street": "Straße und Hausnummer",
+    "postalCode": "PLZ",
+    "notes": "Notizen",
+    "nameRequired": "Bitte einen Namen angeben — sonst ist der Kunde in der Liste nicht zu finden.",
+    "saved": "Kunde gespeichert.",
+    "saveError": "Kunde konnte nicht gespeichert werden."
   }
 }
