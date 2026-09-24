@@ -1,3 +1,5 @@
+'use client';
+
 import type * as React from 'react';
 import { toast, Toaster as SonnerToaster } from 'sonner';
 

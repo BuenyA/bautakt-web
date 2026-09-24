@@ -1,3 +1,5 @@
+'use client';
+
 import { Slot } from '@radix-ui/react-slot';
 import { ChevronRightIcon } from 'lucide-react';
 import type * as React from 'react';
