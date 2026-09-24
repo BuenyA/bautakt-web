@@ -83,8 +83,10 @@ das sind Bauteile der Primitives, keine Bautakt-Symbole.
 
 Hell/Dunkel über `ThemeProvider` (Klasse `dark` am `<html>`, Wahl im
 localStorage, Standard: Systemeinstellung). Die Farbwerte sind die Tokens aus
-`packages/ui/src/styles/theme.css`; dort kamen nur die `--sidebar-*`-Namen dazu,
-die shadcn erwartet, als Aliase auf bestehende Werte.
+`packages/ui/src/styles/theme.css`; die `--sidebar-*`-Namen sind Aliase auf
+bestehende Werte. Die Leiste scrollt in `[data-sidebar="content"]`
+(`SidebarContent` in `packages/ui/src/components/ui/sidebar.tsx`). Nur dieses
+Element trägt die dünne Scrollbar (6px, Thumb `--border-strong`).
 
 ## Datenabfragen
 
