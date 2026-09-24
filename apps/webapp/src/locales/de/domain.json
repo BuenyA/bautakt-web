@@ -54,7 +54,18 @@
     "loadErrorTitle": "Aufträge konnten nicht geladen werden",
     "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
     "notFoundTitle": "Auftrag nicht gefunden",
-    "notFoundDescription": "Dieser Auftrag existiert nicht oder ist für Sie nicht sichtbar."
+    "notFoundDescription": "Dieser Auftrag existiert nicht oder ist für Sie nicht sichtbar.",
+    "photos": {
+      "title": "Fotos",
+      "emptyTitle": "Noch keine Fotos",
+      "emptyDescription": "Fotos aus der Handy-App erscheinen hier, sobald sie synchronisiert sind.",
+      "loadErrorTitle": "Fotos konnten nicht geladen werden",
+      "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+      "openLabel": "Foto vom {{date}} öffnen",
+      "openLabelUndated": "Foto öffnen",
+      "lightboxTitle": "Foto",
+      "takenAt": "Aufgenommen am {{date}}"
+    }
   },
   "customers": {
     "listTitle": "Kunden",
