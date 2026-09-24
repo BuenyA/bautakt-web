@@ -65,6 +65,14 @@
       "openLabelUndated": "Foto öffnen",
       "lightboxTitle": "Foto",
       "takenAt": "Aufgenommen am {{date}}"
+    },
+    "notes": {
+      "title": "Notizen",
+      "emptyTitle": "Noch keine Notizen",
+      "emptyDescription": "Notizen aus der Handy-App erscheinen hier, sobald sie synchronisiert sind.",
+      "loadErrorTitle": "Notizen konnten nicht geladen werden",
+      "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+      "editedAt": "Geändert {{date}}"
     }
   },
   "customers": {

@@ -10,6 +10,7 @@ import { useCompanyListLoading } from '@/features/company/useCompanyListLoading'
 import { formatCurrency, formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import { OrderNotes } from '../OrderNotes';
 import { OrderPhotos } from '../OrderPhotos';
 import { OrderStatusBadge } from '../OrderStatusBadge';
 import { useOrder } from '../useOrder';
@@ -114,6 +115,7 @@ export function OrderDetailPage() {
       </DetailCard>
 
       <OrderPhotos orderId={data.id} />
+      <OrderNotes orderId={data.id} />
     </div>
   );
 }
