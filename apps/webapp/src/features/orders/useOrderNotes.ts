@@ -69,7 +69,7 @@ export function useOrderNotes(orderId: string | undefined) {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return ((data as OrderNoteQueryRow[] | null) ?? []).map(mapOrderNote);
+      return (data ?? []).map(mapOrderNote);
     },
   });
 }
