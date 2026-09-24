@@ -2,7 +2,6 @@ import { createBrowserRouter, Navigate } from 'react-router';
 
 import { ErrorBoundaryPage } from '@/components/common/ErrorBoundaryPage';
 import { NotFoundPage } from '@/components/common/NotFoundPage';
-import { PlaceholderPage } from '@/components/common/PlaceholderPage';
 import { AppShell } from '@/components/layout/AppShell';
 import { AssignmentDetailPage } from '@/features/assignments/pages/AssignmentDetailPage';
 import { AssignmentsListPage } from '@/features/assignments/pages/AssignmentsListPage';
@@ -12,6 +11,7 @@ import { RegisterPage } from '@/features/auth/pages/RegisterPage';
 import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { PublicOnlyRoute } from '@/features/auth/PublicOnlyRoute';
+import { CalendarPage } from '@/features/calendar/pages/CalendarPage';
 import { RequirePermission } from '@/features/company/RequirePermission';
 import { CustomerDetailPage } from '@/features/customers/pages/CustomerDetailPage';
 import { CustomersListPage } from '@/features/customers/pages/CustomersListPage';
@@ -23,9 +23,12 @@ import { InvoicesListPage } from '@/features/finance/pages/InvoicesListPage';
 import { QuotesListPage } from '@/features/finance/pages/QuotesListPage';
 import { ReceivablesPage } from '@/features/finance/pages/ReceivablesPage';
 import { ReportsPage } from '@/features/finance/pages/ReportsPage';
+import { CatalogPage } from '@/features/masterdata/pages/CatalogPage';
+import { CostCentersPage } from '@/features/masterdata/pages/CostCentersPage';
 import { OrderDetailPage } from '@/features/orders/pages/OrderDetailPage';
 import { OrdersListPage } from '@/features/orders/pages/OrdersListPage';
 import { OverviewPage } from '@/features/overview/pages/OverviewPage';
+import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 import { AbsencesPage } from '@/features/team/pages/AbsencesPage';
 import { EmployeesListPage } from '@/features/team/pages/EmployeesListPage';
 import { PayrollPage } from '@/features/team/pages/PayrollPage';
@@ -87,10 +90,7 @@ export const router = createBrowserRouter([
               { path: `${routes.orders}/:id`, element: <OrderDetailPage /> },
               { path: routes.assignments, element: <AssignmentsListPage /> },
               { path: `${routes.assignments}/:id`, element: <AssignmentDetailPage /> },
-              {
-                path: routes.calendar,
-                element: <PlaceholderPage titleKey="common:nav.calendar" />,
-              },
+              { path: routes.calendar, element: <CalendarPage /> },
               { path: routes.times, element: <TimesListPage /> },
 
               // --- Finanzen ---
@@ -184,7 +184,7 @@ export const router = createBrowserRouter([
                 path: routes.catalog,
                 element: (
                   <RequirePermission anyOf={['canManageCatalog']}>
-                    <PlaceholderPage titleKey="common:nav.catalog" />
+                    <CatalogPage />
                   </RequirePermission>
                 ),
               },
@@ -192,15 +192,12 @@ export const router = createBrowserRouter([
                 path: routes.costCenters,
                 element: (
                   <RequirePermission anyOf={['canManageCostCenters']}>
-                    <PlaceholderPage titleKey="common:nav.costCenters" />
+                    <CostCentersPage />
                   </RequirePermission>
                 ),
               },
 
-              {
-                path: routes.settings,
-                element: <PlaceholderPage titleKey="common:nav.settings" />,
-              },
+              { path: routes.settings, element: <SettingsPage /> },
 
               // Alte Pfade umleiten, damit Bookmarks nicht leer laufen.
               // `/mitarbeiter` und `/kalender` sind inzwischen eigene Bereiche.

@@ -434,5 +434,60 @@
     },
     "emptyTitle": "Keine Stundensätze hinterlegt",
     "emptyDescription": "Ohne Sätze lassen sich Lohnkosten nicht auswerten."
+  },
+  "catalog": {
+    "title": "Katalog",
+    "description": "Artikel und Material des Betriebs.",
+    "columns": {
+      "title": "Artikel",
+      "unit": "Einheit",
+      "purchase": "Einkauf",
+      "sale": "Verkauf",
+      "stock": "Bestand",
+      "location": "Lagerort"
+    },
+    "inactive": "Inaktiv",
+    "emptyTitle": "Kein Artikel im Katalog",
+    "emptyDescription": "Angelegte Artikel erscheinen hier."
+  },
+  "costCenters": {
+    "title": "Kostenstellen",
+    "description": "Gliederung für Aufträge und Auswertungen.",
+    "columns": {
+      "code": "Nummer",
+      "name": "Bezeichnung"
+    },
+    "emptyTitle": "Keine Kostenstellen",
+    "emptyDescription": "Ohne Kostenstellen lassen sich Kosten nicht zuordnen."
+  },
+  "settings": {
+    "title": "Einrichtung",
+    "description": "Stammdaten des Betriebs und seine Rollen.",
+    "company": "Betrieb",
+    "tax": "Steuer",
+    "invoicing": "Rechnungsstellung",
+    "roles": "Rollen",
+    "name": "Name",
+    "address": "Anschrift",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "tradeRegister": "Handelsregister",
+    "bank": "Bank",
+    "smallBusiness": "Kleinunternehmer",
+    "smallBusinessYes": "Ja (§ 19 UStG)",
+    "smallBusinessNo": "Nein",
+    "invoicePrefix": "Nummernkreis",
+    "nextNumber": "Nächste Rechnungsnummer",
+    "noRoles": "Keine Rollen angelegt.",
+    "editHint": "Diese Angaben stehen auf jedem Beleg und sind nach dem Festschreiben unveränderlich. Bearbeitet werden sie bis auf Weiteres in der Handy-App, wo die Prüfungen dafür bereits sitzen."
+  },
+  "calendar": {
+    "title": "Kalender",
+    "description": "Einsätze im Monatsüberblick.",
+    "previous": "Voriger Monat",
+    "next": "Nächster Monat",
+    "today": "Heute",
+    "more_one": "{{count}} weiterer",
+    "more_other": "{{count}} weitere"
   }
 }
