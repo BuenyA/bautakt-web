@@ -4,6 +4,18 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Die Webapp gehoert nicht in Suchmaschinen: sie ist ein Arbeitswerkzeug
+      hinter der Anmeldung, kein Inhalt. Zweite Ebene neben dem
+      X-Robots-Tag-Header aus vercel.json — der Header greift auch fuer
+      Antworten, die kein HTML sind.
+
+      Bewusst KEIN "Disallow: /" in einer robots.txt: das verbietet das Lesen,
+      und was nicht gelesen wird, kann dieses noindex nicht sehen. Google
+      indexiert solche Adressen dann als nackten Link ohne Inhalt. Lesen
+      erlauben, Indexieren verbieten.
+    -->
+    <meta name="robots" content="noindex, nofollow" />
     <title>Bautakt</title>
   </head>
   <body>

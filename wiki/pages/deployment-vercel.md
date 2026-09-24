@@ -28,6 +28,27 @@ alles auf `index.html`. Siehe [fallstricke.md](fallstricke.md).
 der Catch-all verdeckt `/assets/*` also nicht. Nicht mit einem Negative-Lookahead
 „reparieren".
 
+## Die Webapp gehört nicht in den Index
+
+⚠️ `app.bautakt.com` ist ein Arbeitswerkzeug hinter der Anmeldung, kein Inhalt.
+Ohne Gegenmaßnahme wäre sie indexierbar — das Marketing verlinkt sie, Google hat
+also einen Weg dorthin.
+
+Zwei Ebenen, beide in diesem Repo:
+
+| Ebene                             | Ort                       | Warum                                             |
+| --------------------------------- | ------------------------- | ------------------------------------------------- |
+| `X-Robots-Tag: noindex, nofollow` | `apps/webapp/vercel.json` | greift für **jede** Antwort, auch für Nicht-HTML  |
+| `<meta name="robots" …>`          | `apps/webapp/index.html`  | greift auch, wenn Header unterwegs verloren gehen |
+
+⚠️ **Kein `Disallow: /` in einer robots.txt.** Das verbietet das _Lesen_, und was
+nicht gelesen wird, kann das `noindex` nicht sehen — Google indexiert solche
+Adressen dann als nackten Link ohne Inhalt. Lesen erlauben, Indexieren
+verbieten.
+
+Für `bautakt.com` gilt das ausdrücklich **nicht**: die Marketingseite soll
+gefunden werden.
+
 ## Env-Präfixe
 
 Dasselbe Wertepaar unter drei Namen:
