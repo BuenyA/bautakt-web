@@ -10,6 +10,7 @@ import { useCompanyListLoading } from '@/features/company/useCompanyListLoading'
 import { formatCurrency, formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import { OrderPhotos } from '../OrderPhotos';
 import { OrderStatusBadge } from '../OrderStatusBadge';
 import { useOrder } from '../useOrder';
 
@@ -111,6 +112,8 @@ export function OrderDetailPage() {
         <DetailRow label={t('domain:orders.fields.costCenter')} value={data.cost_center_label} />
         <DetailRow label={t('domain:orders.fields.created')} value={formatDate(data.created_at)} />
       </DetailCard>
+
+      <OrderPhotos orderId={data.id} />
     </div>
   );
 }
