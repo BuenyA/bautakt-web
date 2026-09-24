@@ -7,6 +7,7 @@ import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
@@ -33,7 +34,9 @@ export function CustomerDetailPage() {
   const { id } = useParams<{ id: string }>();
   const canManage = usePermission('canManageCustomers');
   const [draft, setDraft] = useState<CustomerDraft | null>(null);
-  const { data, isLoading, isError, refetch } = useCustomer(id);
+  const customer = useCustomer(id);
+  const { data, isError, refetch } = customer;
+  const isLoading = useCompanyListLoading(customer);
 
   if (isLoading) {
     return (

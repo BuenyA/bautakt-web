@@ -5,13 +5,17 @@ import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 
 import { type CostCenterRow, useCostCenters } from '../useMasterData';
 
 export function CostCentersPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
-  const { data, isLoading } = useCostCenters();
+  const costCenters = useCostCenters();
+  const { data } = costCenters;
+
+  const isLoading = useCompanyListLoading(costCenters);
 
   const columns = useMemo<DataTableColumn<CostCenterRow>[]>(
     () => [

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { useMembership } from '@/features/company/useMembership';
 import { formatDate } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
@@ -50,7 +51,11 @@ function useCompanyLetterhead() {
 export function InvoicePrintPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
-  const { data, isLoading } = useSalesDocument(id);
+  // Bewusst NICHT `document` genannt: das verdeckt das globale `document` und
+  // damit `document.title` im Effekt darunter.
+  const documentQuery = useSalesDocument(id);
+  const { data } = documentQuery;
+  const isLoading = useCompanyListLoading(documentQuery);
   const { data: company } = useCompanyLetterhead();
 
   useEffect(() => {

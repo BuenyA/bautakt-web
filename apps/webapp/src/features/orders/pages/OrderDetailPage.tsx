@@ -6,6 +6,7 @@ import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
@@ -15,7 +16,9 @@ import { useOrder } from '../useOrder';
 export function OrderDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
-  const { data, isLoading, isError, refetch } = useOrder(id);
+  const order = useOrder(id);
+  const { data, isError, refetch } = order;
+  const isLoading = useCompanyListLoading(order);
 
   if (isLoading) {
     return (

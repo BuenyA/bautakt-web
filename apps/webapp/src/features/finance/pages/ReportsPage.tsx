@@ -26,6 +26,7 @@ import { MonthlyBarChart } from '@/components/charts/MonthlyBarChart';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 
 import { useExpenses, useIncomingInvoiceList } from '../useExpenses';
 import { INVOICE_TYPE_LIST, useSalesDocuments } from '../useSalesDocuments';
@@ -50,6 +51,8 @@ export function ReportsPage() {
   const documents = useSalesDocuments(INVOICE_TYPE_LIST);
   const expenses = useExpenses();
   const incoming = useIncomingInvoiceList();
+
+  const isLoading = useCompanyListLoading(documents, expenses, incoming);
 
   const range = useMemo(() => monthRange(todayIso().slice(0, 7), months), [months]);
 
@@ -171,7 +174,7 @@ export function ReportsPage() {
         <DataTable
           columns={columns}
           data={customerTotals}
-          isLoading={documents.isLoading}
+          isLoading={isLoading}
           labels={labels}
           exportFileName="umsatz-je-kunde"
           empty={

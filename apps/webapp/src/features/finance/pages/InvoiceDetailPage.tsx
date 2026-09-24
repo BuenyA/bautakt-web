@@ -22,6 +22,7 @@ import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
@@ -39,7 +40,9 @@ export function InvoiceDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const access = useFinanceAccess();
-  const { data, isLoading, isError, refetch } = useSalesDocument(id);
+  const document = useSalesDocument(id);
+  const { data, isError, refetch } = document;
+  const isLoading = useCompanyListLoading(document);
   const finalize = useFinalizeDocument(id);
   const [paymentOpen, setPaymentOpen] = useState(false);
 

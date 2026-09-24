@@ -15,6 +15,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
@@ -75,7 +76,8 @@ export function InvoicesListPage() {
   const access = useFinanceAccess();
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = filterFromSearch(searchParams.get('status'));
-  const { data, isLoading, isError, refetch } = useSalesDocuments(INVOICE_TYPE_LIST);
+  const documents = useSalesDocuments(INVOICE_TYPE_LIST);
+  const { data, isError, refetch } = documents;
 
   function setFilter(next: string) {
     const value = SEARCH_VALUE[next as StatusFilter];
@@ -86,6 +88,8 @@ export function InvoicesListPage() {
     () => (data ?? []).filter((document) => matchesFilter(document, filter)),
     [data, filter],
   );
+
+  const isLoading = useCompanyListLoading(documents);
 
   const columns = useMemo<DataTableColumn<SalesDocumentListRow>[]>(
     () => [

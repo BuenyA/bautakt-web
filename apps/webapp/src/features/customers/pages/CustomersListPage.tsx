@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { routes } from '@/lib/routes';
 
@@ -19,7 +20,10 @@ export function CustomersListPage() {
   const labels = useDataTableLabels();
   const canManage = usePermission('canManageCustomers');
   const [draft, setDraft] = useState<CustomerDraft | null>(null);
-  const { data, isLoading, isError, refetch } = useCustomers();
+  const customers = useCustomers();
+  const { data, isError, refetch } = customers;
+
+  const isLoading = useCompanyListLoading(customers);
 
   const columns = useMemo<DataTableColumn<CustomerListRow>[]>(
     () => [

@@ -17,6 +17,7 @@ import { useSearchParams } from 'react-router';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 
@@ -46,7 +47,8 @@ export function AbsencesPage() {
   const filter = searchParams.get('status') === 'offen' ? 'pending' : 'all';
 
   const [sheetOpen, setSheetOpen] = useState(false);
-  const { data, isLoading } = useAbsences();
+  const absences = useAbsences();
+  const { data } = absences;
   const approve = useApproveAbsence();
 
   const rows = useMemo(
@@ -70,6 +72,8 @@ export function AbsencesPage() {
     },
     [approve, t],
   );
+
+  const isLoading = useCompanyListLoading(absences);
 
   const columns = useMemo<DataTableColumn<AbsenceRow>[]>(
     () => [

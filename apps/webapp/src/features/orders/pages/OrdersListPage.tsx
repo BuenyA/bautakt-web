@@ -6,6 +6,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
@@ -22,7 +23,8 @@ export function OrdersListPage() {
   const labels = useDataTableLabels();
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = filterFromSearch(searchParams.get('status'));
-  const { data, isLoading, isError, refetch } = useOrders(filter);
+  const orders = useOrders(filter);
+  const { data, isError, refetch } = orders;
 
   function setFilter(next: string) {
     if (next === 'all') {
@@ -31,6 +33,8 @@ export function OrdersListPage() {
     }
     setSearchParams({ status: next }, { replace: true });
   }
+
+  const isLoading = useCompanyListLoading(orders);
 
   const columns = useMemo<DataTableColumn<OrderListRow>[]>(
     () => [

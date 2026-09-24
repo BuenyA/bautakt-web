@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDateTime, formatNetDuration } from '@/lib/format';
 
@@ -17,7 +18,10 @@ export function TimesListPage() {
   const labels = useDataTableLabels();
   const canTrackForTeam = usePermission('canTrackTimeForTeam');
   const [draft, setDraft] = useState<TimeEntryDraft | null>(null);
-  const { data, isLoading, isError, refetch } = useTimeEntries();
+  const entries = useTimeEntries();
+  const { data, isError, refetch } = entries;
+
+  const isLoading = useCompanyListLoading(entries);
 
   const columns = useMemo<DataTableColumn<TimeEntryListRow>[]>(
     () => [

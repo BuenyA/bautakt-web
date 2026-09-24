@@ -6,6 +6,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { formatDateTimeRange } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
@@ -25,7 +26,8 @@ export function AssignmentsListPage() {
   const labels = useDataTableLabels();
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = filterFromSearch(searchParams.get('zeitraum'));
-  const { data, isLoading, isError, refetch } = useAssignments(filter);
+  const assignments = useAssignments(filter);
+  const { data, isError, refetch } = assignments;
 
   function setFilter(next: string) {
     if (next === 'all') {
@@ -34,6 +36,8 @@ export function AssignmentsListPage() {
     }
     setSearchParams({ zeitraum: 'woche' }, { replace: true });
   }
+
+  const isLoading = useCompanyListLoading(assignments);
 
   const columns = useMemo<DataTableColumn<AssignmentListRow>[]>(
     () => [

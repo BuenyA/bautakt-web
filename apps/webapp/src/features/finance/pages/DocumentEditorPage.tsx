@@ -23,6 +23,7 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { customerDisplayName, useCustomers } from '@/features/customers/useCustomers';
 import { routes } from '@/lib/routes';
 
@@ -73,6 +74,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const existing = useSalesDocument(id);
   const customers = useCustomers();
   const save = useSaveDraft(id);
+  const existingLoading = useCompanyListLoading(existing);
 
   const [state, setState] = useState<EditorState | null>(id ? null : initialState(type));
 
@@ -108,7 +110,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
   const totals = useMemo(() => (state ? editorTotals(state.lines) : null), [state]);
 
-  if (id && existing.isLoading) return <PageSpinner />;
+  if (id && existingLoading) return <PageSpinner />;
 
   if (id && existing.data && existing.data.status !== 'draft') {
     return (

@@ -26,6 +26,7 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { formatDate } from '@/lib/format';
 
 import { INVOICE_TYPE_LIST, usePayments, useSalesDocuments } from '../useSalesDocuments';
@@ -56,7 +57,7 @@ export function ReceivablesPage() {
   const documents = useSalesDocuments(INVOICE_TYPE_LIST);
   const payments = usePayments();
 
-  const isLoading = documents.isLoading || payments.isLoading;
+  const isLoading = useCompanyListLoading(documents, payments);
   const isError = documents.isError || payments.isError;
 
   const items = useMemo(

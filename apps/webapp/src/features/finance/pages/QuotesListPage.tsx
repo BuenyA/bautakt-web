@@ -7,6 +7,7 @@ import { Link } from 'react-router';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
@@ -22,7 +23,10 @@ export function QuotesListPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
   const access = useFinanceAccess();
-  const { data, isLoading, isError, refetch } = useSalesDocuments(QUOTE_TYPE_LIST);
+  const documents = useSalesDocuments(QUOTE_TYPE_LIST);
+  const { data, isError, refetch } = documents;
+
+  const isLoading = useCompanyListLoading(documents);
 
   const columns = useMemo<DataTableColumn<SalesDocumentListRow>[]>(
     () => [

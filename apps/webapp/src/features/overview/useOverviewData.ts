@@ -7,6 +7,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { useMembership } from '@/features/company/useMembership';
 import {
   INVOICE_TYPE_LIST,
@@ -67,6 +68,7 @@ export function useOverviewData(enabled: boolean) {
   const incoming = useIncomingInvoices(enabled);
   const dunned = useDunnedDocumentIds(enabled);
 
+  const isLoading = useCompanyListLoading(documents, payments);
   const month = toIsoDate(new Date()).slice(0, 7);
 
   const kpis = useMemo(
@@ -88,7 +90,7 @@ export function useOverviewData(enabled: boolean) {
   return {
     kpis,
     tasks,
-    isLoading: documents.isLoading || payments.isLoading,
+    isLoading,
     isError: documents.isError || payments.isError,
   };
 }

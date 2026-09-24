@@ -17,6 +17,7 @@ import { useSearchParams } from 'react-router';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 
@@ -44,6 +45,8 @@ export function ExpensesPage() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const incoming = useIncomingInvoiceList();
   const expenses = useExpenses();
+
+  const isLoading = useCompanyListLoading(incoming, expenses);
 
   const incomingColumns = useMemo<DataTableColumn<IncomingInvoiceListRow>[]>(
     () => [
@@ -152,7 +155,7 @@ export function ExpensesPage() {
           <DataTable
             columns={incomingColumns}
             data={incoming.data ?? []}
-            isLoading={incoming.isLoading}
+            isLoading={isLoading}
             labels={labels}
             exportFileName="eingangsrechnungen"
             empty={
@@ -168,7 +171,7 @@ export function ExpensesPage() {
           <DataTable
             columns={expenseColumns}
             data={expenses.data ?? []}
-            isLoading={expenses.isLoading}
+            isLoading={isLoading}
             labels={labels}
             exportFileName="ausgaben"
             empty={

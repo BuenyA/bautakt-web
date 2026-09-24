@@ -6,13 +6,17 @@ import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 
 import { type ArticleRow, useArticles } from '../useMasterData';
 
 export function CatalogPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
-  const { data, isLoading } = useArticles();
+  const articles = useArticles();
+  const { data } = articles;
+
+  const isLoading = useCompanyListLoading(articles);
 
   const columns = useMemo<DataTableColumn<ArticleRow>[]>(
     () => [

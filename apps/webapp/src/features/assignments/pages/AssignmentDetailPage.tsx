@@ -6,6 +6,7 @@ import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { formatDate, formatDateTimeRange } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
@@ -14,7 +15,9 @@ import { useAssignment } from '../useAssignment';
 export function AssignmentDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
-  const { data, isLoading, isError, refetch } = useAssignment(id);
+  const assignment = useAssignment(id);
+  const { data, isError, refetch } = assignment;
+  const isLoading = useCompanyListLoading(assignment);
 
   if (isLoading) {
     return (

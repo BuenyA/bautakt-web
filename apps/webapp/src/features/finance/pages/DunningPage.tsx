@@ -28,6 +28,7 @@ import { Link } from 'react-router';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
@@ -57,6 +58,8 @@ export function DunningPage() {
   const [pending, setPending] = useState<DunnableRow | null>(null);
   const [fee, setFee] = useState('');
   const [interest, setInterest] = useState('');
+
+  const isLoading = useCompanyListLoading(documents, payments, levels);
 
   const rows = useMemo<DunnableRow[]>(() => {
     const items = buildReceivables(documents.data ?? [], payments.data ?? []);
@@ -172,7 +175,7 @@ export function DunningPage() {
       <DataTable
         columns={columns}
         data={rows}
-        isLoading={documents.isLoading || payments.isLoading}
+        isLoading={isLoading}
         labels={labels}
         exportFileName="mahnwesen"
         empty={

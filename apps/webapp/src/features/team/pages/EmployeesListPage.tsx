@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 
@@ -17,7 +18,10 @@ export function EmployeesListPage() {
   const labels = useDataTableLabels();
   const canManage = usePermission('canManageEmployees');
   const [draft, setDraft] = useState<EmployeeDraft | null>(null);
-  const { data, isLoading, isError, refetch } = useEmployees();
+  const employees = useEmployees();
+  const { data, isError, refetch } = employees;
+
+  const isLoading = useCompanyListLoading(employees);
 
   const columns = useMemo<DataTableColumn<EmployeeRow>[]>(
     () => [

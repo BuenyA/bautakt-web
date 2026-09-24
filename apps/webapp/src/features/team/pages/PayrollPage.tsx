@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { useMembership } from '@/features/company/useMembership';
 import { usePermission } from '@/features/company/usePermission';
 import { employmentDisplayName } from '@/lib/employeeName';
@@ -69,7 +70,10 @@ export function PayrollPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
   const canViewCosts = usePermission('canViewWageCosts');
-  const { data, isLoading } = useLaborRates();
+  const rates = useLaborRates();
+  const { data } = rates;
+
+  const isLoading = useCompanyListLoading(rates);
 
   const columns = useMemo<DataTableColumn<RateRow>[]>(() => {
     const base: DataTableColumn<RateRow>[] = [
