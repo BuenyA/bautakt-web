@@ -4,8 +4,9 @@ Die Auftragsdetailseite zeigt die Fotos aus der Handy-App.
 
 ## Was geändert wurde
 
-- `useOrderImages` liest `order_images` des Mandanten und signiert jede Datei
-  im privaten Bucket `order-images` für 3600 Sekunden.
+- `useOrderImages` liest `order_images` des Mandanten und signiert
+  `storage_path` (`{companyId}/{orderId}/{imageId}.jpg`) im privaten Bucket
+  `order-images` für 3600 Sekunden. Keine öffentliche URL.
 - `OrderPhotos` hängt unter der Stammdatenkarte: Laden, Fehler mit erneutem
   Versuch, leerer Hinweis, Raster, Dialog für das einzelne Bild.
 - Texte unter `domain:orders.photos`. Kein Upload, kein Löschen, kein

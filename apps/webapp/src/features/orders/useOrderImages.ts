@@ -51,6 +51,8 @@ export function useOrderImages(orderId: string | undefined) {
 
       const signed = await Promise.all(
         rows.map(async (row) => {
+          // storage_path liegt fertig in der Zeile: {companyId}/{orderId}/{imageId}.jpg.
+          // Nicht selbst bauen und nicht getPublicUrl: der Bucket ist privat.
           const result = await supabase.storage
             .from('order-images')
             .createSignedUrl(row.storage_path, SIGNED_URL_TTL_SECONDS);

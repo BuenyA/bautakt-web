@@ -22,7 +22,9 @@ Die Abfrage steckt in `useOrderImages`: `order_images`, gefiltert auf die
 absteigend. Der `queryKey` ist `['order-images', companyId, orderId]`.
 
 Der Bucket `order-images` ist privat. Die Anzeige-URL kommt von
-`storage.from('order-images').createSignedUrl(storage_path, 3600)`. Die Query
+`storage.from('order-images').createSignedUrl(storage_path, 3600)`.
+`storage_path` hat die Form `{companyId}/{orderId}/{imageId}.jpg` und wird
+unverändert signiert, nicht zu einer öffentlichen URL umgebaut. Die Query
 hält die URLs 50 Minuten und holt sie dann neu, auch beim Zurückkehren ins
 Fenster. Sonst bleiben abgelaufene Signaturen in einer offen gelassenen Seite
 stehen, weil der globale `staleTime` 30 Sekunden beträgt und
@@ -36,9 +38,10 @@ Fehler.
 
 _Stand 2026-09-24._ Lesen hängt an der Betriebsmitgliedschaft, nicht an
 `canTakePhotos`. Die Tabellen-Policy heißt „Members can view order images", die
-Storage-Policy „Members can view order images in storage". Der Speicherpfad hat
-drei Segmente und beginnt mit der `company_id`; die Storage-Policy prüft dieses
-erste Segment. Beides steht im Wiki von `bautakt-app` und wird hier nicht
+Storage-Policy „Members can view order images in storage". Die Storage-Policy
+prüft das erste Pfadsegment, das ist die `company_id`. Dieselben 8 Zeilen
+passen alle auf `{companyId}/{orderId}/{imageId}.jpg`, keine davon ist eine
+öffentliche URL. Policies stehen im Wiki von `bautakt-app` und werden hier nicht
 kopiert:
 <https://github.com/BuenyA/craft/blob/main/wiki/index.md>.
 
