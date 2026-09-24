@@ -1,5 +1,13 @@
-import { DataTable, type DataTableColumn, Tabs, TabsList, TabsTrigger } from '@bautakt/ui';
-import { useMemo } from 'react';
+import {
+  Button,
+  DataTable,
+  type DataTableColumn,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  Uicon,
+} from '@bautakt/ui';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 
@@ -7,9 +15,11 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
+import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import { OrderSheet } from '../OrderSheet';
 import { OrderStatusBadge } from '../OrderStatusBadge';
 import { type OrderListFilter, type OrderListRow, useOrders } from '../useOrders';
 
@@ -21,6 +31,8 @@ export function OrdersListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const labels = useDataTableLabels();
+  const canCreate = usePermission('canCreateOrders');
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = filterFromSearch(searchParams.get('status'));
   const orders = useOrders(filter);
@@ -118,6 +130,14 @@ export function OrdersListPage() {
       <PageHeader
         title={t('domain:orders.listTitle')}
         description={t('domain:orders.listDescription')}
+        actions={
+          canCreate ? (
+            <Button size="sm" onClick={() => setSheetOpen(true)}>
+              <Uicon name="plus" size={16} />
+              {t('domain:orders.create.action')}
+            </Button>
+          ) : null
+        }
       />
 
       <DataTable
@@ -150,6 +170,8 @@ export function OrdersListPage() {
           />
         }
       />
+
+      <OrderSheet open={sheetOpen} onOpenChange={setSheetOpen} />
     </div>
   );
 }
