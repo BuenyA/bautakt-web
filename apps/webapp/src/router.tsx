@@ -15,6 +15,7 @@ import { CalendarPage } from '@/features/calendar/pages/CalendarPage';
 import { RequirePermission } from '@/features/company/RequirePermission';
 import { CustomerDetailPage } from '@/features/customers/pages/CustomerDetailPage';
 import { CustomersListPage } from '@/features/customers/pages/CustomersListPage';
+import { DocumentEditorPage } from '@/features/finance/pages/DocumentEditorPage';
 import { DunningPage } from '@/features/finance/pages/DunningPage';
 import { ExpensesPage } from '@/features/finance/pages/ExpensesPage';
 import { InvoiceDetailPage } from '@/features/finance/pages/InvoiceDetailPage';
@@ -107,6 +108,30 @@ export const router = createBrowserRouter([
                 element: (
                   <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
                     <InvoicesListPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.invoiceNew,
+                element: (
+                  <RequirePermission anyOf={['canUseBillingModule']}>
+                    <DocumentEditorPage type="invoice" />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.quoteNew,
+                element: (
+                  <RequirePermission anyOf={['canUseBillingModule']}>
+                    <DocumentEditorPage type="quote" />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: `${routes.invoices}/:id/bearbeiten`,
+                element: (
+                  <RequirePermission anyOf={['canUseBillingModule']}>
+                    <DocumentEditorPage type="invoice" />
                   </RequirePermission>
                 ),
               },

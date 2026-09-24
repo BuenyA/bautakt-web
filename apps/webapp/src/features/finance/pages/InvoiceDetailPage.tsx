@@ -121,6 +121,15 @@ export function InvoiceDetailPage() {
             ) : null}
 
             {access.canWriteSalesDocuments && isDraft ? (
+              <Button asChild variant="outline" size="sm">
+                <Link to={routes.invoiceEdit(data.id)}>
+                  <Uicon name="pencil" size={16} />
+                  {t('common:action.edit')}
+                </Link>
+              </Button>
+            ) : null}
+
+            {access.canWriteSalesDocuments && isDraft ? (
               <Button size="sm" disabled={finalize.isPending} onClick={() => void onFinalize()}>
                 <Uicon name="badge-check" size={16} />
                 {t('domain:invoices.finalize')}

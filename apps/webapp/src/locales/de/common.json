@@ -1,5 +1,7 @@
 {
-  "app": { "name": "Bautakt" },
+  "app": {
+    "name": "Bautakt"
+  },
   "action": {
     "save": "Speichern",
     "cancel": "Abbrechen",
@@ -8,7 +10,8 @@
     "signOut": "Abmelden",
     "search": "Suchen …",
     "export": "CSV-Export",
-    "columns": "Spalten"
+    "columns": "Spalten",
+    "edit": "Bearbeiten"
   },
   "state": {
     "loading": "Wird geladen …",

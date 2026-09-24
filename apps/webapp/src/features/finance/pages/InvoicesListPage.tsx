@@ -1,5 +1,13 @@
 import { eurosToMinor, formatMoney } from '@bautakt/finance';
-import { DataTable, type DataTableColumn, Tabs, TabsList, TabsTrigger } from '@bautakt/ui';
+import {
+  Button,
+  DataTable,
+  type DataTableColumn,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  Uicon,
+} from '@bautakt/ui';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router';
@@ -11,6 +19,7 @@ import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
 import { DocumentStatusBadge } from '../DocumentStatusBadge';
+import { useFinanceAccess } from '../useFinanceAccess';
 import {
   INVOICE_TYPE_LIST,
   type SalesDocumentListRow,
@@ -63,6 +72,7 @@ export function InvoicesListPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
   const navigate = useNavigate();
+  const access = useFinanceAccess();
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = filterFromSearch(searchParams.get('status'));
   const { data, isLoading, isError, refetch } = useSalesDocuments(INVOICE_TYPE_LIST);
@@ -169,6 +179,16 @@ export function InvoicesListPage() {
       <PageHeader
         title={t('domain:invoices.listTitle')}
         description={t('domain:invoices.listDescription')}
+        actions={
+          access.canWriteSalesDocuments ? (
+            <Button asChild size="sm">
+              <Link to={routes.invoiceNew}>
+                <Uicon name="plus" size={16} />
+                {t('domain:invoices.new')}
+              </Link>
+            </Button>
+          ) : null
+        }
       />
 
       <DataTable

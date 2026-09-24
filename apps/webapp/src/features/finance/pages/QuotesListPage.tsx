@@ -1,14 +1,17 @@
 import { eurosToMinor, formatMoney } from '@bautakt/finance';
-import { DataTable, type DataTableColumn } from '@bautakt/ui';
+import { Button, DataTable, type DataTableColumn, Uicon } from '@bautakt/ui';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { formatDate } from '@/lib/format';
+import { routes } from '@/lib/routes';
 
 import { DocumentStatusBadge } from '../DocumentStatusBadge';
+import { useFinanceAccess } from '../useFinanceAccess';
 import {
   QUOTE_TYPE_LIST,
   type SalesDocumentListRow,
@@ -18,6 +21,7 @@ import {
 export function QuotesListPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
+  const access = useFinanceAccess();
   const { data, isLoading, isError, refetch } = useSalesDocuments(QUOTE_TYPE_LIST);
 
   const columns = useMemo<DataTableColumn<SalesDocumentListRow>[]>(
@@ -93,6 +97,16 @@ export function QuotesListPage() {
       <PageHeader
         title={t('domain:quotes.listTitle')}
         description={t('domain:quotes.listDescription')}
+        actions={
+          access.canWriteSalesDocuments ? (
+            <Button asChild size="sm">
+              <Link to={routes.quoteNew}>
+                <Uicon name="plus" size={16} />
+                {t('domain:quotes.new')}
+              </Link>
+            </Button>
+          ) : null
+        }
       />
 
       <DataTable

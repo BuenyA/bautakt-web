@@ -227,7 +227,8 @@
     "finalizeSuccess": "Beleg festgeschrieben und nummeriert.",
     "finalizeError": "Festschreiben nicht möglich",
     "notFoundTitle": "Beleg nicht gefunden",
-    "notFoundDescription": "Dieser Beleg existiert nicht oder ist für Sie nicht sichtbar."
+    "notFoundDescription": "Dieser Beleg existiert nicht oder ist für Sie nicht sichtbar.",
+    "new": "Neue Rechnung"
   },
   "quotes": {
     "listTitle": "Angebote",
@@ -240,7 +241,8 @@
       "gross": "Brutto"
     },
     "emptyTitle": "Noch keine Angebote",
-    "emptyDescription": "Sobald Angebote geschrieben sind, erscheinen sie hier."
+    "emptyDescription": "Sobald Angebote geschrieben sind, erscheinen sie hier.",
+    "new": "Neues Angebot"
   },
   "receivables": {
     "title": "Offene Posten",
@@ -489,5 +491,34 @@
     "today": "Heute",
     "more_one": "{{count}} weiterer",
     "more_other": "{{count}} weitere"
+  },
+  "editor": {
+    "title": "Beleg",
+    "editTitle": "Entwurf bearbeiten",
+    "newTitle": {
+      "invoice": "Neue Rechnung",
+      "quote": "Neues Angebot"
+    },
+    "draftHint": "Wird als Entwurf gespeichert. Die Nummer vergibt erst das Festschreiben.",
+    "head": "Kopfdaten",
+    "texts": "Texte",
+    "intro": "Einleitung",
+    "footer": "Schlusstext",
+    "kind": "Art",
+    "unit": "Einheit",
+    "discount": "Rabatt %",
+    "kinds": {
+      "labor": "Arbeit",
+      "material": "Material",
+      "other": "Sonstiges",
+      "text": "Textzeile"
+    },
+    "addLine": "Position hinzufügen",
+    "removeLine": "Position entfernen",
+    "saved": "Entwurf gespeichert.",
+    "saveError": "Entwurf konnte nicht gespeichert werden",
+    "lockedTitle": "Beleg ist festgeschrieben",
+    "lockedDescription": "Ein festgeschriebener Beleg lässt sich nicht mehr ändern. Für eine Korrektur wird eine Storno- oder Gutschrift erstellt.",
+    "toDocument": "Zum Beleg"
   }
 }
