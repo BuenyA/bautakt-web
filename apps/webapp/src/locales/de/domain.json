@@ -352,7 +352,9 @@
     "created": "{{level}}. Mahnung angelegt.",
     "createError": "Mahnung konnte nicht angelegt werden",
     "emptyTitle": "Nichts zu mahnen",
-    "emptyDescription": "Kein Beleg ist über seine Fälligkeit hinaus offen."
+    "emptyDescription": "Kein Beleg ist über seine Fälligkeit hinaus offen.",
+    "fee": "Mahngebühr",
+    "interest": "Verzugszinsen"
   },
   "reports": {
     "title": "Auswertungen",
@@ -539,5 +541,47 @@
     "nameRequired": "Bitte einen Namen angeben — sonst ist der Kunde in der Liste nicht zu finden.",
     "saved": "Kunde gespeichert.",
     "saveError": "Kunde konnte nicht gespeichert werden."
+  },
+  "timeForm": {
+    "newTitle": "Zeit nachtragen",
+    "editTitle": "Zeiteintrag bearbeiten",
+    "description": "Für Mitarbeiter, die auf der Baustelle nicht gestempelt haben.",
+    "choose": "Bitte wählen",
+    "date": "Datum",
+    "break": "Pause (Min.)",
+    "orderRequired": "Bitte einen Auftrag wählen.",
+    "endBeforeStart": "Das Ende liegt vor dem Beginn. Einträge über Mitternacht trägt die Handy-App ein.",
+    "saved": "Zeiteintrag gespeichert.",
+    "saveError": "Zeiteintrag konnte nicht gespeichert werden."
+  },
+  "absenceForm": {
+    "title": "Abwesenheit eintragen",
+    "description": "Wird als offener Antrag angelegt und separat genehmigt.",
+    "start": "Von",
+    "end": "Bis",
+    "employeeRequired": "Bitte einen Mitarbeiter wählen.",
+    "endBeforeStart": "Das Ende liegt vor dem Beginn.",
+    "saved": "Abwesenheit eingetragen.",
+    "saveError": "Abwesenheit konnte nicht eingetragen werden."
+  },
+  "expenseForm": {
+    "title": "Ausgabe erfassen",
+    "description": "Gemeinkosten, Material und sonstige Belege.",
+    "vatRate": "USt-Satz",
+    "titleRequired": "Bitte eine Bezeichnung angeben.",
+    "categoryRequired": "Bitte eine Kategorie wählen.",
+    "amountRequired": "Bitte einen Nettobetrag größer als 0 angeben.",
+    "saved": "Ausgabe erfasst.",
+    "saveError": "Ausgabe konnte nicht gespeichert werden."
+  },
+  "employeeForm": {
+    "newTitle": "Neuer Mitarbeiter",
+    "editTitle": "Mitarbeiter bearbeiten",
+    "description": "Stammdaten und Rolle im Betrieb.",
+    "nameRequired": "Bitte einen Namen angeben.",
+    "roleRequired": "Bitte eine Rolle wählen.",
+    "inviteHint": "Wird ohne Benutzerkonto angelegt. Die Einladung in die App läuft separat über die Handy-App.",
+    "saved": "Mitarbeiter gespeichert.",
+    "saveError": "Mitarbeiter konnte nicht gespeichert werden."
   }
 }

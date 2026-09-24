@@ -1,17 +1,22 @@
-import { Badge, DataTable, type DataTableColumn } from '@bautakt/ui';
-import { useMemo } from 'react';
+import { Badge, Button, DataTable, type DataTableColumn, Uicon } from '@bautakt/ui';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 
+import { draftFromEmployee, type EmployeeDraft, emptyEmployee } from '../employeeDraft';
+import { EmployeeSheet } from '../EmployeeSheet';
 import { type EmployeeRow, useEmployees } from '../useEmployees';
 
 export function EmployeesListPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
+  const canManage = usePermission('canManageEmployees');
+  const [draft, setDraft] = useState<EmployeeDraft | null>(null);
   const { data, isLoading, isError, refetch } = useEmployees();
 
   const columns = useMemo<DataTableColumn<EmployeeRow>[]>(
@@ -91,6 +96,14 @@ export function EmployeesListPage() {
       <PageHeader
         title={t('domain:employees.title')}
         description={t('domain:employees.description')}
+        actions={
+          canManage ? (
+            <Button size="sm" onClick={() => setDraft(emptyEmployee())}>
+              <Uicon name="plus" size={16} />
+              {t('domain:employeeForm.newTitle')}
+            </Button>
+          ) : null
+        }
       />
 
       <DataTable
@@ -99,12 +112,19 @@ export function EmployeesListPage() {
         isLoading={isLoading}
         labels={labels}
         exportFileName="mitarbeiter"
+        onRowClick={canManage ? (employee) => setDraft(draftFromEmployee(employee)) : undefined}
         empty={
           <EmptyState
             title={t('domain:employees.emptyTitle')}
             description={t('domain:employees.emptyDescription')}
           />
         }
+      />
+
+      <EmployeeSheet
+        draft={draft}
+        open={draft !== null}
+        onOpenChange={(open) => !open && setDraft(null)}
       />
     </div>
   );

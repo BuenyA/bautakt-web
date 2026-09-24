@@ -8,8 +8,9 @@ import {
   TabsList,
   TabsTrigger,
   toast,
+  Uicon,
 } from '@bautakt/ui';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
@@ -19,6 +20,7 @@ import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 
+import { AbsenceSheet } from '../AbsenceSheet';
 import { type AbsenceRow, useAbsences, useApproveAbsence } from '../useAbsences';
 
 const KNOWN_TYPES = ['vacation', 'sick', 'special', 'unpaid', 'training'] as const;
@@ -43,6 +45,7 @@ export function AbsencesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = searchParams.get('status') === 'offen' ? 'pending' : 'all';
 
+  const [sheetOpen, setSheetOpen] = useState(false);
   const { data, isLoading } = useAbsences();
   const approve = useApproveAbsence();
 
@@ -146,6 +149,14 @@ export function AbsencesPage() {
       <PageHeader
         title={t('domain:absences.title')}
         description={t('domain:absences.description')}
+        actions={
+          canManage ? (
+            <Button size="sm" onClick={() => setSheetOpen(true)}>
+              <Uicon name="plus" size={16} />
+              {t('domain:absenceForm.title')}
+            </Button>
+          ) : null
+        }
       />
 
       <DataTable
@@ -174,6 +185,8 @@ export function AbsencesPage() {
           />
         }
       />
+
+      <AbsenceSheet open={sheetOpen} onOpenChange={setSheetOpen} />
     </div>
   );
 }

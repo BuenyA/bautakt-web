@@ -1,22 +1,26 @@
 import { daysBetween, eurosToMinor, formatMoney, todayIso } from '@bautakt/finance';
 import {
   Badge,
+  Button,
   DataTable,
   type DataTableColumn,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
+  Uicon,
 } from '@bautakt/ui';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 
+import { ExpenseSheet } from '../ExpenseSheet';
 import {
   type ExpenseRow,
   type IncomingInvoiceListRow,
@@ -36,6 +40,8 @@ export function ExpensesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = searchParams.get('bereich') === 'sonstige' ? 'expenses' : 'incoming';
 
+  const canManage = usePermission('canManageOverheadCosts');
+  const [sheetOpen, setSheetOpen] = useState(false);
   const incoming = useIncomingInvoiceList();
   const expenses = useExpenses();
 
@@ -121,6 +127,14 @@ export function ExpensesPage() {
       <PageHeader
         title={t('domain:expenses.title')}
         description={t('domain:expenses.description')}
+        actions={
+          canManage ? (
+            <Button size="sm" onClick={() => setSheetOpen(true)}>
+              <Uicon name="plus" size={16} />
+              {t('domain:expenseForm.title')}
+            </Button>
+          ) : null
+        }
       />
 
       <Tabs
@@ -166,6 +180,8 @@ export function ExpensesPage() {
           />
         </TabsContent>
       </Tabs>
+
+      <ExpenseSheet open={sheetOpen} onOpenChange={setSheetOpen} />
     </div>
   );
 }

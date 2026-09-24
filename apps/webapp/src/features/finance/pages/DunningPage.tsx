@@ -1,20 +1,27 @@
-import { buildReceivables, formatMoney, type ReceivableItem, todayIso } from '@bautakt/finance';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  buildReceivables,
+  formatMoney,
+  fromMinorUnits,
+  parseMoneyInput,
+  type ReceivableItem,
+  todayIso,
+} from '@bautakt/finance';
+import {
   Badge,
   Button,
   DataTable,
   type DataTableColumn,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  Label,
   toast,
 } from '@bautakt/ui';
-import { useMemo, useState } from 'react';
+import { type FormEvent, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
@@ -48,6 +55,8 @@ export function DunningPage() {
   const createNotice = useCreateDunningNotice();
 
   const [pending, setPending] = useState<DunnableRow | null>(null);
+  const [fee, setFee] = useState('');
+  const [interest, setInterest] = useState('');
 
   const rows = useMemo<DunnableRow[]>(() => {
     const items = buildReceivables(documents.data ?? [], payments.data ?? []);
@@ -56,7 +65,14 @@ export function DunningPage() {
       .map((item) => ({ ...item, level: levels.data?.get(item.document.id) ?? 0 }));
   }, [documents.data, payments.data, levels.data]);
 
-  async function onConfirm() {
+  function openFor(row: DunnableRow) {
+    setFee('');
+    setInterest('');
+    setPending(row);
+  }
+
+  async function onConfirm(event: FormEvent) {
+    event.preventDefault();
     if (!pending) return;
     const nextLevel = pending.level + 1;
     try {
@@ -64,6 +80,8 @@ export function DunningPage() {
         documentId: pending.document.id,
         level: nextLevel,
         noticeDateIso: todayIso(),
+        feeAmount: fromMinorUnits(parseMoneyInput(fee) ?? 0),
+        interestAmount: fromMinorUnits(parseMoneyInput(interest) ?? 0),
       });
       toast.success(t('domain:dunning.created', { level: nextLevel }));
     } catch (error) {
@@ -136,7 +154,7 @@ export function DunningPage() {
         cell: ({ row }) =>
           access.canWriteSalesDocuments ? (
             <span className="flex justify-end">
-              <Button variant="outline" size="sm" onClick={() => setPending(row.original)}>
+              <Button variant="outline" size="sm" onClick={() => openFor(row.original)}>
                 {t('domain:dunning.createAction', { level: row.original.level + 1 })}
               </Button>
             </span>
@@ -164,27 +182,60 @@ export function DunningPage() {
         }
       />
 
-      <AlertDialog open={pending !== null} onOpenChange={(open) => !open && setPending(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t('domain:dunning.confirmTitle', { level: (pending?.level ?? 0) + 1 })}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('domain:dunning.confirmDescription', {
-                number: pending?.document.document_number ?? '',
-                amount: formatMoney(pending?.openMinor ?? 0),
-              })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('common:action.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={() => void onConfirm()}>
-              {t('domain:dunning.confirmAction')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Dialog open={pending !== null} onOpenChange={(open) => !open && setPending(null)}>
+        <DialogContent>
+          <form onSubmit={(event) => void onConfirm(event)} className="grid gap-4">
+            <DialogHeader>
+              <DialogTitle>
+                {t('domain:dunning.confirmTitle', { level: (pending?.level ?? 0) + 1 })}
+              </DialogTitle>
+              <DialogDescription>
+                {t('domain:dunning.confirmDescription', {
+                  number: pending?.document.document_number ?? '',
+                  amount: formatMoney(pending?.openMinor ?? 0),
+                })}
+              </DialogDescription>
+            </DialogHeader>
+
+            {/* Bewusst ohne Vorbelegung: Gebuehr und Zinsen haengen an Vertrag
+                und Verzugsdauer. Ein geratener Standardwert landete sonst
+                ungeprueft auf der Mahnung. */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="mahngebuehr">{t('domain:dunning.fee')}</Label>
+                <Input
+                  id="mahngebuehr"
+                  inputMode="decimal"
+                  className="text-right tabular-nums"
+                  placeholder="0,00"
+                  value={fee}
+                  onChange={(event) => setFee(event.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="verzugszinsen">{t('domain:dunning.interest')}</Label>
+                <Input
+                  id="verzugszinsen"
+                  inputMode="decimal"
+                  className="text-right tabular-nums"
+                  placeholder="0,00"
+                  value={interest}
+                  onChange={(event) => setInterest(event.target.value)}
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setPending(null)}>
+                {t('common:action.cancel')}
+              </Button>
+              <Button type="submit" disabled={createNotice.isPending}>
+                {t('domain:dunning.confirmAction')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -32,15 +32,19 @@ export type NewDunningNotice = {
   documentId: string;
   level: number;
   noticeDateIso: string;
+  /** Mahngebuehr in Euro. */
+  feeAmount: number;
+  /** Verzugszinsen in Euro. */
+  interestAmount: number;
 };
 
 /**
  * Mahnung anlegen.
  *
- * Gebuehr und Verzugszinsen bleiben bei 0: beides ist eine kaufmaennische
- * Entscheidung und haengt an Vertrag und Verzugsdauer. Sie hier zu raten waere
- * schlimmer als sie wegzulassen — die Betraege gehoeren spaeter in ein Formular,
- * nicht in einen Standardwert.
+ * Gebuehr und Verzugszinsen kommen aus dem Formular und haben bewusst keinen
+ * Standardwert ausser 0: beides ist eine kaufmaennische Entscheidung und haengt
+ * an Vertrag und Verzugsdauer. Einen Betrag zu raten waere schlimmer, als ihn
+ * leer zu lassen.
  */
 export function useCreateDunningNotice() {
   const queryClient = useQueryClient();
@@ -54,8 +58,8 @@ export function useCreateDunningNotice() {
         document_id: notice.documentId,
         level: notice.level,
         notice_date: notice.noticeDateIso,
-        fee_amount: 0,
-        interest_amount: 0,
+        fee_amount: notice.feeAmount,
+        interest_amount: notice.interestAmount,
       });
       if (error) throw error;
     },

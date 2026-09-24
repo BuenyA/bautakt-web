@@ -1,17 +1,22 @@
-import { DataTable, type DataTableColumn } from '@bautakt/ui';
-import { useMemo } from 'react';
+import { Button, DataTable, type DataTableColumn, Uicon } from '@bautakt/ui';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { usePermission } from '@/features/company/usePermission';
 import { formatDateTime, formatNetDuration } from '@/lib/format';
 
+import { emptyTimeEntry, type TimeEntryDraft } from '../timeEntryDraft';
+import { TimeEntrySheet } from '../TimeEntrySheet';
 import { type TimeEntryListRow, useTimeEntries } from '../useTimeEntries';
 
 export function TimesListPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
+  const canTrackForTeam = usePermission('canTrackTimeForTeam');
+  const [draft, setDraft] = useState<TimeEntryDraft | null>(null);
   const { data, isLoading, isError, refetch } = useTimeEntries();
 
   const columns = useMemo<DataTableColumn<TimeEntryListRow>[]>(
@@ -121,6 +126,14 @@ export function TimesListPage() {
       <PageHeader
         title={t('domain:times.listTitle')}
         description={t('domain:times.listDescription')}
+        actions={
+          canTrackForTeam ? (
+            <Button size="sm" onClick={() => setDraft(emptyTimeEntry())}>
+              <Uicon name="plus" size={16} />
+              {t('domain:timeForm.newTitle')}
+            </Button>
+          ) : null
+        }
       />
 
       <DataTable
@@ -135,6 +148,12 @@ export function TimesListPage() {
             description={t('domain:times.emptyDescription')}
           />
         }
+      />
+
+      <TimeEntrySheet
+        draft={draft}
+        open={draft !== null}
+        onOpenChange={(open) => !open && setDraft(null)}
       />
     </div>
   );
