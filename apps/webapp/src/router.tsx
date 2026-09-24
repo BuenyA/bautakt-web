@@ -26,6 +26,9 @@ import { ReportsPage } from '@/features/finance/pages/ReportsPage';
 import { OrderDetailPage } from '@/features/orders/pages/OrderDetailPage';
 import { OrdersListPage } from '@/features/orders/pages/OrdersListPage';
 import { OverviewPage } from '@/features/overview/pages/OverviewPage';
+import { AbsencesPage } from '@/features/team/pages/AbsencesPage';
+import { EmployeesListPage } from '@/features/team/pages/EmployeesListPage';
+import { PayrollPage } from '@/features/team/pages/PayrollPage';
 import { TimesListPage } from '@/features/times/pages/TimesListPage';
 import { HOME_ROUTE, routes } from '@/lib/routes';
 
@@ -153,7 +156,7 @@ export const router = createBrowserRouter([
                 path: routes.employees,
                 element: (
                   <RequirePermission anyOf={['canManageEmployees']}>
-                    <PlaceholderPage titleKey="common:nav.employees" />
+                    <EmployeesListPage />
                   </RequirePermission>
                 ),
               },
@@ -161,7 +164,7 @@ export const router = createBrowserRouter([
                 path: routes.absences,
                 element: (
                   <RequirePermission anyOf={['canManageAbsences']}>
-                    <PlaceholderPage titleKey="common:nav.absences" />
+                    <AbsencesPage />
                   </RequirePermission>
                 ),
               },
@@ -169,7 +172,7 @@ export const router = createBrowserRouter([
                 path: routes.payroll,
                 element: (
                   <RequirePermission anyOf={['canViewWageCosts', 'canManageRates']}>
-                    <PlaceholderPage titleKey="common:nav.payroll" />
+                    <PayrollPage />
                   </RequirePermission>
                 ),
               },

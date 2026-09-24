@@ -366,5 +366,73 @@
     },
     "noData": "Keine Daten im Zeitraum",
     "noDataDescription": "Für diesen Zeitraum sind keine Belege erfasst."
+  },
+  "employees": {
+    "title": "Mitarbeiter",
+    "description": "Beschäftigte des Betriebs.",
+    "columns": {
+      "name": "Name",
+      "role": "Rolle",
+      "jobTitle": "Tätigkeit",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "since": "Seit"
+    },
+    "unnamed": "Ohne Namen",
+    "former": "Ausgeschieden",
+    "emptyTitle": "Keine Mitarbeiter",
+    "emptyDescription": "Sobald Beschäftigte angelegt sind, erscheinen sie hier.",
+    "loadErrorTitle": "Mitarbeiter konnten nicht geladen werden",
+    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
+  },
+  "absences": {
+    "title": "Abwesenheiten",
+    "description": "Urlaub, Krankheit und sonstige Ausfälle.",
+    "columns": {
+      "employee": "Mitarbeiter",
+      "type": "Art",
+      "period": "Zeitraum",
+      "days": "Kalendertage",
+      "status": "Status"
+    },
+    "types": {
+      "vacation": "Urlaub",
+      "sick": "Krank",
+      "special": "Sonderurlaub",
+      "unpaid": "Unbezahlt",
+      "training": "Fortbildung"
+    },
+    "status": {
+      "pending": "Offen",
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt",
+      "cancelled": "Zurückgezogen"
+    },
+    "filterAll": "Alle",
+    "filterPending": "Offen",
+    "approve": "Genehmigen",
+    "approved": "Abwesenheit genehmigt.",
+    "approveError": "Genehmigung nicht möglich",
+    "emptyTitle": "Keine Abwesenheiten",
+    "emptyDescription": "Es liegt nichts vor."
+  },
+  "payroll": {
+    "title": "Lohn",
+    "description": "Stundensätze: was berechnet wird und was die Stunde kostet.",
+    "columns": {
+      "target": "Gilt für",
+      "validFrom": "Gültig ab",
+      "billing": "Verrechnungssatz",
+      "cost": "Kostensatz"
+    },
+    "companyWide": "Ganzer Betrieb",
+    "scopes": {
+      "company": "Betrieb",
+      "role": "Rolle",
+      "employment": "Person",
+      "order": "Auftrag"
+    },
+    "emptyTitle": "Keine Stundensätze hinterlegt",
+    "emptyDescription": "Ohne Sätze lassen sich Lohnkosten nicht auswerten."
   }
 }
