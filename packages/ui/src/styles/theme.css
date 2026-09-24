@@ -6,11 +6,12 @@
  * Datei. Die Werte sind berechnet (relative Luminanz nach WCAG 2.1) und gelten
  * gegen die jeweils genannte Fläche.
  *
- * ⚠️ Diese Datei ist für das Web kanonisch. Flächen, Text und Statusfarben
- * weichen nicht von bautakt-app ab: dort zuerst ändern, dann hierher holen.
- * Ausnahme (Stand 2026-09-24): Light-Primary, Accent-Fläche, Accent-Foreground
- * und Ring folgen dem Marketing-Blau #3B86E0 / #E8F2FC. Dark-Primary bleibt
- * #4FA3E3. Die Mobile-App zieht das Light-Primary in einem eigenen PR nach.
+ * ⚠️ Diese Datei ist für das Web kanonisch. Light-Flächen, Light-Text und
+ * Statusfarben ausserhalb von Primary weichen nicht von bautakt-app ab: dort
+ * zuerst ändern, dann hierher holen.
+ * Ausnahme (Stand 2026-09-24): Light-Primary #3B86E0 / Accent #E8F2FC, und der
+ * Dark-Satz (kühle Neutrale, Primary bleibt #4FA3E3). Die Mobile-App zieht das
+ * in einem eigenen PR nach.
  *
  * Die Variablennamen folgen der Konvention von shadcn/ui, damit dessen
  * Komponenten unverändert funktionieren. Bautakt-eigene Tokens stehen darunter.
@@ -92,46 +93,47 @@
 
 .dark {
   /* --- Flächen / Elevation --- */
-  --background: #0d0e14;
-  --background-second: #12141c;
-  --background-third: #181b25;
-  --card: #212632; /* hebt sich klar von surface ab, ohne aufzuhellen */
-  --popover: #212632;
-  --surface: #1b1f29;
-  --input: #1b1f29; /* == surface, bewusst (wie im Light-Mode) */
-  --border: #272c38;
-  --border-strong: #3a4150;
+  /* Dark v2, 2026-09-24: kühle Neutrale, fünf Stufen. Kein Violett-Cast. */
+  --background: #0f1115;
+  --background-second: #161a22;
+  --background-third: #1c212b;
+  --card: #1e2430; /* eine Stufe über surface */
+  --popover: #1e2430;
+  --surface: #1a1f28;
+  --input: #1a1f28; /* == surface, bewusst (wie im Light-Mode) */
+  --border: #2a3140;
+  --border-strong: #3d4656;
 
   /* --- Text --- */
-  --foreground: #f2f4f8; /* reines Weiß blendet auf Dunkel — 17.50:1, AAA */
-  --card-foreground: #f2f4f8;
-  --popover-foreground: #f2f4f8;
-  --text-secondary: #b7becc; /* 10.32:1 — AAA */
-  --muted-foreground: #949dae; /* war #5C5C5C (3.02:1, FAIL) — jetzt 7.06:1 */
-  --text-subtle: #868fa0; /* 5.92:1 */
-  --text-placeholder: #474e5c; /* 1.97:1 auf input, eingegebener Text 14.96:1 */
+  --foreground: #f0f2f5; /* 16.85:1 auf background — AAA */
+  --card-foreground: #f0f2f5;
+  --popover-foreground: #f0f2f5;
+  --text-secondary: #a8b0bd; /* 8.65:1 — AAA */
+  --muted-foreground: #8b93a3; /* war #5C5C5C (3.02:1, FAIL) — jetzt 6.12:1 */
+  --text-subtle: #6f7787; /* 4.20:1 auf background — unter AA für normalen Text */
+  --text-placeholder: #4a5160; /* 2.08:1 auf input, eingegebener Text 14.74:1 */
 
   /* --- Primary --- */
-  --primary: #4fa3e3; /* Light-Primary #3b86e0 auf dark.background 5.20:1; dieser Ton 7.05:1 */
-  --primary-foreground: #0d0e14; /* 7.05:1 */
-  --accent: #101f35; /* primary darauf: 6.05:1 */
+  --primary: #4fa3e3; /* 6.91:1 auf background; Light-Primary #3b86e0 dort 5.10:1 */
+  --primary-foreground: #0f1115; /* 6.91:1 */
+  --accent: #152536; /* primary darauf: 5.69:1 */
   --accent-foreground: #4fa3e3;
   --ring: #4fa3e3;
 
   /* --- Sekundär / Muted --- */
-  --secondary: #1b1f29;
-  --secondary-foreground: #b7becc;
-  --muted: #1b1f29;
+  --secondary: #1a1f28;
+  --secondary-foreground: #a8b0bd;
+  --muted: #1a1f28;
 
   /* --- Danger --- */
-  --destructive: #f25a5a; /* 5.86:1 auf background, 4.60:1 auf card */
-  --destructive-foreground: #ffffff;
+  --destructive: #f87171; /* 6.83:1 auf background, 5.62:1 auf card */
+  --destructive-foreground: #0f1115; /* 6.83:1 auf destructive */
   --destructive-solid: #dc2626;
   --destructive-bg: #2a1518;
 
   /* --- Success --- */
   --success: #4ade80;
-  --success-foreground: #0d0e14;
+  --success-foreground: #0f1115;
   --success-bg: #10231a;
 
   /* --- Warnung --- */
@@ -225,4 +227,36 @@
  *
  * --border / --border-strong liegen absichtlich unter AA: sie sind dekorative
  * Trenner und nicht das alleinige Erkennungsmerkmal einer Komponente.
+ *
+ * Dark --text-subtle (#6F7787) liegt auf background bei 4.20:1 und damit knapp
+ * unter AA für normalen Text. Spec Dark v2, Stand 2026-09-24.
  */
+
+/**
+ * Sidebar-Scrollbar. Nur die Scroll-Region der Leiste
+ * (`[data-sidebar="content"]` in sidebar.tsx, overflow-y-auto) — nicht body
+ * und nicht die übrige Seite. Firefox über scrollbar-width/color, WebKit 6px,
+ * Track transparent, Thumb --border-strong, Hover --muted-foreground.
+ */
+[data-sidebar='content'] {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+[data-sidebar='content']::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+[data-sidebar='content']::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-sidebar='content']::-webkit-scrollbar-thumb {
+  background-color: var(--border-strong);
+  border-radius: 999px;
+}
+
+[data-sidebar='content']::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted-foreground);
+}

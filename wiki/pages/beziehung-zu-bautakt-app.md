@@ -44,11 +44,16 @@ Mobile-App ist älter und hat die WCAG-Kontrastarbeit geleistet.
 
 Ausnahme, Stand 2026-09-24: das Light-Primary im Web (`packages/ui/src/styles/theme.css`,
 `statusFills.blue` in `tokens.ts`) ist Marketing-Blau `#3B86E0`, die Accent-Fläche
-`#E8F2FC`. Dark-Primary bleibt `#4FA3E3`. Gemessen (relative Luminanz, WCAG 2.1):
+`#E8F2FC`. Dark-Primary bleibt `#4FA3E3`. Der übrige Dark-Satz ist seit demselben Tag
+ein eigener kühler Neutral (Hintergrund `#0F1115`, Card `#1E2430`, Text `#F0F2F5`),
+nicht mehr der violett-schwarze Mobile-Port. Gemessen (relative Luminanz, WCAG 2.1):
 `#3B86E0` auf Weiß 3.70:1, auf `#E8F2FC` 3.27:1 — unter AA für normalen Text, über 3:1
-für große Schrift und UI-Komponenten. `#4FA3E3` auf `#0D0E14` bleibt 7.05:1. Die
-Mobile-Palette (`#0A66C2`) zieht in einem eigenen PR nach; dieser Web-Stand ändert sie
-nicht. Marketing wiederholt dieselben Light-Werte noch in `apps/marketing/app/globals.css`.
+für große Schrift und UI-Komponenten. `#4FA3E3` auf `#0F1115` 6.91:1. Dark
+`--text-subtle` `#6F7787` auf `#0F1115` 4.20:1, knapp unter AA. Die Mobile-Palette zieht
+in einem eigenen PR nach; dieser Web-Stand ändert sie nicht. Marketing wiederholt
+dieselben Light-Werte noch in `apps/marketing/app/globals.css`. Die Sidebar scrollt in
+`[data-sidebar="content"]`; nur dort ist die dünne Scrollbar (6px, Thumb
+`--border-strong`) gesetzt.
 
 ## Was hier bewusst anders ist
 
