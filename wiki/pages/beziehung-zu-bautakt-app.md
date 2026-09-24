@@ -38,9 +38,17 @@ Die Auflösung bei den Permissions: **maßgeblich ist keins der beiden Repos, so
 Postgres.** Deshalb gibt es `packages/core/scripts/check-permission-drift.ts`. Damit ist
 die Duplikation prüfbar statt bloß dokumentiert.
 
-Bei den Tokens gibt es keinen automatischen Check. Dort gilt die Regel: **Abweichungen
-zuerst in `bautakt-app` beheben**, dann herüberholen. Die Mobile-App ist älter und hat
-die WCAG-Kontrastarbeit geleistet.
+Bei den Tokens gibt es keinen automatischen Check. Für Flächen, Text und Statusfarben
+gilt: **Abweichungen zuerst in `bautakt-app` beheben**, dann herüberholen. Die
+Mobile-App ist älter und hat die WCAG-Kontrastarbeit geleistet.
+
+Ausnahme, Stand 2026-09-24: das Light-Primary im Web (`packages/ui/src/styles/theme.css`,
+`statusFills.blue` in `tokens.ts`) ist Marketing-Blau `#3B86E0`, die Accent-Fläche
+`#E8F2FC`. Dark-Primary bleibt `#4FA3E3`. Gemessen (relative Luminanz, WCAG 2.1):
+`#3B86E0` auf Weiß 3.70:1, auf `#E8F2FC` 3.27:1 — unter AA für normalen Text, über 3:1
+für große Schrift und UI-Komponenten. `#4FA3E3` auf `#0D0E14` bleibt 7.05:1. Die
+Mobile-Palette (`#0A66C2`) zieht in einem eigenen PR nach; dieser Web-Stand ändert sie
+nicht. Marketing wiederholt dieselben Light-Werte noch in `apps/marketing/app/globals.css`.
 
 ## Was hier bewusst anders ist
 
