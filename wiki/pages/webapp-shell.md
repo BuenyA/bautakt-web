@@ -174,6 +174,34 @@ gemischten Status (aktuell und ausgeschieden) setzt `DataTable` `sectionOf`
 die Titel „Aktive Mitarbeiter“ / „Ehemalige Mitarbeiter“, solange nicht
 sortiert wird. Reines Aktiv bleibt eine flache Liste.
 
+## Kundenliste
+
+Stand 2026-10-01. `/kunden` filtert clientseitig mit denselben
+`ListFilterChips`. Default ist **Alle**. Ohne Query oder bei unbekanntem
+Wert gilt `all`. `?filter=company|private` schaltet um; Alle löscht den
+Param. Labels: Alle · Firmen · Privat.
+
+`company` ist `customer_type` `b2b`, `private` ist `b2c`. Andere Typen
+lässt der Check nicht zu. CSV, Spalten und die DataTable-Suche bleiben.
+
+## Rechnungsliste
+
+Stand 2026-10-01. `/rechnungen` filtert die Belegart mit denselben Chips,
+`nowrap`, weil die Labels lang sind. Default ist **Rechnungen**
+(`invoice`). Ohne `filter` oder bei unbekanntem Wert gilt das. Chips:
+Rechnungen · Auftragsbestätigungen · Lieferscheine · Alle. Schlüssel:
+`invoice` · `order_confirmation` · `delivery` · `all`.
+
+`invoice` umfasst `invoice`, `partial_invoice` und `final_invoice` — Abschlag
+und Schluss sind Rechnungen, eigene Chips hat die App nicht. `delivery` ist
+der Chip, gespeichert ist `delivery_note`. `all` zeigt nur die Arten dieser
+Liste. Angebote bleiben auf `/angebote`. Gutschrift und Storno haben keinen
+Chip und werden nicht mitgeladen.
+
+Die Status-Tabs (offen, überfällig, Entwurf, bezahlt) sind weg. Ein
+bestehender Deep-Link `?status=offen|ueberfaellig|entwurf|bezahlt` filtert
+weiter mit, ohne Chip-Oberfläche. Die Typ-Chips lassen den Param stehen.
+
 ## Optik der Shared Primitives
 
 Stand 2026-10-01. Nur Klassen, keine neuen Komponenten und keine Feature-Diffs.
