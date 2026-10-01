@@ -10,8 +10,8 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-start gap-2 rounded-lg border border-dashed border-border-strong bg-surface px-6 py-10">
-      <p className="text-base font-medium text-foreground">{title}</p>
+    <div className="border-border bg-card/50 flex flex-col items-center justify-center gap-2 rounded-xl border px-8 py-14 text-center">
+      <p className="text-base font-semibold text-foreground">{title}</p>
       {description ? <p className="max-w-md text-sm text-muted-foreground">{description}</p> : null}
       {action ? <div className="mt-2">{action}</div> : null}
     </div>
