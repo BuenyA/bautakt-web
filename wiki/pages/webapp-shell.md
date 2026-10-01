@@ -30,30 +30,93 @@ nicht „ganz ausblenden": am Desktop verliert man damit die Anzeige, wo man ist
 
 ## Navigation
 
-Die Begriffe sind die der Handy-App, die **Anordnung bewusst nicht**. Am Telefon
-liegt alles außer den Aufträgen unter „Unternehmen", weil dort nur fünf Reiter
-Platz haben. Am Rechner wäre dieser Hub ein zusätzlicher Klick vor jeder
-Rechnung, deshalb stehen die Bereiche flach nebeneinander, gruppiert:
+Stand 2026-10-01. Die Top-Leiste hat **zehn Punkte, ohne Sektionsüberschriften**.
+Die Begriffe bleiben die der Handy-App. Aufträge und Zeiten sind ein Klick.
+Überfüllte Bereiche sind ein Hub, nicht achtzehn Zeilen.
 
-| Gruppe         | Einträge                                                                    |
-| -------------- | --------------------------------------------------------------------------- |
-| _(ohne)_       | Übersicht (`/uebersicht`, HOME)                                             |
-| **Arbeit**     | Aufträge · Einsätze · Kalender · Zeiten                                     |
-| **Finanzen**   | Angebote · Rechnungen · Offene Posten · Ausgaben · Mahnwesen · Auswertungen |
-| **Team**       | Mitarbeiter · Abwesenheiten · Lohn                                          |
-| **Stammdaten** | Kunden · Katalog · Kostenstellen                                            |
-| _(unten)_      | Einrichtung · Nutzermenü mit Hell/Dunkel-Umschalter und Abmelden            |
+Der Stand bis dahin war das Gegenteil: gruppiert unter Arbeit / Finanzen /
+Team / Stammdaten, weil ein Hub am Rechner ein zusätzlicher Klick vor jeder
+Rechnung gewesen wäre. Der Owner hat das am 01.10.2026 umgedreht. Die Sidebar
+bleibt bei zehn Punkten; Rechnungen ist bewusst der zweite Klick, über die
+erste Karte im Finanzen-Hub.
 
-Definiert in `components/layout/navItems.ts`. Eine Gruppe ohne sichtbare
-Einträge verschwindet samt Überschrift — eine leere Überschrift „Finanzen" wäre
-ein Hinweis auf etwas, das der Angemeldete nicht aufrufen kann.
+| #   | Eintrag       | Ziel             | Art                    |
+| --- | ------------- | ---------------- | ---------------------- |
+| 1   | Übersicht     | `/uebersicht`    | Direkt (HOME)          |
+| 2   | Aufträge      | `/auftraege`     | Direkt                 |
+| 3   | Einsätze      | `/einsaetze`     | Direkt                 |
+| 4   | Zeiten        | `/zeiten`        | Direkt                 |
+| 5   | Kalender      | `/kalender`      | Direkt                 |
+| 6   | Finanzen      | `/finanzen`      | Hub                    |
+| 7   | Mitarbeiter   | `/personal`      | Hub                    |
+| 8   | Kunden        | `/kunden`        | Direkt                 |
+| 9   | Material      | `/material`      | Hub                    |
+| 10  | Einstellungen | `/einstellungen` | Direkt, Fuß der Leiste |
 
+Definiert in `components/layout/navItems.ts`, die Karten in
+`features/hubs/hubs.ts`. Ein Hub-Punkt fehlt, wenn **keine** seiner Karten
+sichtbar ist. Die Karten filtern einzeln, mit denselben Rechten wie die
+frühere flache Zeile. Listen- und Detail-URLs sind nicht umgezogen
+(`/rechnungen`, `/mitarbeiter`, `/katalog`, …). `/finanzen` ist die Hub-Seite;
+der Redirect auf Rechnungen ist weg.
+
+Einstellungen bleibt im Fuß, abgesetzt, und zählt als zehnter Punkt.
 Benachrichtigungen sind die Topbar-Glocke, kein Nav-Eintrag.
+
+Die graue Active-Pill gilt auch für den Hub, solange eine seiner Zielrouten
+offen ist: `/rechnungen` hält „Finanzen“ markiert, `/mitarbeiter` hält
+„Mitarbeiter“.
+
+## Hub-Seiten
+
+`/finanzen`, `/personal` und `/material` sind Landings (`HubPage`): `PageHeader`
+und ein Kartenraster. Breite bis 1120px, links ausgerichtet. Das Padding kommt
+von der Shell (`p-4 sm:p-6`), die Seite legt keins dazu. Raster: eine Spalte,
+ab `sm` zwei, ab `lg` drei, `gap-4`.
+
+Die Karte ist ein Router-Link über die ganze Fläche: `rounded-xl` (24px),
+`bg-card`, `border-border`, `shadow-sm`, `p-5`, Mindesthöhe 120px. Das Icon
+(22px, `text-primary`) sitzt in einem Well (`size-10`, `rounded-lg`, Light
+`bg-accent`, Dark `bg-card-raised`). Hover: `border-border-strong`, `shadow-md`,
+Light `bg-surface`, Dark `bg-card-raised`, 150ms. Fokus: `ring-2 ring-ring`,
+Offset 2. Gedrückt: Deckkraft 0.95. Kein Primary-Fill.
+
+Rechnungen ist die einzige Featured-Karte: erste Zelle, `ring-1 ring-primary/30`
+und `sm:col-span-2`.
+
+| Hub         | Karte                  | Ziel             | Recht wie bisher                  |
+| ----------- | ---------------------- | ---------------- | --------------------------------- |
+| Finanzen    | Rechnungen (Featured)  | `/rechnungen`    | Abrechnung oder GF-Rechnungssicht |
+| Finanzen    | Angebote               | `/angebote`      | dasselbe                          |
+| Finanzen    | Offene Posten          | `/offene-posten` | `canViewCompanyFinance`           |
+| Finanzen    | Ausgaben               | `/ausgaben`      | Finanzen oder Gemeinkosten        |
+| Finanzen    | Mahnwesen              | `/mahnwesen`     | Abrechnung oder Finanzen          |
+| Finanzen    | Auswertungen           | `/auswertungen`  | `canViewCompanyFinance`           |
+| Mitarbeiter | Mitarbeiterverzeichnis | `/mitarbeiter`   | `canManageEmployees`              |
+| Mitarbeiter | Abwesenheiten          | `/abwesenheiten` | `canManageAbsences`               |
+| Mitarbeiter | Lohn                   | `/lohn`          | Lohnkosten oder Sätze             |
+| Mitarbeiter | Mitarbeiter hinzufügen | `/mitarbeiter`   | `canManageEmployees`              |
+| Material    | Katalog                | `/katalog`       | `canManageCatalog`                |
+| Material    | Kostenstellen          | `/kostenstellen` | `canManageCostCenters`            |
+
+„Mitarbeiter hinzufügen“ hängt kein `?neu=1` an. Die Liste öffnet das
+Anlege-Sheet über den bestehenden Button; eine Create-Query gibt es nicht
+(Stand 2026-10-01, `EmployeesListPage`).
+
+Sind nach dem Rechtefilter null Karten übrig, zeigt die Seite das bestehende
+`EmptyState` („Keine Bereiche freigeschaltet“). Das passiert beim Direktaufruf,
+wenn die Leiste den Punkt schon ausgeblendet hat. Solange die Mitgliedschaft
+lädt, steht ein `PageSpinner` — sonst blitzt der Leerzustand auf, weil
+`hasPermission` ohne Rechte auf false fällt.
 
 ## Rechte
 
-Nav-Einträge filtert `maySee` über `hasPermission`; Einträge mit `anyPermission`
-genügen sich mit einem der Rechte (Rechnungen sehen Buchhaltung **oder** GF).
+Nav-Einträge filtert `maySee`. Ein direkter Punkt prüft sein eigenes Recht
+(`hasPermission`); ein Hub-Punkt ist sichtbar, sobald mindestens eine Karte
+denselben Check besteht. `anyPermission` genügt sich mit einem der Rechte
+(Rechnungen sehen Buchhaltung **oder** GF). Die Hub-Seite selbst hat keinen
+`RequirePermission`: null sichtbare Karten sind das `EmptyState`, nicht
+„Kein Zugriff“. Die Zielrouten behalten ihren Wächter.
 
 Die Routen selbst schützt `RequirePermission` und zeigt sonst „Kein Zugriff".
 
@@ -167,9 +230,10 @@ Wave-1-Stand und färbt den aktiven Eintrag blau (damals `#E8F2FC` mit
 Vordergrund `#3B86E0`; die Accent-Fläche ist seit 2026-10-01 `#E6F0FC` mit
 Vordergrund `#0064E0`).
 
-Sektionsüberschriften (Arbeit, Finanzen, Team, Stammdaten) sind 12px / 600,
-Title Case, Farbe `--text-subtle`. Kein Uppercase. Sie sind nur Beschriftung
-der bestehenden Einträge, keine zusätzlichen Routen.
+Sektionsüberschriften rendert die Web-Nav seit 2026-10-01 nicht mehr. Das
+Primitive `SidebarGroupLabel` bleibt (12px / 600, `--text-subtle`, Title Case,
+kein Uppercase), falls eine spätere Leiste sie wieder braucht. Sie waren nur
+Beschriftung, keine Routen.
 
 Dark (Stand 2026-10-01, Meta-Feeling) ist neutrales Charcoal:
 Hintergrund `#111112`, Sidebar `#161618`, Surface `#1A1A1D`, Card `#1F1F22`,
