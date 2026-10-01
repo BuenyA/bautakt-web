@@ -40,7 +40,7 @@ export function CustomerDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8">
         <PageHeader title={t('domain:customers.detailTitle')} />
         <PageSpinner />
       </div>
@@ -49,7 +49,7 @@ export function CustomerDetailPage() {
 
   if (isError) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8">
         <PageHeader title={t('domain:customers.detailTitle')} />
         <EmptyState
           title={t('domain:customers.loadErrorTitle')}
@@ -70,7 +70,7 @@ export function CustomerDetailPage() {
 
   if (!data) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8">
         <PageHeader title={t('domain:customers.detailTitle')} />
         <EmptyState
           title={t('domain:customers.notFoundTitle')}
@@ -95,7 +95,7 @@ export function CustomerDetailPage() {
   const notes = data.notes.trim();
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <PageHeader
         title={name || t('domain:customers.unnamed')}
         description={t('domain:customers.detailDescription')}

@@ -118,22 +118,27 @@ Stand 2026-10-01. Auftrag-Detail (`/auftraege/:id`) und Rechnung-Detail
 (`/rechnungen/:id`) teilen eine Section-Hierarchie. Nur Klassen: kein Upload,
 kein CRUD, keine neuen Texte.
 
-| Element                         | Look                                                                                                                                               |
-| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Section                         | `flex flex-col gap-4`                                                                                                                              |
-| Section-Titel `h2`              | `text-lg font-semibold tracking-tight text-foreground`                                                                                             |
-| Nebenlink (z. B. „Alle Zeiten“) | `text-primary text-sm font-medium`, auf der Baseline des Titels                                                                                    |
-| Notiz- und Zeitkarte            | `rounded-xl border border-border bg-card shadow-sm`. Hover `border-border-strong`. Skelett `rounded-xl`.                                           |
-| Foto-Kachel                     | Dieselbe Card-Fläche, `overflow-hidden`. Hover zusätzlich `shadow-md`. Bildunterschrift `bg-card px-2.5 py-2`. Lightbox-Bild `rounded-xl`.         |
-| Foto-Raster                     | Weiter `grid-cols-2 sm:grid-cols-3 xl:grid-cols-4`.                                                                                                |
-| Seitenwurzel                    | `gap-8`. Die Auftragsbeschreibung ist `text-sm text-muted-foreground`.                                                                             |
-| `DetailCard`                    | Titel `text-base font-semibold tracking-tight`. Label-Spalte `sm:grid-cols-[10rem_1fr]`. `dt` ist `text-muted-foreground`, `dd` `text-foreground`. |
-| Rechnungs-Blocker               | `rounded-xl`, Padding `p-4`. Positions- und Zahlungstitel wie der `DetailCard`-Titel.                                                              |
-| Zahlungszeile                   | `rounded-lg bg-surface/60 px-3 py-2`.                                                                                                              |
+| Element                         | Look                                                                                                                                                                                                                                          |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Section                         | `flex flex-col gap-4`                                                                                                                                                                                                                         |
+| Section-Titel `h2`              | `text-lg font-semibold tracking-tight text-foreground`                                                                                                                                                                                        |
+| Nebenlink (z. B. „Alle Zeiten“) | `text-primary text-sm font-medium`, auf der Baseline des Titels                                                                                                                                                                               |
+| Notiz- und Zeitkarte            | `rounded-xl border border-border bg-card shadow-sm`. Hover `border-border-strong`. Skelett `rounded-xl`.                                                                                                                                      |
+| Foto-Kachel                     | Dieselbe Card-Fläche, `overflow-hidden`. Hover zusätzlich `shadow-md`. Bildunterschrift `bg-card px-2.5 py-2`. Lightbox-Bild `rounded-xl`.                                                                                                    |
+| Foto-Raster                     | Weiter `grid-cols-2 sm:grid-cols-3 xl:grid-cols-4`.                                                                                                                                                                                           |
+| Seitenwurzel                    | `gap-8` auf Auftrag, Rechnung, Kunde (`/kunden/:id`) und Einsatz (`/einsaetze/:id`), auch in Laden, Fehler und Nicht-gefunden. Auftragsbeschreibung und Einsatz-Notiz darüber: `max-w-3xl text-sm text-muted-foreground whitespace-pre-wrap`. |
+| `DetailCard`                    | Titel `text-base font-semibold tracking-tight`. Label-Spalte `sm:grid-cols-[10rem_1fr]`. `dt` ist `text-muted-foreground`, `dd` `text-foreground whitespace-pre-wrap`.                                                                        |
+| Rechnungs-Blocker               | `rounded-xl`, Padding `p-4`. Positions- und Zahlungstitel wie der `DetailCard`-Titel.                                                                                                                                                         |
+| Zahlungszeile                   | `rounded-lg bg-surface/60 px-3 py-2`.                                                                                                                                                                                                         |
 
 `DetailCard` ist geteilt (`components/common/DetailCard.tsx`). Dieselbe
-Label-Spalte und derselbe Titel gelten deshalb auch auf Kunde, Einsatz und
-Einstellungen. Listen, Sidebar und Login bleiben bei den Soft Primitives oben.
+Label-Spalte, derselbe Titel und `whitespace-pre-wrap` auf dem Wert (`dd`)
+gelten deshalb auch auf Kunde, Einsatz und Einstellungen. Adresse und Notiz
+brechen dadurch mehrzeilig, ohne eine eigene Klasse an der Zeile. Die
+Einsatz-Notiz steht einmal als Lead über der Karte und einmal als
+`DetailRow`; der Auftrags-Link bleibt `text-sm font-medium text-primary`.
+Einstellungen behält `gap-6`. Listen, Sidebar und Login bleiben bei den Soft
+Primitives oben.
 
 ## Icons und Theme
 

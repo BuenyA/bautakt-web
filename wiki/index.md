@@ -57,6 +57,7 @@ verlinkt, nie kopiert.
 | 2026-10-01 | [Meta-Detailflächen Auftrag und Rechnung](logs/2026-10-01-meta-detail-surfaces.md)              |
 | 2026-10-01 | [Meta Soft Primitives](logs/2026-10-01-meta-soft-primitives.md)                                 |
 | 2026-10-01 | [Meta Listen und Formulare](logs/2026-10-01-meta-lists-forms.md)                                |
+| 2026-10-01 | [Meta-Detailflächen Kunde und Einsatz](logs/2026-10-01-meta-detail-customer-assignment.md)      |
 
 ## Die drei wichtigsten Sätze
 
