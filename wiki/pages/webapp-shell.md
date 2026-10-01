@@ -76,6 +76,32 @@ alles in eine Spalte legt und Umlaute zerlegt.
 Beträge stehen rechtsbündig mit `tabular-nums`, damit die Stellen untereinander
 liegen.
 
+Die Listen-Shell (Stand 2026-10-01) ist eine weiche Card:
+`rounded-xl border border-border bg-card shadow-sm overflow-hidden`. Der Kopf
+bleibt `bg-surface` mit `text-muted-foreground`. Zellen sind `px-4 py-3`, der
+Kopf `h-11` und `px-4` (`table.tsx`). Sortieren, Suche und Export sind davon
+unberührt.
+
+## Optik der Shared Primitives
+
+Stand 2026-10-01. Nur Klassen, keine neuen Komponenten und keine Feature-Diffs.
+Die Tokens (`#0064E0`, Status-Hex, Sidebar-Grau) bleiben die aus
+[Meta-Feeling](../logs/2026-10-01-meta-feeling-tokens.md) und
+[Light-Primary Electric](../logs/2026-10-01-light-primary-electric.md).
+
+| Primitive  | Look                                                                                                                                                                            |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Button     | Pill (`rounded-full`), auch `sm` / `lg` / `icon`. Default bleibt `bg-primary text-primary-foreground` mit `shadow-sm`. Höhen unverändert (`h-11` / `h-9` / `h-12` / `size-11`). |
+| Badge      | `rounded-full`. Farbvarianten unverändert.                                                                                                                                      |
+| EmptyState | Zentrierte weiche Card: `rounded-xl border border-border bg-card/50`, ohne gestrichelten Rand. Titel `font-semibold`.                                                           |
+| PageHeader | Keine harte Unterstreichung (`pb-2` statt `border-b`). Titel `text-2xl font-semibold tracking-tight text-foreground`. Beschreibung `mt-1.5`.                                    |
+| Tabs       | Liste und Trigger `rounded-full`. Aktiv bleibt `data-[state=active]:bg-card` — graue Pill, kein Primary-Fill.                                                                   |
+| AuthCard   | Canvas `bg-background`. Karte zusätzlich `shadow-md` (Radius weiter von `Card`, `rounded-xl`). Wortmarke `text-foreground`.                                                     |
+| Input      | Weiter `rounded-md` (`--radius-md`, 12px), inklusive `shadow-xs`.                                                                                                               |
+
+Die graue Sidebar-Active-Pill (`rounded-sm`, `#F3F4F6` / Dark `#1F1F22`) ist
+nicht diese Button-Pill und bleibt grau.
+
 ## Icons und Theme
 
 Icons sind die Flaticon-Uicons der Handy-App: die drei TTFs und die generierte

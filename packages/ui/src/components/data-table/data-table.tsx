@@ -180,7 +180,7 @@ export function DataTable<TData extends RowData>({
         </div>
       </div>
 
-      <div className="border-border overflow-hidden rounded-lg border">
+      <div className="border-border bg-card overflow-hidden rounded-xl border shadow-sm">
         <Table>
           <TableHeader className="bg-surface">
             {table.getHeaderGroups().map((headerGroup) => (

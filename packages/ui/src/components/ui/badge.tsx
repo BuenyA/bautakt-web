@@ -12,7 +12,7 @@ import { cn } from '../../lib/cn';
  * beliebige Tailwind-Farben.
  */
 const badgeVariants = cva(
-  'inline-flex items-center justify-center gap-1 rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 [&>span[data-slot=uicon]]:text-[0.875em] transition-colors overflow-hidden',
+  'inline-flex items-center justify-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 [&>span[data-slot=uicon]]:text-[0.875em] transition-colors overflow-hidden',
   {
     variants: {
       variant: {

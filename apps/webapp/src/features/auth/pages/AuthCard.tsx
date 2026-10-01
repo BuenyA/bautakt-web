@@ -13,10 +13,10 @@ export function AuthCard({
   footer?: ReactNode;
 }) {
   return (
-    <main className="flex min-h-svh items-center justify-center bg-background-second p-6">
+    <main className="bg-background flex min-h-svh items-center justify-center p-6">
       <div className="flex w-full max-w-sm flex-col gap-6">
-        <p className="text-center text-lg font-semibold tracking-tight">Bautakt</p>
-        <Card>
+        <p className="text-foreground text-center text-lg font-semibold tracking-tight">Bautakt</p>
+        <Card className="shadow-md">
           <CardHeader>
             <CardTitle>{title}</CardTitle>
             {subtitle ? <CardDescription>{subtitle}</CardDescription> : null}
