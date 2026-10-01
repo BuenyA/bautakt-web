@@ -24,7 +24,11 @@ Sidebar, kein Token-Rewrite.
 
 `DetailCard` nutzen auch Kunde, Einsatz und Einstellungen. Die engere
 Label-Spalte und der Titel mit `tracking-tight` gelten dort mit, weil es
-dieselbe Komponente ist. Deren Seitenabstand (`gap-6`) bleibt.
+dieselbe Komponente ist. Deren Seitenabstand blieb an diesem Tag `gap-6`.
+
+Nachtrag: Kunde und Einsatz stehen seit
+[Meta-Detailflächen Kunde und Einsatz](2026-10-01-meta-detail-customer-assignment.md)
+ebenfalls auf `gap-8`. Einstellungen bleibt bei `gap-6`.
 
 ## Verweise
 

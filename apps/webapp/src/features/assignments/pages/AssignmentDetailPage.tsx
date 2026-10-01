@@ -21,7 +21,7 @@ export function AssignmentDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8">
         <PageHeader title={t('domain:assignments.detailTitle')} />
         <PageSpinner />
       </div>
@@ -30,7 +30,7 @@ export function AssignmentDetailPage() {
 
   if (isError) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8">
         <PageHeader title={t('domain:assignments.detailTitle')} />
         <EmptyState
           title={t('domain:assignments.loadErrorTitle')}
@@ -51,7 +51,7 @@ export function AssignmentDetailPage() {
 
   if (!data) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8">
         <PageHeader title={t('domain:assignments.detailTitle')} />
         <EmptyState
           title={t('domain:assignments.notFoundTitle')}
@@ -72,7 +72,7 @@ export function AssignmentDetailPage() {
     : t('domain:assignments.noEmployees');
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <PageHeader
         title={period || t('domain:assignments.detailTitle')}
         description={t('domain:assignments.detailDescription')}
@@ -95,7 +95,7 @@ export function AssignmentDetailPage() {
       ) : null}
 
       {data.note.trim() ? (
-        <p className="max-w-3xl text-sm text-text-secondary whitespace-pre-wrap">{data.note}</p>
+        <p className="max-w-3xl text-sm text-muted-foreground whitespace-pre-wrap">{data.note}</p>
       ) : null}
 
       <DetailCard className="max-w-3xl">
