@@ -75,7 +75,7 @@ function SheetContent({
       >
         {children}
         {showCloseButton ? (
-          <SheetPrimitive.Close className="ring-offset-background focus-visible:ring-ring hover:bg-surface absolute top-4 right-4 cursor-pointer rounded-md p-1 opacity-70 transition-opacity hover:opacity-100 focus-visible:ring-2 focus-visible:outline-none disabled:pointer-events-none">
+          <SheetPrimitive.Close className="ring-offset-background focus-visible:ring-ring hover:bg-surface absolute top-4 right-4 cursor-pointer rounded-full p-1 opacity-70 transition-opacity hover:opacity-100 focus-visible:ring-2 focus-visible:outline-none disabled:pointer-events-none">
             <XIcon className="size-4" />
             <span className="sr-only">Schließen</span>
           </SheetPrimitive.Close>
@@ -89,7 +89,7 @@ function SheetHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="sheet-header"
-      className={cn('border-border flex flex-col gap-1 border-b p-4', className)}
+      className={cn('border-border/60 flex flex-col gap-1 border-b p-4', className)}
       {...props}
     />
   );
@@ -110,7 +110,7 @@ function SheetFooter({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="sheet-footer"
       className={cn(
-        'border-border mt-auto flex flex-col gap-2 border-t p-4 sm:flex-row sm:justify-end',
+        'border-border/60 mt-auto flex flex-col gap-2 border-t p-4 sm:flex-row sm:justify-end',
         className,
       )}
       {...props}
@@ -122,7 +122,7 @@ function SheetTitle({ className, ...props }: React.ComponentProps<typeof SheetPr
   return (
     <SheetPrimitive.Title
       data-slot="sheet-title"
-      className={cn('text-foreground text-base font-semibold', className)}
+      className={cn('text-foreground text-base font-semibold tracking-tight', className)}
       {...props}
     />
   );

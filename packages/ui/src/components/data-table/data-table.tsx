@@ -126,7 +126,7 @@ export function DataTable<TData extends RowData>({
   const hasRows = table.getRowModel().rows.length > 0;
 
   return (
-    <div className={cn('flex flex-col gap-3', className)}>
+    <div className={cn('flex flex-col gap-4', className)}>
       <div className="flex flex-wrap items-center gap-2">
         {toolbar}
         {searchable ? (
@@ -242,7 +242,7 @@ export function DataTable<TData extends RowData>({
               ))
             ) : (
               <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={table.getVisibleLeafColumns().length} className="p-0">
+                <TableCell colSpan={table.getVisibleLeafColumns().length} className="p-2">
                   {empty}
                 </TableCell>
               </TableRow>
