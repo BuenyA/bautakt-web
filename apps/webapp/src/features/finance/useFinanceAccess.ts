@@ -9,7 +9,10 @@ export type FinanceAccess = {
   canWriteSalesDocuments: boolean;
   canViewExpenses: boolean;
   canManageRates: boolean;
-  /** Reicht fuer irgendeine Finanzseite? Steuert die Gruppe in der Nav. */
+  /**
+   * Irgendeine Finanz- oder Lohnsicht. Die Sidebar nutzt das nicht:
+   * Hub-Karten pruefen ihr Recht einzeln.
+   */
   canViewFinanceArea: boolean;
 };
 

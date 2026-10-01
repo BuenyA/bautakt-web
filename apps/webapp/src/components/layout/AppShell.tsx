@@ -29,7 +29,7 @@ import {
   useSidebar,
 } from '@bautakt/ui';
 import { useTranslation } from 'react-i18next';
-import { Link, Outlet } from 'react-router';
+import { Link, Outlet, useLocation } from 'react-router';
 
 import { type Theme } from '@/app/ThemeContext';
 import { useTheme } from '@/app/useTheme';
@@ -40,7 +40,7 @@ import { useMembership } from '@/features/company/useMembership';
 import { HOME_ROUTE } from '@/lib/routes';
 
 import { Breadcrumbs } from './Breadcrumbs';
-import { settingsNavItem } from './navItems';
+import { isNavActive, settingsNavItem } from './navItems';
 import { SidebarNav } from './SidebarNav';
 
 /** Zustand der Leiste aus dem Cookie, damit sie beim Laden nicht springt. */
@@ -118,6 +118,7 @@ function UserMenu() {
 export function AppShell() {
   const { t } = useTranslation();
   const { data: membership } = useMembership();
+  const { pathname } = useLocation();
 
   return (
     <SidebarProvider defaultOpen={readSidebarCookie()}>
@@ -135,7 +136,11 @@ export function AppShell() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip={t(settingsNavItem.labelKey)}>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={t(settingsNavItem.labelKey)}
+                    isActive={isNavActive(pathname, settingsNavItem)}
+                  >
                     <Link to={settingsNavItem.to}>
                       <Uicon name={settingsNavItem.icon} size={18} />
                       <span>{t(settingsNavItem.labelKey)}</span>

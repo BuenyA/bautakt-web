@@ -36,13 +36,9 @@
     "action": "Zur Übersicht"
   },
   "nav": {
-    "groups": {
-      "work": "Arbeit",
-      "finance": "Finanzen",
-      "team": "Team",
-      "masterData": "Stammdaten"
-    },
     "overview": "Übersicht",
+    "finance": "Finanzen",
+    "material": "Material",
     "orders": "Aufträge",
     "assignments": "Einsätze",
     "calendar": "Kalender",
@@ -66,6 +62,33 @@
     "openMenu": "Menü öffnen",
     "closeMenu": "Menü schließen",
     "main": "Hauptnavigation"
+  },
+  "hub": {
+    "emptyTitle": "Keine Bereiche freigeschaltet",
+    "emptyDescription": "Für dieses Konto ist hier kein Bereich sichtbar.",
+    "finance": {
+      "description": "Belege, Forderungen und Auswertungen.",
+      "invoicesDescription": "Liste & Detail",
+      "quotesDescription": "Angebote verwalten",
+      "receivablesDescription": "Forderungen",
+      "expensesDescription": "Betriebskosten",
+      "dunningDescription": "Mahnungen",
+      "reportsDescription": "Reports"
+    },
+    "personal": {
+      "description": "Verzeichnis, Abwesenheiten und Lohn.",
+      "directoryTitle": "Mitarbeiterverzeichnis",
+      "directoryDescription": "Alle Mitarbeitenden",
+      "absencesDescription": "Urlaub & krank",
+      "payrollDescription": "Lohn / Sätze",
+      "addTitle": "Mitarbeiter hinzufügen",
+      "addDescription": "Neuen anlegen"
+    },
+    "material": {
+      "description": "Artikel, Leistungen und Kostenstellen.",
+      "catalogDescription": "Artikel & Leistungen",
+      "costCentersDescription": "Kostenstellen"
+    }
   },
   "notFound": {
     "title": "Seite nicht gefunden",

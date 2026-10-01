@@ -16,11 +16,11 @@ export const routes = {
   forgotPassword: '/passwort-vergessen',
   resetPassword: '/passwort-zuruecksetzen',
 
-  // Geschuetzt — Bereiche wie in der Handy-App benannt, am Desktop aber flach
-  // nebeneinander statt in einem Hub verschachtelt.
+  // Geschuetzt. Die Top-Nav ist flach (zehn Punkte). Drei davon sind Hubs;
+  // die Listen dahinter behalten ihre Pfade.
   overview: '/uebersicht',
 
-  // Arbeit
+  // Arbeit — direkt in der Leiste
   orders: '/auftraege',
   order: (id: string) => `/auftraege/${id}`,
   assignments: '/einsaetze',
@@ -33,7 +33,8 @@ export const routes = {
    */
   timesForOrder: (orderId: string) => `/zeiten?${timesOrderParam}=${encodeURIComponent(orderId)}`,
 
-  // Finanzen
+  // Finanzen — `/finanzen` ist der Hub, die Listen bleiben wo sie sind.
+  financeHub: '/finanzen',
   quotes: '/angebote',
   quote: (id: string) => `/angebote/${id}`,
   quoteNew: '/angebote/neu',
@@ -47,24 +48,25 @@ export const routes = {
   dunning: '/mahnwesen',
   reports: '/auswertungen',
 
-  // Team
+  // Team — Hub `/personal`, Verzeichnis bleibt `/mitarbeiter`.
+  personalHub: '/personal',
   employees: '/mitarbeiter',
   employee: (id: string) => `/mitarbeiter/${id}`,
   absences: '/abwesenheiten',
   payroll: '/lohn',
 
-  // Stammdaten
+  // Kunden direkt, Material als Hub. Katalog und Kostenstellen bleiben.
   customers: '/kunden',
   customer: (id: string) => `/kunden/${id}`,
+  materialHub: '/material',
   catalog: '/katalog',
   costCenters: '/kostenstellen',
 
   settings: '/einstellungen',
 
   // Alte Pfade: Redirects bleiben, bis Bookmarks und Mails umgezogen sind.
-  // `/mitarbeiter`, `/finanzen` und `/kalender` sind inzwischen echte Seiten;
-  // uebrig bleibt, was keinen eigenen Bereich bekommen hat.
-  legacyFinance: '/finanzen',
+  // `/mitarbeiter`, `/finanzen` und `/kalender` sind echte Seiten. `/finanzen`
+  // ist der Hub, kein Redirect mehr auf Rechnungen.
   legacyNotifications: '/benachrichtigungen',
 } as const;
 

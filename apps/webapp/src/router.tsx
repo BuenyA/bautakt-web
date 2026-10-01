@@ -24,6 +24,7 @@ import { InvoicesListPage } from '@/features/finance/pages/InvoicesListPage';
 import { QuotesListPage } from '@/features/finance/pages/QuotesListPage';
 import { ReceivablesPage } from '@/features/finance/pages/ReceivablesPage';
 import { ReportsPage } from '@/features/finance/pages/ReportsPage';
+import { FinanceHubPage, MaterialHubPage, PersonalHubPage } from '@/features/hubs/HubPage';
 import { CatalogPage } from '@/features/masterdata/pages/CatalogPage';
 import { CostCentersPage } from '@/features/masterdata/pages/CostCentersPage';
 import { OrderDetailPage } from '@/features/orders/pages/OrderDetailPage';
@@ -94,7 +95,8 @@ export const router = createBrowserRouter([
               { path: routes.calendar, element: <CalendarPage /> },
               { path: routes.times, element: <TimesListPage /> },
 
-              // --- Finanzen ---
+              // --- Finanzen: Hub ist kanonisch, Listen bleiben ---
+              { path: routes.financeHub, element: <FinanceHubPage /> },
               {
                 path: routes.quotes,
                 element: (
@@ -176,7 +178,8 @@ export const router = createBrowserRouter([
                 ),
               },
 
-              // --- Team ---
+              // --- Team: Hub, Verzeichnis bleibt `/mitarbeiter` ---
+              { path: routes.personalHub, element: <PersonalHubPage /> },
               {
                 path: routes.employees,
                 element: (
@@ -202,7 +205,8 @@ export const router = createBrowserRouter([
                 ),
               },
 
-              // --- Stammdaten ---
+              // --- Kunden direkt, Material als Hub ---
+              { path: routes.materialHub, element: <MaterialHubPage /> },
               { path: routes.customers, element: <CustomersListPage /> },
               { path: `${routes.customers}/:id`, element: <CustomerDetailPage /> },
               {
@@ -225,8 +229,7 @@ export const router = createBrowserRouter([
               { path: routes.settings, element: <SettingsPage /> },
 
               // Alte Pfade umleiten, damit Bookmarks nicht leer laufen.
-              // `/mitarbeiter` und `/kalender` sind inzwischen eigene Bereiche.
-              { path: routes.legacyFinance, element: <Navigate to={routes.invoices} replace /> },
+              // `/finanzen` ist der Hub, kein Redirect auf Rechnungen.
               { path: routes.legacyNotifications, element: <Navigate to={HOME_ROUTE} replace /> },
             ],
           },
