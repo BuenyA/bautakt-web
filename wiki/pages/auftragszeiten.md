@@ -18,7 +18,9 @@ noch einmal.
 unter den Notizen. Vier Zustände: Skelett beim Laden, Fehler mit „Erneut
 versuchen", leerer Hinweis („Noch keine Zeiten"), Liste der Einträge. Jede
 Karte zeigt Mitarbeiter, Zeitraum, Pause, Nettodauer (ohne Ende: „Offen") und
-die Notiz, soweit sie nicht leer ist. Neueste zuerst.
+die Notiz, soweit sie nicht leer ist, und ist eine weiche Card (`rounded-xl`,
+`bg-card`, `shadow-sm`). Neueste zuerst. Die Optik steht in
+[webapp-shell.md](webapp-shell.md#detailflächen).
 
 „Alle Zeiten“ führt auf `/zeiten?order=<id>`. Dieselbe Abfrage filtert die
 Liste: `useTimeEntries(orderId)` setzt `order_id` nur, wenn die Route den

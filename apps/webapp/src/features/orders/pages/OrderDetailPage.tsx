@@ -25,7 +25,7 @@ export function OrderDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8">
         <PageHeader title={t('domain:orders.detailTitle')} />
         <PageSpinner />
       </div>
@@ -34,7 +34,7 @@ export function OrderDetailPage() {
 
   if (isError) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8">
         <PageHeader title={t('domain:orders.detailTitle')} />
         <EmptyState
           title={t('domain:orders.loadErrorTitle')}
@@ -55,7 +55,7 @@ export function OrderDetailPage() {
 
   if (!data) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8">
         <PageHeader title={t('domain:orders.detailTitle')} />
         <EmptyState
           title={t('domain:orders.notFoundTitle')}
@@ -75,7 +75,7 @@ export function OrderDetailPage() {
     .join(', ');
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <PageHeader
         title={data.name}
         description={t('domain:orders.detailDescription')}
@@ -94,7 +94,7 @@ export function OrderDetailPage() {
       </div>
 
       {data.description ? (
-        <p className="max-w-3xl text-sm text-text-secondary whitespace-pre-wrap">
+        <p className="max-w-3xl text-sm text-muted-foreground whitespace-pre-wrap">
           {data.description}
         </p>
       ) : null}

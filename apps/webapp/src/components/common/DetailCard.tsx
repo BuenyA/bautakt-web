@@ -20,7 +20,7 @@ export function DetailCard({
     <Card className={className}>
       {title ? (
         <CardHeader>
-          <CardTitle className="text-base">{title}</CardTitle>
+          <CardTitle className="text-base font-semibold tracking-tight">{title}</CardTitle>
         </CardHeader>
       ) : null}
       <CardContent>
@@ -33,9 +33,9 @@ export function DetailCard({
 export function DetailRow({ label, value }: { label: string; value: ReactNode }) {
   if (value === null || value === undefined || value === '') return null;
   return (
-    <div className="grid gap-1 sm:grid-cols-[12rem_1fr] sm:gap-4">
-      <dt className="text-muted-foreground text-sm">{label}</dt>
-      <dd className="text-foreground text-sm whitespace-pre-wrap">{value}</dd>
+    <div className="grid gap-1 sm:grid-cols-[10rem_1fr] sm:gap-4">
+      <dt className="text-sm text-muted-foreground">{label}</dt>
+      <dd className="text-sm text-foreground whitespace-pre-wrap">{value}</dd>
     </div>
   );
 }

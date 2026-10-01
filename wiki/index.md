@@ -54,6 +54,7 @@ verlinkt, nie kopiert.
 | 2026-09-24 | [Sidebar-Optik Expo Docs](logs/2026-09-24-sidebar-expo-docs.md)                                 |
 | 2026-10-01 | [Meta-Feeling Dark-Tokens](logs/2026-10-01-meta-feeling-tokens.md)                              |
 | 2026-10-01 | [Light-Primary Electric](logs/2026-10-01-light-primary-electric.md)                             |
+| 2026-10-01 | [Meta-Detailflächen Auftrag und Rechnung](logs/2026-10-01-meta-detail-surfaces.md)              |
 | 2026-10-01 | [Meta Soft Primitives](logs/2026-10-01-meta-soft-primitives.md)                                 |
 
 ## Die drei wichtigsten Sätze

@@ -70,7 +70,7 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
               <li key={photo.id}>
                 <button
                   type="button"
-                  className="focus-visible:ring-ring flex w-full cursor-pointer flex-col overflow-hidden rounded-lg border border-border bg-surface text-left transition-colors hover:border-border-strong focus-visible:ring-2 focus-visible:outline-none"
+                  className="focus-visible:ring-ring flex w-full cursor-pointer flex-col overflow-hidden rounded-xl border border-border bg-card text-left shadow-sm transition-colors hover:border-border-strong hover:shadow-md focus-visible:ring-2 focus-visible:outline-none"
                   aria-label={label}
                   onClick={() => setOpenId(photo.id)}
                 >
@@ -82,7 +82,7 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
                     className="aspect-square w-full bg-surface object-cover"
                   />
                   {takenAt ? (
-                    <span className="text-muted-foreground truncate px-2 py-1.5 text-xs">
+                    <span className="truncate bg-card px-2.5 py-2 text-xs text-muted-foreground">
                       {takenAt}
                     </span>
                   ) : null}
@@ -115,7 +115,7 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
                     ? t('domain:orders.photos.openLabel', { date: openDate })
                     : t('domain:orders.photos.openLabelUndated')
                 }
-                className="max-h-[70vh] w-full rounded-md bg-surface object-contain"
+                className="max-h-[70vh] w-full rounded-xl bg-surface object-contain"
               />
             ) : null}
           </DialogContent>
@@ -125,8 +125,8 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
   }
 
   return (
-    <section className="flex flex-col gap-3" aria-labelledby="order-photos-title">
-      <h2 id="order-photos-title" className="text-foreground text-base font-semibold">
+    <section className="flex flex-col gap-4" aria-labelledby="order-photos-title">
+      <h2 id="order-photos-title" className="text-foreground text-lg font-semibold tracking-tight">
         {t('domain:orders.photos.title')}
       </h2>
       {body}
@@ -139,7 +139,7 @@ function PhotoGridSkeleton({ label }: { label: string }) {
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4" role="status">
       <span className="sr-only">{label}</span>
       {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-        <Skeleton key={index} className="aspect-square rounded-lg" />
+        <Skeleton key={index} className="aspect-square rounded-xl" />
       ))}
     </div>
   );
