@@ -1,8 +1,10 @@
 import { Badge, Button, DataTable, type DataTableColumn, Uicon } from '@bautakt/ui';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { ListFilterChips } from '@/components/common/ListFilterChips';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
@@ -11,17 +13,63 @@ import { formatDate } from '@/lib/format';
 
 import { draftFromEmployee, type EmployeeDraft, emptyEmployee } from '../employeeDraft';
 import { EmployeeSheet } from '../EmployeeSheet';
+import {
+  employeeFilterFromSearch,
+  type EmployeeListFilter,
+  employmentListStatus,
+} from '../employeeStatus';
 import { type EmployeeRow, useEmployees } from '../useEmployees';
 
 export function EmployeesListPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
   const canManage = usePermission('canManageEmployees');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const filter = employeeFilterFromSearch(searchParams.get('status'));
   const [draft, setDraft] = useState<EmployeeDraft | null>(null);
   const employees = useEmployees();
   const { data, isError, refetch } = employees;
 
   const isLoading = useCompanyListLoading(employees);
+
+  function setFilter(next: EmployeeListFilter) {
+    const params = new URLSearchParams(searchParams);
+    // Default ist Aktiv — ohne Param, wie die anderen Listen ihren Default lassen.
+    if (next === 'active') params.delete('status');
+    else params.set('status', next);
+    setSearchParams(params, { replace: true });
+  }
+
+  const rows = useMemo(() => {
+    const all = data ?? [];
+    if (filter === 'all') return all;
+    return all.filter((row) => employmentListStatus(row) === filter);
+  }, [data, filter]);
+
+  const mixedSections = useMemo(() => {
+    if (filter !== 'all') return false;
+    let current = false;
+    let former = false;
+    for (const row of rows) {
+      if (employmentListStatus(row) === 'inactive') former = true;
+      else current = true;
+      if (current && former) return true;
+    }
+    return false;
+  }, [filter, rows]);
+
+  const filterOptions = useMemo(
+    () =>
+      [
+        { value: 'all', label: t('domain:employees.filterAll') },
+        { value: 'active', label: t('domain:employees.filterActive') },
+        { value: 'pending', label: t('domain:employees.filterPending') },
+        { value: 'inactive', label: t('domain:employees.filterInactive') },
+      ] as const,
+    [t],
+  );
+
+  const hasAny = (data?.length ?? 0) > 0;
 
   const columns = useMemo<DataTableColumn<EmployeeRow>[]>(
     () => [
@@ -112,15 +160,38 @@ export function EmployeesListPage() {
 
       <DataTable
         columns={columns}
-        data={data ?? []}
+        data={rows}
         isLoading={isLoading}
         labels={labels}
         exportFileName="mitarbeiter"
         onRowClick={canManage ? (employee) => setDraft(draftFromEmployee(employee)) : undefined}
+        toolbar={
+          <ListFilterChips
+            nowrap
+            label={t('domain:employees.filtersLabel')}
+            value={filter}
+            onValueChange={setFilter}
+            options={filterOptions}
+          />
+        }
+        sectionOf={
+          mixedSections
+            ? (row) =>
+                employmentListStatus(row) === 'inactive'
+                  ? t('domain:employees.sectionFormer')
+                  : t('domain:employees.sectionActive')
+            : undefined
+        }
         empty={
           <EmptyState
-            title={t('domain:employees.emptyTitle')}
-            description={t('domain:employees.emptyDescription')}
+            title={
+              hasAny ? t('domain:employees.emptyResultsTitle') : t('domain:employees.emptyTitle')
+            }
+            description={
+              hasAny
+                ? t('domain:employees.emptyResultsDescription')
+                : t('domain:employees.emptyDescription')
+            }
           />
         }
       />

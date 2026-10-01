@@ -85,8 +85,13 @@ export type DataTableProps<TData extends RowData> = {
   /** Leerzustand der Seite — bewusst von aussen, damit jede Liste ihren Text hat. */
   empty?: React.ReactNode;
   onRowClick?: (row: TData) => void;
-  /** Zusaetzliche Filter links neben der Suche (Status-Tabs, Zeitraum …). */
+  /** Zusaetzliche Filter links neben der Suche (Status-Chips, Zeitraum …). */
   toolbar?: React.ReactNode;
+  /**
+   * Gruppenueberschrift, wenn sich der Wert gegenueber der vorherigen Zeile
+   * aendert. Nur ohne aktive Sortierung — sonst zerfallen die Gruppen.
+   */
+  sectionOf?: (row: TData) => string | null;
   labels?: Partial<DataTableLabels>;
   className?: string;
 };
@@ -102,6 +107,7 @@ export function DataTable<TData extends RowData>({
   empty,
   onRowClick,
   toolbar,
+  sectionOf,
   labels: labelOverrides,
   className,
 }: DataTableProps<TData>) {
@@ -227,19 +233,39 @@ export function DataTable<TData extends RowData>({
                 </TableRow>
               ))
             ) : hasRows ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-                  className={onRowClick ? 'cursor-pointer' : undefined}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              table.getRowModel().rows.map((row, index, pageRows) => {
+                const resolveSection = sorting.length === 0 ? sectionOf : undefined;
+                const section = resolveSection?.(row.original) ?? null;
+                const previousRow = pageRows[index - 1];
+                const previous =
+                  previousRow && resolveSection
+                    ? (resolveSection(previousRow.original) ?? null)
+                    : null;
+                const showSection = section !== null && section !== previous;
+                return (
+                  <React.Fragment key={row.id}>
+                    {showSection ? (
+                      <TableRow className="hover:bg-transparent">
+                        <TableCell colSpan={row.getVisibleCells().length} className="py-2">
+                          <span className="text-muted-foreground text-sm font-semibold">
+                            {section}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ) : null}
+                    <TableRow
+                      onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                      className={onRowClick ? 'cursor-pointer' : undefined}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </React.Fragment>
+                );
+              })
             ) : (
               <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={table.getVisibleLeafColumns().length} className="p-2">

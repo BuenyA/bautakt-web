@@ -430,6 +430,13 @@
   "employees": {
     "title": "Mitarbeiter",
     "description": "Beschäftigte des Betriebs.",
+    "filtersLabel": "Mitarbeiterfilter",
+    "filterAll": "Alle",
+    "filterActive": "Aktiv",
+    "filterPending": "Ausstehend",
+    "filterInactive": "Inaktiv",
+    "sectionActive": "Aktive Mitarbeiter",
+    "sectionFormer": "Ehemalige Mitarbeiter",
     "columns": {
       "name": "Name",
       "role": "Rolle",
@@ -442,6 +449,8 @@
     "former": "Ausgeschieden",
     "emptyTitle": "Keine Mitarbeiter",
     "emptyDescription": "Sobald Beschäftigte angelegt sind, erscheinen sie hier.",
+    "emptyResultsTitle": "Keine Ergebnisse",
+    "emptyResultsDescription": "Für diesen Filter oder diese Suche gibt es keine Treffer.",
     "loadErrorTitle": "Mitarbeiter konnten nicht geladen werden",
     "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
   },

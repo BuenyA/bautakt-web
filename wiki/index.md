@@ -59,6 +59,7 @@ verlinkt, nie kopiert.
 | 2026-10-01 | [Meta Listen und Formulare](logs/2026-10-01-meta-lists-forms.md)                                |
 | 2026-10-01 | [Meta-Detailflächen Kunde und Einsatz](logs/2026-10-01-meta-detail-customer-assignment.md)      |
 | 2026-10-01 | [Sidebar-IA und Hub-Seiten](logs/2026-10-01-sidebar-ia-hubs.md)                                 |
+| 2026-10-01 | [Mitarbeiterliste filtert auf Aktiv](logs/2026-10-01-mitarbeiter-listenfilter.md)               |
 
 ## Die drei wichtigsten Sätze
 
