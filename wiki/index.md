@@ -52,6 +52,7 @@ verlinkt, nie kopiert.
 | 2026-09-24 | [Auftragszeiten nur lesend](logs/2026-09-24-auftragszeiten.md)                                  |
 | 2026-09-24 | [Auftrag aus der Liste anlegen](logs/2026-09-24-auftrag-anlegen.md)                             |
 | 2026-09-24 | [Sidebar-Optik Expo Docs](logs/2026-09-24-sidebar-expo-docs.md)                                 |
+| 2026-10-01 | [Meta-Feeling Dark-Tokens](logs/2026-10-01-meta-feeling-tokens.md)                              |
 
 ## Die drei wichtigsten Sätze
 

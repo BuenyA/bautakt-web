@@ -32,7 +32,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tool
  *
  * Optik (2026-09-24, Expo Docs): 240px / eingeklappt 64px, weisse Flaeche,
  * graue Pill fuer den aktiven Eintrag. Die Farben stehen in theme.css
- * (`--sidebar*`), nicht als Primary-Fill.
+ * (`--sidebar*`), nicht als Primary-Fill. Die Pill bleibt 8px (`rounded-sm`):
+ * `--radius-md` ist seit 2026-10-01 12px.
  */
 const SIDEBAR_COOKIE_NAME = 'bautakt_sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
@@ -446,7 +447,7 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<'li'>) {
 
 const sidebarMenuButtonVariants = cva(
   [
-    'peer/menu-button flex w-full items-center gap-2.5 overflow-hidden rounded-md px-2.5 text-left text-sm font-medium outline-hidden transition-colors',
+    'peer/menu-button flex w-full items-center gap-2.5 overflow-hidden rounded-sm px-2.5 text-left text-sm font-medium outline-hidden transition-colors',
     'min-h-10',
     'text-text-secondary',
     'hover:bg-sidebar-accent-hover hover:text-foreground',
@@ -540,7 +541,7 @@ function SidebarMenuSkeleton({
   return (
     <div
       data-slot="sidebar-menu-skeleton"
-      className={cn('flex min-h-10 items-center gap-2.5 rounded-md px-2.5', className)}
+      className={cn('flex min-h-10 items-center gap-2.5 rounded-sm px-2.5', className)}
       {...props}
     >
       {showIcon ? <Skeleton className="size-4 shrink-0 rounded-md" /> : null}

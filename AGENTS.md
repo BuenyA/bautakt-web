@@ -233,12 +233,14 @@ status fills.
 
 The palette is a port of `bautakt-app/app/constants/theme.ts`, including its WCAG
 contrast notes. Those notes are most of the file's value: they record that `textSubtle`
-used to be `#9ca3af` and failed at 2.54:1. Dark primary stays `#4fa3e3` (7.05:1 on
-`#0d0e14`). Light primary is Marketing `#3B86E0` since 2026-09-24 (3.70:1 on white —
-below AA for normal text); the mobile app still uses `#0a66c2` until its own PR.
+used to be `#9ca3af` and failed at 2.54:1. Light primary is Marketing `#3B86E0` since
+2026-09-24 (3.70:1 on white — below AA for normal text); the mobile app still uses
+`#0a66c2` until its own PR. Dark primary is Electric `#0064E0` since 2026-10-01
+(white foreground 5.39:1 on that blue; the blue as text on `#111112` is 3.50:1).
 ⚠️ **For surfaces, text, and status colors, if the two diverge, fix it in
 `bautakt-app` first**, then bring it over. That repo is older and did the contrast work.
-The light-primary exception is intentional and lives in `theme.css`.
+Two dated web exceptions live in `theme.css`: Light primary `#3B86E0`, and the dark
+Meta-Feeling palette (charcoal surfaces, Electric primary). Status colors still match.
 
 Never hardcode a hex when a token exists. Use `bg-primary`, not `tokens.blue`.
 

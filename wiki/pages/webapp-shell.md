@@ -90,12 +90,13 @@ localStorage, Standard: Systemeinstellung). Die Farbwerte sind die Tokens aus
 
 Die `--sidebar-*`-Tokens sind seit 2026-09-24 eigene Werte (Expo-Docs-Optik),
 keine Aliase auf `--accent` oder `--background-second`. Die Light-Sidebar ist
-`#FFFFFF`. Der aktive Eintrag ist eine graue Pill (`#F3F4F6`, Dark `#1E2430`,
-Radius 8px, Schrift 600) — nie ein Primary-Fill. Idle-Text ist
-`--text-secondary` (`#374151` / Dark `#A8B0BD`). Hover im Light ist dieselbe
-Fläche wie Active; im Dark die Surface `#1A1F28` (`--sidebar-accent-hover`).
-Primary (`--sidebar-primary` / `--sidebar-ring`, `#3B86E0` / Dark `#4FA3E3`)
-bleibt dem Fokus-Ring (2px, Offset 2px) und Badge-Zahlen vorbehalten.
+`#FFFFFF`. Der aktive Eintrag ist eine graue Pill (`#F3F4F6`, Dark `#1F1F22`,
+Radius 8px über `rounded-sm`, Schrift 600) — nie ein Primary-Fill. Idle-Text ist
+`--text-secondary` (`#374151` / Dark `#A1A1AA`). Hover im Light ist dieselbe
+Fläche wie Active; im Dark die Surface `#1A1A1D` (`--sidebar-accent-hover`).
+Primary (`--sidebar-primary` / `--sidebar-ring`, `#3B86E0` / Dark `#0064E0`)
+bleibt dem Fokus-Ring (2px, Offset 2px) und Badge-Zahlen vorbehalten. Die
+Pill-Klasse ist `rounded-sm`, weil `--radius-md` seit 2026-10-01 12px ist.
 
 ⚠️ `--sidebar-accent` nicht wieder auf `--accent` legen. Das war der
 Wave-1-Stand und färbt den aktiven Eintrag blau (`#E8F2FC` mit Vordergrund
@@ -105,9 +106,12 @@ Sektionsüberschriften (Arbeit, Finanzen, Team, Stammdaten) sind 12px / 600,
 Title Case, Farbe `--text-subtle`. Kein Uppercase. Sie sind nur Beschriftung
 der bestehenden Einträge, keine zusätzlichen Routen.
 
-Dark (Stand 2026-09-24, Dark Mode v2) ist eine kühle Graublau-Stufe:
-Hintergrund `#0F1115`, Sidebar `#161A22`, Surface `#1A1F28`, Card `#1E2430`.
-Primary im Dark bleibt `#4FA3E3`. Light ist davon getrennt.
+Dark (Stand 2026-10-01, Meta-Feeling) ist neutrales Charcoal:
+Hintergrund `#111112`, Sidebar `#161618`, Surface `#1A1A1D`, Card `#1F1F22`,
+angehoben `#28292C` (`--card-raised`, unbenutzt bis ein inneres Panel es
+zieht). Primary im Dark ist Electric `#0064E0`, Vordergrund `#FFFFFF`.
+Light-Primary bleibt `#3B86E0`. Das ersetzt Dark Mode v2
+(`#0F1115` / `#4FA3E3`).
 
 Die Sidebar scrollt in `SidebarContent` (`data-sidebar="content"`,
 `overflow-y-auto`). Nur dieses Element bekommt den schmalen Scrollbar (6px,
