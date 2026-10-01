@@ -153,6 +153,27 @@ eine eigene Border (`rounded-xl border bg-card/50`). Mit `p-0` läge diese
 Border bündig an der Shell — die Ecken schneidet `overflow-hidden` ab. Die
 `8px` halten die Karte von der Shell-Kante.
 
+## Mitarbeiterverzeichnis
+
+Stand 2026-10-01. `/mitarbeiter` filtert clientseitig mit
+`ListFilterChips` (Pattern A, `apps/webapp/src/components/common/ListFilterChips.tsx`):
+`rounded-full`, inaktiv `bg-input text-muted-foreground`, aktiv
+`bg-primary text-primary-foreground`. Die Chips sitzen im Toolbar-Slot links
+neben der bestehenden Suche. CSV und Spalten bleiben.
+
+Default ist **Aktiv**. Ohne Query oder bei unbekanntem Wert gilt `active`.
+`?status=all|pending|inactive` schaltet um; Aktiv löscht den Param. Schlüssel
+und Labels: `all` Alle · `active` Aktiv · `pending` Ausstehend · `inactive`
+Inaktiv.
+
+`ended_at` ist inaktiv, sonst aktiv (`employmentListStatus`). Ein
+Pending-Flag gibt es an `employments` nicht — Einladungen liegen in
+`employment_invitations`, und `user_id` null ist eine manuelle Beschäftigung,
+kein Ausstehend. Der Chip bleibt; der Filter ist dann leer. Bei `all` und
+gemischten Status (aktuell und ausgeschieden) setzt `DataTable` `sectionOf`
+die Titel „Aktive Mitarbeiter“ / „Ehemalige Mitarbeiter“, solange nicht
+sortiert wird. Reines Aktiv bleibt eine flache Liste.
+
 ## Optik der Shared Primitives
 
 Stand 2026-10-01. Nur Klassen, keine neuen Komponenten und keine Feature-Diffs.

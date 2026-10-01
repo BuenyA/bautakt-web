@@ -35,8 +35,8 @@ type QueryRow = {
  * keine brauchbare Mitgliedschaft; sie faellt hier raus, statt als Mitarbeiter
  * ohne Rolle in der Liste zu stehen (siehe wiki/pages/fallstricke.md).
  *
- * Ausgeschiedene (`ended_at`) bleiben enthalten und werden in der Liste
- * gekennzeichnet — fuer Lohn und Auswertungen braucht man sie weiterhin.
+ * Ausgeschiedene (`ended_at`) bleiben in der Abfrage. Die Liste filtert sie
+ * clientseitig (Default: nur Aktive) und kennzeichnet sie weiterhin.
  */
 export function useEmployees() {
   const { data: membership } = useMembership();
