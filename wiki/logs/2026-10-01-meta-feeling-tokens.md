@@ -14,7 +14,10 @@ gezogen hätte.
   `#28292C` (Alias, nirgends als Klasse benutzt). Primary, Ring und
   Accent-Foreground `#0064E0`, `--primary-foreground` `#FFFFFF`.
 - Light-Primary bleibt `#3B86E0`. `statusFills.blue` in `tokens.ts` ebenfalls.
-  Destructive, Success und Warning sind dieselben Werte.
+  Destructive, Success und Warning sind dieselben Werte. Nachtrag am selben
+  Tag: der Owner-Override zieht Light-Primary und `statusFills.blue` ebenfalls
+  auf `#0064E0`. Siehe
+  [Light-Primary Electric](2026-10-01-light-primary-electric.md).
 - Radien gemeinsam: sm 8 / md 12 / lg 16 / xl 24 / pill 9999. Schatten weich,
   Light und Dark getrennt, an die bestehenden `shadow-sm/md/lg` gehängt.
 - Sidebar-Menübutton von `rounded-md` auf `rounded-sm`, damit die graue

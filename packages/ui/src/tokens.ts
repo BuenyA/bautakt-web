@@ -7,9 +7,9 @@
  * laeuft. In Komponenten also `bg-primary`, nicht `tokens.blue`.
  *
  * Portiert aus bautakt-app/app/constants/theme.ts (Stand 2026-08-26).
- * `blue` folgt dem Web-Light-Primary #3B86E0 (Stand 2026-09-24).
- * Dark-Primary #0064E0 (Stand 2026-10-01) lebt nur in theme.css `.dark`.
- * Diese Fuells sind keine Theme-Umschaltung und bleiben beim Light-Blau.
+ * `blue` folgt dem Web-Primary #0064E0 (Owner-Override 2026-10-01).
+ * Light und Dark teilen dieses Electric. Die Fuells schalten das Theme
+ * nicht um; Marketing bleibt bei #3B86E0 in apps/marketing/app/globals.css.
  */
 
 /**
@@ -18,7 +18,7 @@
  * 2.15:1. Fuer Text/Icons stattdessen die semantischen Tokens verwenden.
  */
 export const statusFills = {
-  blue: '#3B86E0',
+  blue: '#0064E0',
   red: '#EF4444',
   green: '#26A85A',
   yellow: '#F59E0B',
