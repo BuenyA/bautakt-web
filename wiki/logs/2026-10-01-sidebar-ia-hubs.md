@@ -17,7 +17,8 @@ Token-Rewrite, kein Sync, kein Inhalt der Glocke.
   Verzeichnis.
 - Karten filtern mit denselben Rechten wie die alten Zeilen. Der Hub-Punkt
   fehlt, wenn keine Karte sichtbar ist. Null Karten auf der Seite selbst:
-  bestehendes `EmptyState`.
+  bestehendes `EmptyState`. Ein Ladefehler der Mitgliedschaft ist davon
+  getrennt und bietet „Erneut versuchen“.
 - Rechnungen ist die Featured-Karte (Ring, zwei Spalten ab `sm`).
 - „Mitarbeiter hinzufügen“ verlinkt `/mitarbeiter` ohne Query. `?neu=1` liest
   die Liste nicht.

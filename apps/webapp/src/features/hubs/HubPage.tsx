@@ -9,11 +9,11 @@ import { useMembership } from '@/features/company/useMembership';
 
 import {
   financeHub,
+  type Hub,
+  type HubCard,
   materialHub,
   personalHub,
   visibleHubCards,
-  type Hub,
-  type HubCard,
 } from './hubs';
 
 /**

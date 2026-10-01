@@ -3,9 +3,9 @@ import type { UiconName } from '@bautakt/ui';
 import {
   hubById,
   hubDestinationForPath,
+  type HubId,
   passesGate,
   pathMatches,
-  type HubId,
   type PermissionGate,
 } from '@/features/hubs/hubs';
 import { routes } from '@/lib/routes';

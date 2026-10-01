@@ -107,7 +107,8 @@ Sind nach dem Rechtefilter null Karten übrig, zeigt die Seite das bestehende
 `EmptyState` („Keine Bereiche freigeschaltet“). Das passiert beim Direktaufruf,
 wenn die Leiste den Punkt schon ausgeblendet hat. Solange die Mitgliedschaft
 lädt, steht ein `PageSpinner` — sonst blitzt der Leerzustand auf, weil
-`hasPermission` ohne Rechte auf false fällt.
+`hasPermission` ohne Rechte auf false fällt. Schlägt das Laden fehl, ist das
+ein Fehler-EmptyState mit „Erneut versuchen“, nicht der Rechte-Leerzustand.
 
 ## Rechte
 
