@@ -9,13 +9,14 @@
  * ⚠️ Diese Datei ist für das Web kanonisch. Flächen, Text und Statusfarben
  * weichen nicht von bautakt-app ab: dort zuerst ändern, dann hierher holen.
  * Ausnahme (Stand 2026-09-24): Light-Primary, Accent-Fläche, Accent-Foreground
- * und Ring folgen dem Marketing-Blau #3B86E0 / #E8F2FC. Dark-Primary bleibt
- * #4FA3E3. Die Mobile-App zieht das Light-Primary in einem eigenen PR nach.
+ * und Ring folgen dem Marketing-Blau #3B86E0 / #E8F2FC. Die Mobile-App zieht
+ * das Light-Primary in einem eigenen PR nach.
  *
- * Ausnahme, datiert 2026-09-24: die Dark-Flächen unten sind Dark Mode v2
- * (kühle Graublau-Neutrale). Sie weichen bewusst vom älteren Violettstich in
- * bautakt-app ab und gelten hier, bis die Mobile-Palette nachzieht.
- * Dark-Primary bleibt #4fa3e3.
+ * Ausnahme, datiert 2026-10-01: die Dark-Flächen und das Dark-Primary sind
+ * Meta-Feeling (Charcoal + Electric #0064E0, weißer CTA-Text). Das ersetzt
+ * Dark Mode v2 (2026-09-24: #0F1115 / Card #1E2430 / Primary #4FA3E3).
+ * Light-Primary bleibt #3B86E0. Statusfarben sind unangetastet. Die
+ * Mobile-Palette zieht in einem eigenen PR nach.
  *
  * Die Variablennamen folgen der Konvention von shadcn/ui, damit dessen
  * Komponenten unverändert funktionieren. Bautakt-eigene Tokens stehen darunter.
@@ -26,13 +27,26 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --radius: 0.625rem;
+  /* shadcn-Basis = --radius-lg. Die Stufen stehen explizit, nicht als calc,
+     damit Light und Dark dieselbe Weichheit haben (Meta-Feeling, 2026-10-01). */
+  --radius: 1rem;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+
+  /* Weiche Schatten. Dark überschreibt dieselben Namen. */
+  --shadow-sm: 0 1px 2px rgba(15, 17, 21, 0.06);
+  --shadow-md: 0 8px 24px rgba(15, 17, 21, 0.08);
+  --shadow-lg: 0 16px 40px rgba(15, 17, 21, 0.1);
 
   /* --- Flächen / Elevation --- */
   --background: #ffffff;
   --background-second: #f7f8fa;
   --background-third: #eceff3;
   --card: #ffffff;
+  --card-raised: #ffffff; /* Light hat keine Extra-Stufe; Alias existiert in beiden Modi */
   --popover: #ffffff;
   --surface: #f4f6f8; /* minimal kühler, harmoniert mit dem blauen Primary */
   --input: #f1f3f6; /* hebt sich bewusst von surface ab */
@@ -100,43 +114,52 @@
 }
 
 .dark {
-  /* Dark Mode v2 (2026-09-24): kühle Graublau-Neutrale. Sichtbare Stufen:
-     background, Sidebar (second), surface, third, card. Kein Violettstich. */
+  /* Meta-Feeling (2026-10-01): neutrales Charcoal, Tiefe über Flächenstufen.
+     background, Sidebar (second), surface, third, card, card-raised.
+     Kein Blau-Cast mehr (Dark Mode v2 war #0F1115 / #1E2430). */
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
 
   /* --- Flächen / Elevation --- */
-  --background: #0f1115;
-  --background-second: #161a22; /* Sidebar */
-  --background-third: #1c212b;
-  --card: #1e2430; /* eine Stufe über surface */
-  --popover: #1e2430;
-  --surface: #1a1f28;
-  --input: #1a1f28; /* == surface, bewusst (wie im Light-Mode) */
-  --border: #2a3140;
-  --border-strong: #3d4656;
+  --background: #111112;
+  --background-second: #161618; /* Sidebar */
+  --background-third: #1c1c1f;
+  --card: #1f1f22; /* eine Stufe über surface */
+  --card-raised: #28292c; /* innere Panels; nicht die Card-Fläche */
+  --popover: #1f1f22;
+  --surface: #1a1a1d;
+  --input: #1a1a1d; /* == surface, bewusst (wie im Light-Mode) */
+  --border: #2e2e32;
+  --border-strong: #3f3f46;
 
   /* --- Text --- */
-  --foreground: #f0f2f5; /* reines Weiß blendet auf Dunkel — 16.85:1 auf background, AAA */
-  --card-foreground: #f0f2f5;
-  --popover-foreground: #f0f2f5;
-  --text-secondary: #a8b0bd; /* 8.65:1 auf background — AAA */
-  --muted-foreground: #8b93a3; /* 6.12:1 auf background, 5.04:1 auf card */
-  --text-subtle: #6f7787; /* 4.20:1 auf background — unter AA 4.5:1 für Fließtext */
-  --text-placeholder: #4a5160; /* 2.08:1 auf input, eingegebener Text 14.74:1 */
+  --foreground: #fafafa; /* 18.08:1 auf background, AAA */
+  --card-foreground: #fafafa;
+  --popover-foreground: #fafafa;
+  --text-secondary: #a1a1aa; /* 7.36:1 auf background — AAA */
+  --muted-foreground: #8b8b96; /* 5.60:1 auf background, 4.88:1 auf card */
+  --text-subtle: #71717a; /* 3.90:1 auf background, 3.40:1 auf card — unter AA 4.5:1 */
+  --text-placeholder: #52525b; /* 2.25:1 auf input, eingegebener Text 16.64:1 */
 
   /* --- Primary --- */
-  --primary: #4fa3e3; /* Light-Primary #3b86e0 auf diesem Hintergrund 5.10:1 — dieser Ton 6.91:1 */
-  --primary-foreground: #0f1115; /* 6.91:1 auf primary */
-  --accent: #152536; /* primary darauf: 5.69:1 */
-  --accent-foreground: #4fa3e3;
-  --ring: #4fa3e3;
+  /* Electric #0064E0. Weiß darauf 5.39:1 (AA). Als Text auf Canvas 3.50:1,
+     auf Card 3.05:1 — über 3:1 für UI, unter AA 4.5:1 für Fließtext.
+     Light-Primary #3B86E0 bleibt in :root. */
+  --primary: #0064e0;
+  --primary-foreground: #ffffff; /* 5.39:1 auf primary */
+  --accent: #0a1628; /* primary darauf: 3.37:1 */
+  --accent-foreground: #0064e0;
+  --ring: #0064e0;
 
   /* --- Sekundär / Muted --- */
-  --secondary: #1a1f28;
-  --secondary-foreground: #a8b0bd;
-  --muted: #1a1f28;
+  --secondary: #1a1a1d;
+  --secondary-foreground: #a1a1aa;
+  --muted: #1a1a1d;
 
   /* --- Danger --- */
-  --destructive: #f87171; /* 6.83:1 auf background, 5.62:1 auf card */
+  --destructive: #f87171; /* 6.82:1 auf background, 5.94:1 auf card */
   --destructive-foreground: #0f1115; /* 6.83:1 auf destructive; Weiß darauf nur 2.77:1 */
   --destructive-solid: #dc2626;
   --destructive-bg: #2a1518;
@@ -154,17 +177,18 @@
   /* --- Shell ---
    * Dieselben Rollen wie im Light. --sidebar hat denselben Wert wie
    * --background-second, steht aber explizit, damit eine spaetere
-   * Flaechenaenderung die Leiste nicht mitzieht. Active-Pill = Card,
-   * Hover = Surface. */
-  --sidebar: #161a22;
-  --sidebar-foreground: #f0f2f5;
-  --sidebar-primary: #4fa3e3;
-  --sidebar-primary-foreground: #0f1115;
-  --sidebar-accent: #1e2430;
-  --sidebar-accent-foreground: #f0f2f5;
-  --sidebar-accent-hover: #1a1f28;
-  --sidebar-border: #2a3140;
-  --sidebar-ring: #4fa3e3;
+   * Flaechenaenderung die Leiste nicht mitzieht. Active-Pill = Card
+   * (grau, nie Primary-Fill), Hover = Surface. Badge-Text auf Electric
+   * ist weiss, wie --primary-foreground. */
+  --sidebar: #161618;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #0064e0;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1f1f22;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-accent-hover: #1a1a1d;
+  --sidebar-border: #2e2e32;
+  --sidebar-ring: #0064e0;
 }
 
 @theme inline {
@@ -173,6 +197,7 @@
   --color-background-third: var(--background-third);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
+  --color-card-raised: var(--card-raised);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
@@ -212,10 +237,17 @@
   --color-text-subtle: var(--text-subtle);
   --color-text-placeholder: var(--text-placeholder);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  /* inline, damit die Utilities `var(--shadow-*)` lesen und .dark die
+     Schatten umschaltet. Die Literale stehen unlayered in :root / .dark
+     und gewinnen gegen die Selbstreferenz in @layer theme. */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-pill: var(--radius-pill);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
 }
 
 @layer base {
@@ -259,8 +291,9 @@
 /**
  * Bewusste Abweichung von WCAG AA
  *
- * --text-placeholder liegt in beiden Modi bei ~2.0:1 und damit unter der
- * AA-Schwelle von 4.5:1. Das ist eine bewusste Entscheidung: ein Platzhalter,
+ * --text-placeholder liegt in beiden Modi bei etwa 2:1 (Light 1.97:1 auf
+ * input, Dark 2.25:1 auf input) und damit unter der AA-Schwelle von 4.5:1.
+ * Das ist eine bewusste Entscheidung: ein Platzhalter,
  * der wie ein bereits eingegebener Wert aussieht, ist selbst ein
  * Usability-Fehler. Abgemildert dadurch, dass jedes Feld ein sichtbares Label
  * trägt — der Platzhalter ist Hinweis, nicht Beschriftung.

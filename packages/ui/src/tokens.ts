@@ -8,6 +8,8 @@
  *
  * Portiert aus bautakt-app/app/constants/theme.ts (Stand 2026-08-26).
  * `blue` folgt dem Web-Light-Primary #3B86E0 (Stand 2026-09-24).
+ * Dark-Primary #0064E0 (Stand 2026-10-01) lebt nur in theme.css `.dark`.
+ * Diese Fuells sind keine Theme-Umschaltung und bleiben beim Light-Blau.
  */
 
 /**

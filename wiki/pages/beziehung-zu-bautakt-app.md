@@ -44,17 +44,20 @@ Mobile-App ist älter und hat die WCAG-Kontrastarbeit geleistet.
 
 Ausnahme, Stand 2026-09-24: das Light-Primary im Web (`packages/ui/src/styles/theme.css`,
 `statusFills.blue` in `tokens.ts`) ist Marketing-Blau `#3B86E0`, die Accent-Fläche
-`#E8F2FC`. Dark-Primary bleibt `#4FA3E3`. Gemessen (relative Luminanz, WCAG 2.1):
-`#3B86E0` auf Weiß 3.70:1, auf `#E8F2FC` 3.27:1 — unter AA für normalen Text, über 3:1
-für große Schrift und UI-Komponenten. `#4FA3E3` auf dem Dark-Hintergrund `#0F1115`
-liegt bei 6.91:1. Die Mobile-Palette (`#0A66C2`) zieht in einem eigenen PR nach; dieser
+`#E8F2FC`. Gemessen (relative Luminanz, WCAG 2.1): `#3B86E0` auf Weiß 3.70:1, auf
+`#E8F2FC` 3.27:1 — unter AA für normalen Text, über 3:1 für große Schrift und
+UI-Komponenten. Die Mobile-Palette (`#0A66C2`) zieht in einem eigenen PR nach; dieser
 Web-Stand ändert sie nicht. Marketing wiederholt dieselben Light-Werte noch in
 `apps/marketing/app/globals.css`.
 
-Ausnahme, Stand 2026-09-24: die Dark-Flächen in `theme.css` (Dark Mode v2, kühle
-Graublau-Neutrale) sind hier zuerst gesetzt. Der ältere Violettstich in
-`bautakt-app` ist damit nicht mehr die Quelle für diese Werte. Dark-Primary
-bleibt `#4FA3E3`. Light-Primary ist die Ausnahme im Absatz darüber.
+Ausnahme, Stand 2026-10-01: Dark-Flächen und Dark-Primary in `theme.css` sind
+Meta-Feeling, nicht mehr Dark Mode v2 (2026-09-24: Canvas `#0F1115`, Card `#1E2430`,
+Primary `#4FA3E3`). Canvas `#111112`, Sidebar `#161618`, Card `#1F1F22`, angehobene
+Fläche `#28292C`, Primary `#0064E0` mit weißem Vordergrund (5.39:1, AA). `#0064E0`
+als Text auf `#111112` liegt bei 3.50:1 — über 3:1 für UI, unter AA für Fließtext.
+`statusFills.blue` bleibt `#3B86E0`; das Dark-Primary wird dort nicht gespiegelt.
+Statusfarben sind unverändert. `bautakt-app` ist nicht die Quelle dieser Dark-Werte.
+Siehe [2026-10-01](../logs/2026-10-01-meta-feeling-tokens.md).
 
 ## Was hier bewusst anders ist
 
