@@ -16,7 +16,9 @@ Detailansicht das braucht.
 `OrderNotes` steht unter der Stammdatenkarte auf `OrderDetailPage`, direkt
 unter der Fotogalerie. Vier Zustände: Skelett beim Laden, Fehler mit „Erneut
 versuchen", leerer Hinweis („Noch keine Notizen", Hinweis auf die Handy-App),
-Liste der Notizkarten.
+Liste der Notizkarten. Jede Karte ist eine weiche Card (`rounded-xl`,
+`bg-card`, `shadow-sm`). Die Optik steht in
+[webapp-shell.md](webapp-shell.md#detailflächen).
 
 Jede Karte zeigt Titel und Text, soweit sie nicht leer sind, dazu den
 Zeitstempel von `created_at` und den Namen aus `profiles`, wenn die Zeile über

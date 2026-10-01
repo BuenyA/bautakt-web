@@ -57,8 +57,8 @@ export function OrderNotes({ orderId }: { orderId: string }) {
   }
 
   return (
-    <section className="flex flex-col gap-3" aria-labelledby="order-notes-title">
-      <h2 id="order-notes-title" className="text-foreground text-base font-semibold">
+    <section className="flex flex-col gap-4" aria-labelledby="order-notes-title">
+      <h2 id="order-notes-title" className="text-foreground text-lg font-semibold tracking-tight">
         {t('domain:orders.notes.title')}
       </h2>
       {body}
@@ -73,7 +73,7 @@ function NoteCard({ note }: { note: OrderNote }) {
   const showEdited = Boolean(modified && modified !== created);
 
   return (
-    <li className="flex flex-col gap-1.5 rounded-lg border border-border bg-surface px-4 py-3">
+    <li className="flex flex-col gap-1.5 rounded-xl border border-border bg-card px-4 py-3 shadow-sm transition-colors hover:border-border-strong">
       {note.title ? <h3 className="text-foreground text-sm font-medium">{note.title}</h3> : null}
       {note.body ? (
         <p className="text-foreground text-sm break-words whitespace-pre-wrap">{note.body}</p>
@@ -92,7 +92,7 @@ function NoteListSkeleton({ label }: { label: string }) {
     <div className="flex max-w-3xl flex-col gap-3" role="status">
       <span className="sr-only">{label}</span>
       {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-        <Skeleton key={index} className="h-24 rounded-lg" />
+        <Skeleton key={index} className="h-24 rounded-xl" />
       ))}
     </div>
   );

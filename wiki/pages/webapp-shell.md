@@ -102,6 +102,29 @@ Die Tokens (`#0064E0`, Status-Hex, Sidebar-Grau) bleiben die aus
 Die graue Sidebar-Active-Pill (`rounded-sm`, `#F3F4F6` / Dark `#1F1F22`) ist
 nicht diese Button-Pill und bleibt grau.
 
+## Detailflächen
+
+Stand 2026-10-01. Auftrag-Detail (`/auftraege/:id`) und Rechnung-Detail
+(`/rechnungen/:id`) teilen eine Section-Hierarchie. Nur Klassen: kein Upload,
+kein CRUD, keine neuen Texte.
+
+| Element                         | Look                                                                                                                                               |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Section                         | `flex flex-col gap-4`                                                                                                                              |
+| Section-Titel `h2`              | `text-lg font-semibold tracking-tight text-foreground`                                                                                             |
+| Nebenlink (z. B. „Alle Zeiten“) | `text-primary text-sm font-medium`, auf der Baseline des Titels                                                                                    |
+| Notiz- und Zeitkarte            | `rounded-xl border border-border bg-card shadow-sm`. Hover `border-border-strong`. Skelett `rounded-xl`.                                           |
+| Foto-Kachel                     | Dieselbe Card-Fläche, `overflow-hidden`. Hover zusätzlich `shadow-md`. Bildunterschrift `bg-card px-2.5 py-2`. Lightbox-Bild `rounded-xl`.         |
+| Foto-Raster                     | Weiter `grid-cols-2 sm:grid-cols-3 xl:grid-cols-4`.                                                                                                |
+| Seitenwurzel                    | `gap-8`. Die Auftragsbeschreibung ist `text-sm text-muted-foreground`.                                                                             |
+| `DetailCard`                    | Titel `text-base font-semibold tracking-tight`. Label-Spalte `sm:grid-cols-[10rem_1fr]`. `dt` ist `text-muted-foreground`, `dd` `text-foreground`. |
+| Rechnungs-Blocker               | `rounded-xl`, Padding `p-4`. Positions- und Zahlungstitel wie der `DetailCard`-Titel.                                                              |
+| Zahlungszeile                   | `rounded-lg bg-surface/60 px-3 py-2`.                                                                                                              |
+
+`DetailCard` ist geteilt (`components/common/DetailCard.tsx`). Dieselbe
+Label-Spalte und derselbe Titel gelten deshalb auch auf Kunde, Einsatz und
+Einstellungen. Listen, Sidebar und Login bleiben bei den Soft Primitives oben.
+
 ## Icons und Theme
 
 Icons sind die Flaticon-Uicons der Handy-App: die drei TTFs und die generierte

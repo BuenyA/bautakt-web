@@ -15,7 +15,10 @@ Detailansicht das braucht.
 
 `OrderPhotos` steht unter der Stammdatenkarte auf `OrderDetailPage`. Vier
 Zustände: Skelett beim Laden, Fehler mit „Erneut versuchen", leerer Hinweis,
-Raster der Vorschaubilder. Ein Klick öffnet das Bild in einem Dialog.
+Raster der Vorschaubilder. Ein Klick öffnet das Bild in einem Dialog. Die
+Kacheln sind weiche Cards (`rounded-xl`, `bg-card`, `shadow-sm`); das Raster
+bleibt zwei, drei oder vier Spalten. Die Optik steht in
+[webapp-shell.md](webapp-shell.md#detailflächen).
 
 Die Abfrage steckt in `useOrderImages`: `order_images`, gefiltert auf die
 `company_id` der Mitgliedschaft und die `order_id`, sortiert nach `taken_at`

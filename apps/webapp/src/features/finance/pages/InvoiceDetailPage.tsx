@@ -51,7 +51,7 @@ export function InvoiceDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8">
         <PageHeader title={t('domain:invoices.detailTitle')} />
         <PageSpinner />
       </div>
@@ -60,7 +60,7 @@ export function InvoiceDetailPage() {
 
   if (isError || !data) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8">
         <PageHeader title={t('domain:invoices.detailTitle')} />
         <EmptyState
           title={isError ? t('domain:invoices.loadErrorTitle') : t('domain:invoices.notFoundTitle')}
@@ -107,7 +107,7 @@ export function InvoiceDetailPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <PageHeader
         title={data.document_number || t('domain:invoices.draftTitle')}
         description={data.customer_label || t('domain:invoices.noCustomer')}
@@ -157,7 +157,7 @@ export function InvoiceDetailPage() {
       />
 
       {isDraft && blockers.length > 0 ? (
-        <div className="border-warning-border bg-warning-bg text-text-secondary flex flex-col gap-1 rounded-lg border p-4 text-sm">
+        <div className="border-warning-border bg-warning-bg text-text-secondary flex flex-col gap-1 rounded-xl border p-4 text-sm">
           <span className="text-foreground font-medium">{t('domain:invoices.blockersTitle')}</span>
           <ul className="list-inside list-disc">
             {blockers.map((blocker) => (
@@ -181,7 +181,9 @@ export function InvoiceDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">{t('domain:invoices.lines')}</CardTitle>
+          <CardTitle className="text-base font-semibold tracking-tight">
+            {t('domain:invoices.lines')}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {data.lines.length === 0 ? (
@@ -286,7 +288,9 @@ export function InvoiceDetailPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">{t('domain:payments.title')}</CardTitle>
+            <CardTitle className="text-base font-semibold tracking-tight">
+              {t('domain:payments.title')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {data.payments.length === 0 ? (
@@ -294,7 +298,10 @@ export function InvoiceDetailPage() {
             ) : (
               <ul className="flex flex-col gap-2 text-sm">
                 {data.payments.map((payment) => (
-                  <li key={payment.id} className="flex items-baseline justify-between gap-3">
+                  <li
+                    key={payment.id}
+                    className="flex items-baseline justify-between gap-3 rounded-lg bg-surface/60 px-3 py-2"
+                  >
                     <span className="text-muted-foreground">{formatDate(payment.paid_at)}</span>
                     <span className="text-foreground font-medium tabular-nums">
                       {formatMoney(eurosToMinor(payment.amount))}

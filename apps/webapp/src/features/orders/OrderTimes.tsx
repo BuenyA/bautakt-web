@@ -59,9 +59,9 @@ export function OrderTimes({ orderId }: { orderId: string }) {
   }
 
   return (
-    <section className="flex flex-col gap-3" aria-labelledby="order-times-title">
+    <section className="flex flex-col gap-4" aria-labelledby="order-times-title">
       <div className="flex max-w-3xl flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 id="order-times-title" className="text-foreground text-base font-semibold">
+        <h2 id="order-times-title" className="text-foreground text-lg font-semibold tracking-tight">
           {t('domain:orders.times.title')}
         </h2>
         <Link
@@ -85,7 +85,7 @@ function TimeCard({ entry }: { entry: TimeEntryListRow }) {
   const note = entry.note.trim();
 
   return (
-    <li className="flex flex-col gap-1 rounded-lg border border-border bg-surface px-4 py-3">
+    <li className="flex flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3 shadow-sm transition-colors hover:border-border-strong">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <span className="text-foreground text-sm font-medium">
           {entry.employee_name || t('domain:times.noEmployee')}
@@ -108,7 +108,7 @@ function TimeListSkeleton({ label }: { label: string }) {
     <div className="flex max-w-3xl flex-col gap-3" role="status">
       <span className="sr-only">{label}</span>
       {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-        <Skeleton key={index} className="h-16 rounded-lg" />
+        <Skeleton key={index} className="h-16 rounded-xl" />
       ))}
     </div>
   );
