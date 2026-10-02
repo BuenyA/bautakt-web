@@ -7,6 +7,17 @@ import { supabase } from '@/lib/supabase';
 /** Belegarten, die als Rechnung gelten — Angebote liegen auf einer eigenen Seite. */
 export const INVOICE_TYPE_LIST = ['invoice', 'partial_invoice', 'final_invoice'] as const;
 
+/**
+ * Belege der Liste `/rechnungen`: Rechnungen, Auftragsbestätigungen,
+ * Lieferscheine. Angebote bleiben auf der eigenen Seite. Gutschrift und
+ * Storno haben auf der Handy-Liste keinen Chip und kommen hier nicht dazu.
+ */
+export const FINANCE_LIST_TYPES = [
+  ...INVOICE_TYPE_LIST,
+  'order_confirmation',
+  'delivery_note',
+] as const;
+
 /** Belegarten des Angebotsbereichs. */
 export const QUOTE_TYPE_LIST = ['quote'] as const;
 

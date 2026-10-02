@@ -98,6 +98,10 @@
   "customers": {
     "listTitle": "Kunden",
     "listDescription": "Kundenstamm Ihres Betriebs.",
+    "filtersLabel": "Kundenfilter",
+    "filterAll": "Alle",
+    "filterCompany": "Firmen",
+    "filterPrivate": "Privat",
     "detailTitle": "Kunde",
     "detailDescription": "Stammdaten des Kunden.",
     "columns": {
@@ -130,6 +134,8 @@
     "noNotes": "Keine Notiz",
     "emptyTitle": "Noch keine Kunden",
     "emptyDescription": "Sobald Kunden angelegt sind, erscheinen sie hier.",
+    "emptyResultsTitle": "Keine Ergebnisse",
+    "emptyResultsDescription": "Für diesen Filter oder diese Suche gibt es keine Treffer.",
     "loadErrorTitle": "Kunden konnten nicht geladen werden",
     "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
     "notFoundTitle": "Kunde nicht gefunden",
@@ -217,12 +223,13 @@
   "invoices": {
     "listTitle": "Rechnungen",
     "listDescription": "Ausgangsrechnungen Ihres Betriebs.",
-    "filtersLabel": "Rechnungsfilter",
+    "filtersLabel": "Belegfilter",
+    "filterInvoices": "Rechnungen",
+    "filterOrderConfirmations": "Auftragsbestätigungen",
+    "filterDeliveryNotes": "Lieferscheine",
     "filterAll": "Alle",
-    "filterOpen": "Offen",
-    "filterOverdue": "Überfällig",
-    "filterDrafts": "Entwürfe",
-    "filterPaid": "Bezahlt",
+    "emptyResultsTitle": "Keine Ergebnisse",
+    "emptyResultsDescription": "Für diesen Filter oder diese Suche gibt es keine Treffer.",
     "columns": {
       "number": "Nummer",
       "customer": "Kunde",
