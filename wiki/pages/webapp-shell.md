@@ -202,6 +202,41 @@ Die Status-Tabs (offen, überfällig, Entwurf, bezahlt) sind weg. Ein
 bestehender Deep-Link `?status=offen|ueberfaellig|entwurf|bezahlt` filtert
 weiter mit, ohne Chip-Oberfläche. Die Typ-Chips lassen den Param stehen.
 
+## Auftragsliste
+
+Stand 2026-10-05. `/auftraege` schaltet die Art mit dem grauen `Tabs`-Pill
+(Pattern B: Track `bg-surface`, aktiv `bg-card` und `text-foreground`). Das
+ist nicht `ListFilterChips`. Werte `order` · `quote`, Labels Aufträge ·
+Angebote. Default ist **Aufträge**. Ohne Query oder bei unbekanntem
+`status` gilt `order`. `?status=quote` ist Angebote — derselbe Param wie
+der bisherige Angebote-Tab.
+
+Keine Status-Chips. `sectionOf` setzt „Laufende Aufträge“ und
+„Abgeschlossen“ bzw. „Angebote“ und „Abgelehnt“. Beide Gruppen der Art
+stehen in der Liste; ein Chip „nur aktiv“ gibt es nicht. Eine leere
+Gruppe hat keine Überschrift, weil `sectionOf` nur über Zeilen läuft.
+Sortiert der Nutzer, verschwinden die Überschriften. Innerhalb einer
+Gruppe bleibt `created_at` absteigend.
+
+`finished` ist abgeschlossen. `active` und jeder Status, der weder
+Angebot noch abgelehnt ist, läuft. `quote` ist das offene Angebot,
+`declined` ist abgelehnt. Die Abfrage lädt alle Aufträge des Betriebs;
+die Art filtert clientseitig, damit beide Gruppen aus demselben Cache
+kommen. `useOrders` hat keinen Filter-Parameter mehr.
+
+## Zeitenliste
+
+Stand 2026-10-05. `/zeiten` filtert clientseitig mit denselben
+`ListFilterChips`, `flex-wrap`. Default ist **Woche**. Ohne `period`
+oder bei unbekanntem Wert gilt `week`. `?period=today|month` schaltet
+um; `day` liest denselben Chip wie `today`. Woche löscht den Param.
+Labels: Heute · Woche · Monat. Schlüssel: `today` · `week` · `month`.
+
+Der Zeitraum ist der lokale Kalendertag, die Kalenderwoche ab Montag
+oder der Kalendermonat, gemessen an `started_at`. Einträge später am
+selben Tag, in derselben Woche oder im selben Monat bleiben drin. Der
+Auftrags-Deep-Link `?order=` bleibt und wird vom Zeitraum nicht gelöscht.
+
 ## Optik der Shared Primitives
 
 Stand 2026-10-01. Nur Klassen, keine neuen Komponenten und keine Feature-Diffs.
