@@ -19,13 +19,10 @@ import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import { compareOrdersForKind, orderKindFromSearch, orderSection } from '../orderList';
 import { OrderSheet } from '../OrderSheet';
 import { OrderStatusBadge } from '../OrderStatusBadge';
-import { type OrderListFilter, type OrderListRow, useOrders } from '../useOrders';
-
-function filterFromSearch(value: string | null): OrderListFilter {
-  return value === 'quote' ? 'quote' : 'all';
-}
+import { type OrderListRow, useOrders } from '../useOrders';
 
 export function OrdersListPage() {
   const { t } = useTranslation();
@@ -34,17 +31,26 @@ export function OrdersListPage() {
   const canCreate = usePermission('canCreateOrders');
   const [sheetOpen, setSheetOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const filter = filterFromSearch(searchParams.get('status'));
-  const orders = useOrders(filter);
+  const kind = orderKindFromSearch(searchParams.get('status'));
+  const orders = useOrders();
   const { data, isError, refetch } = orders;
 
-  function setFilter(next: string) {
-    if (next === 'all') {
-      setSearchParams({}, { replace: true });
-      return;
-    }
-    setSearchParams({ status: next }, { replace: true });
+  function setKind(next: string) {
+    const params = new URLSearchParams(searchParams);
+    // Default ist Aufträge — ohne Param. `?status=quote` bleibt der
+    // bisherige Deep-Link auf Angebote.
+    if (next === 'quote') params.set('status', 'quote');
+    else params.delete('status');
+    setSearchParams(params, { replace: true });
   }
+
+  const rows = useMemo(() => {
+    return (data ?? [])
+      .filter((row) => orderSection(row.status, kind) !== null)
+      .sort((a, b) => compareOrdersForKind(kind, a, b));
+  }, [data, kind]);
+
+  const hasAny = (data?.length ?? 0) > 0;
 
   const isLoading = useCompanyListLoading(orders);
 
@@ -142,30 +148,48 @@ export function OrdersListPage() {
 
       <DataTable
         columns={columns}
-        data={data ?? []}
+        data={rows}
         isLoading={isLoading}
         labels={labels}
         exportFileName="auftraege"
         onRowClick={(order) => void navigate(routes.order(order.id))}
         toolbar={
-          <Tabs value={filter} onValueChange={setFilter}>
+          <Tabs value={kind} onValueChange={setKind}>
             <TabsList aria-label={t('domain:orders.filtersLabel')}>
-              <TabsTrigger value="all">{t('domain:orders.filterAll')}</TabsTrigger>
-              <TabsTrigger value="quote">{t('domain:orders.filterQuotes')}</TabsTrigger>
+              <TabsTrigger value="order">{t('domain:orders.kindOrders')}</TabsTrigger>
+              <TabsTrigger value="quote">{t('domain:orders.kindQuotes')}</TabsTrigger>
             </TabsList>
           </Tabs>
         }
+        sectionOf={(row) => {
+          switch (orderSection(row.status, kind)) {
+            case 'running':
+              return t('domain:orders.sectionRunning');
+            case 'finished':
+              return t('domain:orders.sectionFinished');
+            case 'quotes':
+              return t('domain:orders.sectionQuotes');
+            case 'declined':
+              return t('domain:orders.sectionDeclined');
+            default:
+              return null;
+          }
+        }}
         empty={
           <EmptyState
             title={
-              filter === 'quote'
-                ? t('domain:orders.emptyQuotesTitle')
-                : t('domain:orders.emptyTitle')
+              hasAny
+                ? t('domain:orders.emptyResultsTitle')
+                : kind === 'quote'
+                  ? t('domain:orders.emptyQuotesTitle')
+                  : t('domain:orders.emptyTitle')
             }
             description={
-              filter === 'quote'
-                ? t('domain:orders.emptyQuotesDescription')
-                : t('domain:orders.emptyDescription')
+              hasAny
+                ? t('domain:orders.emptyResultsDescription')
+                : kind === 'quote'
+                  ? t('domain:orders.emptyQuotesDescription')
+                  : t('domain:orders.emptyDescription')
             }
           />
         }

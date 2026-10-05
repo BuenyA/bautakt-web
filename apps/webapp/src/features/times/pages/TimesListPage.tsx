@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { ListFilterChips } from '@/components/common/ListFilterChips';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
@@ -13,6 +14,7 @@ import { routes, timesOrderParam } from '@/lib/routes';
 
 import { emptyTimeEntry, type TimeEntryDraft } from '../timeEntryDraft';
 import { TimeEntrySheet } from '../TimeEntrySheet';
+import { matchesTimePeriod, type TimePeriod, timePeriodFromSearch } from '../timePeriod';
 import { type TimeEntryListRow, useTimeEntries } from '../useTimeEntries';
 
 export function TimesListPage() {
@@ -21,10 +23,37 @@ export function TimesListPage() {
   const canTrackForTeam = usePermission('canTrackTimeForTeam');
   const [searchParams, setSearchParams] = useSearchParams();
   const orderId = searchParams.get(timesOrderParam)?.trim() || undefined;
+  const period = timePeriodFromSearch(searchParams.get('period'));
   const [draft, setDraft] = useState<TimeEntryDraft | null>(null);
   const entries = useTimeEntries(orderId);
   const { data, isError, refetch } = entries;
   const orderName = data?.find((row) => row.order_name)?.order_name ?? '';
+
+  function setPeriod(next: TimePeriod) {
+    const params = new URLSearchParams(searchParams);
+    // Default ist Woche — ohne Param. `order` bleibt, der Deep-Link
+    // auf einen Auftrag hängt nicht am Zeitraum.
+    if (next === 'week') params.delete('period');
+    else params.set('period', next);
+    setSearchParams(params, { replace: true });
+  }
+
+  const rows = useMemo(
+    () => (data ?? []).filter((row) => matchesTimePeriod(row.started_at, period)),
+    [data, period],
+  );
+
+  const periodOptions = useMemo(
+    () =>
+      [
+        { value: 'today', label: t('domain:times.periodToday') },
+        { value: 'week', label: t('domain:times.periodWeek') },
+        { value: 'month', label: t('domain:times.periodMonth') },
+      ] as const,
+    [t],
+  );
+
+  const hasAny = (data?.length ?? 0) > 0;
 
   function clearOrderFilter() {
     const next = new URLSearchParams(searchParams);
@@ -185,17 +214,33 @@ export function TimesListPage() {
 
       <DataTable
         columns={columns}
-        data={data ?? []}
+        data={rows}
         isLoading={isLoading}
         labels={labels}
         exportFileName="zeiten"
+        toolbar={
+          <ListFilterChips
+            label={t('domain:times.filtersLabel')}
+            value={period}
+            onValueChange={setPeriod}
+            options={periodOptions}
+          />
+        }
         empty={
           <EmptyState
-            title={orderId ? t('domain:times.emptyForOrderTitle') : t('domain:times.emptyTitle')}
+            title={
+              hasAny
+                ? t('domain:times.emptyResultsTitle')
+                : orderId
+                  ? t('domain:times.emptyForOrderTitle')
+                  : t('domain:times.emptyTitle')
+            }
             description={
-              orderId
-                ? t('domain:times.emptyForOrderDescription')
-                : t('domain:times.emptyDescription')
+              hasAny
+                ? t('domain:times.emptyResultsDescription')
+                : orderId
+                  ? t('domain:times.emptyForOrderDescription')
+                  : t('domain:times.emptyDescription')
             }
             action={
               orderId ? (

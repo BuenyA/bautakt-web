@@ -94,7 +94,7 @@ export function TimeEntrySheet({
 function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: () => void }) {
   const { t } = useTranslation();
   const save = useSaveTimeEntry();
-  const orders = useOrders('all');
+  const orders = useOrders();
   const employees = useEmployees();
 
   const [draft, setDraft] = useState<TimeEntryDraft>(initial);
