@@ -293,3 +293,22 @@ danach Fehler oder „Beleg nicht gefunden“.
 ist. Danach dieselben Texte wie `InvoiceDetailPage`, mit Rückweg auf
 `/rechnungen`. Die Briefkopf-Abfrage bleibt parallel und hält die Seite nicht
 fest.
+
+## Einsatz löschen nimmt die Zeiten mit
+
+_Festgestellt 2026-10-05, beim Löschen in der Web-App. Issue #43._
+
+**Symptom:** Nach dem Löschen eines Einsatzes fehlen die Arbeitszeiten, die
+daran hingen. Sie sind nicht verwaist, sie sind weg.
+
+`time_entries.work_assignment_id` verweist mit `ON DELETE CASCADE` auf
+`work_assignments` (gemessen 2026-10-05). RLS auf `time_entries` ist nicht
+`FORCE`. Die Kaskade läuft deshalb nicht als der angemeldete Nutzer und löscht
+auch Zeilen, die seine Select-Policy nicht zeigt.
+
+**Lösung:** Die Web-App löscht nur, wenn das Konto alle Zeiten des Betriebs
+sehen kann (`canTrackTimeForTeam`, `canViewWageCosts` oder
+`canViewCompanyFinance`) und für diesen Einsatz keine Zeile zählt. Sonst bleibt
+der Einsatz stehen und der Dialog sagt, warum. Die Zeilen in
+`work_assignment_employees` fallen mit — das ist die Zuordnung, keine Buchung.
+Siehe [einsatz-anlegen.md](einsatz-anlegen.md).

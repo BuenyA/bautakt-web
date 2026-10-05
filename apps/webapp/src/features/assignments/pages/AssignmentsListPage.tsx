@@ -1,5 +1,13 @@
-import { DataTable, type DataTableColumn, Tabs, TabsList, TabsTrigger } from '@bautakt/ui';
-import { useMemo } from 'react';
+import {
+  Button,
+  DataTable,
+  type DataTableColumn,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  Uicon,
+} from '@bautakt/ui';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 
@@ -7,9 +15,11 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
+import { usePermission } from '@/features/company/usePermission';
 import { formatDateTimeRange } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import { AssignmentSheet } from '../AssignmentSheet';
 import {
   type AssignmentListFilter,
   type AssignmentListRow,
@@ -24,6 +34,8 @@ export function AssignmentsListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const labels = useDataTableLabels();
+  const canManage = usePermission('canManageWorkAssignments');
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = filterFromSearch(searchParams.get('zeitraum'));
   const assignments = useAssignments(filter);
@@ -117,6 +129,14 @@ export function AssignmentsListPage() {
       <PageHeader
         title={t('domain:assignments.listTitle')}
         description={t('domain:assignments.listDescription')}
+        actions={
+          canManage ? (
+            <Button size="sm" onClick={() => setSheetOpen(true)}>
+              <Uicon name="plus" size={16} />
+              {t('domain:assignments.create.action')}
+            </Button>
+          ) : null
+        }
       />
 
       <DataTable
@@ -144,22 +164,36 @@ export function AssignmentsListPage() {
             description={
               filter === 'week'
                 ? t('domain:assignments.emptyWeekDescription')
-                : t('domain:assignments.emptyDescription')
+                : canManage
+                  ? t('domain:assignments.emptyDescriptionManage')
+                  : t('domain:assignments.emptyDescription')
             }
             action={
-              filter === 'week' ? (
-                <button
-                  type="button"
-                  className="text-primary cursor-pointer text-sm font-medium hover:underline"
-                  onClick={() => setFilter('all')}
-                >
-                  {t('domain:assignments.emptyWeekShowAll')}
-                </button>
+              canManage || filter === 'week' ? (
+                <div className="flex flex-col items-center gap-3">
+                  {canManage ? (
+                    <Button size="sm" onClick={() => setSheetOpen(true)}>
+                      <Uicon name="plus" size={16} />
+                      {t('domain:assignments.create.action')}
+                    </Button>
+                  ) : null}
+                  {filter === 'week' ? (
+                    <button
+                      type="button"
+                      className="text-primary cursor-pointer text-sm font-medium hover:underline"
+                      onClick={() => setFilter('all')}
+                    >
+                      {t('domain:assignments.emptyWeekShowAll')}
+                    </button>
+                  ) : null}
+                </div>
               ) : undefined
             }
           />
         }
       />
+
+      <AssignmentSheet open={sheetOpen} onOpenChange={setSheetOpen} />
     </div>
   );
 }
