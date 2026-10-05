@@ -1,4 +1,5 @@
-import { Button } from '@bautakt/ui';
+import { Button, Uicon } from '@bautakt/ui';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 
@@ -7,14 +8,18 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
+import { usePermission } from '@/features/company/usePermission';
 import { formatDate, formatDateTimeRange } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import { AssignmentDeleteDialog } from '../AssignmentDeleteDialog';
 import { useAssignment } from '../useAssignment';
 
 export function AssignmentDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+  const canManage = usePermission('canManageWorkAssignments');
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const assignment = useAssignment(id);
   const { data, isError, refetch } = assignment;
   const isLoading = useCompanyListLoading(assignment);
@@ -77,9 +82,22 @@ export function AssignmentDetailPage() {
         title={period || t('domain:assignments.detailTitle')}
         description={t('domain:assignments.detailDescription')}
         actions={
-          <Button asChild variant="outline" size="sm">
-            <Link to={routes.assignments}>{t('common:action.back')}</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link to={routes.assignments}>{t('common:action.back')}</Link>
+            </Button>
+            {canManage ? (
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                onClick={() => setDeleteOpen(true)}
+              >
+                <Uicon name="trash" size={16} />
+                {t('domain:assignments.delete.action')}
+              </Button>
+            ) : null}
+          </div>
         }
       />
 
@@ -114,6 +132,10 @@ export function AssignmentDetailPage() {
           value={formatDate(data.created_at)}
         />
       </DetailCard>
+
+      {canManage ? (
+        <AssignmentDeleteDialog assignment={data} open={deleteOpen} onOpenChange={setDeleteOpen} />
+      ) : null}
     </div>
   );
 }
