@@ -312,3 +312,20 @@ sehen kann (`canTrackTimeForTeam`, `canViewWageCosts` oder
 der Einsatz stehen und der Dialog sagt, warum. Die Zeilen in
 `work_assignment_employees` fallen mit — das ist die Zuordnung, keine Buchung.
 Siehe [einsatz-anlegen.md](einsatz-anlegen.md).
+
+## Kostenstelle löschen löst die Auftragszuordnung
+
+_Gefunden 2026-10-05, Issue #42._
+
+**Symptom:** Eine gelöschte Kostenstelle verschwindet, die Aufträge bleiben —
+aber `cost_center_id` ist `null`. Die Bezeichnung in `cost_center_label` steht
+weiter da, ohne dass noch eine Kostenstelle dazu gehört.
+
+`orders.cost_center_id` verweist mit `ON DELETE SET NULL`. Die Datenbank
+verhindert das Löschen nicht.
+
+**Lösung:** Die Liste löscht nur, wenn eine frische Zählung der verknüpften
+Aufträge 0 ergibt, und erklärt sonst, warum die Zeile bleibt. Die Prüfung und
+das `delete` sind zwei Anfragen; ein Auftrag, der genau dazwischen verknüpft
+wird, kann noch genullt werden. Das schlösse erst `ON DELETE RESTRICT` in
+`bautakt-app`. Siehe [kostenstellen.md](kostenstellen.md).

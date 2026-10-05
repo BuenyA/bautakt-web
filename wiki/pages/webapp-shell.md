@@ -345,8 +345,9 @@ und Mahnungen. Geld- und Kennzahlenlogik liegt in `@bautakt/finance`.
 Zwei Muster, bewusst getrennt:
 
 - **Seitenpanel (Sheet)** für kurze Formulare — Zahlung erfassen, Kunde anlegen,
-  Auftrag anlegen. Die Liste dahinter bleibt sichtbar. Das Formular wird nur
-  gemountet, solange das Panel offen ist, und startet damit jedes Mal frisch;
+  Auftrag anlegen, Kostenstelle anlegen. Die Liste dahinter bleibt sichtbar.
+  Das Formular wird nur gemountet, solange das Panel offen ist, und startet
+  damit jedes Mal frisch;
   sonst steht beim nächsten Öffnen die vorige Eingabe da und verleitet zur
   Doppelbuchung.
 - **Eigene Seite** für Belege mit Positionen (`DocumentEditorPage`). Eine
@@ -381,8 +382,10 @@ sondern den Hinweis auf Storno und Gutschrift.
 (siehe [fallstricke.md](fallstricke.md)). Die vollständige Liste steht dort.
 
 Gebaut sind: Zahlung, Kunde, Auftrag, Zeiteintrag, Abwesenheit, Ausgabe,
-Mitarbeiter, Mahnung (mit Gebühr und Verzugszinsen) und der Beleg-Editor.
-Auftrag anlegen: [auftrag-anlegen.md](auftrag-anlegen.md).
+Mitarbeiter, Mahnung (mit Gebühr und Verzugszinsen), der Beleg-Editor und
+Kostenstellen (anlegen und löschen). Auftrag anlegen:
+[auftrag-anlegen.md](auftrag-anlegen.md). Kostenstellen:
+[kostenstellen.md](kostenstellen.md).
 
 ## Offen
 
@@ -394,5 +397,6 @@ Auftrag anlegen: [auftrag-anlegen.md](auftrag-anlegen.md).
   Ladefehler wie die Detailseite, mit Rückweg zur Liste — keinen Spinner.
   Der Briefkopf lädt weiter parallel und blockiert die Seite nicht.
 - **Einladung von Mitarbeitern in die App** — läuft weiter über das Handy.
-- **Katalog und Kostenstellen pflegen** — bisher nur lesend.
+- **Katalog pflegen** — bisher nur lesend. Kostenstellen anlegen und löschen
+  steht, siehe [kostenstellen.md](kostenstellen.md).
 - **Mobilansicht** ist gebaut, aber noch nicht an einem echten Gerät geprüft.

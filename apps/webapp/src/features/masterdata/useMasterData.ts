@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useMembership } from '@/features/company/useMembership';
 import { supabase } from '@/lib/supabase';
 
+import { aggregateCostCenterStats } from './costCenterStats';
+
 export type ArticleRow = {
   id: string;
   title: string;
@@ -20,6 +22,10 @@ export type CostCenterRow = {
   id: string;
   code: string;
   name: string;
+  /** Auftraege mit dieser `cost_center_id`, unabhaengig vom Status. */
+  orderCount: number;
+  /** Summe der hinterlegten Auftragssummen in Euro. `null`, wenn keine gesetzt ist. */
+  contractSum: number | null;
 };
 
 /** Artikelkatalog des Betriebs. */
@@ -45,7 +51,11 @@ export function useArticles() {
   });
 }
 
-/** Kostenstellen des Betriebs. */
+/**
+ * Kostenstellen des Betriebs, mit Anzahl und Auftragssumme der verknuepften
+ * Auftraege. Beide Abfragen filtern auf `company_id`; die Kennzahl steht in
+ * wiki/pages/kostenstellen.md.
+ */
 export function useCostCenters() {
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
@@ -54,14 +64,33 @@ export function useCostCenters() {
     queryKey: ['cost-centers', companyId],
     enabled: Boolean(companyId),
     queryFn: async (): Promise<CostCenterRow[]> => {
-      const { data, error } = await supabase
-        .from('cost_centers')
-        .select('id, code, name')
-        .eq('company_id', companyId!)
-        .order('code', { ascending: true });
+      const [centers, orders] = await Promise.all([
+        supabase
+          .from('cost_centers')
+          .select('id, code, name')
+          .eq('company_id', companyId!)
+          .order('code', { ascending: true }),
+        supabase
+          .from('orders')
+          .select('cost_center_id, contract_sum')
+          .eq('company_id', companyId!)
+          .not('cost_center_id', 'is', null),
+      ]);
 
-      if (error) throw error;
-      return data ?? [];
+      if (centers.error) throw centers.error;
+      if (orders.error) throw orders.error;
+
+      const stats = aggregateCostCenterStats(orders.data ?? []);
+      return (centers.data ?? []).map((center) => {
+        const stat = stats.get(center.id);
+        return {
+          id: center.id,
+          code: center.code,
+          name: center.name,
+          orderCount: stat?.orderCount ?? 0,
+          contractSum: stat?.contractSum ?? null,
+        };
+      });
     },
   });
 }
