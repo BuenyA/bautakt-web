@@ -198,6 +198,24 @@ genau der Ordner, den die AGENTS.md-Regel hier verbietet.
 **Lösung:** `/supabase/` steht in der `.gitignore`. Das Schema gehört `bautakt-app`;
 dieses Repo liest nur.
 
+## Überzahlung sieht aus wie „Offen: 0,00 €“
+
+_Festgestellt 2026-10-05 an RE00002 (Spahrbau): 20.000 € gezahlt bei 13.452,95 €
+Brutto, Status `paid`._
+
+**Symptom:** Die Rechnung zeigt „Bezahlt“ und „Offen: 0,00 €“, obwohl die
+Zahlungszeile deutlich über dem Brutto liegt. Kein Hinweis, dass zu viel
+eingegangen ist.
+
+`update_document_payment_status` setzt `paid`, sobald `gezahlt >= brutto`. Die
+Detailseite klemmte den Rest mit `Math.max(0, brutto − gezahlt)` und zeigte
+diese 0 als offenen Betrag. Exakte Vollzahlung und Überzahlung sahen gleich aus.
+
+**Lösung:** `openMinorOf` bleibt die geklemmte Forderung (Button, „Offen“ bei
+Teil- und Vollzahlung). `overpaidMinorOf` ist der Überschuss und ersetzt auf
+der Detailseite die Null-Anzeige. Den Status in der Datenbank nicht anfassen —
+ein `overpaid` wäre eine Schemaänderung in `bautakt-app`.
+
 ## `employments.company_id` und `.role` sind nullable
 
 **Symptom:** Leere Listen, obwohl Daten vorhanden sind — die Abfrage filtert effektiv

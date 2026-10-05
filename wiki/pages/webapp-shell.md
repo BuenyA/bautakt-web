@@ -357,6 +357,21 @@ Was die Datenbank besser weiß, macht die Datenbank: die Belegnummer vergibt
 `finalize_sales_document`, die Genehmigung einer Abwesenheit `approve_absence`.
 Beide tragen Prüfungen, die ein direktes `update` umginge.
 
+`update_document_payment_status` setzt den Beleg auf `paid`, sobald die
+Zahlungssumme (Betrag plus Skonto) das Brutto erreicht **oder übersteigt**.
+Einen Status `overpaid` gibt es nicht; den legt dieses Repo nicht an — das
+Schema gehört `bautakt-app`. `openMinorOf` bleibt die noch einziehbare
+Forderung und ist nie negativ, der Button „Zahlung erfassen“ hängt daran.
+Der Überschuss kommt aus `overpaidMinor` in `@bautakt/finance`.
+Liegt die Summe darüber, zeigt die Rechnungsdetailseite den Überschuss als
+„Überzahlt“: dieselbe Hinweisfläche wie die Festschreib-Blocker, ein
+Warning-Badge und in der Summe die Zeile „Überzahlt“ statt „Offen: 0,00 €“.
+Teilzahlung und exakte Vollzahlung bleiben bei „Offen“. Im Zahlungsformular
+erscheint der Hinweis, sobald Betrag plus Skonto den offenen Rest übersteigt;
+die Buchung wird nicht abgelehnt. Stand 2026-10-05, Issue
+[#37](https://github.com/BuenyA/bautakt-web/issues/37). Siehe
+[fallstricke.md](fallstricke.md).
+
 ⚠️ Bearbeitet werden nur Entwürfe. `enforce_sales_document_immutability` sperrt
 festgeschriebene Belege; der Editor zeigt für sie keinen Speichern-Knopf,
 sondern den Hinweis auf Storno und Gutschrift.

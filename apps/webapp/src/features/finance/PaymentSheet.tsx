@@ -1,4 +1,10 @@
-import { formatMoney, fromMinorUnits, parseMoneyInput, todayIso } from '@bautakt/finance';
+import {
+  formatMoney,
+  fromMinorUnits,
+  overpaidMinor,
+  parseMoneyInput,
+  todayIso,
+} from '@bautakt/finance';
 import {
   Button,
   Input,
@@ -34,6 +40,16 @@ import { useAddPayment } from './useSalesDocument';
  * Betragsfeld und ist keine Zahlungsart.
  */
 const METHODS = ['transfer', 'cash', 'card', 'other'] as const;
+
+/**
+ * Ueberschuss in Cent, wenn Betrag plus Skonto den offenen Rest uebersteigt.
+ * 0 bei leerer oder ungueltiger Eingabe und bei Teil- oder Vollzahlung.
+ */
+function surplusMinor(amountRaw: string, skontoRaw: string, openMinor: number): number {
+  const amountMinor = parseMoneyInput(amountRaw);
+  if (amountMinor === null || amountMinor <= 0) return 0;
+  return overpaidMinor(openMinor, amountMinor + (parseMoneyInput(skontoRaw) ?? 0));
+}
 
 /**
  * Zahlungseingang erfassen.
@@ -97,6 +113,7 @@ function PaymentForm({
   const [method, setMethod] = useState<string>('transfer');
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const overpayMinor = surplusMinor(amount, skonto, openMinor);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -115,7 +132,16 @@ function PaymentForm({
         method,
         note: note.trim(),
       });
-      toast.success(t('domain:payments.saved'));
+      toast.success(
+        t('domain:payments.saved'),
+        overpayMinor > 0
+          ? {
+              description: t('domain:payments.overpaidSaved', {
+                amount: formatMoney(overpayMinor),
+              }),
+            }
+          : undefined,
+      );
       onDone();
     } catch (caught) {
       setError(readableDbError(caught) ?? t('domain:payments.saveError'));
@@ -153,6 +179,12 @@ function PaymentForm({
             placeholder="0,00"
           />
         </div>
+
+        {overpayMinor > 0 ? (
+          <p className="text-warning text-sm">
+            {t('domain:payments.overpayHint', { amount: formatMoney(overpayMinor) })}
+          </p>
+        ) : null}
 
         <div className="grid gap-2">
           <Label htmlFor={dateId}>{t('domain:payments.paidAt')}</Label>
