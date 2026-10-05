@@ -255,3 +255,23 @@ order by c.table_name;
 **Lösung:** Beim Anlegen `id: crypto.randomUUID()` mitgeben. **Nicht** in der
 Datenbank ein Default nachrüsten — das wäre eine Schemaänderung, und die gehört
 ohnehin nach `bautakt-app`.
+
+## Druckansicht bleibt bei fehlendem Beleg im Spinner
+
+_Behoben 2026-10-05, Issue #35._
+
+**Symptom:** `/rechnungen/<id>/druck` mit fehlender, unbekannter oder ungültiger
+Beleg-Id zeigt endlos den Ladekreis. Eine gültige Id druckt weiter.
+
+`InvoicePrintPage` behandelte `!data` wie „noch am Laden“. `useSalesDocument`
+liefert bei unbekannter Id `null` (`maybeSingle`, Erfolg ohne Zeile) und bei
+einer Nicht-UUID einen Fehler. Beides ist ein Endzustand, `data` bleibt leer.
+Fehlt die Id ganz, ist die Abfrage `enabled: false`; TanStack Query v5 hält
+`isPending` dann dauerhaft wahr, und `useCompanyListLoading` meldet ebenfalls
+endloses Laden. Die Detailseite trennt das schon: Spinner nur bei `isPending`,
+danach Fehler oder „Beleg nicht gefunden“.
+
+**Lösung:** Spinner nur, solange eine Id da ist und die Abfrage noch pending
+ist. Danach dieselben Texte wie `InvoiceDetailPage`, mit Rückweg auf
+`/rechnungen`. Die Briefkopf-Abfrage bleibt parallel und hält die Seite nicht
+fest.

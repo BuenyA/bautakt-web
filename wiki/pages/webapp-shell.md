@@ -374,7 +374,10 @@ Auftrag anlegen: [auftrag-anlegen.md](auftrag-anlegen.md).
 - **Firmenstammdaten bearbeiten** — bewusst offen, siehe Abschnitt Schreiben.
 - **E-Mail-Versand von Belegen** — dafür fehlt die Edge Function in
   `bautakt-app` (`finance-document-send` liefert 501). Bis dahin ist die
-  Druckansicht der Weg zum Kunden.
+  Druckansicht der Weg zum Kunden. Eine fehlende, unbekannte oder ungültige
+  Id auf `/rechnungen/:id/druck` zeigt denselben Nicht-gefunden- bzw.
+  Ladefehler wie die Detailseite, mit Rückweg zur Liste — keinen Spinner.
+  Der Briefkopf lädt weiter parallel und blockiert die Seite nicht.
 - **Einladung von Mitarbeitern in die App** — läuft weiter über das Handy.
 - **Katalog und Kostenstellen pflegen** — bisher nur lesend.
 - **Mobilansicht** ist gebaut, aber noch nicht an einem echten Gerät geprüft.
