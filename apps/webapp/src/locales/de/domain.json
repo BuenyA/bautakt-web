@@ -586,13 +586,41 @@
   },
   "costCenters": {
     "title": "Kostenstellen",
-    "description": "Gliederung für Aufträge und Auswertungen.",
+    "description": "Gliederung für Aufträge. Gezählt wird jeder verknüpfte Auftrag, die Summe ist seine Auftragssumme.",
     "columns": {
       "code": "Nummer",
-      "name": "Bezeichnung"
+      "name": "Bezeichnung",
+      "orders": "Aufträge",
+      "contractSum": "Auftragssumme"
     },
+    "noContractSum": "—",
+    "noContractSumHint": "Noch keine Auftragssumme hinterlegt.",
+    "contractSumHint": "Summe der Auftragssummen der verknüpften Aufträge.",
     "emptyTitle": "Keine Kostenstellen",
-    "emptyDescription": "Ohne Kostenstellen lassen sich Kosten nicht zuordnen."
+    "emptyDescription": "Lege eine Kostenstelle an, um Aufträge danach zu gliedern.",
+    "loadErrorTitle": "Kostenstellen konnten nicht geladen werden",
+    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+    "form": {
+      "action": "Kostenstelle anlegen",
+      "title": "Kostenstelle anlegen",
+      "description": "Nummer und Bezeichnung gelten für diesen Betrieb und sind danach auch in der Handy-App sichtbar.",
+      "codeRequired": "Bitte eine Nummer angeben — sonst ist die Kostenstelle in der Liste nicht zu finden.",
+      "nameRequired": "Bitte eine Bezeichnung angeben — sonst ist die Kostenstelle in der Liste nicht zu finden.",
+      "duplicateCode": "Diese Nummer gibt es in diesem Betrieb schon.",
+      "saved": "Kostenstelle angelegt.",
+      "saveError": "Kostenstelle konnte nicht angelegt werden."
+    },
+    "delete": {
+      "actionLabel": "{{name}} ({{code}}) löschen",
+      "confirmTitle": "Kostenstelle löschen?",
+      "confirmDescription": "{{code}} {{name}} wird entfernt. Das lässt sich nicht rückgängig machen.",
+      "confirmAction": "Löschen",
+      "blockedTitle": "Kostenstelle wird noch verwendet",
+      "blockedDescription_one": "An dieser Kostenstelle hängt {{count}} Auftrag. Löschen würde die Zuordnung lösen, deshalb bleibt sie bestehen.",
+      "blockedDescription_other": "An dieser Kostenstelle hängen {{count}} Aufträge. Löschen würde die Zuordnung lösen, deshalb bleibt sie bestehen.",
+      "deleted": "Kostenstelle gelöscht.",
+      "deleteError": "Kostenstelle konnte nicht gelöscht werden."
+    }
   },
   "settings": {
     "title": "Einrichtung",

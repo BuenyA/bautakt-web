@@ -30,6 +30,7 @@ verlinkt, nie kopiert.
 | [auftragszeiten.md](pages/auftragszeiten.md)               | Read-only Zeiten auf der Auftragsdetailseite.                 |
 | [auftrag-anlegen.md](pages/auftrag-anlegen.md)             | Auftrag aus der Liste anlegen, dieselbe `orders`-Zeile.       |
 | [einsatz-anlegen.md](pages/einsatz-anlegen.md)             | Einsatz anlegen und löschen, Zeiten bleiben stehen.           |
+| [kostenstellen.md](pages/kostenstellen.md)                 | Kostenstelle anlegen und löschen, Auftragssumme je Zeile.     |
 | [demo-gf-2026-10-10.md](pages/demo-gf-2026-10-10.md)       | Klickpfad GF-Demo 10.10.2026 (Spahrbau).                      |
 
 ## Protokolle
@@ -66,6 +67,7 @@ verlinkt, nie kopiert.
 | 2026-10-05 | [Druckansicht bei unbekannter Beleg-Id](logs/2026-10-05-druckansicht-ungueltige-id.md)          |
 | 2026-10-05 | [Überzahlung auf der Rechnung sichtbar](logs/2026-10-05-ueberzahlung-anzeige.md)                |
 | 2026-10-05 | [Einsatz anlegen und löschen](logs/2026-10-05-einsatz-anlegen-loeschen.md)                      |
+| 2026-10-05 | [Kostenstellen anlegen, löschen, Auftragssumme](logs/2026-10-05-kostenstellen-anlegen.md)       |
 
 ## Die drei wichtigsten Sätze
 
