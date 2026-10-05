@@ -62,6 +62,7 @@ verlinkt, nie kopiert.
 | 2026-10-01 | [Mitarbeiterliste filtert auf Aktiv](logs/2026-10-01-mitarbeiter-listenfilter.md)               |
 | 2026-10-01 | [Kunden und Rechnungen filtern nach Art](logs/2026-10-01-kunden-rechnungen-listenfilter.md)     |
 | 2026-10-05 | [Aufträge und Zeiten filtern wie in der App](logs/2026-10-05-auftraege-zeiten-listenfilter.md)  |
+| 2026-10-05 | [Druckansicht bei unbekannter Beleg-Id](logs/2026-10-05-druckansicht-ungueltige-id.md)          |
 
 ## Die drei wichtigsten Sätze
 

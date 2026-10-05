@@ -1,13 +1,16 @@
 import { eurosToMinor, formatMoney, vatByRateGroups } from '@bautakt/finance';
+import { Button } from '@bautakt/ui';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 
+import { EmptyState } from '@/components/common/EmptyState';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { useMembership } from '@/features/company/useMembership';
 import { formatDate } from '@/lib/format';
+import { routes } from '@/lib/routes';
 import { supabase } from '@/lib/supabase';
 
 import { useSalesDocument } from '../useSalesDocument';
@@ -54,7 +57,7 @@ export function InvoicePrintPage() {
   // Bewusst NICHT `document` genannt: das verdeckt das globale `document` und
   // damit `document.title` im Effekt darunter.
   const documentQuery = useSalesDocument(id);
-  const { data } = documentQuery;
+  const { data, isError, refetch } = documentQuery;
   const isLoading = useCompanyListLoading(documentQuery);
   const { data: company } = useCompanyLetterhead();
 
@@ -62,7 +65,41 @@ export function InvoicePrintPage() {
     if (data) document.title = data.document_number || t('domain:invoices.draftTitle');
   }, [data, t]);
 
-  if (isLoading || !data) return <PageSpinner />;
+  // Spinner nur, solange eine Id da ist und die Abfrage noch laeuft.
+  // Ohne Id bleibt die Query disabled (`enabled: false`) und TanStack Query
+  // haelt `isPending` dauerhaft wahr — das waere ein Spinner ohne Ende.
+  // `null` (unbekannte Id) und `isError` (z. B. keine UUID) sind Endzustaende,
+  // kein Laden. `!data` darf den Spinner deshalb nicht ausloesen.
+  if (id && isLoading) return <PageSpinner />;
+
+  if (isError || !data) {
+    return (
+      <PrintUnavailable
+        title={isError ? t('domain:invoices.loadErrorTitle') : t('domain:invoices.notFoundTitle')}
+        description={
+          isError
+            ? t('domain:invoices.loadErrorDescription')
+            : t('domain:invoices.notFoundDescription')
+        }
+        action={
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            {isError ? (
+              <button
+                type="button"
+                className="text-primary cursor-pointer text-sm font-medium hover:underline"
+                onClick={() => void refetch()}
+              >
+                {t('common:action.retry')}
+              </button>
+            ) : null}
+            <Button asChild variant="outline" size="sm">
+              <Link to={routes.invoices}>{t('common:action.back')}</Link>
+            </Button>
+          </div>
+        }
+      />
+    );
+  }
 
   const vatGroups = vatByRateGroups(
     data.lines.map((line) => ({
@@ -209,6 +246,28 @@ export function InvoicePrintPage() {
           <p>{company?.bic ? `BIC ${company.bic}` : ''}</p>
         </div>
       </footer>
+    </div>
+  );
+}
+
+/**
+ * Fehler ausserhalb der Shell: die Druckseite hat kein Menue, der Rueckweg
+ * muss also auf der Seite selbst stehen. Dieselben Texte wie die Detailseite.
+ */
+function PrintUnavailable({
+  title,
+  description,
+  action,
+}: {
+  title: string;
+  description: string;
+  action: ReactNode;
+}) {
+  return (
+    <div className="flex min-h-svh items-center justify-center bg-background p-6">
+      <div className="w-full max-w-lg">
+        <EmptyState title={title} description={description} action={action} />
+      </div>
     </div>
   );
 }
