@@ -1,4 +1,4 @@
-import { eurosToMinor } from '@bautakt/finance';
+import { eurosToMinor, overpaidMinor } from '@bautakt/finance';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useMembership } from '@/features/company/useMembership';
@@ -63,6 +63,8 @@ export type SalesDocumentDetail = {
   dunning: DunningNotice[];
 };
 
+type PayableDocument = Pick<SalesDocumentDetail, 'payments' | 'gross_total'>;
+
 /** Bereits gezahlt inkl. Skonto, in Cent. */
 export function paidMinorOf(document: Pick<SalesDocumentDetail, 'payments'>): number {
   return document.payments.reduce(
@@ -71,9 +73,21 @@ export function paidMinorOf(document: Pick<SalesDocumentDetail, 'payments'>): nu
   );
 }
 
-/** Noch offener Betrag in Cent. */
-export function openMinorOf(document: SalesDocumentDetail): number {
+/**
+ * Noch einziehbare Forderung in Cent.
+ *
+ * Nie negativ: der Button „Zahlung erfassen“ haengt daran. Liegt die
+ * Zahlungssumme ueber dem Brutto, ist der Rest hier 0 — der Ueberschuss steht
+ * in `overpaidMinorOf`. Der Trigger `update_document_payment_status` setzt
+ * beides auf `paid`; die Oberflaeche muss den Unterschied selbst zeigen.
+ */
+export function openMinorOf(document: PayableDocument): number {
   return Math.max(0, eurosToMinor(document.gross_total) - paidMinorOf(document));
+}
+
+/** Ueberschuss in Cent, wenn Zahlungen (inkl. Skonto) das Brutto uebersteigen. */
+export function overpaidMinorOf(document: PayableDocument): number {
+  return overpaidMinor(eurosToMinor(document.gross_total), paidMinorOf(document));
 }
 
 /**

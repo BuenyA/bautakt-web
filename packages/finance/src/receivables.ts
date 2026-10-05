@@ -60,6 +60,19 @@ export function agingBucket(daysOverdue: number): AgingBucket {
   return '90_plus';
 }
 
+/**
+ * Ueberschuss in Cent, wenn `paidMinor` das Brutto uebersteigt. Sonst 0.
+ *
+ * Offene Posten klemmen den Rest auf 0, weil eine Ueberzahlung keine Forderung
+ * ist. Die Belegansicht braucht den Ueberschuss trotzdem: der Status-Trigger
+ * setzt `paid`, sobald gezahlt >= brutto, und unterscheidet die beiden Faelle
+ * nicht.
+ */
+export function overpaidMinor(grossMinor: number, paidMinor: number): number {
+  if (!Number.isFinite(grossMinor) || !Number.isFinite(paidMinor)) return 0;
+  return Math.max(0, paidMinor - grossMinor);
+}
+
 /** Zahlungen je Beleg in Cent, Skonto eingerechnet. */
 export function paidByDocument(payments: readonly PaymentRow[]): Map<string, number> {
   const byDocument = new Map<string, number>();

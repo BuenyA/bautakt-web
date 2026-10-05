@@ -1,5 +1,6 @@
 import { eurosToMinor, formatMoney } from '@bautakt/finance';
 import {
+  Badge,
   Button,
   Card,
   CardContent,
@@ -33,6 +34,7 @@ import { useFinalizeBlockers } from '../useFinalizeBlockers';
 import { useFinanceAccess } from '../useFinanceAccess';
 import {
   openMinorOf,
+  overpaidMinorOf,
   paidMinorOf,
   useFinalizeDocument,
   useSalesDocument,
@@ -92,6 +94,7 @@ export function InvoiceDetailPage() {
   const isDraft = data.status === 'draft';
   const openMinor = openMinorOf(data);
   const paidMinor = paidMinorOf(data);
+  const overpaidMinor = overpaidMinorOf(data);
 
   async function onFinalize() {
     try {
@@ -172,10 +175,26 @@ export function InvoiceDetailPage() {
         </div>
       ) : null}
 
+      {overpaidMinor > 0 ? (
+        <div className="border-warning-border bg-warning-bg text-text-secondary flex flex-col gap-1 rounded-xl border p-4 text-sm">
+          <span className="text-foreground font-medium">{t('domain:invoices.overpaid')}</span>
+          <p>{t('domain:invoices.overpaidWarning', { amount: formatMoney(overpaidMinor) })}</p>
+        </div>
+      ) : null}
+
       <div className="flex flex-wrap items-center gap-3">
         <DocumentStatusBadge status={data.status} />
-        <span className="text-muted-foreground text-sm">
-          {t('domain:invoices.openAmount', { amount: formatMoney(openMinor) })}
+        {overpaidMinor > 0 ? (
+          <Badge variant="warning">{t('domain:invoices.overpaid')}</Badge>
+        ) : null}
+        <span
+          className={
+            overpaidMinor > 0 ? 'text-warning text-sm font-medium' : 'text-muted-foreground text-sm'
+          }
+        >
+          {overpaidMinor > 0
+            ? t('domain:invoices.overpaidAmount', { amount: formatMoney(overpaidMinor) })
+            : t('domain:invoices.openAmount', { amount: formatMoney(openMinor) })}
         </span>
       </div>
 
@@ -253,7 +272,15 @@ export function InvoiceDetailPage() {
             {paidMinor > 0 ? (
               <>
                 <SumRow label={t('domain:invoices.paid')} value={`− ${formatMoney(paidMinor)}`} />
-                <SumRow label={t('domain:invoices.open')} value={formatMoney(openMinor)} strong />
+                {overpaidMinor > 0 ? (
+                  <SumRow
+                    label={t('domain:invoices.overpaid')}
+                    value={formatMoney(overpaidMinor)}
+                    warning
+                  />
+                ) : (
+                  <SumRow label={t('domain:invoices.open')} value={formatMoney(openMinor)} strong />
+                )}
               </>
             ) : null}
           </dl>
@@ -332,17 +359,32 @@ export function InvoiceDetailPage() {
   );
 }
 
-function SumRow({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
+function SumRow({
+  label,
+  value,
+  strong,
+  warning,
+}: {
+  label: string;
+  value: string;
+  strong?: boolean;
+  warning?: boolean;
+}) {
+  const labelClass = warning
+    ? 'text-warning font-medium'
+    : strong
+      ? 'text-foreground font-medium'
+      : 'text-muted-foreground';
+  const valueClass = warning
+    ? 'text-warning font-semibold tabular-nums'
+    : strong
+      ? 'text-foreground font-semibold tabular-nums'
+      : 'text-foreground tabular-nums';
+
   return (
     <div className="flex items-baseline justify-between gap-4">
-      <dt className={strong ? 'text-foreground font-medium' : 'text-muted-foreground'}>{label}</dt>
-      <dd
-        className={
-          strong ? 'text-foreground font-semibold tabular-nums' : 'text-foreground tabular-nums'
-        }
-      >
-        {value}
-      </dd>
+      <dt className={labelClass}>{label}</dt>
+      <dd className={valueClass}>{value}</dd>
     </div>
   );
 }

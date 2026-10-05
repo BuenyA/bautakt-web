@@ -50,6 +50,7 @@ export {
   INVOICE_TYPES,
   ISSUED_STATUSES,
   OPEN_STATUSES,
+  overpaidMinor,
   paidByDocument,
   type PaymentRow,
   type ReceivableItem,

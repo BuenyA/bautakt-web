@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { computeOpenTasks, computeOverviewKpis, previousMonth } from './kpis';
+import { eurosToMinor } from './money';
 import {
   agingBucket,
   buildReceivables,
+  overpaidMinor,
   type PaymentRow,
   receivablesByBucket,
   type SalesDocumentRow,
@@ -154,5 +156,27 @@ describe('computeOpenTasks', () => {
     expect(tasks.draftDocuments).toBe(1);
     expect(tasks.dunnable).toBe(1);
     expect(tasks.incomingDueSoon).toBe(1);
+  });
+});
+
+describe('overpaidMinor', () => {
+  it('nennt den Ueberschuss, wenn mehr gezahlt wurde als das Brutto', () => {
+    // RE00002: 20.000 € bei 13.452,95 € brutto.
+    const gross = eurosToMinor('13452.95');
+    const paid = eurosToMinor('20000.00');
+
+    expect(overpaidMinor(gross, paid)).toBe(654_705);
+    expect(Math.max(0, gross - paid)).toBe(0);
+  });
+
+  it('bleibt 0 bei Teilzahlung und exakter Vollzahlung', () => {
+    expect(overpaidMinor(100_000, 40_000)).toBe(0);
+    expect(overpaidMinor(100_000, 100_000)).toBe(0);
+    expect(overpaidMinor(100_000, 100_001)).toBe(1);
+  });
+
+  it('macht aus Unlesbarem eine Null', () => {
+    expect(overpaidMinor(Number.NaN, 100)).toBe(0);
+    expect(overpaidMinor(100, Number.POSITIVE_INFINITY)).toBe(0);
   });
 });

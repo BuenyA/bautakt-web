@@ -276,6 +276,9 @@
     "paid": "Bereits gezahlt",
     "open": "Offen",
     "openAmount": "Offen: {{amount}}",
+    "overpaid": "Überzahlt",
+    "overpaidAmount": "Überzahlt: {{amount}}",
+    "overpaidWarning": "Die Zahlungen übersteigen den Bruttobetrag um {{amount}}.",
     "serviceDate": "Leistungsdatum",
     "paymentTerm": "Zahlungsziel",
     "buyerReference": "Referenz des Kunden",
@@ -384,8 +387,10 @@
       "skonto": "Skonto"
     },
     "openHint": "Offen sind noch {{amount}}.",
+    "overpayHint": "Der Betrag übersteigt den offenen Rest um {{amount}}. Die Rechnung wird überzahlt.",
     "amountInvalid": "Bitte einen Betrag größer als 0 eingeben.",
     "saved": "Zahlung gebucht.",
+    "overpaidSaved": "Die Rechnung ist um {{amount}} überzahlt.",
     "saveError": "Zahlung konnte nicht gebucht werden.",
     "dunningLevel": "Mahnstufe {{level}} versendet."
   },
