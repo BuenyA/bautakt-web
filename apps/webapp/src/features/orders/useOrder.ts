@@ -18,6 +18,7 @@ export type OrderDetail = {
   country: string;
   contract_sum: number | null;
   billing_mode: string;
+  cost_center_id: string | null;
   cost_center_label: string;
   created_at: string;
 };
@@ -33,7 +34,7 @@ export function useOrder(orderId: string | undefined) {
       const { data, error } = await supabase
         .from('orders')
         .select(
-          'id, name, status, description, customer_label, customer_id, start_date, end_date, street_address, postal_code, city, country, contract_sum, billing_mode, cost_center_label, created_at',
+          'id, name, status, description, customer_label, customer_id, start_date, end_date, street_address, postal_code, city, country, contract_sum, billing_mode, cost_center_id, cost_center_label, created_at',
         )
         .eq('company_id', companyId!)
         .eq('id', orderId!)

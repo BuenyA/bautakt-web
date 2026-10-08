@@ -1,4 +1,5 @@
-import { Button } from '@bautakt/ui';
+import { Button, Uicon } from '@bautakt/ui';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 
@@ -7,11 +8,13 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
+import { usePermission } from '@/features/company/usePermission';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
 import { OrderNotes } from '../OrderNotes';
 import { OrderPhotos } from '../OrderPhotos';
+import { OrderSheet } from '../OrderSheet';
 import { OrderStatusBadge } from '../OrderStatusBadge';
 import { OrderTimes } from '../OrderTimes';
 import { useOrder } from '../useOrder';
@@ -19,6 +22,8 @@ import { useOrder } from '../useOrder';
 export function OrderDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+  const canManage = usePermission('canManageOrders');
+  const [editing, setEditing] = useState(false);
   const order = useOrder(id);
   const { data, isError, refetch } = order;
   const isLoading = useCompanyListLoading(order);
@@ -80,9 +85,17 @@ export function OrderDetailPage() {
         title={data.name}
         description={t('domain:orders.detailDescription')}
         actions={
-          <Button asChild variant="outline" size="sm">
-            <Link to={routes.orders}>{t('common:action.back')}</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link to={routes.orders}>{t('common:action.back')}</Link>
+            </Button>
+            {canManage ? (
+              <Button size="sm" onClick={() => setEditing(true)}>
+                <Uicon name="pencil" size={16} />
+                {t('common:action.edit')}
+              </Button>
+            ) : null}
+          </div>
         }
       />
 
@@ -105,6 +118,7 @@ export function OrderDetailPage() {
           value={data.customer_label || t('domain:orders.noCustomer')}
         />
         <DetailRow label={t('domain:orders.fields.address')} value={address} />
+        <DetailRow label={t('domain:orders.fields.country')} value={data.country.trim()} />
         <DetailRow label={t('domain:orders.fields.start')} value={formatDate(data.start_date)} />
         <DetailRow label={t('domain:orders.fields.end')} value={formatDate(data.end_date)} />
         <DetailRow
@@ -114,6 +128,8 @@ export function OrderDetailPage() {
         <DetailRow label={t('domain:orders.fields.costCenter')} value={data.cost_center_label} />
         <DetailRow label={t('domain:orders.fields.created')} value={formatDate(data.created_at)} />
       </DetailCard>
+
+      <OrderSheet mode="edit" order={data} open={editing} onOpenChange={setEditing} />
 
       <OrderPhotos orderId={data.id} />
       <OrderNotes orderId={data.id} />

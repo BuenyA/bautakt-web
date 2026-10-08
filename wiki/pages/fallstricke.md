@@ -274,6 +274,27 @@ order by c.table_name;
 Datenbank ein Default nachrüsten — das wäre eine Schemaänderung, und die gehört
 ohnehin nach `bautakt-app`.
 
+## Auftrag speichern rollt fremde Felder zurück
+
+_Festgelegt 2026-10-08, Issue #53. Dieselbe Falle hat die Handy-App am
+24.09.2026 geschlossen._
+
+**Symptom:** Nach dem Speichern im Web sind Status, Auftragssumme oder das
+Titelbild weg, oder eine Kundenbezeichnung ohne `customer_id` ist leer.
+
+`orders.modified_at` hat keinen Default und keinen Trigger. Ein Update, das
+die ganze Zeile aus dem Formular schickt, schreibt jede Spalte neu — auch
+die, die das Formular nie gezeigt hat. Die Handy-App schickt deshalb nur die
+geänderten Felder und setzt `modified_at` selbst.
+
+**Lösung:** `orderUpdatePatch` baut den Patch. Nie dabei: `status`,
+`billing_mode`, `contract_sum`, `quote_accepted_at`, `icon`,
+`cover_image_path`, `company_id`, `created_at`, `id`. `customer_id` und
+`cost_center_id` nie auf null. Eine Freitext-Bezeichnung ohne Id nur, wenn
+der Text sich geändert hat. Kommt nach dem Update keine Zeile zurück, ist
+das ein Rechtefehler, kein Erfolg. Siehe
+[auftrag-bearbeiten.md](auftrag-bearbeiten.md).
+
 ## Bearbeiten einer Notiz setzt den Autor neu
 
 _Festgestellt 2026-10-08, Issue #47._

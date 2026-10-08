@@ -49,6 +49,7 @@
       "end": "Ende",
       "contractSum": "Auftragssumme",
       "costCenter": "Kostenstelle",
+      "country": "Land",
       "created": "Angelegt"
     },
     "noCustomer": "Kein Kunde",
@@ -101,6 +102,22 @@
       "nameRequired": "Bitte eine Bezeichnung angeben — sonst ist der Auftrag in der Liste nicht zu finden.",
       "saved": "Auftrag angelegt.",
       "saveError": "Auftrag konnte nicht angelegt werden."
+    },
+    "edit": {
+      "title": "Auftrag bearbeiten",
+      "description": "Bezeichnung, Kunde, Adresse und Zeitraum. Status, Auftragssumme und Abrechnungsart bleiben, wie sie sind.",
+      "chooseCustomer": "Aus dem Kundenstamm wählen",
+      "customerHint": "Ohne Auswahl aus dem Stamm bleibt diese Bezeichnung.",
+      "chooseCostCenter": "Kostenstelle wählen",
+      "unnamedCostCenter": "Ohne Bezeichnung",
+      "noCustomers": "Im Kundenstamm ist noch niemand angelegt.",
+      "noCostCenters": "Es ist noch keine Kostenstelle angelegt.",
+      "customersError": "Kunden konnten nicht geladen werden.",
+      "costCentersError": "Kostenstellen konnten nicht geladen werden.",
+      "documentWarning": "An diesem Auftrag hängen schon Angebote oder Rechnungen. Der Kunde auf den Belegen bleibt, wie er ist.",
+      "endBeforeStart": "Das Ende liegt vor dem Beginn.",
+      "saved": "Auftrag gespeichert.",
+      "saveError": "Auftrag konnte nicht gespeichert werden."
     }
   },
   "customers": {
