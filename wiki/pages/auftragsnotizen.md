@@ -48,9 +48,11 @@ leeren Text an; eine Notiz aus nur Leerzeichen wäre in der Liste unsichtbar,
 weil die Anzeige trimmt. Eine Längengrenze gibt es in der Tabelle nicht, und
 das Formular setzt keine.
 
-Löschen sitzt im Panel und fragt vorher nach. Dialog und Panel bleiben offen,
-bis die Zeile weg ist. Der Knopf zeigt „Wird gelöscht …“. Ein Fehler bleibt
-im Dialog.
+Löschen sitzt links in der Fußleiste des Panels und fragt vorher nach.
+Abbrechen und Speichern bleiben rechts. Unter `sm` stapelt die Leiste, der
+Löschen-Knopf bleibt der erste. Dialog und Panel bleiben offen, bis die Zeile
+weg ist. Der Knopf im Dialog zeigt „Wird gelöscht …“. Ein Fehler bleibt im
+Dialog.
 
 `id` hat kein Default. Der Client setzt `crypto.randomUUID()`. `user_id` ist
 beim Anlegen der angemeldete Nutzer (`auth.uid()` über die Sitzung), nicht

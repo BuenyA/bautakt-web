@@ -65,8 +65,8 @@ ist und inzwischen ausgeschieden ist (`ended_at`), bleibt in der Auswahl
 stehen, damit ein Speichern ohne Wechsel die Zuweisung nicht löscht. Eine
 neue Zuweisung an jemanden mit `ended_at` lehnt der Client ab. Die Auswahl
 öffnet nach oben (`side="top"`, `align="start"`, `collisionPadding` unten
-120px), der Knopf „Punkt löschen“ sitzt in der Fußleiste. Sonst deckt die
-Liste bei 1280×800 den Knopf ab.
+120px), der Knopf „Punkt löschen“ sitzt links in der Fußleiste, Abbrechen
+und Speichern rechts. Sonst deckt die Liste bei 1280×800 den Knopf ab.
 
 ## Was geschrieben wird
 

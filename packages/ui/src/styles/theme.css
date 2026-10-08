@@ -67,6 +67,12 @@
      lesen. 1.97:1 auf input. Siehe Hinweis am Dateiende. */
   --text-placeholder: #a9b0ba;
 
+  /* Schleier hinter Dialog, AlertDialog und Sheet.
+     Light bleibt die Vordergrundfarbe bei 40 % — bisher `bg-foreground/40`
+     (#111827). Dark darf dieselbe Klasse nicht erben: --foreground ist dort
+     #fafafa, und 40 % Weiß über der Fläche wirkt hellgrau. */
+  --overlay: color-mix(in oklab, var(--foreground) 40%, transparent);
+
   /* --- Primary --- */
   /* Light = Electric #0064E0 (Owner-Override 2026-10-01; Spec hielt #3B86E0).
      Gemessen (WCAG 2.1): #0064E0 auf #ffffff 5.39:1 — AA für normalen Text.
@@ -148,6 +154,9 @@
   --text-subtle: #71717a; /* 3.90:1 auf background, 3.40:1 auf card — unter AA 4.5:1 */
   --text-placeholder: #52525b; /* 2.25:1 auf input, eingegebener Text 16.64:1 */
 
+  /* Schwarz bei 65 %. Siehe --overlay im Light. */
+  --overlay: color-mix(in oklab, black 65%, transparent);
+
   /* --- Primary --- */
   /* Electric #0064E0, gleich dem Light. Weiß darauf 5.39:1 (AA). Als Text
      auf Canvas 3.50:1, auf Card 3.05:1 — über 3:1 für UI, unter AA 4.5:1
@@ -201,6 +210,7 @@
   --color-background-second: var(--background-second);
   --color-background-third: var(--background-third);
   --color-foreground: var(--foreground);
+  --color-overlay: var(--overlay);
   --color-card: var(--card);
   --color-card-raised: var(--card-raised);
   --color-card-foreground: var(--card-foreground);

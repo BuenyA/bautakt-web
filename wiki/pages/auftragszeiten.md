@@ -95,7 +95,9 @@ Sätze verwaltet, bekommt den Formulartag.
 ## Abgerechnet
 
 Ein Eintrag mit `billed_document_id` lässt sich hier nicht ändern und nicht
-löschen. Das Panel zeigt den Hinweis und keinen Speichern-Knopf. Die Datenbank
+löschen. Das Panel zeigt den Hinweis und keinen Speichern-Knopf. „Zeiteintrag
+löschen“ sitzt sonst links in der Fußleiste, neben Abbrechen und Speichern
+rechts; bei einer abgerechneten Zeile fehlt der Knopf. Die Datenbank
 sperrt das nicht: der Trigger hält `billed_document_id` nur für Konten ohne
 `canUseBillingModule` fest. Die Oberfläche prüft die Spalte noch einmal direkt
 vor dem Schreiben. Zwischen den beiden Abfragen kann ein Beleg festgeschrieben

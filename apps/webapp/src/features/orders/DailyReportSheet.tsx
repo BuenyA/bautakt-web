@@ -411,18 +411,6 @@ function DailyReportForm({
             onChange={(event) => set({ notes: event.target.value })}
           />
         </div>
-
-        {draft.id && canDelete ? (
-          <Button
-            type="button"
-            variant="destructive"
-            className="w-fit"
-            disabled={busy}
-            onClick={() => setConfirmDelete(true)}
-          >
-            {t('domain:dailyReportForm.delete.action')}
-          </Button>
-        ) : null}
       </SheetBody>
 
       <SheetFooter className="sm:flex-col sm:items-stretch">
@@ -445,7 +433,18 @@ function DailyReportForm({
             ) : null}
           </div>
         ) : null}
-        <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
+          {draft.id && canDelete ? (
+            <Button
+              type="button"
+              variant="destructive"
+              className="sm:mr-auto"
+              disabled={busy}
+              onClick={() => setConfirmDelete(true)}
+            >
+              {t('domain:dailyReportForm.delete.action')}
+            </Button>
+          ) : null}
           <Button type="button" variant="outline" onClick={onDone} disabled={busy}>
             {t('common:action.cancel')}
           </Button>
