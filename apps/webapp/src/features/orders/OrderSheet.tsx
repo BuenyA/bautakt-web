@@ -18,7 +18,7 @@ import {
   toast,
 } from '@bautakt/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { type FormEvent, useId, useState } from 'react';
+import { type FormEvent, type Ref, useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
@@ -116,6 +116,9 @@ function OrderForm({ onDone }: { onDone: () => void }) {
   const create = useCreateOrder();
   const [draft, setDraft] = useState<OrderDraft>(emptyOrder());
   const [error, setError] = useState<string | null>(null);
+  const [nameAttempted, setNameAttempted] = useState(false);
+  const [nameReveal, setNameReveal] = useState(0);
+  const nameRef = useScrollField(nameAttempted && !draft.name.trim(), nameReveal);
   const ids = {
     name: useId(),
     customer: useId(),
@@ -132,11 +135,14 @@ function OrderForm({ onDone }: { onDone: () => void }) {
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
 
-    // Eine Bezeichnung aus nur Leerzeichen waere in der Liste nicht zu finden.
-    // Die Spalte selbst akzeptiert den leeren Text; die Pruefung hier ist die
-    // gleiche wie beim Kundenformular.
+    // Eine Bezeichnung aus nur Leerzeichen wäre in der Liste nicht zu finden.
+    // Die Spalte selbst akzeptiert den leeren Text. Die Meldung steht am
+    // Feld: am Ende des Panels scrollt sie aus dem sichtbaren Bereich, das
+    // Sheet bleibt offen und der Klick sieht aus, als hätte er nichts getan.
     if (!draft.name.trim()) {
-      setError(t('domain:orders.create.nameRequired'));
+      setNameAttempted(true);
+      setNameReveal((pulse) => pulse + 1);
+      setError(null);
       return;
     }
 
@@ -162,6 +168,10 @@ function OrderForm({ onDone }: { onDone: () => void }) {
           label={t('domain:orders.columns.name')}
           value={draft.name}
           onChange={(value) => set({ name: value })}
+          error={
+            nameAttempted && !draft.name.trim() ? t('domain:orders.create.nameRequired') : undefined
+          }
+          containerRef={nameRef}
         />
         <TextField
           id={ids.customer}
@@ -222,6 +232,10 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
   const documents = useOrderHasSalesDocuments(order.id);
   const [draft, setDraft] = useState<OrderEditDraft>(() => draftFromOrder(order));
   const [error, setError] = useState<string | null>(null);
+  const [nameAttempted, setNameAttempted] = useState(false);
+  const [nameReveal, setNameReveal] = useState(0);
+  const nameMissing = nameAttempted && !draft.name.trim();
+  const nameRef = useScrollField(nameMissing, nameReveal);
   const ids = {
     name: useId(),
     customerLabel: useId(),
@@ -268,6 +282,12 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     const issue = orderEditIssue(draft);
+    if (issue === 'name') {
+      setNameAttempted(true);
+      setNameReveal((pulse) => pulse + 1);
+      setError(null);
+      return;
+    }
     if (issue) {
       setError(issueMessage(issue));
       return;
@@ -280,6 +300,12 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
     } catch (caught) {
       if (caught instanceof Error && caught.message === 'INVALID_ORDER') {
         const again = orderEditIssue(draft);
+        if (again === 'name') {
+          setNameAttempted(true);
+          setNameReveal((pulse) => pulse + 1);
+          setError(null);
+          return;
+        }
         setError(again ? issueMessage(again) : t('domain:orders.edit.saveError'));
         return;
       }
@@ -310,6 +336,8 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
           label={t('domain:orders.columns.name')}
           value={draft.name}
           onChange={(value) => set({ name: value })}
+          error={nameMissing ? t('domain:orders.create.nameRequired') : undefined}
+          containerRef={nameRef}
         />
 
         <div className="grid gap-2">
@@ -479,16 +507,49 @@ function TextField({
   label,
   value,
   onChange,
+  error,
+  containerRef,
 }: {
   id: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
+  error?: string;
+  containerRef?: Ref<HTMLDivElement>;
 }) {
+  const errorId = `${id}-error`;
   return (
-    <div className="grid gap-2">
+    <div ref={containerRef} className="grid gap-2">
       <Label htmlFor={id}>{label}</Label>
-      <Input id={id} value={value} onChange={(event) => onChange(event.target.value)} />
+      <Input
+        id={id}
+        value={value}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
+        onChange={(event) => onChange(event.target.value)}
+      />
+      {error ? (
+        <p id={errorId} role="alert" className="text-destructive text-sm">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
+}
+
+/**
+ * Pflichtfeld in den sichtbaren Bereich holen.
+ *
+ * `SheetBody` scrollt, der Speichern-Knopf bleibt unten stehen. Eine Meldung
+ * am Ende der Felder ist beim Bearbeiten nicht zu sehen. Der Effekt läuft
+ * nach dem Render, wenn der Text schon unter dem Feld steht.
+ */
+function useScrollField(active: boolean, pulse: number) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!active) return;
+    ref.current?.scrollIntoView({ block: 'center' });
+    ref.current?.querySelector('input')?.focus();
+  }, [active, pulse]);
+  return ref;
 }

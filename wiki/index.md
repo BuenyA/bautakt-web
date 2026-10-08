@@ -28,6 +28,7 @@ verlinkt, nie kopiert.
 | [auftragsfotos.md](pages/auftragsfotos.md)                 | Fotos am Auftrag anzeigen, hochladen und löschen.             |
 | [auftragsnotizen.md](pages/auftragsnotizen.md)             | Notizen am Auftrag lesen, anlegen, bearbeiten, löschen.       |
 | [auftragszeiten.md](pages/auftragszeiten.md)               | Zeiten am Auftrag und auf `/zeiten` anlegen, ändern, löschen. |
+| [auftragsmaterial.md](pages/auftragsmaterial.md)           | Material am Auftrag lesen, anlegen, ändern, löschen.          |
 | [auftrag-anlegen.md](pages/auftrag-anlegen.md)             | Auftrag aus der Liste anlegen, dieselbe `orders`-Zeile.       |
 | [auftrag-bearbeiten.md](pages/auftrag-bearbeiten.md)       | Stammdaten eines Auftrags ändern, Teilpatch wie in der App.   |
 | [einsatz-anlegen.md](pages/einsatz-anlegen.md)             | Einsatz anlegen und löschen, Zeiten bleiben stehen.           |
@@ -75,6 +76,8 @@ verlinkt, nie kopiert.
 | 2026-10-08 | [Fotos am Auftrag hochladen und löschen](logs/2026-10-08-auftragsfotos-schreiben.md)            |
 | 2026-10-08 | [Zeit nachtragen und Notiz-Panel: Smoke](logs/2026-10-08-zeit-nachtragen-smoke.md)              |
 | 2026-10-08 | [Auftrag im Web bearbeiten](logs/2026-10-08-auftrag-bearbeiten.md)                              |
+| 2026-10-08 | [Material am Auftrag](logs/2026-10-08-material-am-auftrag.md)                                   |
+| 2026-10-08 | [Leerer Auftragsname im Sheet](logs/2026-10-08-auftrag-name-fehler.md)                          |
 
 ## Die drei wichtigsten Sätze
 
