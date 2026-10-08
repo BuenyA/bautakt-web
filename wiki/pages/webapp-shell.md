@@ -271,13 +271,16 @@ seit demselben Tag hochladen; die Kachel bleibt dieselbe Fläche, darüber
 liegt eine gestrichelte Ablegefläche. Siehe [auftragsfotos.md](auftragsfotos.md).
 Die Checkliste unter den Notizen lässt sich seit 2026-10-08 abhaken; die Zeile
 ist dieselbe Card. Siehe [auftragscheckliste.md](auftragscheckliste.md).
+Das Bautagebuch steht seit demselben Tag unter dem Material; die Karte ist
+dieselbe Fläche und bei Schreibrecht ein Knopf. Siehe
+[bautagebuch.md](bautagebuch.md).
 
 | Element                         | Look                                                                                                                                                                                                                                          |
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Section                         | `flex flex-col gap-4`                                                                                                                                                                                                                         |
 | Section-Titel `h2`              | `text-lg font-semibold tracking-tight text-foreground`                                                                                                                                                                                        |
 | Nebenlink (z. B. „Alle Zeiten“) | `text-primary text-sm font-medium`, auf der Baseline des Titels                                                                                                                                                                               |
-| Notiz- und Zeitkarte            | `rounded-xl border border-border bg-card shadow-sm`. Hover `border-border-strong`. Skelett `rounded-xl`.                                                                                                                                      |
+| Notiz-, Zeit- und Berichtskarte | `rounded-xl border border-border bg-card shadow-sm`. Hover `border-border-strong`. Skelett `rounded-xl`.                                                                                                                                      |
 | Foto-Kachel                     | Dieselbe Card-Fläche, `overflow-hidden`. Hover zusätzlich `shadow-md`. Bildunterschrift `bg-card px-2.5 py-2`. Lightbox-Bild `rounded-xl`.                                                                                                    |
 | Foto-Raster                     | Weiter `grid-cols-2 sm:grid-cols-3 xl:grid-cols-4`.                                                                                                                                                                                           |
 | Foto-Ablegefläche               | `rounded-xl border border-dashed border-border bg-card`. Beim Ziehen `border-primary` und `bg-primary/10`. Löschen auf der Kachel: `bg-card`, Icon `text-destructive`.                                                                        |

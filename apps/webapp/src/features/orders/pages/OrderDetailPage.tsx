@@ -13,6 +13,7 @@ import { formatCurrency, formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
 import { OrderChecklist } from '../OrderChecklist';
+import { OrderDailyReports } from '../OrderDailyReports';
 import { OrderMaterials } from '../OrderMaterials';
 import { OrderNotes } from '../OrderNotes';
 import { OrderPhotos } from '../OrderPhotos';
@@ -138,6 +139,7 @@ export function OrderDetailPage() {
       <OrderChecklist orderId={data.id} />
       <OrderTimes orderId={data.id} orderName={data.name} />
       <OrderMaterials orderId={data.id} />
+      <OrderDailyReports orderId={data.id} />
     </div>
   );
 }

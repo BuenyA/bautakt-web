@@ -453,6 +453,32 @@ bringen, unter 5 MB bleiben, `id` mit `crypto.randomUUID()` setzen. Pfad
 `{companyId}/{orderId}/{imageId}.jpg`. Siehe
 [auftragsfotos.md](auftragsfotos.md).
 
+## Bautagebuch löschen nimmt Zeiten, Material, Fotos und Mängel mit
+
+_Gemessen 2026-10-08, Issue #57._
+
+**Symptom:** Nach dem Löschen eines Berichts fehlen Arbeitszeiten, Material,
+Fotos und Mängel, die an ihm hingen. Sie sind nicht verwaist, sie sind weg.
+Oder das Anlegen eines zweiten Berichts am selben Tag scheitert mit einem
+Unique-Fehler.
+
+`time_entries.daily_report_id`, `order_materials.daily_report_id`,
+`order_images.daily_report_id` und `order_issues.daily_report_id` verweisen
+mit `ON DELETE CASCADE` auf `daily_reports`. RLS auf diesen Tabellen ist nicht
+`FORCE`. Die Kaskade läuft nicht als der angemeldete Nutzer und löscht auch
+Zeilen, die seine Select-Policy nicht zeigt — einschließlich abgerechneter
+Zeiten. Der Unique-Index `daily_reports_order_id_report_date_uidx` lässt nur
+einen Bericht je Auftrag und Tag zu. `daily_reports.id` hat kein Default.
+
+**Lösung:** Die Oberfläche löscht im Web nur einen Bericht ohne jede
+verknüpfte Zeit, ohne Material, ohne Foto und ohne Mangel, und nur wenn das
+Konto diese vier Tabellen vollständig sieht. Abgerechnete Zeiten oder
+abgerechnetes Material (`billed_document_id`) sperren immer. Der Bericht
+verschwindet erst nach der Server-Antwort. Die Datenbank kaskadiert weiter;
+die Sperre dort kommt über bautakt-app #104. Den zweiten Bericht am selben
+Tag lehnt die Oberfläche mit einer Klartextmeldung ab. `id` setzt der Client.
+Siehe [bautagebuch.md](bautagebuch.md).
+
 ## Foto löschen: erst die Datei, dann die Zeile
 
 _Festgelegt 2026-10-08, Issue #48._
