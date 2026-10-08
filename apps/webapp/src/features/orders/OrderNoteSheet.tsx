@@ -1,0 +1,167 @@
+import {
+  Button,
+  Input,
+  Label,
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  Textarea,
+  toast,
+} from '@bautakt/ui';
+import { type FormEvent, useId, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { readableDbError } from '@/lib/dbErrors';
+
+import { OrderNoteDeleteDialog } from './OrderNoteDeleteDialog';
+import { type OrderNoteDraft, type OrderNoteIssue, orderNoteIssue } from './orderNoteDraft';
+import { useSaveOrderNote } from './useOrderNoteMutations';
+
+/**
+ * Notiz anlegen oder bearbeiten.
+ *
+ * Das Panel ist nur gemountet, solange es offen ist, und startet deshalb
+ * jedes Mal mit dem übergebenen Entwurf. Löschen sitzt im selben Panel, mit
+ * eigenem Bestätigungsdialog.
+ */
+export function OrderNoteSheet({
+  draft,
+  open,
+  onOpenChange,
+}: {
+  draft: OrderNoteDraft | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="p-0">
+        {open && draft ? (
+          <OrderNoteForm initial={draft} onDone={() => onOpenChange(false)} />
+        ) : null}
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function deleteLabel(title: string, body: string): string {
+  const heading = title.trim();
+  if (heading) return heading;
+  const line = body.trim().split('\n')[0] ?? '';
+  if (line.length <= 80) return line;
+  return `${line.slice(0, 79)}…`;
+}
+
+function OrderNoteForm({ initial, onDone }: { initial: OrderNoteDraft; onDone: () => void }) {
+  const { t } = useTranslation();
+  const save = useSaveOrderNote();
+  const [draft, setDraft] = useState<OrderNoteDraft>(initial);
+  const [error, setError] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const ids = { title: useId(), body: useId() };
+
+  function set(patch: Partial<OrderNoteDraft>) {
+    setDraft((current) => ({ ...current, ...patch }));
+  }
+
+  function issueMessage(issue: OrderNoteIssue): string {
+    switch (issue) {
+      case 'empty':
+        return t('domain:noteForm.contentRequired');
+    }
+  }
+
+  async function onSubmit(event: FormEvent) {
+    event.preventDefault();
+    const issue = orderNoteIssue(draft);
+    if (issue) {
+      setError(issueMessage(issue));
+      return;
+    }
+
+    try {
+      await save.mutateAsync(draft);
+      toast.success(t('domain:noteForm.saved'));
+      onDone();
+    } catch (caught) {
+      if (caught instanceof Error && caught.message === 'INVALID_ORDER_NOTE') {
+        setError(t('domain:noteForm.contentRequired'));
+        return;
+      }
+      setError(readableDbError(caught) ?? t('domain:noteForm.saveError'));
+    }
+  }
+
+  return (
+    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
+      <SheetHeader>
+        <SheetTitle>
+          {draft.id ? t('domain:noteForm.editTitle') : t('domain:noteForm.newTitle')}
+        </SheetTitle>
+        <SheetDescription>{t('domain:noteForm.description')}</SheetDescription>
+      </SheetHeader>
+
+      <SheetBody className="flex flex-col gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor={ids.title}>{t('domain:noteForm.title')}</Label>
+          <Input
+            id={ids.title}
+            value={draft.title}
+            onChange={(event) => set({ title: event.target.value })}
+            autoComplete="off"
+          />
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor={ids.body}>{t('domain:noteForm.body')}</Label>
+          <Textarea
+            id={ids.body}
+            rows={6}
+            value={draft.body}
+            onChange={(event) => set({ body: event.target.value })}
+          />
+        </div>
+
+        {draft.id ? (
+          <Button
+            type="button"
+            variant="destructive"
+            className="w-fit"
+            onClick={() => setConfirmDelete(true)}
+          >
+            {t('domain:noteForm.delete.action')}
+          </Button>
+        ) : null}
+
+        {error ? (
+          <p role="alert" className="text-destructive text-sm">
+            {error}
+          </p>
+        ) : null}
+      </SheetBody>
+
+      <SheetFooter>
+        <Button type="button" variant="outline" onClick={onDone}>
+          {t('common:action.cancel')}
+        </Button>
+        <Button type="submit" disabled={save.isPending}>
+          {t('common:action.save')}
+        </Button>
+      </SheetFooter>
+
+      {draft.id ? (
+        <OrderNoteDeleteDialog
+          noteId={draft.id}
+          label={deleteLabel(initial.title, initial.body)}
+          open={confirmDelete}
+          onOpenChange={setConfirmDelete}
+          onDeleted={onDone}
+        />
+      ) : null}
+    </form>
+  );
+}

@@ -76,6 +76,7 @@
       "title": "Notizen",
       "emptyTitle": "Noch keine Notizen",
       "emptyDescription": "Notizen aus der Handy-App erscheinen hier, sobald sie synchronisiert sind.",
+      "emptyDescriptionWrite": "Hier lässt sich die erste Notiz anlegen. Sie erscheint danach auch in der Handy-App.",
       "loadErrorTitle": "Notizen konnten nicht geladen werden",
       "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
       "editedAt": "Geändert {{date}}"
@@ -702,6 +703,25 @@
     "nameRequired": "Bitte einen Namen angeben — sonst ist der Kunde in der Liste nicht zu finden.",
     "saved": "Kunde gespeichert.",
     "saveError": "Kunde konnte nicht gespeichert werden."
+  },
+  "noteForm": {
+    "newTitle": "Notiz hinzufügen",
+    "editTitle": "Notiz bearbeiten",
+    "description": "Titel oder Text, eines von beiden reicht. Die Notiz ist danach auch in der Handy-App sichtbar.",
+    "title": "Titel",
+    "body": "Text",
+    "contentRequired": "Bitte einen Titel oder einen Text angeben.",
+    "saved": "Notiz gespeichert.",
+    "saveError": "Notiz konnte nicht gespeichert werden.",
+    "delete": {
+      "action": "Notiz löschen",
+      "title": "Notiz löschen?",
+      "description": "„{{label}}“ wird entfernt. Das lässt sich nicht rückgängig machen.",
+      "descriptionUntitled": "Diese Notiz wird entfernt. Das lässt sich nicht rückgängig machen.",
+      "confirm": "Endgültig löschen",
+      "deleted": "Notiz gelöscht.",
+      "error": "Notiz konnte nicht gelöscht werden."
+    }
   },
   "timeForm": {
     "newTitle": "Zeit nachtragen",

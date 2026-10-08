@@ -43,15 +43,15 @@ function mapOrderNote(row: OrderNoteQueryRow): OrderNote {
 }
 
 /**
- * Notizen eines Auftrags, nur lesend.
+ * Notizen eines Auftrags.
  *
- * Die Handy-App schreibt die Zeilen nach `order_notes`. Die Webapp zeigt sie
- * an und legt nichts an. queryKey beginnt mit dem Mandanten.
+ * Dieselbe Tabelle `order_notes`, die die Handy-App schreibt. queryKey
+ * beginnt mit dem Mandanten. Schreiben liegt in `useOrderNoteMutations`.
  *
  * Sortierung ist `created_at` absteigend: das ist der Schreibzeitpunkt. Der
- * Index `(order_id, modified_at desc nulls last, created_at desc)` wuerde
+ * Index `(order_id, modified_at desc nulls last, created_at desc)` würde
  * Notizen ohne `modified_at` nach hinten schieben — die Spalte hat keinen
- * Default und ist null, bis die App sie spaeter setzt.
+ * Default und ist null, bis ein Client sie setzt.
  */
 export function useOrderNotes(orderId: string | undefined) {
   const { data: membership } = useMembership();

@@ -1,24 +1,37 @@
-import { Skeleton } from '@bautakt/ui';
-import { type ReactNode } from 'react';
+import { Button, Skeleton, Uicon } from '@bautakt/ui';
+import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
+import { usePermission } from '@/features/company/usePermission';
 import { formatDateTime } from '@/lib/format';
 
+import { draftFromOrderNote, emptyOrderNote, type OrderNoteDraft } from './orderNoteDraft';
+import { OrderNoteSheet } from './OrderNoteSheet';
 import { type OrderNote, useOrderNotes } from './useOrderNotes';
 
 const SKELETON_COUNT = 2;
 
 /**
- * Notizen unter den Stammdaten eines Auftrags, neben den Fotos. Nur Anzeige:
- * kein Anlegen, kein Bearbeiten, kein Loeschen. Schreiben bleibt in der Handy-App.
+ * Notizen unter den Stammdaten eines Auftrags, unter den Fotos.
+ *
+ * Anlegen, Bearbeiten und Löschen laufen über ein Seitenpanel. Wer
+ * `canCreateNotes` nicht hat, sieht die Liste nur — auch fremde Notizen
+ * öffnen sich mit dem Recht, denn die Policies unterscheiden seit dem
+ * 11.08.2026 nicht mehr zwischen eigenen und fremden Zeilen.
  */
 export function OrderNotes({ orderId }: { orderId: string }) {
   const { t } = useTranslation();
+  const canCreate = usePermission('canCreateNotes');
+  const [draft, setDraft] = useState<OrderNoteDraft | null>(null);
   const notes = useOrderNotes(orderId);
   const { data, isError, refetch } = notes;
   const isLoading = useCompanyListLoading(notes);
+
+  function openNew() {
+    setDraft(emptyOrderNote(orderId));
+  }
 
   let body: ReactNode;
   if (isLoading) {
@@ -43,14 +56,31 @@ export function OrderNotes({ orderId }: { orderId: string }) {
     body = (
       <EmptyState
         title={t('domain:orders.notes.emptyTitle')}
-        description={t('domain:orders.notes.emptyDescription')}
+        description={
+          canCreate
+            ? t('domain:orders.notes.emptyDescriptionWrite')
+            : t('domain:orders.notes.emptyDescription')
+        }
+        action={
+          canCreate ? (
+            <Button size="sm" onClick={openNew}>
+              <Uicon name="plus" size={16} />
+              {t('domain:noteForm.newTitle')}
+            </Button>
+          ) : undefined
+        }
       />
     );
   } else {
     body = (
       <ul className="flex max-w-3xl flex-col gap-3">
         {data.map((note) => (
-          <NoteCard key={note.id} note={note} />
+          <NoteCard
+            key={note.id}
+            note={note}
+            editable={canCreate}
+            onEdit={() => setDraft(draftFromOrderNote(note, orderId))}
+          />
         ))}
       </ul>
     );
@@ -58,31 +88,72 @@ export function OrderNotes({ orderId }: { orderId: string }) {
 
   return (
     <section className="flex flex-col gap-4" aria-labelledby="order-notes-title">
-      <h2 id="order-notes-title" className="text-foreground text-lg font-semibold tracking-tight">
-        {t('domain:orders.notes.title')}
-      </h2>
+      <div className="flex max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <h2 id="order-notes-title" className="text-foreground text-lg font-semibold tracking-tight">
+          {t('domain:orders.notes.title')}
+        </h2>
+        {canCreate ? (
+          <Button size="sm" onClick={openNew}>
+            <Uicon name="plus" size={16} />
+            {t('domain:noteForm.newTitle')}
+          </Button>
+        ) : null}
+      </div>
       {body}
+      <OrderNoteSheet
+        draft={draft}
+        open={draft !== null}
+        onOpenChange={(open) => !open && setDraft(null)}
+      />
     </section>
   );
 }
 
-function NoteCard({ note }: { note: OrderNote }) {
+function NoteCard({
+  note,
+  editable,
+  onEdit,
+}: {
+  note: OrderNote;
+  editable: boolean;
+  onEdit: () => void;
+}) {
   const { t } = useTranslation();
   const created = formatDateTime(note.createdAt);
   const modified = formatDateTime(note.modifiedAt);
   const showEdited = Boolean(modified && modified !== created);
+  const className =
+    'flex w-full flex-col gap-1.5 rounded-xl border border-border bg-card px-4 py-3 text-left shadow-sm transition-colors';
 
-  return (
-    <li className="flex flex-col gap-1.5 rounded-xl border border-border bg-card px-4 py-3 shadow-sm transition-colors hover:border-border-strong">
-      {note.title ? <h3 className="text-foreground text-sm font-medium">{note.title}</h3> : null}
-      {note.body ? (
-        <p className="text-foreground text-sm break-words whitespace-pre-wrap">{note.body}</p>
+  const content = (
+    <>
+      {note.title ? (
+        <span className="text-foreground text-sm font-medium">{note.title}</span>
       ) : null}
-      <p className="text-muted-foreground flex flex-wrap items-baseline gap-x-2 text-xs">
+      {note.body ? (
+        <span className="text-foreground text-sm break-words whitespace-pre-wrap">{note.body}</span>
+      ) : null}
+      <span className="text-muted-foreground flex flex-wrap items-baseline gap-x-2 text-xs">
         {note.author ? <span>{note.author}</span> : null}
         {created ? <time dateTime={note.createdAt}>{created}</time> : null}
         {showEdited ? <span>{t('domain:orders.notes.editedAt', { date: modified })}</span> : null}
-      </p>
+      </span>
+    </>
+  );
+
+  return (
+    <li>
+      {editable ? (
+        <button
+          type="button"
+          className={`${className} cursor-pointer hover:border-border-strong`}
+          onClick={onEdit}
+        >
+          {content}
+        </button>
+      ) : (
+        <div className={className}>{content}</div>
+      )}
     </li>
   );
 }
