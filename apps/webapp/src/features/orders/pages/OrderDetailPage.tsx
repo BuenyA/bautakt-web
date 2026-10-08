@@ -117,7 +117,7 @@ export function OrderDetailPage() {
 
       <OrderPhotos orderId={data.id} />
       <OrderNotes orderId={data.id} />
-      <OrderTimes orderId={data.id} />
+      <OrderTimes orderId={data.id} orderName={data.name} />
     </div>
   );
 }

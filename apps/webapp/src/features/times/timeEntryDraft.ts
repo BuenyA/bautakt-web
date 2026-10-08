@@ -15,6 +15,14 @@ import { todayIso } from '@bautakt/finance';
 export type TimeEntryDraft = {
   id?: string;
   orderId: string;
+  /**
+   * Bezeichnung des Auftrags, schon bevor `useOrders` liefert.
+   *
+   * Das Auftragsdetail kennt den Namen. Das Select im Formular zeigt ihn
+   * sonst erst, wenn die Optionen gemountet sind — beim ersten Öffnen mit
+   * kaltem Cache bleibt das Feld leer.
+   */
+  orderLabel: string;
   employmentIds: string[];
   date: string;
   startTime: string;
@@ -32,11 +40,13 @@ export type TimeEntryIssue =
 
 export function emptyTimeEntry(partial?: {
   orderId?: string;
+  orderLabel?: string;
   employmentId?: string;
   lockOrder?: boolean;
 }): TimeEntryDraft {
   return {
     orderId: partial?.orderId ?? '',
+    orderLabel: partial?.orderLabel?.trim() ?? '',
     employmentIds: partial?.employmentId ? [partial.employmentId] : [],
     date: todayIso(),
     startTime: '07:00',
@@ -58,12 +68,14 @@ export function draftFromTimeEntry(
     break_minutes: number;
     note: string;
     billed: boolean;
+    order_name?: string;
   },
   options?: { lockOrder?: boolean },
 ): TimeEntryDraft {
   return {
     id: row.id,
     orderId: row.order_id,
+    orderLabel: row.order_name?.trim() ?? '',
     employmentIds: row.employment_id ? [row.employment_id] : [],
     date: toDateInput(row.started_at),
     startTime: toTimeInput(row.started_at),
