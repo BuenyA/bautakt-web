@@ -266,7 +266,9 @@ Stand 2026-10-01, Optik. Auftrag-Detail (`/auftraege/:id`) und Rechnung-Detail
 (`/rechnungen/:id`) teilen eine Section-Hierarchie. Der Pass von damals hat
 keine neuen Texte und keinen Upload gebracht. Zeiten auf dem Auftrag lassen
 sich seit 2026-10-08 nachtragen; die Karte bleibt dieselbe Fläche und ist dann
-ein Knopf. Siehe [auftragszeiten.md](auftragszeiten.md).
+ein Knopf. Siehe [auftragszeiten.md](auftragszeiten.md). Fotos lassen sich
+seit demselben Tag hochladen; die Kachel bleibt dieselbe Fläche, darüber
+liegt eine gestrichelte Ablegefläche. Siehe [auftragsfotos.md](auftragsfotos.md).
 
 | Element                         | Look                                                                                                                                                                                                                                          |
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -276,6 +278,7 @@ ein Knopf. Siehe [auftragszeiten.md](auftragszeiten.md).
 | Notiz- und Zeitkarte            | `rounded-xl border border-border bg-card shadow-sm`. Hover `border-border-strong`. Skelett `rounded-xl`.                                                                                                                                      |
 | Foto-Kachel                     | Dieselbe Card-Fläche, `overflow-hidden`. Hover zusätzlich `shadow-md`. Bildunterschrift `bg-card px-2.5 py-2`. Lightbox-Bild `rounded-xl`.                                                                                                    |
 | Foto-Raster                     | Weiter `grid-cols-2 sm:grid-cols-3 xl:grid-cols-4`.                                                                                                                                                                                           |
+| Foto-Ablegefläche               | `rounded-xl border border-dashed border-border bg-card`. Beim Ziehen `border-primary` und `bg-primary/10`. Löschen auf der Kachel: `bg-card`, Icon `text-destructive`.                                                                        |
 | Seitenwurzel                    | `gap-8` auf Auftrag, Rechnung, Kunde (`/kunden/:id`) und Einsatz (`/einsaetze/:id`), auch in Laden, Fehler und Nicht-gefunden. Auftragsbeschreibung und Einsatz-Notiz darüber: `max-w-3xl text-sm text-muted-foreground whitespace-pre-wrap`. |
 | `DetailCard`                    | Titel `text-base font-semibold tracking-tight`. Label-Spalte `sm:grid-cols-[10rem_1fr]`. `dt` ist `text-muted-foreground`, `dd` `text-foreground whitespace-pre-wrap`.                                                                        |
 | Rechnungs-Blocker               | `rounded-xl`, Padding `p-4`. Positions- und Zahlungstitel wie der `DetailCard`-Titel.                                                                                                                                                         |

@@ -378,3 +378,42 @@ weglassen, der Trigger füllt sie. Invalidieren unter `timeEntries`. Siehe
 Abgerechnete Zeilen (`billed_document_id`) sperrt die Datenbank nicht. Die
 Oberfläche lehnt Ändern und Löschen ab und liest die Spalte direkt vor dem
 Schreiben noch einmal. Eine echte Sperre wäre ein Trigger in `bautakt-app`.
+
+## Auftragsfoto: der Bucket nimmt nur JPEG bis 5 MB
+
+_Gemessen 2026-10-08, Issue #48._
+
+**Symptom:** Ein Upload schlägt fehl, obwohl die Datei ein Bild ist. Die
+Meldung kommt von Storage, nicht von `order_images`.
+
+Der Bucket `order-images` ist privat. `file_size_limit` ist 5242880,
+`allowed_mime_types` ist nur `image/jpeg`. Ein PNG oder HEIC direkt in den
+Bucket läuft dagegen. `order_images.id` hat kein Default.
+
+**Lösung:** Im Browser nach JPEG wandeln, breiter als 1920 Pixel auf 1920
+bringen, unter 5 MB bleiben, `id` mit `crypto.randomUUID()` setzen. Pfad
+`{companyId}/{orderId}/{imageId}.jpg`. Siehe
+[auftragsfotos.md](auftragsfotos.md).
+
+## Foto löschen: erst die Datei, dann die Zeile
+
+_Festgelegt 2026-10-08, Issue #48._
+
+**Symptom:** Die Zeile ist weg, die Datei liegt noch im Bucket. Oder die
+Galerie zeigt einen Fehler, obwohl der Löschdialog noch offen ist.
+
+Die Handy-App entfernt bei `order_image.delete` zuerst das Storage-Objekt und
+toleriert „Object not found“, danach die Zeile. Macht man es umgekehrt und
+die Datei bleibt liegen, hat die Oberfläche den Pfad verloren. Ein
+verweigertes Storage-Delete kommt außerdem nicht immer als Fehler zurück; die
+Policy filtert das Objekt aus der Antwort. Deshalb erst löschen, dann mit
+HEAD nachsehen, und die Zeile nur entfernen, wenn die Datei weg ist.
+
+Beim Anlegen ist die Reihenfolge die andere: erst Upload, dann Insert.
+Schlägt das Insert fehl, wird das Objekt entfernt. Sonst sieht die Handy-App
+eine Datei nicht, die niemand in `order_images` findet.
+
+**Nicht aufräumen, was schon liegt.** _Stand 2026-10-08: 49 Objekte im
+Bucket, 10 Zeilen, 10 davon verknüpft._ `order_images.order_id` verweist mit
+`ON DELETE CASCADE` auf `orders`. Die Datei im Bucket fällt dabei nicht mit.
+Das gehört nach `bautakt-app`, nicht in eine Web-Migration.

@@ -4,7 +4,7 @@ import { useMembership } from '@/features/company/useMembership';
 import { supabase } from '@/lib/supabase';
 
 /** Dieselbe Frist wie in der Handy-App. Der Bucket `order-images` ist privat. */
-const SIGNED_URL_TTL_SECONDS = 3600;
+export const ORDER_IMAGE_SIGNED_URL_TTL_SECONDS = 3600;
 
 /**
  * Kurz vor Ablauf neu signieren. Der globale staleTime von 30s wuerde bei jedem
@@ -17,13 +17,16 @@ export type OrderPhoto = {
   id: string;
   takenAt: string;
   signedUrl: string;
+  userId: string;
+  storagePath: string;
 };
 
 /**
- * Fotos eines Auftrags, nur lesend.
+ * Fotos eines Auftrags.
  *
  * Die Handy-App schreibt die Zeilen nach `order_images` und die Dateien in den
- * Bucket `order-images`. Die Webapp zeigt sie an und legt nichts an.
+ * Bucket `order-images`. Hochladen und Loeschen sitzen in
+ * `useOrderImageMutations` und invalidieren `['order-images', companyId]`.
  * queryKey beginnt mit dem Mandanten.
  */
 export function useOrderImages(orderId: string | undefined) {
@@ -40,7 +43,7 @@ export function useOrderImages(orderId: string | undefined) {
     queryFn: async (): Promise<OrderPhoto[]> => {
       const { data, error } = await supabase
         .from('order_images')
-        .select('id, storage_path, taken_at')
+        .select('id, storage_path, taken_at, user_id')
         .eq('company_id', companyId!)
         .eq('order_id', orderId!)
         .order('taken_at', { ascending: false });
@@ -55,12 +58,14 @@ export function useOrderImages(orderId: string | undefined) {
           // Nicht selbst bauen und nicht getPublicUrl: der Bucket ist privat.
           const result = await supabase.storage
             .from('order-images')
-            .createSignedUrl(row.storage_path, SIGNED_URL_TTL_SECONDS);
+            .createSignedUrl(row.storage_path, ORDER_IMAGE_SIGNED_URL_TTL_SECONDS);
           if (result.error || !result.data?.signedUrl) return null;
           return {
             id: row.id,
             takenAt: row.taken_at,
             signedUrl: result.data.signedUrl,
+            userId: row.user_id,
+            storagePath: row.storage_path,
           };
         }),
       );

@@ -25,7 +25,7 @@ verlinkt, nie kopiert.
 | [berechtigungen-im-web.md](pages/berechtigungen-im-web.md) | Die 33 Rechte, drei Durchsetzungsebenen, Drift-Check.         |
 | [deployment-vercel.md](pages/deployment-vercel.md)         | Zwei Projekte aus einem Repo, der SPA-Rewrite, Env-Präfixe.   |
 | [webapp-shell.md](pages/webapp-shell.md)                   | Shell-Layout, kanonische Top-Nav IA, Listen-Muster.           |
-| [auftragsfotos.md](pages/auftragsfotos.md)                 | Read-only Fotogalerie auf der Auftragsdetailseite.            |
+| [auftragsfotos.md](pages/auftragsfotos.md)                 | Fotos am Auftrag anzeigen, hochladen und löschen.             |
 | [auftragsnotizen.md](pages/auftragsnotizen.md)             | Notizen am Auftrag lesen, anlegen, bearbeiten, löschen.       |
 | [auftragszeiten.md](pages/auftragszeiten.md)               | Zeiten am Auftrag und auf `/zeiten` anlegen, ändern, löschen. |
 | [auftrag-anlegen.md](pages/auftrag-anlegen.md)             | Auftrag aus der Liste anlegen, dieselbe `orders`-Zeile.       |
@@ -71,6 +71,7 @@ verlinkt, nie kopiert.
 | 2026-10-08 | [Zeit am Auftrag und auf /zeiten schreiben](logs/2026-10-08-zeit-erfassen.md)                   |
 | 2026-10-08 | [Notizen am Auftrag schreiben](logs/2026-10-08-auftragsnotizen-schreiben.md)                    |
 | 2026-10-08 | [Wiki verlinkt bautakt-app](logs/2026-10-08-wiki-link-bautakt-app.md)                           |
+| 2026-10-08 | [Fotos am Auftrag hochladen und löschen](logs/2026-10-08-auftragsfotos-schreiben.md)            |
 
 ## Die drei wichtigsten Sätze
 
