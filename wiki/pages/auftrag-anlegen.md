@@ -2,6 +2,8 @@
 
 Die Auftragsliste legt einen Auftrag in `orders` an und öffnet danach die
 Detailseite. Die Zeile liegt in derselben Tabelle, die die Handy-App liest.
+Stammdaten ändern steht auf der Detailseite, siehe
+[auftrag-bearbeiten.md](auftrag-bearbeiten.md).
 Fotos lassen sich auf der Detailseite hochladen und löschen, siehe
 [auftragsfotos.md](auftragsfotos.md). Notizen lassen sich dort
 schreiben, siehe [auftragsnotizen.md](auftragsnotizen.md). Zeiten lassen

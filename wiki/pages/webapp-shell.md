@@ -386,10 +386,11 @@ sondern den Hinweis auf Storno und Gutschrift.
 `DEFAULT gen_random_uuid()` — beim Anlegen muss der Client die `id` mitgeben
 (siehe [fallstricke.md](fallstricke.md)). Die vollständige Liste steht dort.
 
-Gebaut sind: Zahlung, Kunde, Auftrag, Zeiteintrag, Abwesenheit, Ausgabe,
-Mitarbeiter, Mahnung (mit Gebühr und Verzugszinsen), der Beleg-Editor und
-Kostenstellen (anlegen und löschen). Auftrag anlegen:
-[auftrag-anlegen.md](auftrag-anlegen.md). Kostenstellen:
+Gebaut sind: Zahlung, Kunde, Auftrag (anlegen und Stammdaten ändern),
+Zeiteintrag, Abwesenheit, Ausgabe, Mitarbeiter, Mahnung (mit Gebühr und
+Verzugszinsen), der Beleg-Editor und Kostenstellen (anlegen und löschen).
+Auftrag anlegen: [auftrag-anlegen.md](auftrag-anlegen.md). Auftrag
+bearbeiten: [auftrag-bearbeiten.md](auftrag-bearbeiten.md). Kostenstellen:
 [kostenstellen.md](kostenstellen.md).
 
 ## Offen

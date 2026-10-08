@@ -195,7 +195,7 @@ export function OrdersListPage() {
         }
       />
 
-      <OrderSheet open={sheetOpen} onOpenChange={setSheetOpen} />
+      <OrderSheet mode="create" open={sheetOpen} onOpenChange={setSheetOpen} />
     </div>
   );
 }
