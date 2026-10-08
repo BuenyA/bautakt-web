@@ -788,6 +788,7 @@
       "description": "„{{label}}“ wird entfernt. Das lässt sich nicht rückgängig machen.",
       "descriptionUntitled": "Diese Notiz wird entfernt. Das lässt sich nicht rückgängig machen.",
       "confirm": "Endgültig löschen",
+      "pending": "Wird gelöscht …",
       "deleted": "Notiz gelöscht.",
       "error": "Notiz konnte nicht gelöscht werden."
     }
@@ -816,6 +817,7 @@
       "description": "„{{label}}“ wird entfernt. Das lässt sich nicht rückgängig machen.",
       "descriptionUntitled": "Dieser Punkt wird entfernt. Das lässt sich nicht rückgängig machen.",
       "confirm": "Endgültig löschen",
+      "pending": "Wird gelöscht …",
       "deleted": "Punkt gelöscht.",
       "error": "Punkt konnte nicht gelöscht werden."
     }
@@ -854,6 +856,7 @@
       "description": "„{{label}}“ wird entfernt. Das lässt sich nicht rückgängig machen.",
       "descriptionUntitled": "Dieses Material wird entfernt. Das lässt sich nicht rückgängig machen.",
       "confirm": "Endgültig löschen",
+      "pending": "Wird gelöscht …",
       "deleted": "Material gelöscht.",
       "error": "Material konnte nicht gelöscht werden."
     }
@@ -891,6 +894,7 @@
       "title": "Zeiteintrag löschen?",
       "description": "Der Eintrag von {{employee}} wird entfernt. Eine bereits geschriebene Rechnung ändert sich dadurch nicht.",
       "confirm": "Endgültig löschen",
+      "pending": "Wird gelöscht …",
       "deleted": "Zeiteintrag gelöscht.",
       "error": "Zeiteintrag konnte nicht gelöscht werden."
     }

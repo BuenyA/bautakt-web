@@ -21,12 +21,18 @@ Darüber steht „2 von 3 erledigt“. Sortiert wird nach `position`, danach
 `(checklist_id, position)`. _Stand 2026-10-08._
 
 Wer `canEditChecklist` hat, öffnet die Zeile als Knopf das Panel. Das Kästchen
-hakt sofort ab und speichert. Wer nur lesen darf, sieht dieselbe Zeile, das
-Kästchen ist deaktiviert, es gibt keinen Knopf „Punkt hinzufügen“.
+kippt sofort im Query-Cache (`onMutate`) und speichert danach. Schlägt das
+Schreiben fehl, geht nur dieser Punkt auf den vorigen Stand zurück und eine
+Meldung erscheint. Mehrere Klicks hintereinander schreiben nacheinander, jeder
+auf einem frisch gelesenen Stand — sonst überschriebe das zweite Abhaken die
+Liste vom ersten. Wer nur lesen darf, sieht dieselbe Zeile, das Kästchen ist
+deaktiviert, es gibt keinen Knopf „Punkt hinzufügen“.
 
 Die Abfrage steckt in `useOrderChecklist`. Der `queryKey` ist
-`['order-checklist', companyId, orderId]`. Nach dem Speichern wird
-`['order-checklist', companyId]` invalidiert.
+`['order-checklist', companyId, orderId]`. Invalidiert wird
+`['order-checklist', companyId]`, sobald keine Checklisten-Mutation mehr
+offen ist. Löschen nimmt den Punkt erst danach aus dem Cache, wenn der
+Server die Liste ohne ihn bestätigt hat.
 
 ## Eine Liste pro Auftrag
 
@@ -57,7 +63,10 @@ genauso ab.
 Zuweisung ist eine aktive Beschäftigung oder niemand. Wer schon zugewiesen
 ist und inzwischen ausgeschieden ist (`ended_at`), bleibt in der Auswahl
 stehen, damit ein Speichern ohne Wechsel die Zuweisung nicht löscht. Eine
-neue Zuweisung an jemanden mit `ended_at` lehnt der Client ab.
+neue Zuweisung an jemanden mit `ended_at` lehnt der Client ab. Die Auswahl
+öffnet nach oben (`side="top"`, `align="start"`, `collisionPadding` unten
+120px), der Knopf „Punkt löschen“ sitzt in der Fußleiste. Sonst deckt die
+Liste bei 1280×800 den Knopf ab.
 
 ## Was geschrieben wird
 
@@ -94,6 +103,12 @@ Endlage ist dieselbe wie `checklist.upsert` in der Handy-App.
 
 Ist der getrimmte Inhalt gleich dem gespeicherten, gibt es keinen
 Schreibzugriff.
+
+Löschen wartet auf diese Schreibfolge. Der Bestätigungsdialog und das Panel
+bleiben offen, der Knopf zeigt „Wird gelöscht …“. Erst die bestätigte Liste
+ohne den Punkt nimmt ihn aus der Anzeige. Ein Fehler bleibt im Dialog, der
+Punkt bleibt. Das Panel schließt nicht, weil der Dialog den Fokus bekommt
+oder weil jemand während der Anfrage außerhalb klickt.
 
 ## Recht
 

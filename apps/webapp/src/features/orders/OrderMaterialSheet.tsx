@@ -21,6 +21,7 @@ import {
 import { type FormEvent, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useDismissLock } from '@/components/common/useDismissLock';
 import { useArticles } from '@/features/masterdata/useMasterData';
 import { readableDbError } from '@/lib/dbErrors';
 import { formatCurrency } from '@/lib/format';
@@ -61,11 +62,16 @@ export function OrderMaterialSheet({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const dismiss = useDismissLock(onOpenChange);
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={dismiss.handleOpenChange}>
       <SheetContent className="p-0">
         {open && draft ? (
-          <OrderMaterialForm initial={draft} onDone={() => onOpenChange(false)} />
+          <OrderMaterialForm
+            initial={draft}
+            onBusyChange={dismiss.onBusyChange}
+            onDone={() => onOpenChange(false)}
+          />
         ) : null}
       </SheetContent>
     </Sheet>
@@ -74,9 +80,11 @@ export function OrderMaterialSheet({
 
 function OrderMaterialForm({
   initial,
+  onBusyChange,
   onDone,
 }: {
   initial: OrderMaterialDraft;
+  onBusyChange: (busy: boolean) => void;
   onDone: () => void;
 }) {
   const { t } = useTranslation();
@@ -89,6 +97,7 @@ function OrderMaterialForm({
   const [revealPulse, setRevealPulse] = useState(0);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deletePending, setDeletePending] = useState(false);
   const ids = {
     title: useId(),
     quantity: useId(),
@@ -102,6 +111,15 @@ function OrderMaterialForm({
   const issue = revealIssues && !draft.billed ? orderMaterialIssue(draft) : null;
   const error = saveError;
   const locked = draft.billed;
+  const busy = save.isPending || deletePending;
+
+  useEffect(() => {
+    onBusyChange(busy);
+  }, [busy, onBusyChange]);
+
+  useEffect(() => {
+    return () => onBusyChange(false);
+  }, [onBusyChange]);
 
   const catalog = [...(articles.data ?? [])]
     .filter((article) => article.is_active || article.id === draft.articleId)
@@ -366,6 +384,7 @@ function OrderMaterialForm({
             type="button"
             variant="destructive"
             className="w-fit"
+            disabled={busy}
             onClick={() => setConfirmDelete(true)}
           >
             {t('domain:materialForm.delete.action')}
@@ -380,11 +399,11 @@ function OrderMaterialForm({
       </SheetBody>
 
       <SheetFooter>
-        <Button type="button" variant="outline" onClick={onDone}>
+        <Button type="button" variant="outline" onClick={onDone} disabled={busy}>
           {t('common:action.cancel')}
         </Button>
         {locked ? null : (
-          <Button type="submit" disabled={save.isPending}>
+          <Button type="submit" disabled={busy}>
             {t('common:action.save')}
           </Button>
         )}
@@ -396,6 +415,7 @@ function OrderMaterialForm({
           label={deleteLabel}
           open={confirmDelete}
           onOpenChange={setConfirmDelete}
+          onPendingChange={setDeletePending}
           onDeleted={onDone}
         />
       ) : null}

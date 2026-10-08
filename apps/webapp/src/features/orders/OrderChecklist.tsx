@@ -106,7 +106,6 @@ export function OrderChecklist({ orderId }: { orderId: string }) {
             key={item.id}
             item={item}
             editable={canEdit}
-            pending={save.isPending}
             onEdit={() => setDraft(draftFromChecklistItem(item, orderId))}
             onToggle={(isDone) => void onToggle(item, isDone)}
           />
@@ -162,13 +161,11 @@ function formatIsoDate(value: string): string {
 function ChecklistRow({
   item,
   editable,
-  pending,
   onEdit,
   onToggle,
 }: {
   item: OrderChecklistItem;
   editable: boolean;
-  pending: boolean;
   onEdit: () => void;
   onToggle: (isDone: boolean) => void;
 }) {
@@ -212,7 +209,7 @@ function ChecklistRow({
       <Checkbox
         className="mt-0.5"
         checked={item.isDone}
-        disabled={!editable || pending}
+        disabled={!editable}
         aria-label={t('domain:orders.checklist.toggle', { title })}
         onCheckedChange={(value) => {
           if (value === 'indeterminate') return;

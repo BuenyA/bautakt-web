@@ -81,6 +81,7 @@ verlinkt, nie kopiert.
 | 2026-10-08 | [Checkliste am Auftrag](logs/2026-10-08-auftragscheckliste.md)                                  |
 | 2026-10-08 | [Leerer Auftragsname im Sheet](logs/2026-10-08-auftrag-name-fehler.md)                          |
 | 2026-10-08 | [Geldfelder mit zwei Nachkommastellen](logs/2026-10-08-geld-nachkommastellen.md)                |
+| 2026-10-08 | [Checkliste: Löschen abwarten, Abhaken sofort](logs/2026-10-08-checkliste-smoke.md)             |
 
 ## Die drei wichtigsten Sätze
 

@@ -8,7 +8,7 @@ import {
   DialogTitle,
   toast,
 } from '@bautakt/ui';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { readableDbError } from '@/lib/dbErrors';
@@ -28,6 +28,7 @@ export function OrderChecklistDeleteDialog({
   label,
   open,
   onOpenChange,
+  onPendingChange,
   onDeleted,
 }: {
   orderId: string;
@@ -35,11 +36,16 @@ export function OrderChecklistDeleteDialog({
   label: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onPendingChange?: (pending: boolean) => void;
   onDeleted: () => void;
 }) {
   const { t } = useTranslation();
   const save = useSaveOrderChecklist();
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    onPendingChange?.(save.isPending);
+  }, [onPendingChange, save.isPending]);
 
   function close() {
     setError(null);
@@ -66,6 +72,7 @@ export function OrderChecklistDeleteDialog({
     <Dialog
       open={open}
       onOpenChange={(next) => {
+        if (save.isPending) return;
         if (!next) setError(null);
         onOpenChange(next);
       }}
@@ -83,16 +90,19 @@ export function OrderChecklistDeleteDialog({
         ) : null}
 
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={close}>
+          <Button type="button" variant="outline" onClick={close} disabled={save.isPending}>
             {t('common:action.cancel')}
           </Button>
           <Button
             type="button"
             variant="destructive"
             disabled={save.isPending}
+            aria-busy={save.isPending}
             onClick={() => void onConfirm()}
           >
-            {t('domain:checklistForm.delete.confirm')}
+            {save.isPending
+              ? t('domain:checklistForm.delete.pending')
+              : t('domain:checklistForm.delete.confirm')}
           </Button>
         </DialogFooter>
       </DialogContent>

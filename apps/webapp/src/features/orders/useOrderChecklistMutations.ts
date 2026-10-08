@@ -10,6 +10,7 @@ import {
   type ChecklistChange,
   type OrderChecklistItem,
   type OrderChecklistParent,
+  type OrderChecklistSnapshot,
   readChecklistFields,
 } from './orderChecklistDraft';
 import { findOrderChecklist, loadOrderChecklist } from './useOrderChecklist';
@@ -44,6 +45,7 @@ import { findOrderChecklist, loadOrderChecklist } from './useOrderChecklist';
  */
 
 let checklistWriteTail: Promise<void> = Promise.resolve();
+let openChecklistMutations = 0;
 
 function enqueueChecklistWrite<T>(task: () => Promise<T>): Promise<T> {
   const run = checklistWriteTail.then(task, task);
@@ -52,6 +54,20 @@ function enqueueChecklistWrite<T>(task: () => Promise<T>): Promise<T> {
     () => undefined,
   );
   return run;
+}
+
+function beginChecklistMutation() {
+  openChecklistMutations += 1;
+}
+
+/** true, wenn keine Checklisten-Mutation mehr offen ist. */
+function finishChecklistMutation(): boolean {
+  openChecklistMutations = Math.max(0, openChecklistMutations - 1);
+  return openChecklistMutations === 0;
+}
+
+function checklistQueryKey(companyId: string | undefined, orderId: string) {
+  return ['order-checklist', companyId, orderId] as const;
 }
 
 function normalizedChange(change: ChecklistChange): ChecklistChange {
@@ -269,9 +285,15 @@ async function invalidateChecklist(
 /**
  * Punkt anlegen, ändern, abhaken oder löschen.
  *
+ * Abhaken kippt die Checkbox sofort im Cache und rollt bei einem Fehler
+ * nur diesen Punkt zurück. Löschen fasst den Cache erst an, wenn der
+ * Server die Liste ohne den Punkt bestätigt hat.
+ *
  * Jeder Aufruf schreibt die ganze Liste. Die Aufrufe eines Tabs laufen
  * nacheinander, jeder liest vorher neu. Sonst würde ein zweites Abhaken
- * die Liste vom ersten überschreiben.
+ * die Liste vom ersten überschreiben und den Punkt verlieren. Die
+ * Invalidierung wartet, bis keine Mutation mehr offen ist — ein Refetch
+ * dazwischen würde den optimistischen Stand überschreiben.
  */
 export function useSaveOrderChecklist() {
   const queryClient = useQueryClient();
@@ -287,8 +309,51 @@ export function useSaveOrderChecklist() {
       }
       return enqueueChecklistWrite(() => writeChecklist(companyId, user.id, change));
     },
-    onSuccess: async () => {
-      await invalidateChecklist(queryClient, companyId);
+    onMutate: async (change) => {
+      beginChecklistMutation();
+      if (!companyId || change.kind !== 'toggle') return;
+      const key = checklistQueryKey(companyId, change.orderId);
+      await queryClient.cancelQueries({ queryKey: key });
+      const previous = queryClient.getQueryData<OrderChecklistSnapshot>(key);
+      const prior = previous?.items.find((item) => item.id === change.id);
+      const now = new Date().toISOString();
+      queryClient.setQueryData<OrderChecklistSnapshot>(key, (current) => {
+        if (!current) return current;
+        const applied = applyChecklistChange(current.items, change, now);
+        if (!applied.ok || !applied.changed) return current;
+        return { ...current, items: applied.items };
+      });
+      return prior ? { isDone: prior.isDone, doneAt: prior.doneAt } : undefined;
+    },
+    onError: (_error, change, prior) => {
+      if (!companyId || change.kind !== 'toggle' || !prior) return;
+      queryClient.setQueryData<OrderChecklistSnapshot>(
+        checklistQueryKey(companyId, change.orderId),
+        (current) => {
+          if (!current) return current;
+          return {
+            ...current,
+            items: current.items.map((item) =>
+              item.id === change.id
+                ? { ...item, isDone: prior.isDone, doneAt: prior.doneAt }
+                : item,
+            ),
+          };
+        },
+      );
+    },
+    onSuccess: (_data, change) => {
+      if (!companyId || change.kind !== 'delete') return;
+      queryClient.setQueryData<OrderChecklistSnapshot>(
+        checklistQueryKey(companyId, change.orderId),
+        (current) =>
+          current
+            ? { ...current, items: current.items.filter((item) => item.id !== change.id) }
+            : current,
+      );
+    },
+    onSettled: async () => {
+      if (finishChecklistMutation()) await invalidateChecklist(queryClient, companyId);
     },
   });
 }

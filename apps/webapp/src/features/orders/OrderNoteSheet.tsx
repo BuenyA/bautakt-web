@@ -12,9 +12,10 @@ import {
   Textarea,
   toast,
 } from '@bautakt/ui';
-import { type FormEvent, useId, useState } from 'react';
+import { type FormEvent, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useDismissLock } from '@/components/common/useDismissLock';
 import { readableDbError } from '@/lib/dbErrors';
 
 import { OrderNoteDeleteDialog } from './OrderNoteDeleteDialog';
@@ -37,11 +38,16 @@ export function OrderNoteSheet({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const dismiss = useDismissLock(onOpenChange);
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={dismiss.handleOpenChange}>
       <SheetContent className="p-0">
         {open && draft ? (
-          <OrderNoteForm initial={draft} onDone={() => onOpenChange(false)} />
+          <OrderNoteForm
+            initial={draft}
+            onBusyChange={dismiss.onBusyChange}
+            onDone={() => onOpenChange(false)}
+          />
         ) : null}
       </SheetContent>
     </Sheet>
@@ -56,13 +62,31 @@ function deleteLabel(title: string, body: string): string {
   return `${line.slice(0, 79)}…`;
 }
 
-function OrderNoteForm({ initial, onDone }: { initial: OrderNoteDraft; onDone: () => void }) {
+function OrderNoteForm({
+  initial,
+  onBusyChange,
+  onDone,
+}: {
+  initial: OrderNoteDraft;
+  onBusyChange: (busy: boolean) => void;
+  onDone: () => void;
+}) {
   const { t } = useTranslation();
   const save = useSaveOrderNote();
   const [draft, setDraft] = useState<OrderNoteDraft>(initial);
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deletePending, setDeletePending] = useState(false);
   const ids = { title: useId(), body: useId() };
+  const busy = save.isPending || deletePending;
+
+  useEffect(() => {
+    onBusyChange(busy);
+  }, [busy, onBusyChange]);
+
+  useEffect(() => {
+    return () => onBusyChange(false);
+  }, [onBusyChange]);
 
   function set(patch: Partial<OrderNoteDraft>) {
     setDraft((current) => ({ ...current, ...patch }));
@@ -131,6 +155,7 @@ function OrderNoteForm({ initial, onDone }: { initial: OrderNoteDraft; onDone: (
             type="button"
             variant="destructive"
             className="w-fit"
+            disabled={busy}
             onClick={() => setConfirmDelete(true)}
           >
             {t('domain:noteForm.delete.action')}
@@ -145,10 +170,10 @@ function OrderNoteForm({ initial, onDone }: { initial: OrderNoteDraft; onDone: (
       </SheetBody>
 
       <SheetFooter>
-        <Button type="button" variant="outline" onClick={onDone}>
+        <Button type="button" variant="outline" onClick={onDone} disabled={busy}>
           {t('common:action.cancel')}
         </Button>
-        <Button type="submit" disabled={save.isPending}>
+        <Button type="submit" disabled={busy}>
           {t('common:action.save')}
         </Button>
       </SheetFooter>
@@ -159,6 +184,7 @@ function OrderNoteForm({ initial, onDone }: { initial: OrderNoteDraft; onDone: (
           label={deleteLabel(initial.title, initial.body)}
           open={confirmDelete}
           onOpenChange={setConfirmDelete}
+          onPendingChange={setDeletePending}
           onDeleted={onDone}
         />
       ) : null}

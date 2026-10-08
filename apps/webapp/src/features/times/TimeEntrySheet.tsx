@@ -20,9 +20,10 @@ import {
   Textarea,
   toast,
 } from '@bautakt/ui';
-import { type FormEvent, useId, useState } from 'react';
+import { type FormEvent, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useDismissLock } from '@/components/common/useDismissLock';
 import { useMembership } from '@/features/company/useMembership';
 import { useOrders } from '@/features/orders/useOrders';
 import { useEmployees } from '@/features/team/useEmployees';
@@ -59,18 +60,31 @@ export function TimeEntrySheet({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const dismiss = useDismissLock(onOpenChange);
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={dismiss.handleOpenChange}>
       <SheetContent className="p-0">
         {open && draft ? (
-          <TimeEntryForm initial={draft} onDone={() => onOpenChange(false)} />
+          <TimeEntryForm
+            initial={draft}
+            onBusyChange={dismiss.onBusyChange}
+            onDone={() => onOpenChange(false)}
+          />
         ) : null}
       </SheetContent>
     </Sheet>
   );
 }
 
-function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: () => void }) {
+function TimeEntryForm({
+  initial,
+  onBusyChange,
+  onDone,
+}: {
+  initial: TimeEntryDraft;
+  onBusyChange: (busy: boolean) => void;
+  onDone: () => void;
+}) {
   const { t } = useTranslation();
   const save = useSaveTimeEntry();
   const { data: membership } = useMembership();
@@ -85,12 +99,22 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
   const [revealIssues, setRevealIssues] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deletePending, setDeletePending] = useState(false);
   const ids = { date: useId(), start: useId(), end: useId(), pause: useId(), note: useId() };
 
   const issue = revealIssues ? timeEntryIssue(draft) : null;
   const error = (issue ? t(ISSUE_KEY[issue]) : null) ?? saveError;
 
   const locked = draft.billed;
+  const busy = save.isPending || deletePending;
+
+  useEffect(() => {
+    onBusyChange(busy);
+  }, [busy, onBusyChange]);
+
+  useEffect(() => {
+    return () => onBusyChange(false);
+  }, [onBusyChange]);
   const orderOptions = [...(orders.data ?? [])].sort((a, b) => a.name.localeCompare(b.name, 'de'));
   const resolvedOrderLabel =
     orderOptions.find((order) => order.id === draft.orderId)?.name.trim() ||
@@ -345,6 +369,7 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
             type="button"
             variant="destructive"
             className="w-fit"
+            disabled={busy}
             onClick={() => setConfirmDelete(true)}
           >
             {t('domain:timeForm.delete.action')}
@@ -359,11 +384,11 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
       </SheetBody>
 
       <SheetFooter>
-        <Button type="button" variant="outline" onClick={onDone}>
+        <Button type="button" variant="outline" onClick={onDone} disabled={busy}>
           {t('common:action.cancel')}
         </Button>
         {locked ? null : (
-          <Button type="submit" disabled={save.isPending}>
+          <Button type="submit" disabled={busy}>
             {t('common:action.save')}
           </Button>
         )}
@@ -375,6 +400,7 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
           description={deleteDescription}
           open={confirmDelete}
           onOpenChange={setConfirmDelete}
+          onPendingChange={setDeletePending}
           onDeleted={onDone}
         />
       ) : null}
