@@ -545,3 +545,20 @@ Das würde die Sync-Semantik auseinanderlaufen lassen. Die Liste erst mit dem
 ersten Punkt anlegen, die älteste Liste eines Auftrags wiederverwenden, den
 Parent beim Ändern nur an `modified_at` anfassen. Siehe
 [auftragscheckliste.md](auftragscheckliste.md).
+
+## Dialog-Overlay im Dunkelmodus wirkt hellgrau
+
+_Festgestellt 2026-10-08, Issue #122._
+
+**Symptom:** Hinter Dialog, AlertDialog und Sheet liegt im Dunkelmodus ein
+hellgrauer Schleier. Die Fläche dahinter sieht verwaschen aus. Im Hellmodus
+ist derselbe Schleier dunkel und in Ordnung.
+
+Die Klasse war `bg-foreground/40`. `--foreground` ist im Light `#111827`, im
+Dark `#fafafa`. 40 % Weiß über `#111112` ist das Hellgrau. Kein eigenes
+Overlay-Token, deshalb an jeder Seite dieselbe Klasse.
+
+**Lösung:** `--overlay` in `theme.css`. Light bleibt die Vordergrundfarbe bei
+40 %. Dark ist Schwarz bei 65 %. `Dialog`, `AlertDialog` und `Sheet` lesen
+`bg-overlay`. `z-[60]` und `duration-150` aus #121 bleiben. Siehe
+[webapp-shell.md](webapp-shell.md).

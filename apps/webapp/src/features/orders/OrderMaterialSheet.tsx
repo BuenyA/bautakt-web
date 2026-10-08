@@ -379,18 +379,6 @@ function OrderMaterialForm({
           />
         </div>
 
-        {draft.id && !locked ? (
-          <Button
-            type="button"
-            variant="destructive"
-            className="w-fit"
-            disabled={busy}
-            onClick={() => setConfirmDelete(true)}
-          >
-            {t('domain:materialForm.delete.action')}
-          </Button>
-        ) : null}
-
         {error ? (
           <p role="alert" className="text-destructive text-sm">
             {error}
@@ -398,7 +386,18 @@ function OrderMaterialForm({
         ) : null}
       </SheetBody>
 
-      <SheetFooter>
+      <SheetFooter className="sm:flex-wrap">
+        {draft.id && !locked ? (
+          <Button
+            type="button"
+            variant="destructive"
+            className="sm:mr-auto"
+            disabled={busy}
+            onClick={() => setConfirmDelete(true)}
+          >
+            {t('domain:materialForm.delete.action')}
+          </Button>
+        ) : null}
         <Button type="button" variant="outline" onClick={onDone} disabled={busy}>
           {t('common:action.cancel')}
         </Button>

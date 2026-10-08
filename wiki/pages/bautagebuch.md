@@ -99,7 +99,9 @@ gelöscht. Sonst bliebe eine halbe Zeile stehen, die die Handy-App sieht.
 ## Löschen
 
 Löschen gibt es nur mit `canTrackTimeForTeam` und dem Bearbeitungsrecht für
-diesen Bericht. Alle anderen sehen den Knopf nicht.
+diesen Bericht. Alle anderen sehen den Knopf nicht. Er sitzt links in der
+Fußleiste, Abbrechen und Speichern rechts. Die Fehlermeldung zum doppelten
+Tag bleibt darüber, über die volle Breite.
 
 Unmittelbar vor dem DELETE, und schon beim Öffnen des Dialogs, liest das Web
 frisch vom Server, nicht aus dem Listen-Cache. Eine Zeit oder ein Material mit

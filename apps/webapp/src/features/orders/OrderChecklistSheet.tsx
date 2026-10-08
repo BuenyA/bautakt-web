@@ -254,7 +254,7 @@ function ChecklistItemForm({
         ) : null}
       </SheetBody>
 
-      <SheetFooter>
+      <SheetFooter className="sm:flex-wrap">
         {draft.id ? (
           <Button
             type="button"

@@ -34,7 +34,7 @@ function DialogOverlay({
         // geerbtes --tw-duration vom Panel (300ms) die Einblendung nicht
         // streckt — sonst scheint der Knopf dahinter durch die transparente
         // Anfangsphase.
-        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-150 bg-foreground/40 fixed inset-0 z-[60]',
+        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-150 bg-overlay fixed inset-0 z-[60]',
         className,
       )}
       {...props}

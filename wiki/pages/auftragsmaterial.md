@@ -71,7 +71,9 @@ Inhalt gleich dem gespeicherten, gibt es keinen Schreibzugriff.
 ## Abgerechnet
 
 Eine Zeile mit `billed_document_id` lässt sich hier nicht ändern und nicht
-löschen. Das Panel zeigt den Hinweis und keinen Speichern-Knopf. Die
+löschen. Das Panel zeigt den Hinweis und keinen Speichern-Knopf. „Material
+löschen“ sitzt sonst links in der Fußleiste, neben Abbrechen und Speichern
+rechts; bei einer abgerechneten Zeile fehlt der Knopf. Die
 Datenbank sperrt das nicht für Konten mit `canUseBillingModule`: der Trigger
 `enforce_order_material_billing_fields` friert `is_billable` und
 `billed_document_id` nur ohne dieses Recht ein (gemessen 2026-10-08). Die

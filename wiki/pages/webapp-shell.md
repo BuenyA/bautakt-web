@@ -260,6 +260,18 @@ Die Tokens (`#0064E0`, Status-Hex, Sidebar-Grau) bleiben die aus
 Die graue Sidebar-Active-Pill (`rounded-sm`, `#F3F4F6` / Dark `#1F1F22`) ist
 nicht diese Button-Pill und bleibt grau.
 
+Der Schleier hinter `Dialog`, `AlertDialog` und `Sheet` ist `--overlay`
+(`bg-overlay` in `packages/ui`). Light: Vordergrundfarbe bei 40 %, wie zuvor
+`bg-foreground/40`. Dark: Schwarz bei 65 %. `--foreground` ist im Dark
+`#fafafa`; dieselbe Klasse würde dort einen hellgrauen Schleier legen.
+Dialog und AlertDialog bleiben auf `z-[60]` mit `duration-150`, das Sheet
+auf `z-50`.
+
+Eine destruktive Aktion im Auftrags-Panel sitzt links in der Fußleiste
+(`sm:mr-auto`), Abbrechen und Speichern rechts. Unter `sm` stapelt die
+Leiste, Löschen bleibt der erste Knopf. Ab `sm` darf die Zeile umbrechen.
+Das gilt für Notiz, Zeit, Material, Checkliste und Bautagebuch.
+
 ## Detailflächen
 
 Stand 2026-10-01, Optik. Auftrag-Detail (`/auftraege/:id`) und Rechnung-Detail
