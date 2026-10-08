@@ -27,7 +27,7 @@ es in diesem Betrieb schon.“ (`23505`).
 Insert-Policy: `has_company_permission(company_id, 'canManageCostCenters')`
 oder `is_company_chef(company_id)`. Welches Recht welche Rolle trägt, steht im
 Wiki von `bautakt-app`:
-<https://github.com/BuenyA/craft/blob/main/wiki/pages/berechtigungen-und-rollen.md>.
+<https://github.com/BuenyA/bautakt-app/blob/main/wiki/pages/berechtigungen-und-rollen.md>.
 
 ## Statistik
 

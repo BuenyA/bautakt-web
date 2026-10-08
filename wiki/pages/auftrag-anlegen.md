@@ -2,7 +2,8 @@
 
 Die Auftragsliste legt einen Auftrag in `orders` an und öffnet danach die
 Detailseite. Die Zeile liegt in derselben Tabelle, die die Handy-App liest.
-Fotos und Notizen bleiben auf der Detailseite nur lesend. Zeiten lassen
+Fotos bleiben auf der Detailseite nur lesend. Notizen lassen sich dort
+schreiben, siehe [auftragsnotizen.md](auftragsnotizen.md). Zeiten lassen
 sich dort nachtragen, siehe [auftragszeiten.md](auftragszeiten.md).
 
 ## Formular
@@ -37,7 +38,7 @@ ab, zeigt das Formular „Dafür fehlt dir die Berechtigung.“ (`readableDbErro
 Postgres `42501`).
 
 Welches Recht welche Rolle trägt, steht im Wiki von `bautakt-app`:
-<https://github.com/BuenyA/craft/blob/main/wiki/pages/berechtigungen-und-rollen.md>.
+<https://github.com/BuenyA/bautakt-app/blob/main/wiki/pages/berechtigungen-und-rollen.md>.
 Wie das Web die Flags liest: [berechtigungen-im-web.md](berechtigungen-im-web.md).
 
 ## Nach dem Speichern

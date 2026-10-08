@@ -274,6 +274,25 @@ order by c.table_name;
 Datenbank ein Default nachrüsten — das wäre eine Schemaänderung, und die gehört
 ohnehin nach `bautakt-app`.
 
+## Bearbeiten einer Notiz setzt den Autor neu
+
+_Festgestellt 2026-10-08, Issue #47._
+
+**Symptom:** Nach dem Speichern steht ein anderer Name unter der Notiz,
+`created_at` springt, oder die Notiz hängt an einem anderen Auftrag.
+
+`order_notes` hat als Inhalt nur `title` und `body`. Ein Update, das
+`user_id`, `created_at`, `company_id` oder `order_id` mitschickt,
+überschreibt sie. Die Handy-App synchronisiert Last-Write-Wins aus ihrem
+Cache und schreibt diese Felder wieder mit. Die Datenbank prüft den Autor
+seit der Migration `order_notes_shared_and_view_permission` (2026-08-11)
+nicht mehr: Insert, Update und Delete verlangen nur `canCreateNotes`.
+
+**Lösung:** Beim Anlegen `id: crypto.randomUUID()`, `user_id` des
+angemeldeten Nutzers, `created_at` und `modified_at` setzen. Beim Bearbeiten
+nur `title`, `body` und `modified_at`. Siehe
+[auftragsnotizen.md](auftragsnotizen.md).
+
 ## Druckansicht bleibt bei fehlendem Beleg im Spinner
 
 _Behoben 2026-10-05, Issue #35._

@@ -2,7 +2,7 @@
 
 Das Rechtemodell selbst — die 33 Flags, die sieben Systemrollen, die RLS-Policies und
 die `enforce_*`-Trigger — ist im Wiki von `bautakt-app` beschrieben:
-<https://github.com/BuenyA/craft/blob/main/wiki/pages/berechtigungen-und-rollen.md>
+<https://github.com/BuenyA/bautakt-app/blob/main/wiki/pages/berechtigungen-und-rollen.md>
 
 Diese Seite beschreibt nur, was im Web hinzukommt. **Nicht kopieren, was dort steht.**
 

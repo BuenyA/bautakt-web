@@ -8,10 +8,10 @@ app, `bautakt-app/AGENTS.md` governs and this file defers to it.
 
 Bautakt lives in two independent git repositories that share **one** Supabase project.
 
-| Repo          | Contains                                                                                   | Remote                                           |
-| ------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| `bautakt-app` | Expo / React Native app **and** `supabase/` — 95 migrations, 7 Edge Functions, the `wiki/` | `BuenyA/craft` (older name `handwerk` redirects) |
-| `bautakt-web` | This repo — marketing site (`bautakt.com`) and web app (`app.bautakt.com`)                 | `BuenyA/bautakt-web`                             |
+| Repo          | Contains                                                                                   | Remote               |
+| ------------- | ------------------------------------------------------------------------------------------ | -------------------- |
+| `bautakt-app` | Expo / React Native app **and** `supabase/` — 95 migrations, 7 Edge Functions, the `wiki/` | `BuenyA/bautakt-app` |
+| `bautakt-web` | This repo — marketing site (`bautakt.com`) and web app (`app.bautakt.com`)                 | `BuenyA/bautakt-web` |
 
 Both target Supabase project `bxivzvmlcnaxqlytumvz` (`Bautakt`, `eu-central-1`,
 Postgres 17). _Stand 2026-08-26: 49 tables in `public`, every one with RLS enabled._
@@ -57,7 +57,7 @@ session.
 ## Issue tracker
 
 Web work goes to this repo's GitHub Issues (`BuenyA/bautakt-web`), backend and mobile
-work to `BuenyA/craft`. Same labels as over there: one `area:*`, one `prio:*`, plus
+work to `BuenyA/bautakt-app`. Same labels as over there: one `area:*`, one `prio:*`, plus
 `entscheidung`, `tech-debt`, `bug` or `enhancement` where they fit. Cross-repo
 references go by URL, never by bare `#<nr>` — that would resolve to the wrong repo.
 

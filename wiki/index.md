@@ -26,7 +26,7 @@ verlinkt, nie kopiert.
 | [deployment-vercel.md](pages/deployment-vercel.md)         | Zwei Projekte aus einem Repo, der SPA-Rewrite, Env-Präfixe.   |
 | [webapp-shell.md](pages/webapp-shell.md)                   | Shell-Layout, kanonische Top-Nav IA, Listen-Muster.           |
 | [auftragsfotos.md](pages/auftragsfotos.md)                 | Read-only Fotogalerie auf der Auftragsdetailseite.            |
-| [auftragsnotizen.md](pages/auftragsnotizen.md)             | Read-only Notizen auf der Auftragsdetailseite.                |
+| [auftragsnotizen.md](pages/auftragsnotizen.md)             | Notizen am Auftrag lesen, anlegen, bearbeiten, löschen.       |
 | [auftragszeiten.md](pages/auftragszeiten.md)               | Zeiten am Auftrag und auf `/zeiten` anlegen, ändern, löschen. |
 | [auftrag-anlegen.md](pages/auftrag-anlegen.md)             | Auftrag aus der Liste anlegen, dieselbe `orders`-Zeile.       |
 | [einsatz-anlegen.md](pages/einsatz-anlegen.md)             | Einsatz anlegen und löschen, Zeiten bleiben stehen.           |
@@ -69,6 +69,8 @@ verlinkt, nie kopiert.
 | 2026-10-05 | [Einsatz anlegen und löschen](logs/2026-10-05-einsatz-anlegen-loeschen.md)                      |
 | 2026-10-05 | [Kostenstellen anlegen, löschen, Auftragssumme](logs/2026-10-05-kostenstellen-anlegen.md)       |
 | 2026-10-08 | [Zeit am Auftrag und auf /zeiten schreiben](logs/2026-10-08-zeit-erfassen.md)                   |
+| 2026-10-08 | [Notizen am Auftrag schreiben](logs/2026-10-08-auftragsnotizen-schreiben.md)                    |
+| 2026-10-08 | [Wiki verlinkt bautakt-app](logs/2026-10-08-wiki-link-bautakt-app.md)                           |
 
 ## Die drei wichtigsten Sätze
 
