@@ -91,6 +91,18 @@
       "loadErrorTitle": "Zeiten konnten nicht geladen werden",
       "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
     },
+    "materials": {
+      "title": "Material",
+      "emptyTitle": "Noch kein Material",
+      "emptyDescription": "Erfasstes Material zu diesem Auftrag erscheint hier.",
+      "emptyDescriptionWrite": "Hier lässt sich Material erfassen. Es erscheint danach auch in der Handy-App.",
+      "loadErrorTitle": "Material konnte nicht geladen werden",
+      "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+      "billed": "Abgerechnet",
+      "noTitle": "Ohne Bezeichnung",
+      "cost": "EK {{price}}",
+      "price": "VK {{price}}"
+    },
     "create": {
       "action": "Auftrag anlegen",
       "title": "Auftrag anlegen",
@@ -99,7 +111,7 @@
       "postalCode": "PLZ",
       "city": "Ort",
       "notes": "Beschreibung",
-      "nameRequired": "Bitte eine Bezeichnung angeben — sonst ist der Auftrag in der Liste nicht zu finden.",
+      "nameRequired": "Bitte einen Namen eingeben.",
       "saved": "Auftrag angelegt.",
       "saveError": "Auftrag konnte nicht angelegt werden."
     },
@@ -766,6 +778,44 @@
       "confirm": "Endgültig löschen",
       "deleted": "Notiz gelöscht.",
       "error": "Notiz konnte nicht gelöscht werden."
+    }
+  },
+  "materialForm": {
+    "newTitle": "Material erfassen",
+    "editTitle": "Material bearbeiten",
+    "description": "Artikel aus dem Katalog oder eine eigene Bezeichnung. Menge und Einkaufspreis sind Pflicht.",
+    "mode": "Art des Materials",
+    "modeCatalog": "Aus dem Katalog",
+    "modeCustom": "Freitext",
+    "article": "Artikel *",
+    "chooseArticle": "Artikel wählen",
+    "noArticles": "Im Katalog ist noch kein Artikel aktiv. Eine eigene Bezeichnung geht trotzdem.",
+    "articlesError": "Artikel konnten nicht geladen werden.",
+    "title": "Bezeichnung *",
+    "quantity": "Menge *",
+    "unit": "Einheit",
+    "unitCost": "Einkaufspreis *",
+    "unitPrice": "Verkaufspreis",
+    "priceHint": "Beim Artikel aus dem Katalog steht hier dessen Verkaufspreis. Leer heißt: die Rechnung nimmt den Einkaufspreis.",
+    "usedAt": "Datum *",
+    "notes": "Notiz",
+    "articleRequired": "Bitte einen Artikel wählen.",
+    "titleRequired": "Bitte eine Bezeichnung eingeben.",
+    "quantityRequired": "Die Menge muss größer als 0 sein.",
+    "costRequired": "Der Einkaufspreis muss größer als 0 sein.",
+    "priceInvalid": "Der Verkaufspreis ist keine Zahl.",
+    "dateRequired": "Bitte ein Datum angeben.",
+    "billedHint": "Dieses Material ist bereits abgerechnet. Bearbeiten und Löschen sind gesperrt, damit die Rechnung dazu passt.",
+    "saved": "Material gespeichert.",
+    "saveError": "Material konnte nicht gespeichert werden.",
+    "delete": {
+      "action": "Material löschen",
+      "title": "Material löschen?",
+      "description": "„{{label}}“ wird entfernt. Das lässt sich nicht rückgängig machen.",
+      "descriptionUntitled": "Dieses Material wird entfernt. Das lässt sich nicht rückgängig machen.",
+      "confirm": "Endgültig löschen",
+      "deleted": "Material gelöscht.",
+      "error": "Material konnte nicht gelöscht werden."
     }
   },
   "timeForm": {

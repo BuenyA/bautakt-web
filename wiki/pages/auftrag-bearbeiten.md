@@ -29,7 +29,11 @@ Auftrag.
 
 Felder, wie „Details bearbeiten“ in der Handy-App, ohne Icon und Titelbild:
 
-- Bezeichnung, Pflicht, nach dem Trim nicht leer.
+- Bezeichnung, Pflicht, nach dem Trim nicht leer. Die Meldung
+  „Bitte einen Namen eingeben.“ steht am Feld und verschwindet, sobald der
+  Name nicht mehr leer ist. Dieselbe Meldung im Anlegen-Modus. Am Ende des
+  Panels wäre sie beim Bearbeiten unter dem Falz: `SheetBody` scrollt, der
+  Speichern-Knopf bleibt stehen.
 - Kunde. Ist `customer_id` gesetzt, nur die Auswahl aus `customers`. Ist sie
   leer, bleibt `customer_label` ein editierbares Freitextfeld. Eine Auswahl
   setzt `customer_id` und `customer_label` gemeinsam. Zurück auf „kein

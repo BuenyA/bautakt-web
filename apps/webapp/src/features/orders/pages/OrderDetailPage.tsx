@@ -12,6 +12,7 @@ import { usePermission } from '@/features/company/usePermission';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import { OrderMaterials } from '../OrderMaterials';
 import { OrderNotes } from '../OrderNotes';
 import { OrderPhotos } from '../OrderPhotos';
 import { OrderSheet } from '../OrderSheet';
@@ -134,6 +135,7 @@ export function OrderDetailPage() {
       <OrderPhotos orderId={data.id} />
       <OrderNotes orderId={data.id} />
       <OrderTimes orderId={data.id} orderName={data.name} />
+      <OrderMaterials orderId={data.id} />
     </div>
   );
 }

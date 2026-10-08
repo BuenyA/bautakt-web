@@ -400,6 +400,43 @@ Abgerechnete Zeilen (`billed_document_id`) sperrt die Datenbank nicht. Die
 Oberfläche lehnt Ändern und Löschen ab und liest die Spalte direkt vor dem
 Schreiben noch einmal. Eine echte Sperre wäre ein Trigger in `bautakt-app`.
 
+## Material: Abrechnung und der XOR-Check
+
+_Gemessen 2026-10-08, Issue #55._
+
+**Symptom:** Eine abgerechnete Materialzeile lässt sich noch ändern, oder ein
+Update scheitert, obwohl nur der Titel gewechselt wurde.
+
+`enforce_order_material_billing_fields` hält `is_billable` und
+`billed_document_id` nur für Konten ohne `canUseBillingModule` fest.
+Geschäftsführung hat das Recht. Die Oberfläche sperrt Ändern und Löschen und
+liest `billed_document_id` direkt vor dem Schreiben noch einmal.
+
+Der Check verlangt genau eines von `article_id` und `custom_title` (getrimmt,
+nicht leer). Ein Update, das nur die neue Spalte setzt, lässt die alte stehen
+und verletzt den Check. `unit_cost` ist nullable; das Formular verlangt einen
+Einkaufspreis größer als 0, wie die Handy-App. `id` hat kein Default.
+
+Select ist enger als Update: `canManageOrders` allein darf ändern, aber nicht
+lesen. Lesen läuft über `canRecordMaterials` (eigene Zeile, oder alle mit
+`canManageOrders`) oder über `canViewCompanyFinance` / `canViewOrderFinance`.
+
+**Lösung:** Siehe [auftragsmaterial.md](auftragsmaterial.md). Keine Migration.
+
+## Sheet: Fehlermeldung unter dem Falz
+
+_Festgestellt 2026-10-08 am Auftrag-Bearbeiten, Smoke von #54._
+
+**Symptom:** Speichern bei leerem Auftragsnamen lässt das Panel offen, und es
+ist keine Meldung zu sehen.
+
+`SheetBody` scrollt, `SheetFooter` bleibt stehen. Die Meldung stand am Ende
+der Felder und lag beim langen Formular unter dem sichtbaren Bereich.
+
+**Lösung:** Die Meldung an das Namensfeld, das Feld in den sichtbaren Bereich
+scrollen. Anlegen und Bearbeiten gleich. Siehe
+[auftrag-bearbeiten.md](auftrag-bearbeiten.md).
+
 ## Auftragsfoto: der Bucket nimmt nur JPEG bis 5 MB
 
 _Gemessen 2026-10-08, Issue #48._

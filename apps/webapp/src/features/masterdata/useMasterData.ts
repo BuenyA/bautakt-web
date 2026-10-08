@@ -28,14 +28,21 @@ export type CostCenterRow = {
   contractSum: number | null;
 };
 
-/** Artikelkatalog des Betriebs. */
-export function useArticles() {
+/**
+ * Artikelkatalog des Betriebs.
+ *
+ * Dieselbe Abfrage nutzt die Materialerfassung am Auftrag, nur zur Auswahl.
+ * `enabled: false` lässt den Cache in Ruhe, solange das Formular nicht
+ * aufgehen kann.
+ */
+export function useArticles(options?: { enabled?: boolean }) {
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
+  const enabled = options?.enabled ?? true;
 
   return useQuery({
     queryKey: ['articles', companyId],
-    enabled: Boolean(companyId),
+    enabled: Boolean(companyId) && enabled,
     queryFn: async (): Promise<ArticleRow[]> => {
       const { data, error } = await supabase
         .from('articles')
