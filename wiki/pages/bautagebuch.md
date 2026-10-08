@@ -22,7 +22,10 @@ Die Optik steht in [webapp-shell.md](webapp-shell.md#detailflächen).
 Wer den Bericht ändern darf, öffnet die Karte als Knopf das Panel. Wer ihn
 nur lesen darf, sieht dieselbe Karte ohne Knopf. „Bericht anlegen“ steht in
 der Überschrift und im leeren Zustand, sobald das Konto Berichte anlegen
-darf — dasselbe Recht wie das Lesen.
+darf — dasselbe Recht wie das Lesen. Der Knopf bleibt aus, solange die
+Anstellungen noch nicht da sind. Sonst öffnet das Panel ohne Vorauswahl, und
+eine Auswahl aus der Mitgliedschaft allein träfe eine Person, die die Liste
+noch nicht bestätigt.
 
 Sichtbar verknüpfte Zeiten, Material, Fotos und Mängel stehen als Anzahl auf
 der Karte, wenn die Zahl größer als 0 ist. Die Zeilen selbst werden hier
@@ -65,9 +68,15 @@ Beim Bearbeiten gehen Datum, beide Wetter, beide Temperaturen, Leistungen,
 Notizen und `modified_at` mit. Ungeschrieben bleiben `materials`,
 `special_occurrences`, `user_id`, `company_id`, `order_id` und `created_at`.
 Ein zweiter Bericht am selben Tag scheitert am Unique-Index
-`daily_reports_order_id_report_date_uidx`. Die Meldung sagt das, und wenn der
-bestehende Bericht für dieses Konto lesbar und änderbar ist, öffnet ein Knopf
-ihn.
+`daily_reports_order_id_report_date_uidx`. Der Hinweis „Für diesen Tag gibt
+es an diesem Auftrag schon einen Bericht.“ steht, sobald das Datum im
+Formular auf einen belegten Tag zeigt — gegen die geladene Liste und
+zusätzlich gegen eine Abfrage nur auf `id` mit `(order_id, report_date)`.
+Die Liste allein reicht nicht, sie kann noch laden. Speichern ist dann aus.
+Die eigene Zeile zählt beim Bearbeiten nicht. Trifft das Insert oder Update
+trotzdem `23505`, erscheint derselbe Hinweis. Ist die bestehende Zeile
+lesbar, öffnet „Vorhandenen Bericht öffnen“ sie; ohne Änderungsrecht bleibt
+der Hinweis und der Knopf sagt, dass Bearbeiten nicht geht.
 
 ## Anwesenheit und Zeit
 
@@ -81,8 +90,12 @@ darf (`canTrackTimeForTeam` für jede, nur `canTrackTime` für die eigene).
 Ohne eines von beiden gibt es keine Uhrzeit und es entsteht keine Zeile in
 `time_entries`. Eine Anstellung ohne Konto bucht nur das Team-Recht.
 
-Neue Berichtszeiten starten um 07:00 und enden um 16:00, Pause 0, Notiz leer,
-`group_id` leer, `daily_report_id` gesetzt. `is_billable` ist wahr. Sätze
+Beim Anlegen ist die eigene aktive Anstellung vorausgewählt, sobald die
+Mitarbeiterliste da ist. Hat der Nutzer die Anwesenheit schon geändert, bleibt
+seine Auswahl. Eine leere Auswahl, die nur daher kommt, dass die Liste noch
+lud, wird nachgezogen. Neue Berichtszeiten starten um 07:00 und enden um
+16:00, Pause 0, Notiz leer, `group_id` leer, `daily_report_id` gesetzt.
+`is_billable` ist wahr. Sätze
 gehen nur mit `canManageRates` mit, sonst füllt der Trigger sie. Liegt das
 Ende vor dem Beginn, ist das eine Nachtschicht, wie bei der Zeiterfassung.
 
@@ -114,9 +127,12 @@ Mangel am Bericht hängt, auch ohne Abrechnung. Grund: die Select-Policy auf
 `order_materials` zeigt einem Konto mit Team-Zeit und Bearbeitungsrecht nicht
 jede Zeile (gemessen 2026-10-08). Eine Zählung von 0 gilt nur, wenn das Konto
 alle vier Tabellen vollständig sieht (`seesEveryReportLink`). Sonst bleibt der
-Knopf aus, mit dem Hinweis: „Dieser Bericht hat verknüpfte Zeiten, Material,
-Fotos oder Mängel und kann im Web nicht gelöscht werden.“ Die Datenbank
-selbst löscht weiter per CASCADE; die Sperre dort kommt über
+Knopf aus, mit dem Hinweis: „Dieser Bericht hat verknüpfte Einträge und kann
+im Web noch nicht gelöscht werden.“ Unter beiden Sperrtexten stehen die
+sichtbaren Anzahlen wie auf der Karte, nur Werte über 0, mit Singular und
+Plural („6 Zeiten · 1 Material · 1 Foto“). Eine fehlgeschlagene Zählung fehlt
+in der Zeile. Die Datenbank selbst löscht weiter per CASCADE; die Sperre dort
+kommt über
 [bautakt-app #104](https://github.com/BuenyA/bautakt-app/issues/104).
 
 Ist nichts verknüpft und das Konto sieht alle vier Tabellen, nennt der Dialog

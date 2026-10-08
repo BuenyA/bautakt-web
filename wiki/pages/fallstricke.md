@@ -476,8 +476,13 @@ Konto diese vier Tabellen vollständig sieht. Abgerechnete Zeiten oder
 abgerechnetes Material (`billed_document_id`) sperren immer. Der Bericht
 verschwindet erst nach der Server-Antwort. Die Datenbank kaskadiert weiter;
 die Sperre dort kommt über bautakt-app #104. Den zweiten Bericht am selben
-Tag lehnt die Oberfläche mit einer Klartextmeldung ab. `id` setzt der Client.
-Siehe [bautagebuch.md](bautagebuch.md).
+Tag lehnt die Oberfläche mit einer Klartextmeldung ab, und zwar schon beim
+Wechsel des Datums: die geladene Liste und eine Abfrage auf
+`(order_id, report_date)`. Nur beim Speichern zu prüfen hat im Smoke von #120
+den Hinweis verfehlt, obwohl die Karte schon da war. Die eigene Zeile zählt
+beim Bearbeiten nicht. `id` setzt der Client. „Bericht anlegen“ wartet auf
+die Mitarbeiterliste; eine Vorauswahl davor bleibt leer oder trifft die
+falsche Person. Siehe [bautagebuch.md](bautagebuch.md).
 
 ## Foto löschen: erst die Datei, dann die Zeile
 

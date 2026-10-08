@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import {
   type DailyReportAttendance,
   type DailyReportDraft,
+  isDailyReportDate,
   temperatureToInput,
 } from './dailyReportDraft';
 
@@ -333,4 +334,78 @@ export function draftFromDailyReport(report: DailyReport): DailyReportDraft {
 
 export function formatReportDate(isoDate: string): string {
   return formatIsoDateDe(isoDate);
+}
+
+/**
+ * Anderer Bericht am selben Tag, aus der schon geladenen Liste.
+ *
+ * Die eigene Zeile zählt nicht. Ein ungültiges Datum ist kein Treffer.
+ * Die Liste kann noch leer sein — dann bleibt die Serverabfrage übrig.
+ */
+export function otherDailyReportId(
+  reports: readonly { id: string; date: string }[],
+  date: string,
+  selfId?: string,
+): string | null {
+  if (!isDailyReportDate(date)) return null;
+  const match = reports.find((report) => report.date === date && report.id !== selfId);
+  return match?.id ?? null;
+}
+
+/**
+ * Ob an diesem Auftrag und Tag schon ein Bericht liegt.
+ *
+ * Nur die `id`, gefiltert auf Mandant, Auftrag und Datum. Die Liste muss
+ * dafür nicht fertig sein. Sichtbar ist die Zeile auch, wenn dieses Konto
+ * sie nicht ändern darf — Select hängt an `canCreateAndViewReports`.
+ * Den eigenen Bericht filtert der Aufrufer heraus.
+ */
+export function useDailyReportOnDate(orderId: string | undefined, date: string) {
+  const { data: membership } = useMembership();
+  const companyId = membership?.companyId;
+  const ready = isDailyReportDate(date);
+
+  return useQuery({
+    queryKey: ['daily-report-on-date', companyId, orderId, date],
+    enabled: Boolean(companyId && orderId) && ready,
+    queryFn: async (): Promise<string[]> => {
+      const { data, error } = await supabase
+        .from('daily_reports')
+        .select('id')
+        .eq('company_id', companyId!)
+        .eq('order_id', orderId!)
+        .eq('report_date', date)
+        .limit(2);
+      if (error) throw error;
+      return (data ?? []).map((row) => row.id);
+    },
+  });
+}
+
+/**
+ * Anzahlen wie auf der Karte: nur Werte über 0, Singular und Plural aus dem Katalog.
+ *
+ * „1 Zeit“, „6 Zeiten“, „1 Material“, „2 Materialien“, „1 Foto“, „1 Mangel“.
+ * Eine fehlende Zählung (`null`) wird ausgelassen, nicht als 0 behauptet.
+ */
+export function formatDailyReportLinkCounts(
+  counts: DailyReportLinkCounts,
+  translate: (key: string, options: { count: number }) => string,
+): string {
+  const parts: string[] = [];
+  if (counts.times != null && counts.times > 0) {
+    parts.push(translate('domain:orders.dailyReports.linkedTimes', { count: counts.times }));
+  }
+  if (counts.materials != null && counts.materials > 0) {
+    parts.push(
+      translate('domain:orders.dailyReports.linkedMaterials', { count: counts.materials }),
+    );
+  }
+  if (counts.photos != null && counts.photos > 0) {
+    parts.push(translate('domain:orders.dailyReports.linkedPhotos', { count: counts.photos }));
+  }
+  if (counts.issues != null && counts.issues > 0) {
+    parts.push(translate('domain:orders.dailyReports.linkedIssues', { count: counts.issues }));
+  }
+  return parts.join(' · ');
 }
