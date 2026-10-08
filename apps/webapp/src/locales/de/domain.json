@@ -103,6 +103,18 @@
       "cost": "EK {{price}}",
       "price": "VK {{price}}"
     },
+    "checklist": {
+      "title": "Checkliste",
+      "emptyTitle": "Noch keine Punkte",
+      "emptyDescription": "Punkte aus der Handy-App erscheinen hier, sobald sie synchronisiert sind.",
+      "emptyDescriptionWrite": "Hier lässt sich der erste Punkt anlegen. Er erscheint danach auch in der Handy-App.",
+      "loadErrorTitle": "Checkliste konnte nicht geladen werden",
+      "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+      "progress": "{{done}} von {{total}} erledigt",
+      "due": "Fällig {{date}}",
+      "untitled": "Ohne Titel",
+      "toggle": "„{{title}}“ abhaken"
+    },
     "create": {
       "action": "Auftrag anlegen",
       "title": "Auftrag anlegen",
@@ -778,6 +790,34 @@
       "confirm": "Endgültig löschen",
       "deleted": "Notiz gelöscht.",
       "error": "Notiz konnte nicht gelöscht werden."
+    }
+  },
+  "checklistForm": {
+    "newTitle": "Punkt hinzufügen",
+    "editTitle": "Punkt bearbeiten",
+    "description": "Titel ist Pflicht. Datum und Zuweisung sind frei. Der Punkt ist danach auch in der Handy-App sichtbar.",
+    "title": "Titel *",
+    "due": "Fällig am",
+    "assignee": "Zugewiesen an",
+    "nobody": "Niemand",
+    "assigneeHint": "Die Person sieht den Punkt in der Handy-App.",
+    "assigneeEnded": "{{name}} (ausgeschieden)",
+    "assigneeInvalid": "Diese Zuweisung ist ungültig.",
+    "employeesError": "Mitarbeiter konnten nicht geladen werden.",
+    "noEmployees": "Keine aktiven Mitarbeiter.",
+    "titleRequired": "Bitte einen Titel eingeben.",
+    "dateInvalid": "Das Datum ist ungültig.",
+    "saved": "Punkt gespeichert.",
+    "saveError": "Punkt konnte nicht gespeichert werden.",
+    "toggleError": "Der Punkt konnte nicht geändert werden.",
+    "delete": {
+      "action": "Punkt löschen",
+      "title": "Punkt löschen?",
+      "description": "„{{label}}“ wird entfernt. Das lässt sich nicht rückgängig machen.",
+      "descriptionUntitled": "Dieser Punkt wird entfernt. Das lässt sich nicht rückgängig machen.",
+      "confirm": "Endgültig löschen",
+      "deleted": "Punkt gelöscht.",
+      "error": "Punkt konnte nicht gelöscht werden."
     }
   },
   "materialForm": {

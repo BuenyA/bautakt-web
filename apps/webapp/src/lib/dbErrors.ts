@@ -17,6 +17,9 @@ const MESSAGES: Record<string, string> = {
   INVALID_STATUS: 'Über diese Abwesenheit wurde bereits entschieden.',
   ABSENCE_NOT_FOUND: 'Diese Abwesenheit existiert nicht mehr.',
   EMPLOYMENT_NOT_FOUND: 'Diesen Mitarbeiter gibt es nicht mehr.',
+  CHECKLIST_ASSIGNEE_INACTIVE: 'Dieser Mitarbeiter ist nicht mehr im Betrieb.',
+  CHECKLIST_ITEM_MISSING: 'Dieser Punkt existiert nicht mehr.',
+  CHECKLIST_CONFLICT: 'Die Checkliste wurde gerade geändert. Bitte noch einmal speichern.',
   FORBIDDEN: 'Dafür fehlt dir die Berechtigung.',
   NOT_AUTHENTICATED: 'Die Anmeldung ist abgelaufen. Bitte neu anmelden.',
   MISSING_SERVICE_DATE:

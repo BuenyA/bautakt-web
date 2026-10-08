@@ -475,3 +475,24 @@ eine Datei nicht, die niemand in `order_images` findet.
 Bucket, 10 Zeilen, 10 davon verknüpft._ `order_images.order_id` verweist mit
 `ON DELETE CASCADE` auf `orders`. Die Datei im Bucket fällt dabei nicht mit.
 Das gehört nach `bautakt-app`, nicht in eine Web-Migration.
+
+## Checkliste: eine Änderung schreibt die ganze Liste
+
+_Festgelegt 2026-10-08, Issue #56. Dieselbe Semantik wie `checklist.upsert`
+in der Handy-App._
+
+**Symptom:** Ein Punkt, den jemand gerade in der Handy-App offline angelegt
+hat, ist nach dem Speichern im Web weg. Oder ein Punkt aus dem Web fehlt
+nach dem nächsten Sync des Geräts.
+
+Die Handy-App speichert nicht einen Punkt, sondern Parent plus die komplette
+Item-Liste. Ids, die in dieser Liste fehlen, werden gelöscht. Das Web macht
+das genauso. Ein Lesevorgang unmittelbar vor dem Schreiben bewahrt Punkte,
+die den Server schon erreicht haben. Was nur im Offline-Cache des Geräts
+liegt, sieht dieser Lesevorgang nicht.
+
+**Lösung:** Nicht auf einzelne Updates umstellen, um das Risiko zu vermeiden.
+Das würde die Sync-Semantik auseinanderlaufen lassen. Die Liste erst mit dem
+ersten Punkt anlegen, die älteste Liste eines Auftrags wiederverwenden, den
+Parent beim Ändern nur an `modified_at` anfassen. Siehe
+[auftragscheckliste.md](auftragscheckliste.md).

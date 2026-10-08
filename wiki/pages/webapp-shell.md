@@ -269,6 +269,8 @@ sich seit 2026-10-08 nachtragen; die Karte bleibt dieselbe Fläche und ist dann
 ein Knopf. Siehe [auftragszeiten.md](auftragszeiten.md). Fotos lassen sich
 seit demselben Tag hochladen; die Kachel bleibt dieselbe Fläche, darüber
 liegt eine gestrichelte Ablegefläche. Siehe [auftragsfotos.md](auftragsfotos.md).
+Die Checkliste unter den Notizen lässt sich seit 2026-10-08 abhaken; die Zeile
+ist dieselbe Card. Siehe [auftragscheckliste.md](auftragscheckliste.md).
 
 | Element                         | Look                                                                                                                                                                                                                                          |
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
