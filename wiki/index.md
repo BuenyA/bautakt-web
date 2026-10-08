@@ -29,6 +29,7 @@ verlinkt, nie kopiert.
 | [auftragsnotizen.md](pages/auftragsnotizen.md)             | Notizen am Auftrag lesen, anlegen, bearbeiten, löschen.       |
 | [auftragszeiten.md](pages/auftragszeiten.md)               | Zeiten am Auftrag und auf `/zeiten` anlegen, ändern, löschen. |
 | [auftragsmaterial.md](pages/auftragsmaterial.md)           | Material am Auftrag lesen, anlegen, ändern, löschen.          |
+| [bautagebuch.md](pages/bautagebuch.md)                     | Bautagebuch am Auftrag lesen, anlegen, ändern, löschen.       |
 | [auftragscheckliste.md](pages/auftragscheckliste.md)       | Checkliste am Auftrag lesen, abhaken, zuweisen.               |
 | [auftrag-anlegen.md](pages/auftrag-anlegen.md)             | Auftrag aus der Liste anlegen, dieselbe `orders`-Zeile.       |
 | [auftrag-bearbeiten.md](pages/auftrag-bearbeiten.md)       | Stammdaten eines Auftrags ändern, Teilpatch wie in der App.   |
@@ -78,6 +79,7 @@ verlinkt, nie kopiert.
 | 2026-10-08 | [Zeit nachtragen und Notiz-Panel: Smoke](logs/2026-10-08-zeit-nachtragen-smoke.md)              |
 | 2026-10-08 | [Auftrag im Web bearbeiten](logs/2026-10-08-auftrag-bearbeiten.md)                              |
 | 2026-10-08 | [Material am Auftrag](logs/2026-10-08-material-am-auftrag.md)                                   |
+| 2026-10-08 | [Bautagebuch am Auftrag](logs/2026-10-08-bautagebuch.md)                                        |
 | 2026-10-08 | [Checkliste am Auftrag](logs/2026-10-08-auftragscheckliste.md)                                  |
 | 2026-10-08 | [Leerer Auftragsname im Sheet](logs/2026-10-08-auftrag-name-fehler.md)                          |
 | 2026-10-08 | [Geldfelder mit zwei Nachkommastellen](logs/2026-10-08-geld-nachkommastellen.md)                |
