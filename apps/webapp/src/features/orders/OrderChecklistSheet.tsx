@@ -1,0 +1,269 @@
+import {
+  Button,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  toast,
+} from '@bautakt/ui';
+import { type FormEvent, useId, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { useEmployees } from '@/features/team/useEmployees';
+import { readableDbError } from '@/lib/dbErrors';
+
+import { OrderChecklistDeleteDialog } from './OrderChecklistDeleteDialog';
+import {
+  CHECKLIST_UNASSIGNED,
+  type ChecklistFieldIssue,
+  type ChecklistItemDraft,
+  readChecklistFields,
+} from './orderChecklistDraft';
+import { useSaveOrderChecklist } from './useOrderChecklistMutations';
+
+/**
+ * Punkt anlegen oder umbenennen, mit Datum und Zuweisung.
+ *
+ * Das Panel ist nur gemountet, solange es offen ist, und startet deshalb
+ * jedes Mal mit dem übergebenen Entwurf. Abhaken sitzt auf der Karte, nicht
+ * hier. Löschen fragt vorher nach.
+ */
+export function OrderChecklistSheet({
+  draft,
+  open,
+  onOpenChange,
+}: {
+  draft: ChecklistItemDraft | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="p-0">
+        {open && draft ? (
+          <ChecklistItemForm initial={draft} onDone={() => onOpenChange(false)} />
+        ) : null}
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+type AssigneeOption = { id: string; name: string; ended: boolean };
+
+function ChecklistItemForm({
+  initial,
+  onDone,
+}: {
+  initial: ChecklistItemDraft;
+  onDone: () => void;
+}) {
+  const { t } = useTranslation();
+  const save = useSaveOrderChecklist();
+  const employees = useEmployees();
+  const [draft, setDraft] = useState(initial);
+  const [issue, setIssue] = useState<ChecklistFieldIssue | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const ids = { title: useId(), due: useId(), assignee: useId() };
+
+  function set(patch: Partial<ChecklistItemDraft>) {
+    setIssue(null);
+    setDraft((current) => ({ ...current, ...patch }));
+  }
+
+  const options: AssigneeOption[] = (employees.data ?? [])
+    .filter((employee) => !employee.ended_at)
+    .map((employee) => ({ id: employee.id, name: employee.name, ended: false }));
+  if (
+    draft.assignedEmploymentId &&
+    !options.some((option) => option.id === draft.assignedEmploymentId)
+  ) {
+    options.push({
+      id: draft.assignedEmploymentId,
+      name: draft.assigneeName,
+      ended: true,
+    });
+  }
+  options.sort((a, b) => a.name.localeCompare(b.name, 'de'));
+
+  function issueMessage(next: ChecklistFieldIssue): string {
+    switch (next) {
+      case 'title':
+        return t('domain:checklistForm.titleRequired');
+      case 'date':
+        return t('domain:checklistForm.dateInvalid');
+      case 'assignee':
+        return t('domain:checklistForm.assigneeInvalid');
+    }
+  }
+
+  async function onSubmit(event: FormEvent) {
+    event.preventDefault();
+    const fields = readChecklistFields(draft);
+    if (!fields.ok) {
+      setError(null);
+      setIssue(fields.issue);
+      return;
+    }
+
+    const id = draft.id ?? crypto.randomUUID();
+    try {
+      await save.mutateAsync({
+        kind: draft.id ? 'update' : 'create',
+        orderId: draft.orderId,
+        id,
+        ...fields.fields,
+      });
+      toast.success(t('domain:checklistForm.saved'));
+      onDone();
+    } catch (caught) {
+      if (caught instanceof Error && caught.message === 'INVALID_CHECKLIST_ITEM') {
+        setIssue('title');
+        setError(null);
+        return;
+      }
+      if (caught instanceof Error && caught.message === 'INVALID_CHECKLIST_DATE') {
+        setIssue('date');
+        setError(null);
+        return;
+      }
+      setError(readableDbError(caught) ?? t('domain:checklistForm.saveError'));
+    }
+  }
+
+  const assigneeValue = draft.assignedEmploymentId || CHECKLIST_UNASSIGNED;
+
+  return (
+    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
+      <SheetHeader>
+        <SheetTitle>
+          {draft.id ? t('domain:checklistForm.editTitle') : t('domain:checklistForm.newTitle')}
+        </SheetTitle>
+        <SheetDescription>{t('domain:checklistForm.description')}</SheetDescription>
+      </SheetHeader>
+
+      <SheetBody className="flex flex-col gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor={ids.title}>{t('domain:checklistForm.title')}</Label>
+          <Input
+            id={ids.title}
+            value={draft.title}
+            aria-invalid={issue === 'title'}
+            autoComplete="off"
+            onChange={(event) => set({ title: event.target.value })}
+          />
+          {issue === 'title' ? (
+            <p role="alert" className="text-destructive text-sm">
+              {issueMessage('title')}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor={ids.due}>{t('domain:checklistForm.due')}</Label>
+          <Input
+            id={ids.due}
+            type="date"
+            value={draft.dueDate}
+            aria-invalid={issue === 'date'}
+            onChange={(event) => set({ dueDate: event.target.value })}
+          />
+          {issue === 'date' ? (
+            <p role="alert" className="text-destructive text-sm">
+              {issueMessage('date')}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor={ids.assignee}>{t('domain:checklistForm.assignee')}</Label>
+          <Select
+            value={assigneeValue}
+            onValueChange={(value) => {
+              if (!value) return;
+              set({
+                assignedEmploymentId: value === CHECKLIST_UNASSIGNED ? '' : value,
+              });
+            }}
+          >
+            <SelectTrigger id={ids.assignee} className="w-full">
+              <SelectValue placeholder={t('domain:checklistForm.nobody')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={CHECKLIST_UNASSIGNED}>
+                {t('domain:checklistForm.nobody')}
+              </SelectItem>
+              {options.map((option) => (
+                <SelectItem key={option.id} value={option.id}>
+                  {option.ended
+                    ? t('domain:checklistForm.assigneeEnded', {
+                        name: option.name || t('domain:employees.unnamed'),
+                      })
+                    : option.name || t('domain:employees.unnamed')}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {employees.isError ? (
+            <p className="text-destructive text-sm">{t('domain:checklistForm.employeesError')}</p>
+          ) : !employees.data && !employees.isError ? (
+            <p className="text-muted-foreground text-sm">{t('common:state.loading')}</p>
+          ) : options.length === 0 ? (
+            <p className="text-muted-foreground text-sm">{t('domain:checklistForm.noEmployees')}</p>
+          ) : (
+            <p className="text-muted-foreground text-xs">
+              {t('domain:checklistForm.assigneeHint')}
+            </p>
+          )}
+        </div>
+
+        {draft.id ? (
+          <Button
+            type="button"
+            variant="destructive"
+            className="w-fit"
+            onClick={() => setConfirmDelete(true)}
+          >
+            {t('domain:checklistForm.delete.action')}
+          </Button>
+        ) : null}
+
+        {error ? (
+          <p role="alert" className="text-destructive text-sm">
+            {error}
+          </p>
+        ) : null}
+      </SheetBody>
+
+      <SheetFooter>
+        <Button type="button" variant="outline" onClick={onDone}>
+          {t('common:action.cancel')}
+        </Button>
+        <Button type="submit" disabled={save.isPending}>
+          {t('common:action.save')}
+        </Button>
+      </SheetFooter>
+
+      {draft.id ? (
+        <OrderChecklistDeleteDialog
+          orderId={draft.orderId}
+          itemId={draft.id}
+          label={initial.title.trim()}
+          open={confirmDelete}
+          onOpenChange={setConfirmDelete}
+          onDeleted={onDone}
+        />
+      ) : null}
+    </form>
+  );
+}
