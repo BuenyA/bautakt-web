@@ -6,8 +6,11 @@ teilen. Das ist die wichtigste Tatsache über dieses Repo, und fast jede Regel i
 
 | Repo          | Enthält                                                                                             | Remote               |
 | ------------- | --------------------------------------------------------------------------------------------------- | -------------------- |
-| `bautakt-app` | Expo/React-Native-App **und** `supabase/` (95 Migrationen, 7 Edge Functions) sowie das Backend-Wiki | `BuenyA/craft`       |
+| `bautakt-app` | Expo/React-Native-App **und** `supabase/` (95 Migrationen, 7 Edge Functions) sowie das Backend-Wiki | `BuenyA/bautakt-app` |
 | `bautakt-web` | Marketing-Seite und Web-App                                                                         | `BuenyA/bautakt-web` |
+
+_Stand 2026-10-08: der Remote des Mobile-Repos ist `BuenyA/bautakt-app`. Ältere
+Seiten haben `BuenyA/craft` verlinkt; das ist nicht mehr der Name._
 
 Gemeinsames Projekt: `bxivzvmlcnaxqlytumvz` (`Bautakt`, `eu-central-1`, Postgres 17).
 _Stand 2026-08-26: 49 Tabellen in `public`, alle mit RLS._

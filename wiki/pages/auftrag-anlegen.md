@@ -38,7 +38,7 @@ ab, zeigt das Formular „Dafür fehlt dir die Berechtigung.“ (`readableDbErro
 Postgres `42501`).
 
 Welches Recht welche Rolle trägt, steht im Wiki von `bautakt-app`:
-<https://github.com/BuenyA/craft/blob/main/wiki/pages/berechtigungen-und-rollen.md>.
+<https://github.com/BuenyA/bautakt-app/blob/main/wiki/pages/berechtigungen-und-rollen.md>.
 Wie das Web die Flags liest: [berechtigungen-im-web.md](berechtigungen-im-web.md).
 
 ## Nach dem Speichern

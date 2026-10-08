@@ -67,7 +67,7 @@ verlangen dasselbe Recht. Lehnt die Datenbank ab, zeigt das Formular „Dafür
 fehlt dir die Berechtigung.“ (`readableDbError`, Postgres `42501`).
 
 Welches Recht welche Rolle trägt, steht im Wiki von `bautakt-app`:
-<https://github.com/BuenyA/craft/blob/main/wiki/pages/berechtigungen-und-rollen.md>.
+<https://github.com/BuenyA/bautakt-app/blob/main/wiki/pages/berechtigungen-und-rollen.md>.
 Wie das Web die Flags liest: [berechtigungen-im-web.md](berechtigungen-im-web.md).
 
 _Stand 2026-10-05, Rollen mit `canManageWorkAssignments` im Projekt:_ Bauleiter,

@@ -70,6 +70,7 @@ verlinkt, nie kopiert.
 | 2026-10-05 | [Kostenstellen anlegen, löschen, Auftragssumme](logs/2026-10-05-kostenstellen-anlegen.md)       |
 | 2026-10-08 | [Zeit am Auftrag und auf /zeiten schreiben](logs/2026-10-08-zeit-erfassen.md)                   |
 | 2026-10-08 | [Notizen am Auftrag schreiben](logs/2026-10-08-auftragsnotizen-schreiben.md)                    |
+| 2026-10-08 | [Wiki verlinkt bautakt-app](logs/2026-10-08-wiki-link-bautakt-app.md)                           |
 
 ## Die drei wichtigsten Sätze
 

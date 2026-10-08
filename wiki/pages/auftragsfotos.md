@@ -46,7 +46,7 @@ prüft das erste Pfadsegment, das ist die `company_id`. Dieselben 8 Zeilen
 passen alle auf `{companyId}/{orderId}/{imageId}.jpg`, keine davon ist eine
 öffentliche URL. Policies stehen im Wiki von `bautakt-app` und werden hier nicht
 kopiert:
-<https://github.com/BuenyA/craft/blob/main/wiki/index.md>.
+<https://github.com/BuenyA/bautakt-app/blob/main/wiki/index.md>.
 
 Die generierten Typen in `packages/supabase/src/database.types.ts` enthalten
 `order_images` bereits. Diese Änderung hat das Schema nicht angefasst.

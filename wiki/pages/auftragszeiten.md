@@ -127,7 +127,7 @@ aus und ist keine Kontrolle.
 Lehnt die Datenbank ab, zeigt das Formular „Dafür fehlt dir die Berechtigung.“
 (`readableDbError`, Postgres `42501`). Policies stehen im Wiki von
 `bautakt-app` und werden hier nicht kopiert:
-<https://github.com/BuenyA/craft/blob/main/wiki/index.md>.
+<https://github.com/BuenyA/bautakt-app/blob/main/wiki/index.md>.
 
 Ohne das weitere Leserecht sieht ein Mitglied nur die eigenen Zeilen. Die
 Oberfläche zeigt dann denselben leeren Hinweis wie bei einem Auftrag ohne
