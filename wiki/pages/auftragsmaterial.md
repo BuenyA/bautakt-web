@@ -44,6 +44,14 @@ Bei der Wahl werden Einheit, Einkaufspreis und Verkaufspreis aus dem Artikel
 übernommen. Ein leerer Verkaufspreis lässt das Feld leer: die Rechnung nimmt
 dann den Einkaufspreis (`unit_price ?? unit_cost` im Line-Generator der
 Handy-App). Der Verkaufspreis bleibt danach editierbar, auch bei Freitext.
+
+Einkaufspreis und Verkaufspreis stehen beim Öffnen und nach der Artikelwahl
+über `formatMoneyInput` (`packages/finance/src/money.ts`) als de-DE mit genau
+zwei Nachkommastellen im Feld, ohne Tausenderpunkt und ohne Währungszeichen:
+`1,5` wird `1,50`, leer bleibt leer. Die Menge bleibt bei `decimalInput`
+(bis zu vier Stellen, ohne festes Nachkomma). `parseDecimal` ist unverändert;
+`1,50` und `1.50` lesen sich wieder als `1,5`.
+
 Stand 2026-10-08 hat der einzige Artikel von Spahrbau („Wat weis ich“) weder
 Einkaufs- noch Verkaufspreis.
 

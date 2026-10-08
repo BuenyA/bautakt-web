@@ -1,3 +1,5 @@
+import { formatMoneyInput } from '@bautakt/finance';
+
 /**
  * Formularzustand für Material an einem Auftrag.
  *
@@ -70,7 +72,10 @@ export function finiteOrNull(value: unknown): number | null {
   return null;
 }
 
-/** Zahl fürs Feld, deutsch, ohne Tausenderpunkt, damit der Parser sie wiedererkennt. */
+/**
+ * Menge fürs Feld, deutsch, ohne Tausenderpunkt.
+ * Geldbeträge nutzen `formatMoneyInput` — immer zwei Nachkommastellen.
+ */
 export function decimalInput(value: number | null): string {
   if (value == null || !Number.isFinite(value)) return '';
   return new Intl.NumberFormat('de-DE', {
@@ -141,8 +146,8 @@ export function draftFromOrderMaterial(
     customTitle: row.customTitle,
     quantity: decimalInput(row.quantity),
     unit: row.unit.trim() || UNIT_DEFAULT,
-    unitCost: decimalInput(row.unitCost),
-    unitPrice: decimalInput(row.unitPrice),
+    unitCost: formatMoneyInput(row.unitCost),
+    unitPrice: formatMoneyInput(row.unitPrice),
     notes: row.notes,
     usedAt: row.usedAt.slice(0, 10),
     billed: row.billed,
@@ -168,8 +173,8 @@ export function applyArticle(
     articleId: article.id,
     customTitle: '',
     unit: article.unit.trim() || UNIT_DEFAULT,
-    unitCost: decimalInput(article.purchasePrice),
-    unitPrice: decimalInput(article.salePrice),
+    unitCost: formatMoneyInput(article.purchasePrice),
+    unitPrice: formatMoneyInput(article.salePrice),
   };
 }
 

@@ -113,6 +113,29 @@ export function formatMoney(
   return fromMinorUnits(minorUnits).toLocaleString(locale, { style: 'currency', currency });
 }
 
+/**
+ * Euro-Betrag fuer ein Eingabefeld: de-DE, genau zwei Nachkommastellen.
+ *
+ * Ohne Waehrungszeichen und ohne Tausenderpunkt. `formatMoney` ist die
+ * Anzeige („1,50 €"); ein Feld, das denselben Text zurueckschreibt, wuerde
+ * am Zeichen scheitern. Leer, `null` und Unlesbares bleiben leer — auch ein
+ * PostgREST-String „1.5" wird „1,50".
+ *
+ * Der Parser bleibt aussen vor. Zwei Stellen bringen immer ein Komma mit,
+ * deshalb liest `parseMoneyInput` „1,50" und „1.50" wieder als 150 Cent.
+ */
+export function formatMoneyInput(value: unknown): string {
+  if (value == null) return '';
+  if (typeof value === 'string' && value.trim() === '') return '';
+  const parsed = typeof value === 'number' ? value : Number(String(value).trim());
+  if (!Number.isFinite(parsed)) return '';
+  return new Intl.NumberFormat('de-DE', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    useGrouping: false,
+  }).format(parsed);
+}
+
 /** Deutsche Eingabe wie „1.234,56", „1234,56" oder „1234.56" als Minor Units. */
 export function parseMoneyInput(value: string): number | null {
   const trimmed = value.trim().replace(/\s/g, '');

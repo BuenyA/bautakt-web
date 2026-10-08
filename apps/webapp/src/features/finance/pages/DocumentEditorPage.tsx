@@ -1,4 +1,4 @@
-import { formatMoney, todayIso } from '@bautakt/finance';
+import { formatMoney, formatMoneyInput, todayIso } from '@bautakt/finance';
 import {
   Button,
   Card,
@@ -102,7 +102,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
               : 'other',
             quantity: String(line.quantity),
             unit: line.unit,
-            unitPrice: String(line.unit_price),
+            unitPrice: formatMoneyInput(line.unit_price),
             discountPercent: String(line.discount_percent),
             taxRatePercent: String(line.tax_rate_percent),
           }))
