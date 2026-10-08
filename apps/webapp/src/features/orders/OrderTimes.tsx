@@ -8,6 +8,8 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { useAuth } from '@/features/auth/useAuth';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { useMembership } from '@/features/company/useMembership';
+import { useOrders } from '@/features/orders/useOrders';
+import { useEmployees } from '@/features/team/useEmployees';
 import { canCreateTimeEntry, canEditTimeEntry } from '@/features/times/timeEntryAccess';
 import {
   draftFromTimeEntry,
@@ -28,12 +30,17 @@ const SKELETON_COUNT = 2;
  * Der Auftrag ist vorbelegt und bleibt dieser. Wer weder eigene Zeit noch
  * Team-Zeit erfassen darf, sieht die Liste nur.
  */
-export function OrderTimes({ orderId }: { orderId: string }) {
+export function OrderTimes({ orderId, orderName }: { orderId: string; orderName: string }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { data: membership } = useMembership();
   const canCreate = canCreateTimeEntry(membership?.permissions);
   const canTrackForTeam = hasPermission(membership?.permissions, 'canTrackTimeForTeam');
+  // Dieselben Abfragen wie das Panel, aber schon mit der Seite. Starten sie
+  // erst beim Öffnen, ist der Cache kalt: das Select setzt den vorbelegten
+  // Auftrag zurück, und die Mitarbeiter bleiben auf „Wird geladen …“.
+  useOrders({ enabled: canCreate });
+  useEmployees({ enabled: canCreate });
   const [draft, setDraft] = useState<TimeEntryDraft | null>(null);
   const entries = useTimeEntries(orderId);
   const { data, isError, refetch } = entries;
@@ -43,6 +50,7 @@ export function OrderTimes({ orderId }: { orderId: string }) {
     setDraft(
       emptyTimeEntry({
         orderId,
+        orderLabel: orderName,
         lockOrder: true,
         employmentId: canTrackForTeam ? undefined : membership?.employmentId,
       }),

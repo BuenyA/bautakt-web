@@ -72,6 +72,7 @@ verlinkt, nie kopiert.
 | 2026-10-08 | [Notizen am Auftrag schreiben](logs/2026-10-08-auftragsnotizen-schreiben.md)                    |
 | 2026-10-08 | [Wiki verlinkt bautakt-app](logs/2026-10-08-wiki-link-bautakt-app.md)                           |
 | 2026-10-08 | [Fotos am Auftrag hochladen und löschen](logs/2026-10-08-auftragsfotos-schreiben.md)            |
+| 2026-10-08 | [Zeit nachtragen und Notiz-Panel: Smoke](logs/2026-10-08-zeit-nachtragen-smoke.md)              |
 
 ## Die drei wichtigsten Sätze
 

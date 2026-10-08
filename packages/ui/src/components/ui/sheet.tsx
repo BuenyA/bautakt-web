@@ -60,11 +60,17 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          'bg-card data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-200 data-[state=open]:duration-300',
+          'bg-card data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex min-w-0 flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-200 data-[state=open]:duration-300',
+          // RemoveScroll setzt am body overflow:hidden und margin-right in der
+          // Breite der Scrollbar (--removed-body-scroll-bar-size). right:0
+          // klebt das Panel an den Viewport, also in diesen Rand — dort wird
+          // die rechte Kante abgeschnitten. Die Variable zieht sie zurueck,
+          // die max-width haelt das Panel im Rest des Viewports (unter sm
+          // volle Breite, darueber hoechstens 28rem).
           side === 'right' &&
-            'data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right border-border inset-y-0 right-0 h-full w-full border-l sm:max-w-md',
+            'data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right border-border inset-y-0 right-[var(--removed-body-scroll-bar-size,0px)] h-full w-full max-w-[calc(100vw-var(--removed-body-scroll-bar-size,0px))] border-l sm:max-w-[min(28rem,calc(100vw-var(--removed-body-scroll-bar-size,0px)))]',
           side === 'left' &&
-            'data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left border-border inset-y-0 left-0 h-full w-full border-r sm:max-w-md',
+            'data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left border-border inset-y-0 left-0 h-full w-full max-w-[calc(100vw-var(--removed-body-scroll-bar-size,0px))] border-r sm:max-w-[min(28rem,calc(100vw-var(--removed-body-scroll-bar-size,0px)))]',
           side === 'top' &&
             'data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top border-border inset-x-0 top-0 h-auto border-b',
           side === 'bottom' &&

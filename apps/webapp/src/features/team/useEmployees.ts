@@ -38,13 +38,14 @@ type QueryRow = {
  * Ausgeschiedene (`ended_at`) bleiben in der Abfrage. Die Liste filtert sie
  * clientseitig (Default: nur Aktive) und kennzeichnet sie weiterhin.
  */
-export function useEmployees() {
+export function useEmployees(options?: { enabled?: boolean }) {
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
+  const enabled = options?.enabled ?? true;
 
   return useQuery({
     queryKey: ['employments', companyId],
-    enabled: Boolean(companyId),
+    enabled: Boolean(companyId) && enabled,
     queryFn: async (): Promise<EmployeeRow[]> => {
       const { data, error } = await supabase
         .from('employments')

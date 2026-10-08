@@ -20,13 +20,14 @@ export type OrderListRow = {
  * Angebote/Abgelehnt aus demselben Cache kommen. queryKey beginnt mit
  * companyId (Mandant).
  */
-export function useOrders() {
+export function useOrders(options?: { enabled?: boolean }) {
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
+  const enabled = options?.enabled ?? true;
 
   return useQuery({
     queryKey: ['orders', companyId],
-    enabled: Boolean(companyId),
+    enabled: Boolean(companyId) && enabled,
     queryFn: async (): Promise<OrderListRow[]> => {
       const { data, error } = await supabase
         .from('orders')

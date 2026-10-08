@@ -1,5 +1,6 @@
 import { hasPermission } from '@bautakt/core';
 import {
+  Badge,
   Button,
   Checkbox,
   Input,
@@ -30,6 +31,16 @@ import { readableDbError } from '@/lib/dbErrors';
 import { TimeEntryDeleteDialog } from './TimeEntryDeleteDialog';
 import { type TimeEntryDraft, type TimeEntryIssue, timeEntryIssue } from './timeEntryDraft';
 import { TimeEntryBilledError, useSaveTimeEntry } from './useTimeEntryMutations';
+
+const ISSUE_KEY = {
+  order: 'domain:timeForm.orderRequired',
+  date: 'domain:timeForm.dateRequired',
+  start: 'domain:timeForm.startRequired',
+  end: 'domain:timeForm.endRequired',
+  break: 'domain:timeForm.breakInvalid',
+  breakTooLong: 'domain:timeForm.breakTooLong',
+  employee: 'domain:timeForm.employeeRequired',
+} as const satisfies Record<TimeEntryIssue, string>;
 
 /**
  * Zeiteintrag anlegen oder korrigieren.
@@ -68,12 +79,27 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
   const canTeam = hasPermission(membership?.permissions, 'canTrackTimeForTeam');
 
   const [draft, setDraft] = useState<TimeEntryDraft>(initial);
-  const [error, setError] = useState<string | null>(null);
+  // Feldfehler erst nach dem ersten Speichern. Danach haengt die Meldung am
+  // aktuellen Entwurf: eine korrigierte Pause darf nicht rot bleiben, bis
+  // man noch einmal speichert.
+  const [revealIssues, setRevealIssues] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const ids = { date: useId(), start: useId(), end: useId(), pause: useId(), note: useId() };
 
+  const issue = revealIssues ? timeEntryIssue(draft) : null;
+  const error = (issue ? t(ISSUE_KEY[issue]) : null) ?? saveError;
+
   const locked = draft.billed;
   const orderOptions = [...(orders.data ?? [])].sort((a, b) => a.name.localeCompare(b.name, 'de'));
+  const resolvedOrderLabel =
+    orderOptions.find((order) => order.id === draft.orderId)?.name.trim() ||
+    draft.orderLabel.trim();
+  // Remount, sobald die passende Option da ist. Vorher hat das native Select
+  // im Formular keine Option und meldet den vorbelegten Wert als leer.
+  const orderSelectKey = orderOptions.some((order) => order.id === draft.orderId)
+    ? 'ready'
+    : 'pending';
   const activeEmployees = (employees.data ?? []).filter((employee) => !employee.ended_at);
   const selectedEnded = (employees.data ?? []).filter(
     (employee) => employee.ended_at && draft.employmentIds.includes(employee.id),
@@ -87,6 +113,7 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
 
   function set(patch: Partial<TimeEntryDraft>) {
     setDraft((current) => ({ ...current, ...patch }));
+    setSaveError(null);
   }
 
   function toggleEmployee(employmentId: string, on: boolean) {
@@ -96,36 +123,25 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
         ? [...current.employmentIds, employmentId]
         : current.employmentIds.filter((id) => id !== employmentId),
     }));
+    setSaveError(null);
   }
 
-  function issueMessage(issue: TimeEntryIssue): string {
-    switch (issue) {
-      case 'order':
-        return t('domain:timeForm.orderRequired');
-      case 'date':
-        return t('domain:timeForm.dateRequired');
-      case 'start':
-        return t('domain:timeForm.startRequired');
-      case 'end':
-        return t('domain:timeForm.endRequired');
-      case 'break':
-        return t('domain:timeForm.breakInvalid');
-      case 'breakTooLong':
-        return t('domain:timeForm.breakTooLong');
-      case 'employee':
-        return t('domain:timeForm.employeeRequired');
-    }
+  function chooseOrder(value: string) {
+    if (!value) return;
+    set({ orderId: value });
   }
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     if (locked) return;
 
-    const issue = timeEntryIssue(draft);
-    if (issue) {
-      setError(issueMessage(issue));
+    const nextIssue = timeEntryIssue(draft);
+    if (nextIssue) {
+      setRevealIssues(true);
+      setSaveError(null);
       return;
     }
+    setRevealIssues(false);
 
     try {
       await save.mutateAsync(draft);
@@ -133,10 +149,10 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
       onDone();
     } catch (caught) {
       if (caught instanceof TimeEntryBilledError) {
-        setError(t('domain:timeForm.billedHint'));
+        setSaveError(t('domain:timeForm.billedHint'));
         return;
       }
-      setError(readableDbError(caught) ?? t('domain:timeForm.saveError'));
+      setSaveError(readableDbError(caught) ?? t('domain:timeForm.saveError'));
     }
   }
 
@@ -153,7 +169,10 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
     <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
       <SheetHeader>
         <SheetTitle>
-          {draft.id ? t('domain:timeForm.editTitle') : t('domain:timeForm.newTitle')}
+          <span className="inline-flex flex-wrap items-center gap-2">
+            {draft.id ? t('domain:timeForm.editTitle') : t('domain:timeForm.newTitle')}
+            {draft.billed ? <Badge variant="muted">{t('domain:times.billed')}</Badge> : null}
+          </span>
         </SheetTitle>
         <SheetDescription>{t('domain:timeForm.description')}</SheetDescription>
       </SheetHeader>
@@ -168,12 +187,21 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
         <div className="grid gap-2">
           <Label>{t('domain:times.columns.order')}</Label>
           <Select
+            key={orderSelectKey}
             value={draft.orderId}
-            onValueChange={(value) => set({ orderId: value })}
+            onValueChange={chooseOrder}
             disabled={locked || draft.lockOrder}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={t('domain:timeForm.choose')} />
+              <SelectValue
+                placeholder={
+                  draft.orderId && orders.isPending
+                    ? t('common:state.loading')
+                    : t('domain:timeForm.choose')
+                }
+              >
+                {resolvedOrderLabel || undefined}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {orderOptions.map((order) => (
@@ -196,7 +224,7 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
               {t('domain:times.columns.employee')}
             </legend>
             <p className="text-muted-foreground text-sm">{t('domain:timeForm.employeesHint')}</p>
-            {employees.isPending ? (
+            {!employees.data && !employees.isError ? (
               <p className="text-muted-foreground text-sm">{t('common:state.loading')}</p>
             ) : employees.isError ? (
               <p className="text-destructive text-sm">{t('domain:timeForm.employeesError')}</p>
@@ -225,7 +253,10 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
             <Label>{t('domain:times.columns.employee')}</Label>
             <Select
               value={draft.employmentIds[0] ?? ''}
-              onValueChange={(value) => set({ employmentIds: [value] })}
+              onValueChange={(value) => {
+                if (!value) return;
+                set({ employmentIds: [value] });
+              }}
               disabled={locked}
             >
               <SelectTrigger className="w-full">

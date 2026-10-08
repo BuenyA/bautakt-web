@@ -11,6 +11,8 @@ import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useAuth } from '@/features/auth/useAuth';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { useMembership } from '@/features/company/useMembership';
+import { useOrders } from '@/features/orders/useOrders';
+import { useEmployees } from '@/features/team/useEmployees';
 import { formatDateTime, formatNetDuration } from '@/lib/format';
 import { routes, timesOrderParam } from '@/lib/routes';
 
@@ -27,6 +29,9 @@ export function TimesListPage() {
   const { data: membership } = useMembership();
   const canCreate = canCreateTimeEntry(membership?.permissions);
   const canTrackForTeam = hasPermission(membership?.permissions, 'canTrackTimeForTeam');
+  // Siehe OrderTimes: Auftrag und Mitarbeiter vor dem Panel laden.
+  useOrders({ enabled: canCreate });
+  useEmployees({ enabled: canCreate });
   const [searchParams, setSearchParams] = useSearchParams();
   const orderId = searchParams.get(timesOrderParam)?.trim() || undefined;
   const period = timePeriodFromSearch(searchParams.get('period'));
@@ -78,6 +83,7 @@ export function TimesListPage() {
     setDraft(
       emptyTimeEntry({
         orderId,
+        orderLabel: orderName,
         employmentId: canTrackForTeam ? undefined : membership?.employmentId,
       }),
     );
