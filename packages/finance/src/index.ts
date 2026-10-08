@@ -22,6 +22,7 @@ export {
   documentTotals,
   eurosToMinor,
   formatMoney,
+  formatMoneyInput,
   fromMinorUnits,
   minorToEuros,
   type Money,

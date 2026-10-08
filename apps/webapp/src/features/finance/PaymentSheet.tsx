@@ -1,5 +1,6 @@
 import {
   formatMoney,
+  formatMoneyInput,
   fromMinorUnits,
   overpaidMinor,
   parseMoneyInput,
@@ -106,7 +107,7 @@ function PaymentForm({
   // Der offene Betrag steht als Vorgabe im Feld: der haeufigste Fall ist die
   // vollstaendige Zahlung, und Abtippen ist die haeufigste Fehlerquelle.
   const [amount, setAmount] = useState(() =>
-    openMinor > 0 ? String(fromMinorUnits(openMinor)).replace('.', ',') : '',
+    openMinor > 0 ? formatMoneyInput(fromMinorUnits(openMinor)) : '',
   );
   const [skonto, setSkonto] = useState('');
   const [paidAt, setPaidAt] = useState(todayIso);

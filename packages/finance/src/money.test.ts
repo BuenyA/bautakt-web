@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   documentTotals,
   eurosToMinor,
+  formatMoneyInput,
+  fromMinorUnits,
   parseMoneyInput,
   percentOf,
   roundHalfAwayFromZero,
@@ -94,5 +96,36 @@ describe('parseMoneyInput', () => {
   it('gibt null zurueck, wenn nichts Brauchbares dasteht', () => {
     expect(parseMoneyInput('')).toBeNull();
     expect(parseMoneyInput('abc')).toBeNull();
+  });
+});
+
+describe('formatMoneyInput', () => {
+  it('zeigt beim Oeffnen immer zwei Nachkommastellen', () => {
+    expect(formatMoneyInput(1.5)).toBe('1,50');
+    expect(formatMoneyInput(2.5)).toBe('2,50');
+    expect(formatMoneyInput(1)).toBe('1,00');
+    expect(formatMoneyInput(0)).toBe('0,00');
+    expect(formatMoneyInput(fromMinorUnits(150))).toBe('1,50');
+  });
+
+  it('laesst leere und unlesbare Werte leer', () => {
+    expect(formatMoneyInput(null)).toBe('');
+    expect(formatMoneyInput(undefined)).toBe('');
+    expect(formatMoneyInput('')).toBe('');
+    expect(formatMoneyInput('   ')).toBe('');
+    expect(formatMoneyInput('abc')).toBe('');
+    expect(formatMoneyInput(Number.NaN)).toBe('');
+  });
+
+  it('nimmt PostgREST-Strings und schreibt ohne Tausenderpunkt', () => {
+    expect(formatMoneyInput('1.5')).toBe('1,50');
+    expect(formatMoneyInput(1234.5)).toBe('1234,50');
+  });
+
+  it('rundet die Anzeige auf Cent, der Parser liest sie zurueck', () => {
+    expect(parseMoneyInput(formatMoneyInput(1.5))).toBe(150);
+    expect(parseMoneyInput(formatMoneyInput(2.5))).toBe(250);
+    expect(parseMoneyInput('1,50')).toBe(150);
+    expect(parseMoneyInput('1.50')).toBe(150);
   });
 });
