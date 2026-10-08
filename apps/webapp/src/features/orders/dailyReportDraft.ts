@@ -83,9 +83,14 @@ export function emptyAttendance(employmentId: string): DailyReportAttendance {
   };
 }
 
-/** Temperatur aus dem Feld. Leer und Unlesbares sind `null`, nie eine geratene 0. */
+/**
+ * Temperatur aus dem Feld. Leer und Unlesbares sind `null`, nie eine geratene 0.
+ *
+ * Komma wird zum Punkt. Der Hinweis zeigt das Unicode-Minus (U+2212); das
+ * wird vor dem Parsen zum ASCII-Bindestrich, sonst scheitert „−2“.
+ */
 export function parseTemperature(value: string): number | null {
-  const trimmed = value.trim().replace(',', '.');
+  const trimmed = value.trim().replace(',', '.').replaceAll('−', '-').replaceAll('–', '-');
   if (!trimmed) return null;
   if (!/^[+-]?\d+(\.\d+)?$/.test(trimmed)) return null;
   const parsed = Number(trimmed);
