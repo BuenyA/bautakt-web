@@ -98,16 +98,30 @@ gelöscht. Sonst bliebe eine halbe Zeile stehen, die die Handy-App sieht.
 
 ## Löschen
 
-Der Dialog nennt, dass Zeiten, Material, Fotos und Mängel des Berichts per
-`ON DELETE CASCADE` mitfallen, auch Zeilen, die dieses Konto nicht sieht, und
-auch abgerechnete Zeiten. RLS auf den vier Tabellen ist nicht `FORCE`
-(gemessen 2026-10-08). Die Anzahlen sind das, was die Select-Policy zeigt;
-fehlt eine Abfrage, fehlt die Zahl.
+Löschen gibt es nur mit `canTrackTimeForTeam` und dem Bearbeitungsrecht für
+diesen Bericht. Alle anderen sehen den Knopf nicht.
 
-Der Knopf trägt „Wird gelöscht …“ und ist gesperrt, solange die Anfrage
-läuft. Der Bericht verschwindet aus der Liste erst, wenn die Antwort eine
-gelöschte `id` enthält. Eine von RLS verschluckte Löschung ist ein Fehler,
-kein Erfolg.
+Unmittelbar vor dem DELETE, und schon beim Öffnen des Dialogs, liest das Web
+frisch vom Server, nicht aus dem Listen-Cache. Eine Zeit oder ein Material mit
+`billed_document_id` sperrt den Knopf. Der Hinweis lautet dann: „Dieser
+Bericht enthält abgerechnete Zeiten oder Material und kann nicht gelöscht
+werden.“
+
+Dieselbe Sperre gilt, sobald irgendeine Zeit, ein Material, ein Foto oder ein
+Mangel am Bericht hängt, auch ohne Abrechnung. Grund: die Select-Policy auf
+`order_materials` zeigt einem Konto mit Team-Zeit und Bearbeitungsrecht nicht
+jede Zeile (gemessen 2026-10-08). Eine Zählung von 0 gilt nur, wenn das Konto
+alle vier Tabellen vollständig sieht (`seesEveryReportLink`). Sonst bleibt der
+Knopf aus, mit dem Hinweis: „Dieser Bericht hat verknüpfte Zeiten, Material,
+Fotos oder Mängel und kann im Web nicht gelöscht werden.“ Die Datenbank
+selbst löscht weiter per CASCADE; die Sperre dort kommt über
+[bautakt-app #104](https://github.com/BuenyA/bautakt-app/issues/104).
+
+Ist nichts verknüpft und das Konto sieht alle vier Tabellen, nennt der Dialog
+weiter die CASCADE. Der Knopf trägt „Wird gelöscht …“ und ist gesperrt,
+solange die Anfrage läuft. Der Bericht verschwindet aus der Liste erst, wenn
+die Antwort eine gelöschte `id` enthält. Scheitert das DELETE an der
+Datenbank, bleibt die Karte stehen und der Dialog zeigt den Fehler.
 
 Panel und Dialog bleiben offen, solange Speichern oder Löschen läuft.
 `useDismissLock` lässt Fokus, Escape und einen Klick daneben in der Zeit
@@ -120,13 +134,13 @@ verschachtelten Dialog zielen; der Dialog liegt auf `z-[60]`.
 Knöpfe hängen an `canCreateDailyReport` und `canEditDailyReport`. Das blendet
 sie aus und ist keine Kontrolle.
 
-- `canCreateAndViewReports`: die Liste, anlegen, und ändern oder löschen, wo
-  `user_id` der angemeldete Nutzer ist.
-- `canManageOrders`: ändern und löschen für jede sichtbare Zeile. Anlegen
-  bleibt an `canCreateAndViewReports`. Ohne das Leserecht ist die Liste leer,
-  der Block fehlt.
+- `canCreateAndViewReports`: die Liste, anlegen, und ändern, wo `user_id`
+  der angemeldete Nutzer ist. Löschen nur zusammen mit `canTrackTimeForTeam`.
+- `canManageOrders`: ändern für jede sichtbare Zeile. Löschen nur zusammen
+  mit `canTrackTimeForTeam`. Anlegen bleibt an `canCreateAndViewReports`.
+  Ohne das Leserecht ist die Liste leer, der Block fehlt.
 - `canTrackTimeForTeam`: aus dem Bericht Zeiten für jede ausgewählte
-  Anstellung.
+  Anstellung, und Voraussetzung für den Löschen-Knopf.
 - nur `canTrackTime`: eine Zeit nur für die eigene Anstellung. Die übrigen
   Personen stehen in der Anwesenheit, ohne Uhrzeit und ohne Schreibversuch.
 - keines der beiden Zeitrechte: keine Uhrzeit, keine Zeitzeile.

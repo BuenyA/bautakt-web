@@ -28,7 +28,7 @@ import { useAuth } from '@/features/auth/useAuth';
 import { useMembership } from '@/features/company/useMembership';
 import { readableDbError } from '@/lib/dbErrors';
 
-import { canBookReportTime } from './dailyReportAccess';
+import { canBookReportTime, canDeleteDailyReport } from './dailyReportAccess';
 import { DailyReportDeleteDialog } from './DailyReportDeleteDialog';
 import {
   type DailyReportAttendance,
@@ -141,6 +141,9 @@ function DailyReportForm({
   const canTeam = hasPermission(membership?.permissions, 'canTrackTimeForTeam');
   const canOwn = hasPermission(membership?.permissions, 'canTrackTime');
   const offersTime = canTeam || canOwn;
+  const canDelete = draft.authorUserId
+    ? canDeleteDailyReport(membership?.permissions, user?.id, { userId: draft.authorUserId })
+    : false;
   const busy = save.isPending || deletePending;
 
   useEffect(() => {
@@ -409,7 +412,7 @@ function DailyReportForm({
           />
         </div>
 
-        {draft.id ? (
+        {draft.id && canDelete ? (
           <Button
             type="button"
             variant="destructive"
@@ -452,7 +455,7 @@ function DailyReportForm({
         </div>
       </SheetFooter>
 
-      {draft.id ? (
+      {draft.id && canDelete ? (
         <DailyReportDeleteDialog
           reportId={draft.id}
           dateLabel={formatReportDate(draft.date)}

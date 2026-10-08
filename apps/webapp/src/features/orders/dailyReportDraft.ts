@@ -36,6 +36,8 @@ export type DailyReportDraft = {
   workDone: string;
   notes: string;
   attendance: DailyReportAttendance[];
+  /** Autor des bestehenden Berichts. Wird nicht geschrieben, nur fürs Löschen gelesen. */
+  authorUserId?: string;
 };
 
 export type DailyReportIssue =

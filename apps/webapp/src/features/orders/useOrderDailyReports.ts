@@ -327,6 +327,7 @@ export function draftFromDailyReport(report: DailyReport): DailyReportDraft {
     workDone: report.workDone,
     notes: report.notes,
     attendance,
+    authorUserId: report.userId,
   };
 }
 

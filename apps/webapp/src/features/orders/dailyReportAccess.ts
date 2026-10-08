@@ -35,6 +35,53 @@ export function canEditDailyReport(
 }
 
 /**
+ * Darf dieses Konto den Bericht im Web löschen?
+ *
+ * Zusätzlich zum Bearbeitungsrecht (`canManageOrders` oder eigener Bericht
+ * mit `canCreateAndViewReports`) ist `canTrackTimeForTeam` Pflicht. Ohne das
+ * Team-Recht sieht das Konto fremde Zeiten nicht, und die Kaskade würde sie
+ * trotzdem entfernen. Der Knopf fehlt dann ganz.
+ */
+export function canDeleteDailyReport(
+  permissions: Partial<EmployeePermissions> | null | undefined,
+  userId: string | null | undefined,
+  report: { userId: string },
+): boolean {
+  return (
+    hasPermission(permissions, 'canTrackTimeForTeam') &&
+    canEditDailyReport(permissions, userId, report)
+  );
+}
+
+/**
+ * Sieht dieses Konto jede Zeile, die ein Löschen per CASCADE mitnehmen würde?
+ *
+ * Gemessen 2026-10-08, SELECT-Policies. `canTrackTimeForTeam` reicht dafür
+ * nicht. Material ist nur vollständig sichtbar mit Finanzrecht oder mit
+ * `canRecordMaterials` zusammen mit `canManageOrders`. Sonst ist eine Zählung
+ * von 0 kein Beweis, dass keine Zeile hängt.
+ *
+ * Fotos: `is_company_member(company_id)`, ohne weiteres Recht. Mängel:
+ * Mitglied und `canCreateAndViewReports`. Zeiten: `canTrackTimeForTeam` oder
+ * Finanz- bzw. Lohnrecht.
+ */
+export function seesEveryReportLink(
+  permissions: Partial<EmployeePermissions> | null | undefined,
+): boolean {
+  const times =
+    hasPermission(permissions, 'canTrackTimeForTeam') ||
+    hasPermission(permissions, 'canViewCompanyFinance') ||
+    hasPermission(permissions, 'canViewWageCosts');
+  const issues = hasPermission(permissions, 'canCreateAndViewReports');
+  const materials =
+    hasPermission(permissions, 'canViewCompanyFinance') ||
+    hasPermission(permissions, 'canViewOrderFinance') ||
+    (hasPermission(permissions, 'canRecordMaterials') &&
+      hasPermission(permissions, 'canManageOrders'));
+  return times && issues && materials;
+}
+
+/**
  * Darf aus diesem Bericht eine Zeit für diese Anstellung entstehen?
  *
  * `canTrackTimeForTeam` gilt für jede Anstellung, auch ohne Konto.

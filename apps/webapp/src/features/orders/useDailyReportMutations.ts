@@ -7,7 +7,8 @@ import { type LaborRateCandidate, resolveLaborRate } from '@/features/times/reso
 import { entryRange } from '@/features/times/timeEntryDraft';
 import { supabase } from '@/lib/supabase';
 
-import { canBookReportTime } from './dailyReportAccess';
+import { canBookReportTime, canDeleteDailyReport } from './dailyReportAccess';
+import { DailyReportDeleteBlockedError, readDailyReportDeleteBlock } from './dailyReportDeleteGate';
 import { type DailyReportDraft, parseTemperature } from './dailyReportDraft';
 
 /**
@@ -273,17 +274,37 @@ export function useSaveDailyReport() {
  *
  * `time_entries`, `order_materials`, `order_images` und `order_issues`
  * verweisen mit ON DELETE CASCADE. RLS ist dort nicht FORCE (gemessen
- * 2026-10-08), die Kaskade löscht also auch Zeilen, die dieses Konto nicht
- * sieht.
+ * 2026-10-08). Deshalb löscht das Web nur, wenn die frische Lesung keine
+ * abgerechnete Zeit, kein abgerechnetes Material und keine andere
+ * Verknüpfung zeigt und das Konto alle vier Tabellen vollständig sieht.
+ * Die Datenbank selbst sperrt das noch nicht; das kommt über bautakt-app #104.
  */
 export function useDeleteDailyReport() {
   const queryClient = useQueryClient();
   const { data: membership } = useMembership();
+  const { user } = useAuth();
   const companyId = membership?.companyId;
 
   return useMutation({
     mutationFn: async (reportId: string) => {
-      if (!companyId) throw new Error('NOT_AUTHENTICATED');
+      if (!companyId || !user?.id) throw new Error('NOT_AUTHENTICATED');
+
+      const { data: report, error: reportError } = await supabase
+        .from('daily_reports')
+        .select('user_id')
+        .eq('company_id', companyId)
+        .eq('id', reportId)
+        .maybeSingle();
+      if (reportError) throw reportError;
+      if (
+        !report ||
+        !canDeleteDailyReport(membership?.permissions, user.id, { userId: report.user_id })
+      ) {
+        throw new Error('FORBIDDEN');
+      }
+
+      const block = await readDailyReportDeleteBlock(companyId, reportId, membership?.permissions);
+      if (block) throw new DailyReportDeleteBlockedError(block);
 
       const { data, error } = await supabase
         .from('daily_reports')
