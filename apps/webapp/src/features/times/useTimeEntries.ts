@@ -11,6 +11,9 @@ export type TimeEntryListRow = {
   break_minutes: number;
   note: string;
   order_id: string;
+  employment_id: string | null;
+  user_id: string | null;
+  billed: boolean;
   order_name: string;
   employee_name: string;
 };
@@ -22,6 +25,9 @@ type TimeEntryQueryRow = {
   break_minutes: number;
   note: string;
   order_id: string;
+  employment_id: string | null;
+  user_id: string | null;
+  billed_document_id: string | null;
   orders: { name: string } | null;
   employments: {
     display_first_name: string | null;
@@ -47,6 +53,9 @@ function mapTimeEntryRow(row: TimeEntryQueryRow): TimeEntryListRow {
     break_minutes: row.break_minutes,
     note: row.note,
     order_id: row.order_id,
+    employment_id: row.employment_id,
+    user_id: row.user_id,
+    billed: Boolean(row.billed_document_id),
     order_name: row.orders?.name ?? '',
     employee_name: fromEmployment || fromProfile,
   };
@@ -79,6 +88,9 @@ export function useTimeEntries(orderId?: string) {
           break_minutes,
           note,
           order_id,
+          employment_id,
+          user_id,
+          billed_document_id,
           orders ( name ),
           employments (
             display_first_name,

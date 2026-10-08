@@ -2,7 +2,8 @@
 
 Die Auftragsliste legt einen Auftrag in `orders` an und öffnet danach die
 Detailseite. Die Zeile liegt in derselben Tabelle, die die Handy-App liest.
-Fotos, Notizen und Zeiten bleiben auf der Detailseite nur lesend.
+Fotos und Notizen bleiben auf der Detailseite nur lesend. Zeiten lassen
+sich dort nachtragen, siehe [auftragszeiten.md](auftragszeiten.md).
 
 ## Formular
 

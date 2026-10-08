@@ -1,5 +1,7 @@
+import { hasPermission } from '@bautakt/core';
 import {
   Button,
+  Checkbox,
   Input,
   Label,
   Select,
@@ -17,7 +19,6 @@ import {
   Textarea,
   toast,
 } from '@bautakt/ui';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -25,51 +26,18 @@ import { useMembership } from '@/features/company/useMembership';
 import { useOrders } from '@/features/orders/useOrders';
 import { useEmployees } from '@/features/team/useEmployees';
 import { readableDbError } from '@/lib/dbErrors';
-import { supabase } from '@/lib/supabase';
 
-import { type TimeEntryDraft, toTimestamp } from './timeEntryDraft';
-
-function useSaveTimeEntry() {
-  const queryClient = useQueryClient();
-  const { data: membership } = useMembership();
-  const companyId = membership?.companyId;
-
-  return useMutation({
-    mutationFn: async (draft: TimeEntryDraft) => {
-      const startedAt = toTimestamp(draft.date, draft.startTime);
-      const endedAt = toTimestamp(draft.date, draft.endTime);
-      if (!startedAt) throw new Error('Kein gültiger Beginn.');
-
-      const row = {
-        company_id: companyId!,
-        order_id: draft.orderId,
-        employment_id: draft.employmentId || null,
-        started_at: startedAt,
-        ended_at: endedAt,
-        break_minutes: Math.max(0, Math.round(Number(draft.breakMinutes) || 0)),
-        note: draft.note.trim(),
-      };
-
-      // ⚠️ `time_entries.id` hat kein Default — siehe wiki/pages/fallstricke.md.
-      const query = draft.id
-        ? supabase.from('time_entries').update(row).eq('id', draft.id).eq('company_id', companyId!)
-        : supabase.from('time_entries').insert({ ...row, id: crypto.randomUUID() });
-
-      const { error } = await query;
-      if (error) throw error;
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['time-entries', companyId] });
-    },
-  });
-}
+import { TimeEntryDeleteDialog } from './TimeEntryDeleteDialog';
+import { type TimeEntryDraft, type TimeEntryIssue, timeEntryIssue } from './timeEntryDraft';
+import { TimeEntryBilledError, useSaveTimeEntry } from './useTimeEntryMutations';
 
 /**
- * Zeiteintrag nachtragen oder korrigieren.
+ * Zeiteintrag anlegen oder korrigieren.
  *
- * Im Buero ist das der Nachtrag fuer jemanden, der auf der Baustelle nicht
- * gestempelt hat — deshalb steht die Mitarbeiterauswahl mit im Formular und
- * nicht der angemeldete Nutzer fest.
+ * Mit `canTrackTimeForTeam` wählt man beim Anlegen mehrere Mitarbeiter; jede
+ * Person bekommt eine Zeile. Ohne das Recht gilt der Eintrag für die eigene
+ * Anstellung. Das Panel ist nur gemountet, solange es offen ist, und startet
+ * deshalb jedes Mal mit dem übergebenen Entwurf.
  */
 export function TimeEntrySheet({
   draft,
@@ -94,31 +62,68 @@ export function TimeEntrySheet({
 function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: () => void }) {
   const { t } = useTranslation();
   const save = useSaveTimeEntry();
+  const { data: membership } = useMembership();
   const orders = useOrders();
   const employees = useEmployees();
+  const canTeam = hasPermission(membership?.permissions, 'canTrackTimeForTeam');
 
   const [draft, setDraft] = useState<TimeEntryDraft>(initial);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const ids = { date: useId(), start: useId(), end: useId(), pause: useId(), note: useId() };
 
-  // Ausgeschiedene stehen nicht zur Auswahl — fuer sie wird nichts mehr erfasst.
-  const selectableEmployees = (employees.data ?? []).filter((employee) => !employee.ended_at);
+  const locked = draft.billed;
+  const orderOptions = [...(orders.data ?? [])].sort((a, b) => a.name.localeCompare(b.name, 'de'));
+  const activeEmployees = (employees.data ?? []).filter((employee) => !employee.ended_at);
+  const selectedEnded = (employees.data ?? []).filter(
+    (employee) => employee.ended_at && draft.employmentIds.includes(employee.id),
+  );
+  const selectableEmployees = [...activeEmployees, ...selectedEnded].sort((a, b) =>
+    a.name.localeCompare(b.name, 'de'),
+  );
+  const ownEmployee = selectableEmployees.find(
+    (employee) => employee.id === membership?.employmentId,
+  );
 
   function set(patch: Partial<TimeEntryDraft>) {
     setDraft((current) => ({ ...current, ...patch }));
   }
 
+  function toggleEmployee(employmentId: string, on: boolean) {
+    setDraft((current) => ({
+      ...current,
+      employmentIds: on
+        ? [...current.employmentIds, employmentId]
+        : current.employmentIds.filter((id) => id !== employmentId),
+    }));
+  }
+
+  function issueMessage(issue: TimeEntryIssue): string {
+    switch (issue) {
+      case 'order':
+        return t('domain:timeForm.orderRequired');
+      case 'date':
+        return t('domain:timeForm.dateRequired');
+      case 'start':
+        return t('domain:timeForm.startRequired');
+      case 'end':
+        return t('domain:timeForm.endRequired');
+      case 'break':
+        return t('domain:timeForm.breakInvalid');
+      case 'breakTooLong':
+        return t('domain:timeForm.breakTooLong');
+      case 'employee':
+        return t('domain:timeForm.employeeRequired');
+    }
+  }
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
+    if (locked) return;
 
-    if (!draft.orderId) {
-      setError(t('domain:timeForm.orderRequired'));
-      return;
-    }
-    if (draft.endTime && draft.endTime <= draft.startTime) {
-      // Ein Eintrag ueber Mitternacht ist im Buero fast immer ein Tippfehler;
-      // die Nachtschicht traegt das Handy ein.
-      setError(t('domain:timeForm.endBeforeStart'));
+    const issue = timeEntryIssue(draft);
+    if (issue) {
+      setError(issueMessage(issue));
       return;
     }
 
@@ -127,9 +132,22 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
       toast.success(t('domain:timeForm.saved'));
       onDone();
     } catch (caught) {
+      if (caught instanceof TimeEntryBilledError) {
+        setError(t('domain:timeForm.billedHint'));
+        return;
+      }
       setError(readableDbError(caught) ?? t('domain:timeForm.saveError'));
     }
   }
+
+  const employeeName =
+    (draft.id
+      ? selectableEmployees.find((employee) => employee.id === draft.employmentIds[0])?.name
+      : ownEmployee?.name) || t('domain:times.noEmployee');
+
+  const deleteDescription = t('domain:timeForm.delete.description', {
+    employee: employeeName,
+  });
 
   return (
     <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
@@ -141,46 +159,103 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
       </SheetHeader>
 
       <SheetBody className="flex flex-col gap-4">
-        <div className="grid gap-2">
-          <Label>{t('domain:times.columns.order')}</Label>
-          <Select value={draft.orderId} onValueChange={(value) => set({ orderId: value })}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder={t('domain:timeForm.choose')} />
-            </SelectTrigger>
-            <SelectContent>
-              {(orders.data ?? []).map((order) => (
-                <SelectItem key={order.id} value={order.id}>
-                  {order.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {locked ? (
+          <p role="status" className="text-muted-foreground text-sm">
+            {t('domain:timeForm.billedHint')}
+          </p>
+        ) : null}
 
         <div className="grid gap-2">
-          <Label>{t('domain:times.columns.employee')}</Label>
+          <Label>{t('domain:times.columns.order')}</Label>
           <Select
-            value={draft.employmentId}
-            onValueChange={(value) => set({ employmentId: value })}
+            value={draft.orderId}
+            onValueChange={(value) => set({ orderId: value })}
+            disabled={locked || draft.lockOrder}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder={t('domain:timeForm.choose')} />
             </SelectTrigger>
             <SelectContent>
-              {selectableEmployees.map((employee) => (
-                <SelectItem key={employee.id} value={employee.id}>
-                  {employee.name || t('domain:employees.unnamed')}
+              {orderOptions.map((order) => (
+                <SelectItem key={order.id} value={order.id}>
+                  {order.name.trim() || t('domain:timeForm.unnamedOrder')}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          {orders.isError ? (
+            <p className="text-destructive text-sm">{t('domain:timeForm.ordersError')}</p>
+          ) : !orders.isPending && orderOptions.length === 0 ? (
+            <p className="text-muted-foreground text-sm">{t('domain:timeForm.noOrders')}</p>
+          ) : null}
         </div>
+
+        {canTeam && !draft.id ? (
+          <fieldset className="grid gap-2" disabled={locked}>
+            <legend className="text-sm leading-none font-medium">
+              {t('domain:times.columns.employee')}
+            </legend>
+            <p className="text-muted-foreground text-sm">{t('domain:timeForm.employeesHint')}</p>
+            {employees.isPending ? (
+              <p className="text-muted-foreground text-sm">{t('common:state.loading')}</p>
+            ) : employees.isError ? (
+              <p className="text-destructive text-sm">{t('domain:timeForm.employeesError')}</p>
+            ) : selectableEmployees.length === 0 ? (
+              <p className="text-muted-foreground text-sm">{t('domain:timeForm.noEmployees')}</p>
+            ) : (
+              <div className="border-border flex max-h-48 flex-col gap-2 overflow-y-auto rounded-lg border p-3">
+                {selectableEmployees.map((employee) => {
+                  const checked = draft.employmentIds.includes(employee.id);
+                  return (
+                    <label key={employee.id} className="flex items-center gap-2 text-sm">
+                      <Checkbox
+                        checked={checked}
+                        disabled={locked}
+                        onCheckedChange={(value) => toggleEmployee(employee.id, value === true)}
+                      />
+                      <span>{employee.name || t('domain:employees.unnamed')}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </fieldset>
+        ) : canTeam ? (
+          <div className="grid gap-2">
+            <Label>{t('domain:times.columns.employee')}</Label>
+            <Select
+              value={draft.employmentIds[0] ?? ''}
+              onValueChange={(value) => set({ employmentIds: [value] })}
+              disabled={locked}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t('domain:timeForm.choose')} />
+              </SelectTrigger>
+              <SelectContent>
+                {selectableEmployees.map((employee) => (
+                  <SelectItem key={employee.id} value={employee.id}>
+                    {employee.name || t('domain:employees.unnamed')}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-muted-foreground text-sm">{t('domain:timeForm.editEmployeeHint')}</p>
+          </div>
+        ) : (
+          <div className="grid gap-2">
+            <Label>{t('domain:times.columns.employee')}</Label>
+            <p className="text-foreground text-sm">{employeeName}</p>
+            <p className="text-muted-foreground text-sm">{t('domain:timeForm.ownEmployeeHint')}</p>
+          </div>
+        )}
 
         <div className="grid gap-2">
           <Label htmlFor={ids.date}>{t('domain:timeForm.date')}</Label>
           <Input
             id={ids.date}
             type="date"
+            required
+            disabled={locked}
             value={draft.date}
             onChange={(event) => set({ date: event.target.value })}
           />
@@ -188,19 +263,23 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="grid gap-2">
-            <Label htmlFor={ids.start}>{t('domain:times.columns.start')}</Label>
+            <Label htmlFor={ids.start}>{t('domain:timeForm.start')}</Label>
             <Input
               id={ids.start}
               type="time"
+              required
+              disabled={locked}
               value={draft.startTime}
               onChange={(event) => set({ startTime: event.target.value })}
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor={ids.end}>{t('domain:times.columns.end')}</Label>
+            <Label htmlFor={ids.end}>{t('domain:timeForm.end')}</Label>
             <Input
               id={ids.end}
               type="time"
+              required
+              disabled={locked}
               value={draft.endTime}
               onChange={(event) => set({ endTime: event.target.value })}
             />
@@ -210,34 +289,64 @@ function TimeEntryForm({ initial, onDone }: { initial: TimeEntryDraft; onDone: (
             <Input
               id={ids.pause}
               inputMode="numeric"
+              disabled={locked}
               className="text-right tabular-nums"
               value={draft.breakMinutes}
               onChange={(event) => set({ breakMinutes: event.target.value })}
             />
           </div>
         </div>
+        <p className="text-muted-foreground text-xs">{t('domain:timeForm.overnightHint')}</p>
 
         <div className="grid gap-2">
           <Label htmlFor={ids.note}>{t('domain:times.columns.note')}</Label>
           <Textarea
             id={ids.note}
             rows={3}
+            disabled={locked}
             value={draft.note}
             onChange={(event) => set({ note: event.target.value })}
           />
         </div>
 
-        {error ? <p className="text-destructive text-sm">{error}</p> : null}
+        {draft.id && !locked ? (
+          <Button
+            type="button"
+            variant="destructive"
+            className="w-fit"
+            onClick={() => setConfirmDelete(true)}
+          >
+            {t('domain:timeForm.delete.action')}
+          </Button>
+        ) : null}
+
+        {error ? (
+          <p role="alert" className="text-destructive text-sm">
+            {error}
+          </p>
+        ) : null}
       </SheetBody>
 
       <SheetFooter>
         <Button type="button" variant="outline" onClick={onDone}>
           {t('common:action.cancel')}
         </Button>
-        <Button type="submit" disabled={save.isPending}>
-          {t('common:action.save')}
-        </Button>
+        {locked ? null : (
+          <Button type="submit" disabled={save.isPending}>
+            {t('common:action.save')}
+          </Button>
+        )}
       </SheetFooter>
+
+      {draft.id ? (
+        <TimeEntryDeleteDialog
+          entryId={draft.id}
+          description={deleteDescription}
+          open={confirmDelete}
+          onOpenChange={setConfirmDelete}
+          onDeleted={onDone}
+        />
+      ) : null}
     </form>
   );
 }

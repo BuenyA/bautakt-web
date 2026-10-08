@@ -262,9 +262,11 @@ nicht diese Button-Pill und bleibt grau.
 
 ## Detailflächen
 
-Stand 2026-10-01. Auftrag-Detail (`/auftraege/:id`) und Rechnung-Detail
-(`/rechnungen/:id`) teilen eine Section-Hierarchie. Nur Klassen: kein Upload,
-kein CRUD, keine neuen Texte.
+Stand 2026-10-01, Optik. Auftrag-Detail (`/auftraege/:id`) und Rechnung-Detail
+(`/rechnungen/:id`) teilen eine Section-Hierarchie. Der Pass von damals hat
+keine neuen Texte und keinen Upload gebracht. Zeiten auf dem Auftrag lassen
+sich seit 2026-10-08 nachtragen; die Karte bleibt dieselbe Fläche und ist dann
+ein Knopf. Siehe [auftragszeiten.md](auftragszeiten.md).
 
 | Element                         | Look                                                                                                                                                                                                                                          |
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

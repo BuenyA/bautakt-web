@@ -27,7 +27,7 @@ verlinkt, nie kopiert.
 | [webapp-shell.md](pages/webapp-shell.md)                   | Shell-Layout, kanonische Top-Nav IA, Listen-Muster.           |
 | [auftragsfotos.md](pages/auftragsfotos.md)                 | Read-only Fotogalerie auf der Auftragsdetailseite.            |
 | [auftragsnotizen.md](pages/auftragsnotizen.md)             | Read-only Notizen auf der Auftragsdetailseite.                |
-| [auftragszeiten.md](pages/auftragszeiten.md)               | Read-only Zeiten auf der Auftragsdetailseite.                 |
+| [auftragszeiten.md](pages/auftragszeiten.md)               | Zeiten am Auftrag und auf `/zeiten` anlegen, ändern, löschen. |
 | [auftrag-anlegen.md](pages/auftrag-anlegen.md)             | Auftrag aus der Liste anlegen, dieselbe `orders`-Zeile.       |
 | [einsatz-anlegen.md](pages/einsatz-anlegen.md)             | Einsatz anlegen und löschen, Zeiten bleiben stehen.           |
 | [kostenstellen.md](pages/kostenstellen.md)                 | Kostenstelle anlegen und löschen, Auftragssumme je Zeile.     |
@@ -68,6 +68,7 @@ verlinkt, nie kopiert.
 | 2026-10-05 | [Überzahlung auf der Rechnung sichtbar](logs/2026-10-05-ueberzahlung-anzeige.md)                |
 | 2026-10-05 | [Einsatz anlegen und löschen](logs/2026-10-05-einsatz-anlegen-loeschen.md)                      |
 | 2026-10-05 | [Kostenstellen anlegen, löschen, Auftragssumme](logs/2026-10-05-kostenstellen-anlegen.md)       |
+| 2026-10-08 | [Zeit am Auftrag und auf /zeiten schreiben](logs/2026-10-08-zeit-erfassen.md)                   |
 
 ## Die drei wichtigsten Sätze
 

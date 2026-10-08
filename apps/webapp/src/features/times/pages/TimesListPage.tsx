@@ -1,4 +1,5 @@
-import { Button, DataTable, type DataTableColumn, Uicon } from '@bautakt/ui';
+import { hasPermission } from '@bautakt/core';
+import { Badge, Button, DataTable, type DataTableColumn, Uicon } from '@bautakt/ui';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router';
@@ -7,12 +8,14 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { ListFilterChips } from '@/components/common/ListFilterChips';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useAuth } from '@/features/auth/useAuth';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
-import { usePermission } from '@/features/company/usePermission';
+import { useMembership } from '@/features/company/useMembership';
 import { formatDateTime, formatNetDuration } from '@/lib/format';
 import { routes, timesOrderParam } from '@/lib/routes';
 
-import { emptyTimeEntry, type TimeEntryDraft } from '../timeEntryDraft';
+import { canCreateTimeEntry, canEditTimeEntry } from '../timeEntryAccess';
+import { draftFromTimeEntry, emptyTimeEntry, type TimeEntryDraft } from '../timeEntryDraft';
 import { TimeEntrySheet } from '../TimeEntrySheet';
 import { matchesTimePeriod, type TimePeriod, timePeriodFromSearch } from '../timePeriod';
 import { type TimeEntryListRow, useTimeEntries } from '../useTimeEntries';
@@ -20,7 +23,10 @@ import { type TimeEntryListRow, useTimeEntries } from '../useTimeEntries';
 export function TimesListPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
-  const canTrackForTeam = usePermission('canTrackTimeForTeam');
+  const { user } = useAuth();
+  const { data: membership } = useMembership();
+  const canCreate = canCreateTimeEntry(membership?.permissions);
+  const canTrackForTeam = hasPermission(membership?.permissions, 'canTrackTimeForTeam');
   const [searchParams, setSearchParams] = useSearchParams();
   const orderId = searchParams.get(timesOrderParam)?.trim() || undefined;
   const period = timePeriodFromSearch(searchParams.get('period'));
@@ -67,16 +73,26 @@ export function TimesListPage() {
       ? t('domain:times.filteredOnOrder', { order: orderName })
       : t('domain:times.filteredDescription')
     : t('domain:times.listDescription');
+
+  function openNew() {
+    setDraft(
+      emptyTimeEntry({
+        orderId,
+        employmentId: canTrackForTeam ? undefined : membership?.employmentId,
+      }),
+    );
+  }
+
   const headerActions =
-    orderId || canTrackForTeam ? (
+    orderId || canCreate ? (
       <div className="flex flex-wrap items-center gap-2">
         {orderId ? (
           <Button asChild variant="outline" size="sm">
             <Link to={routes.order(orderId)}>{t('domain:times.openOrder')}</Link>
           </Button>
         ) : null}
-        {canTrackForTeam ? (
-          <Button size="sm" onClick={() => setDraft(emptyTimeEntry())}>
+        {canCreate ? (
+          <Button size="sm" onClick={openNew}>
             <Uicon name="plus" size={16} />
             {t('domain:timeForm.newTitle')}
           </Button>
@@ -90,8 +106,11 @@ export function TimesListPage() {
         accessorKey: 'employee_name',
         header: t('domain:times.columns.employee'),
         cell: ({ row }) => (
-          <span className="text-foreground font-medium">
-            {row.original.employee_name || t('domain:times.noEmployee')}
+          <span className="flex flex-wrap items-center gap-2">
+            <span className="text-foreground font-medium">
+              {row.original.employee_name || t('domain:times.noEmployee')}
+            </span>
+            {row.original.billed ? <Badge variant="muted">{t('domain:times.billed')}</Badge> : null}
           </span>
         ),
       },
@@ -218,6 +237,14 @@ export function TimesListPage() {
         isLoading={isLoading}
         labels={labels}
         exportFileName="zeiten"
+        onRowClick={
+          canCreate
+            ? (row) => {
+                if (!canEditTimeEntry(membership?.permissions, user?.id, row)) return;
+                setDraft(draftFromTimeEntry(row));
+              }
+            : undefined
+        }
         toolbar={
           <ListFilterChips
             label={t('domain:times.filtersLabel')}
@@ -243,14 +270,24 @@ export function TimesListPage() {
                   : t('domain:times.emptyDescription')
             }
             action={
-              orderId ? (
-                <button
-                  type="button"
-                  className="text-primary cursor-pointer text-sm font-medium hover:underline"
-                  onClick={clearOrderFilter}
-                >
-                  {t('domain:times.clearOrderFilter')}
-                </button>
+              canCreate || orderId ? (
+                <div className="flex flex-col items-center gap-3">
+                  {canCreate ? (
+                    <Button size="sm" onClick={openNew}>
+                      <Uicon name="plus" size={16} />
+                      {t('domain:timeForm.newTitle')}
+                    </Button>
+                  ) : null}
+                  {orderId ? (
+                    <button
+                      type="button"
+                      className="text-primary cursor-pointer text-sm font-medium hover:underline"
+                      onClick={clearOrderFilter}
+                    >
+                      {t('domain:times.clearOrderFilter')}
+                    </button>
+                  ) : null}
+                </div>
               ) : undefined
             }
           />

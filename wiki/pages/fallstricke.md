@@ -329,3 +329,33 @@ Aufträge 0 ergibt, und erklärt sonst, warum die Zeile bleibt. Die Prüfung und
 das `delete` sind zwei Anfragen; ein Auftrag, der genau dazwischen verknüpft
 wird, kann noch genullt werden. Das schlösse erst `ON DELETE RESTRICT` in
 `bautakt-app`. Siehe [kostenstellen.md](kostenstellen.md).
+
+## Zeiteintrag ohne Nutzer oder ohne Satz
+
+_Gemessen 2026-10-08, Issue #46._
+
+**Symptom:** Ein Insert in `time_entries` aus dem Web scheitert für Konten, die
+nur `canTrackTime` haben, oder er landet mit `cost_rate` und `billing_rate`
+NULL. Die Rechnung aus Zeiten hat dann keinen Preis. Der Cache der Liste bleibt
+trotzdem stehen, weil die Mutation `['time-entries', companyId]` invalidiert
+hat und die Abfrage `['timeEntries', companyId, …]` heißt.
+
+Die Insert-Policy verlangt für die eigene Erfassung `user_id = auth.uid()`.
+Die Handy-App setzt `user_id` auf den Nutzer der gewählten Anstellung. Der
+Trigger `trg_time_entries_billing_fields` löst die Sätze beim INSERT nur auf,
+wenn das Konto **kein** `canManageRates` hat. Mit dem Recht bleibt der Wert des
+Clients, einschließlich NULL.
+
+`resolve_labor_rate` ist `SECURITY DEFINER` und für `authenticated` nicht
+ausführbar (gemessen 2026-10-08). Sie prüft die Mitgliedschaft nicht. Ein Grant
+wäre das alte mandantenübergreifende Leck wieder. Nicht freischalten.
+
+**Lösung:** `user_id` aus der Anstellung mitgeben. Sätze nur mit
+`canManageRates` selbst aus `labor_rates` auflösen (Auftrag, Anstellung, Rolle,
+Betrieb, jüngster gültiger Satz, sonst 0). Ohne das Recht die Spalten
+weglassen, der Trigger füllt sie. Invalidieren unter `timeEntries`. Siehe
+[auftragszeiten.md](auftragszeiten.md).
+
+Abgerechnete Zeilen (`billed_document_id`) sperrt die Datenbank nicht. Die
+Oberfläche lehnt Ändern und Löschen ab und liest die Spalte direkt vor dem
+Schreiben noch einmal. Eine echte Sperre wäre ein Trigger in `bautakt-app`.
