@@ -65,6 +65,7 @@
       "title": "Fotos",
       "emptyTitle": "Noch keine Fotos",
       "emptyDescription": "Fotos aus der Handy-App erscheinen hier, sobald sie synchronisiert sind.",
+      "emptyDescriptionWrite": "Hier lassen sich Fotos hochladen. Sie erscheinen danach auch in der Handy-App.",
       "loadErrorTitle": "Fotos konnten nicht geladen werden",
       "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
       "openLabel": "Foto vom {{date}} öffnen",
@@ -703,6 +704,33 @@
     "nameRequired": "Bitte einen Namen angeben — sonst ist der Kunde in der Liste nicht zu finden.",
     "saved": "Kunde gespeichert.",
     "saveError": "Kunde konnte nicht gespeichert werden."
+  },
+  "photoForm": {
+    "upload": "Fotos hochladen",
+    "dropTitle": "Fotos hierher ziehen oder auswählen",
+    "dropHint": "JPEG, PNG, WebP oder HEIC. Gespeichert wird ein JPEG, wie in der Handy-App.",
+    "progress": "Foto {{current}} von {{total}} wird hochgeladen …",
+    "uploaded_one": "Foto hochgeladen.",
+    "uploaded_other": "{{count}} Fotos hochgeladen.",
+    "partial": "{{done}} von {{total}} Fotos hochgeladen.",
+    "failedLine": "„{{name}}“: {{message}}",
+    "saveError": "Foto konnte nicht hochgeladen werden.",
+    "unsupported": "Bitte ein Bild wählen (JPEG, PNG oder HEIC).",
+    "unreadable": "Diese Datei lässt sich hier nicht lesen. Bitte ein JPEG oder PNG wählen.",
+    "tooLarge": "Das Foto bleibt auch nach dem Verkleinern über 5 MB.",
+    "cleanupFailed": "Die Datei liegt im Speicher, der Eintrag aber nicht. Bitte erneut hochladen.",
+    "delete": {
+      "action": "Foto löschen",
+      "label": "Foto vom {{date}} löschen",
+      "labelUndated": "Foto löschen",
+      "title": "Foto löschen?",
+      "description": "Das Foto vom {{date}} wird entfernt. Das lässt sich nicht rückgängig machen.",
+      "descriptionUndated": "Dieses Foto wird entfernt. Das lässt sich nicht rückgängig machen.",
+      "confirm": "Endgültig löschen",
+      "pending": "Wird gelöscht …",
+      "deleted": "Foto gelöscht.",
+      "error": "Foto konnte nicht gelöscht werden."
+    }
   },
   "noteForm": {
     "newTitle": "Notiz hinzufügen",
