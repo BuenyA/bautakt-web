@@ -109,6 +109,12 @@ läuft. Der Bericht verschwindet aus der Liste erst, wenn die Antwort eine
 gelöschte `id` enthält. Eine von RLS verschluckte Löschung ist ein Fehler,
 kein Erfolg.
 
+Panel und Dialog bleiben offen, solange Speichern oder Löschen läuft.
+`useDismissLock` lässt Fokus, Escape und einen Klick daneben in der Zeit
+nicht durch. Der Dialog meldet `isPending` nach oben, damit das Panel
+mitgesperrt ist. Das Sheet selbst ignoriert Fokus und Klicks, die auf einen
+verschachtelten Dialog zielen; der Dialog liegt auf `z-[60]`.
+
 ## Recht
 
 Knöpfe hängen an `canCreateDailyReport` und `canEditDailyReport`. Das blendet

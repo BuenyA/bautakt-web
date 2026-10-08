@@ -9,9 +9,10 @@ import {
   toast,
 } from '@bautakt/ui';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useDismissLock } from '@/components/common/useDismissLock';
 import { useMembership } from '@/features/company/useMembership';
 import { readableDbError } from '@/lib/dbErrors';
 
@@ -23,20 +24,22 @@ import { type DailyReportLinkCounts, fetchDailyReportLinkCounts } from './useOrd
  *
  * Die Zeile bleibt in der Liste, bis die Löschung bestätigt ist. Der Knopf
  * zeigt solange den Lade-Zustand und lässt sich nicht ein zweites Mal
- * auslösen. Schließen währenddessen ist zu, damit die Anfrage nicht wie ein
- * Abbruch aussieht.
+ * auslösen. Fokus, Escape und ein Klick daneben schließen den Dialog
+ * währenddessen nicht.
  */
 export function DailyReportDeleteDialog({
   reportId,
   dateLabel,
   open,
   onOpenChange,
+  onPendingChange,
   onDeleted,
 }: {
   reportId: string;
   dateLabel: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onPendingChange?: (pending: boolean) => void;
   onDeleted: () => void;
 }) {
   const { t } = useTranslation();
@@ -44,14 +47,25 @@ export function DailyReportDeleteDialog({
   const companyId = membership?.companyId;
   const remove = useDeleteDailyReport();
   const [error, setError] = useState<string | null>(null);
+  const { onBusyChange, handleOpenChange } = useDismissLock((next) => {
+    if (!next) setError(null);
+    onOpenChange(next);
+  });
   const counts = useQuery({
     queryKey: ['daily-report-links', companyId, reportId],
     enabled: open && Boolean(companyId && reportId),
     queryFn: (): Promise<DailyReportLinkCounts> => fetchDailyReportLinkCounts(companyId!, reportId),
   });
 
+  useEffect(() => {
+    onBusyChange(remove.isPending);
+  }, [onBusyChange, remove.isPending]);
+
+  useEffect(() => {
+    onPendingChange?.(remove.isPending);
+  }, [onPendingChange, remove.isPending]);
+
   function close() {
-    if (remove.isPending) return;
     setError(null);
     onOpenChange(false);
   }
@@ -72,13 +86,7 @@ export function DailyReportDeleteDialog({
   const summary = linkSummary(t, counts.data);
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        if (!next) close();
-        else onOpenChange(next);
-      }}
-    >
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t('domain:dailyReportForm.delete.title')}</DialogTitle>
@@ -111,6 +119,7 @@ export function DailyReportDeleteDialog({
             type="button"
             variant="destructive"
             disabled={remove.isPending || counts.isPending}
+            aria-busy={remove.isPending}
             onClick={() => void onConfirm()}
           >
             {remove.isPending

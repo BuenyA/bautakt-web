@@ -19,7 +19,8 @@ sie und löscht sie. Dieselbe Tabelle schreibt die Handy-App.
 - Zweiter Bericht am selben Tag: Klartext, Unique
   `(order_id, report_date)`. Löschen erst nach der Server-Antwort, mit
   Lade-Zustand und Warnung vor der CASCADE auf Zeiten, Material, Fotos und
-  Mängel.
+  Mängel. Panel und Dialog bleiben offen, solange Speichern oder Löschen
+  läuft (`useDismissLock`).
 - Insert mit clientseitiger `id`, `user_id` des angemeldeten Nutzers und
   `modified_at`. Update schreibt die Kernfelder, nie Materialtext, besondere
   Vorkommnisse oder den Autor.

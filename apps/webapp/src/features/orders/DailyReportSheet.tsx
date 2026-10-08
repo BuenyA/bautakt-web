@@ -23,6 +23,7 @@ import {
 import { type FormEvent, useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useDismissLock } from '@/components/common/useDismissLock';
 import { useAuth } from '@/features/auth/useAuth';
 import { useMembership } from '@/features/company/useMembership';
 import { readableDbError } from '@/lib/dbErrors';
@@ -56,7 +57,8 @@ const ISSUE_KEY = {
  *
  * Das Panel ist nur gemountet, solange es offen ist, und startet deshalb
  * jedes Mal mit dem übergebenen Entwurf. Von/Bis erscheint nur für Personen,
- * deren Zeit dieses Konto buchen darf.
+ * deren Zeit dieses Konto buchen darf. Solange Speichern oder Löschen läuft,
+ * bleibt es offen: Fokus, Escape und ein Klick daneben schließen es nicht.
  */
 export function DailyReportSheet({
   draft,
@@ -75,8 +77,9 @@ export function DailyReportSheet({
   staffPending: boolean;
   onOpenExisting: (reportId: string) => boolean;
 }) {
+  const dismiss = useDismissLock(onOpenChange);
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={dismiss.handleOpenChange}>
       <SheetContent className="p-0">
         {open && draft ? (
           <DailyReportForm
@@ -86,6 +89,7 @@ export function DailyReportSheet({
             staffError={staffError}
             staffPending={staffPending}
             onOpenExisting={onOpenExisting}
+            onBusyChange={dismiss.onBusyChange}
             onDone={() => onOpenChange(false)}
           />
         ) : null}
@@ -100,6 +104,7 @@ function DailyReportForm({
   staffError,
   staffPending,
   onOpenExisting,
+  onBusyChange,
   onDone,
 }: {
   initial: DailyReportDraft;
@@ -107,6 +112,7 @@ function DailyReportForm({
   staffError: boolean;
   staffPending: boolean;
   onOpenExisting: (reportId: string) => boolean;
+  onBusyChange: (busy: boolean) => void;
   onDone: () => void;
 }) {
   const { t } = useTranslation();
@@ -120,6 +126,7 @@ function DailyReportForm({
   const [duplicateId, setDuplicateId] = useState<string | null>(null);
   const [duplicateDenied, setDuplicateDenied] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deletePending, setDeletePending] = useState(false);
   const dateRef = useRef<HTMLDivElement>(null);
   const attendanceRef = useRef<HTMLFieldSetElement>(null);
   const workRef = useRef<HTMLDivElement>(null);
@@ -134,6 +141,15 @@ function DailyReportForm({
   const canTeam = hasPermission(membership?.permissions, 'canTrackTimeForTeam');
   const canOwn = hasPermission(membership?.permissions, 'canTrackTime');
   const offersTime = canTeam || canOwn;
+  const busy = save.isPending || deletePending;
+
+  useEffect(() => {
+    onBusyChange(busy);
+  }, [busy, onBusyChange]);
+
+  useEffect(() => {
+    return () => onBusyChange(false);
+  }, [onBusyChange]);
 
   function bookable(employmentId: string): boolean {
     const person = staff.find((entry) => entry.id === employmentId);
@@ -398,6 +414,7 @@ function DailyReportForm({
             type="button"
             variant="destructive"
             className="w-fit"
+            disabled={busy}
             onClick={() => setConfirmDelete(true)}
           >
             {t('domain:dailyReportForm.delete.action')}
@@ -426,10 +443,10 @@ function DailyReportForm({
           </div>
         ) : null}
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={onDone}>
+          <Button type="button" variant="outline" onClick={onDone} disabled={busy}>
             {t('common:action.cancel')}
           </Button>
-          <Button type="submit" disabled={save.isPending || staffPending || staffError}>
+          <Button type="submit" disabled={busy || staffPending || staffError}>
             {save.isPending ? t('domain:dailyReportForm.saving') : t('common:action.save')}
           </Button>
         </div>
@@ -441,6 +458,7 @@ function DailyReportForm({
           dateLabel={formatReportDate(draft.date)}
           open={confirmDelete}
           onOpenChange={setConfirmDelete}
+          onPendingChange={setDeletePending}
           onDeleted={onDone}
         />
       ) : null}
