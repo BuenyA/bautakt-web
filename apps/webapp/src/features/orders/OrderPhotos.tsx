@@ -203,7 +203,7 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
           >
             <div
               className="bg-primary h-full transition-[width]"
-              style={{ width: `${(progress.current / progress.total) * 100}%` }}
+              style={{ width: `${((progress.current - 0.5) / progress.total) * 100}%` }}
             />
           </div>
         </div>
