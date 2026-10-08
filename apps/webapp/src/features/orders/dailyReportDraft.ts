@@ -111,7 +111,8 @@ export function formatTemperature(value: number | null): string {
   return input ? `${input} °C` : '';
 }
 
-function isIsoDate(value: string): boolean {
+/** `YYYY-MM-DD` und ein echtes Kalenderdatum. */
+export function isDailyReportDate(value: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   const [year, month, day] = value.split('-').map(Number);
   if (!year || !month || !day) return false;
@@ -130,7 +131,7 @@ export function dailyReportIssue(
   draft: DailyReportDraft,
   bookable: (employmentId: string) => boolean,
 ): DailyReportIssue | null {
-  if (!isIsoDate(draft.date)) return 'date';
+  if (!isDailyReportDate(draft.date)) return 'date';
   if (!draft.weatherMorning.trim()) return 'weatherMorning';
   if (!draft.weatherAfternoon.trim()) return 'weatherAfternoon';
   if (parseTemperature(draft.temperatureMorning) == null) return 'temperatureMorning';

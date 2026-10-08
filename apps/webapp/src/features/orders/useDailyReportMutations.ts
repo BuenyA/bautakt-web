@@ -257,6 +257,7 @@ export function useSaveDailyReport() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['daily-reports', companyId] });
+      await queryClient.invalidateQueries({ queryKey: ['daily-report-on-date', companyId] });
       await queryClient.invalidateQueries({ queryKey: ['daily-report-links', companyId] });
       await queryClient.invalidateQueries({ queryKey: ['timeEntries', companyId] });
       await queryClient.invalidateQueries({ queryKey: ['sales-documents', companyId] });
@@ -303,8 +304,12 @@ export function useDeleteDailyReport() {
         throw new Error('FORBIDDEN');
       }
 
-      const block = await readDailyReportDeleteBlock(companyId, reportId, membership?.permissions);
-      if (block) throw new DailyReportDeleteBlockedError(block);
+      const reading = await readDailyReportDeleteBlock(
+        companyId,
+        reportId,
+        membership?.permissions,
+      );
+      if (reading.block) throw new DailyReportDeleteBlockedError(reading.block, reading.counts);
 
       const { data, error } = await supabase
         .from('daily_reports')
@@ -317,6 +322,7 @@ export function useDeleteDailyReport() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['daily-reports', companyId] });
+      await queryClient.invalidateQueries({ queryKey: ['daily-report-on-date', companyId] });
       await queryClient.invalidateQueries({ queryKey: ['daily-report-links', companyId] });
       await queryClient.invalidateQueries({ queryKey: ['timeEntries', companyId] });
       await queryClient.invalidateQueries({ queryKey: ['order-materials', companyId] });

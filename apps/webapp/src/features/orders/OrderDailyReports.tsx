@@ -9,15 +9,20 @@ import { useMembership } from '@/features/company/useMembership';
 
 import { canCreateDailyReport, canEditDailyReport } from './dailyReportAccess';
 import { emptyDailyReport, formatTemperature } from './dailyReportDraft';
-import { DailyReportSheet } from './DailyReportSheet';
+import { DailyReportSheet, type OpenDailyReportResult } from './DailyReportSheet';
 import {
   type DailyReport,
   type DailyReportLinkCounts,
   draftFromDailyReport,
+  formatDailyReportLinkCounts,
   formatReportDate,
+  type ReportStaff,
   useOrderDailyReports,
   useReportStaff,
 } from './useOrderDailyReports';
+
+const EMPTY_REPORTS: DailyReport[] = [];
+const EMPTY_STAFF: ReportStaff[] = [];
 
 const SKELETON_COUNT = 2;
 
@@ -42,19 +47,29 @@ export function OrderDailyReports({ orderId }: { orderId: string }) {
 
   if (!canCreate) return null;
 
+  // Solange die Anstellungen fehlen, keine Vorauswahl aus einer leeren Liste.
+  const staffLoading = staff.isPending;
+
   function openNew() {
+    if (staffLoading) return;
     const own = staff.data?.find(
       (person) => person.id === membership?.employmentId && !person.endedAt,
     );
     setDraft(emptyDailyReport(orderId, own?.id));
   }
 
-  function openExisting(reportId: string): boolean {
-    const row = data?.find((report) => report.id === reportId);
-    if (!row) return false;
-    if (!canEditDailyReport(membership?.permissions, user?.id, row)) return false;
+  async function openExisting(reportId: string): Promise<OpenDailyReportResult> {
+    const from = (rows: DailyReport[] | undefined) =>
+      rows?.find((report) => report.id === reportId);
+    let row = from(data);
+    if (!row) {
+      const result = await refetch();
+      row = from(result.data);
+    }
+    if (!row) return 'missing';
+    if (!canEditDailyReport(membership?.permissions, user?.id, row)) return 'denied';
     setDraft(draftFromDailyReport(row));
-    return true;
+    return 'opened';
   }
 
   let body: ReactNode;
@@ -82,7 +97,7 @@ export function OrderDailyReports({ orderId }: { orderId: string }) {
         title={t('domain:orders.dailyReports.emptyTitle')}
         description={t('domain:orders.dailyReports.emptyDescriptionWrite')}
         action={
-          <Button size="sm" onClick={openNew}>
+          <Button size="sm" onClick={openNew} disabled={staffLoading}>
             <Uicon name="plus" size={16} />
             {t('domain:dailyReportForm.newTitle')}
           </Button>
@@ -114,7 +129,7 @@ export function OrderDailyReports({ orderId }: { orderId: string }) {
         >
           {t('domain:orders.dailyReports.title')}
         </h2>
-        <Button size="sm" onClick={openNew}>
+        <Button size="sm" onClick={openNew} disabled={staffLoading}>
           <Uicon name="plus" size={16} />
           {t('domain:dailyReportForm.newTitle')}
         </Button>
@@ -124,7 +139,8 @@ export function OrderDailyReports({ orderId }: { orderId: string }) {
         draft={draft}
         open={draft !== null}
         onOpenChange={(open) => !open && setDraft(null)}
-        staff={staff.data ?? []}
+        reports={data ?? EMPTY_REPORTS}
+        staff={staff.data ?? EMPTY_STAFF}
         staffError={staff.isError}
         staffPending={staff.isPending}
         onOpenExisting={openExisting}
@@ -226,16 +242,9 @@ function ReportCard({
 
 function LinkCounts({ counts }: { counts: DailyReportLinkCounts }) {
   const { t } = useTranslation();
-  const parts = [
-    counts.times ? t('domain:orders.dailyReports.linkedTimes', { count: counts.times }) : '',
-    counts.materials
-      ? t('domain:orders.dailyReports.linkedMaterials', { count: counts.materials })
-      : '',
-    counts.photos ? t('domain:orders.dailyReports.linkedPhotos', { count: counts.photos }) : '',
-    counts.issues ? t('domain:orders.dailyReports.linkedIssues', { count: counts.issues }) : '',
-  ].filter(Boolean);
-  if (parts.length === 0) return null;
-  return <p className="text-muted-foreground text-xs">{parts.join(' · ')}</p>;
+  const summary = formatDailyReportLinkCounts(counts, (key, options) => t(key, options));
+  if (!summary) return null;
+  return <p className="text-muted-foreground text-xs">{summary}</p>;
 }
 
 function ReportListSkeleton({ label }: { label: string }) {

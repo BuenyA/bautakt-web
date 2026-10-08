@@ -865,7 +865,7 @@
       "deleted": "Bericht gelöscht.",
       "error": "Bericht konnte nicht gelöscht werden.",
       "billedBlocked": "Dieser Bericht enthält abgerechnete Zeiten oder Material und kann nicht gelöscht werden.",
-      "linkedBlocked": "Dieser Bericht hat verknüpfte Zeiten, Material, Fotos oder Mängel und kann im Web nicht gelöscht werden."
+      "linkedBlocked": "Dieser Bericht hat verknüpfte Einträge und kann im Web noch nicht gelöscht werden."
     }
   },
   "checklistForm": {

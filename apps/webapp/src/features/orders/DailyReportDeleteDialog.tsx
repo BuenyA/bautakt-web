@@ -19,9 +19,11 @@ import { readableDbError } from '@/lib/dbErrors';
 import {
   type DailyReportDeleteBlock,
   DailyReportDeleteBlockedError,
+  type DailyReportDeleteReading,
   readDailyReportDeleteBlock,
 } from './dailyReportDeleteGate';
 import { useDeleteDailyReport } from './useDailyReportMutations';
+import { formatDailyReportLinkCounts } from './useOrderDailyReports';
 
 /**
  * Bestätigung vor dem Löschen eines Bautagebuchs.
@@ -33,7 +35,8 @@ import { useDeleteDailyReport } from './useDailyReportMutations';
  *
  * Beim Öffnen und noch einmal unmittelbar vor dem DELETE liest der Dialog
  * abgerechnete Zeiten und Material sowie jede Verknüpfung frisch vom Server.
- * Trifft eine Sperre zu, bleibt der Knopf aus und die Karte stehen.
+ * Trifft eine Sperre zu, bleibt der Knopf aus, der Text nennt den Grund, und
+ * darunter stehen die Anzahlen, die größer als 0 sind. Die Karte bleibt.
  */
 export function DailyReportDeleteDialog({
   reportId,
@@ -55,11 +58,11 @@ export function DailyReportDeleteDialog({
   const companyId = membership?.companyId;
   const remove = useDeleteDailyReport();
   const [error, setError] = useState<string | null>(null);
-  const [forcedBlock, setForcedBlock] = useState<DailyReportDeleteBlock | null>(null);
+  const [forced, setForced] = useState<DailyReportDeleteReading | null>(null);
   const { onBusyChange, handleOpenChange } = useDismissLock((next) => {
     if (!next) {
       setError(null);
-      setForcedBlock(null);
+      setForced(null);
     }
     onOpenChange(next);
   });
@@ -68,7 +71,7 @@ export function DailyReportDeleteDialog({
     enabled: open && Boolean(companyId && reportId),
     staleTime: 0,
     gcTime: 0,
-    queryFn: (): Promise<DailyReportDeleteBlock | null> =>
+    queryFn: (): Promise<DailyReportDeleteReading> =>
       readDailyReportDeleteBlock(companyId!, reportId, membership?.permissions),
   });
 
@@ -82,7 +85,7 @@ export function DailyReportDeleteDialog({
 
   function close() {
     setError(null);
-    setForcedBlock(null);
+    setForced(null);
     onOpenChange(false);
   }
 
@@ -102,14 +105,17 @@ export function DailyReportDeleteDialog({
       onDeleted();
     } catch (caught) {
       if (caught instanceof DailyReportDeleteBlockedError) {
-        setForcedBlock(caught.block);
+        setForced({ block: caught.block, counts: caught.counts });
         return;
       }
       setError(readableDbError(caught) ?? t('domain:dailyReportForm.delete.error'));
     }
   }
 
-  const block = forcedBlock ?? probe.data ?? (probe.isError ? 'linked' : null);
+  const block = forced?.block ?? probe.data?.block ?? (probe.isError ? 'linked' : null);
+  const counts = forced?.counts ?? probe.data?.counts ?? null;
+  const summary =
+    block && counts ? formatDailyReportLinkCounts(counts, (key, options) => t(key, options)) : '';
   const waiting = probe.isPending || probe.isFetching;
   const allowed = !waiting && block == null && !probe.isError;
 
@@ -126,6 +132,8 @@ export function DailyReportDeleteDialog({
                 : t('domain:dailyReportForm.delete.countsLoading')}
           </DialogDescription>
         </DialogHeader>
+
+        {summary ? <p className="text-foreground text-sm">{summary}</p> : null}
 
         {error ? (
           <p role="alert" className="text-destructive text-sm">

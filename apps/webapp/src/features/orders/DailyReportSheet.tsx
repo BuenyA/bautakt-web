@@ -38,8 +38,15 @@ import {
   emptyAttendance,
 } from './dailyReportDraft';
 import { DailyReportDuplicateDateError, useSaveDailyReport } from './useDailyReportMutations';
-import { formatReportDate, type ReportStaff } from './useOrderDailyReports';
+import {
+  formatReportDate,
+  otherDailyReportId,
+  type ReportStaff,
+  useDailyReportOnDate,
+} from './useOrderDailyReports';
 import { weatherChoices } from './weatherOptions';
+
+export type OpenDailyReportResult = 'opened' | 'denied' | 'missing';
 
 const ISSUE_KEY = {
   date: 'domain:dailyReportForm.dateRequired',
@@ -59,11 +66,16 @@ const ISSUE_KEY = {
  * jedes Mal mit dem übergebenen Entwurf. Von/Bis erscheint nur für Personen,
  * deren Zeit dieses Konto buchen darf. Solange Speichern oder Löschen läuft,
  * bleibt es offen: Fokus, Escape und ein Klick daneben schließen es nicht.
+ *
+ * Ein belegtes Datum zeigt den Hinweis sofort, nicht erst nach dem Speichern.
+ * Die eigene Anwesenheit kommt erst, wenn die Mitarbeiter geladen sind, und
+ * nur solange der Nutzer die Auswahl nicht selbst geändert hat.
  */
 export function DailyReportSheet({
   draft,
   open,
   onOpenChange,
+  reports,
   staff,
   staffError,
   staffPending,
@@ -72,10 +84,11 @@ export function DailyReportSheet({
   draft: DailyReportDraft | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  reports: readonly { id: string; date: string }[];
   staff: ReportStaff[];
   staffError: boolean;
   staffPending: boolean;
-  onOpenExisting: (reportId: string) => boolean;
+  onOpenExisting: (reportId: string) => OpenDailyReportResult | Promise<OpenDailyReportResult>;
 }) {
   const dismiss = useDismissLock(onOpenChange);
   return (
@@ -85,6 +98,7 @@ export function DailyReportSheet({
           <DailyReportForm
             key={draft.id ?? 'new'}
             initial={draft}
+            reports={reports}
             staff={staff}
             staffError={staffError}
             staffPending={staffPending}
@@ -100,6 +114,7 @@ export function DailyReportSheet({
 
 function DailyReportForm({
   initial,
+  reports,
   staff,
   staffError,
   staffPending,
@@ -108,10 +123,11 @@ function DailyReportForm({
   onDone,
 }: {
   initial: DailyReportDraft;
+  reports: readonly { id: string; date: string }[];
   staff: ReportStaff[];
   staffError: boolean;
   staffPending: boolean;
-  onOpenExisting: (reportId: string) => boolean;
+  onOpenExisting: (reportId: string) => OpenDailyReportResult | Promise<OpenDailyReportResult>;
   onBusyChange: (busy: boolean) => void;
   onDone: () => void;
 }) {
@@ -123,10 +139,16 @@ function DailyReportForm({
   const [revealIssues, setRevealIssues] = useState(false);
   const [revealPulse, setRevealPulse] = useState(0);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [duplicateId, setDuplicateId] = useState<string | null>(null);
-  const [duplicateDenied, setDuplicateDenied] = useState(false);
+  const [forcedDuplicate, setForcedDuplicate] = useState<{
+    date: string;
+    id: string | null;
+  } | null>(null);
+  const [deniedOnDate, setDeniedOnDate] = useState<string | null>(null);
+  const [openingExisting, setOpeningExisting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deletePending, setDeletePending] = useState(false);
+  const [attendanceTouched, setAttendanceTouched] = useState(false);
+  const [appliedStaffKey, setAppliedStaffKey] = useState<string | null>(null);
   const dateRef = useRef<HTMLDivElement>(null);
   const attendanceRef = useRef<HTMLFieldSetElement>(null);
   const workRef = useRef<HTMLDivElement>(null);
@@ -136,7 +158,43 @@ function DailyReportForm({
     temperatureAfternoon: useId(),
     workDone: useId(),
     notes: useId(),
+    duplicate: useId(),
   };
+
+  const dateProbe = useDailyReportOnDate(draft.orderId, draft.date);
+  const localDuplicateId = otherDailyReportId(reports, draft.date, draft.id);
+  const serverDuplicateId = dateProbe.isSuccess
+    ? (dateProbe.data.find((id) => id !== draft.id) ?? null)
+    : null;
+  // Solange die Abfrage läuft, gilt die geladene Liste — sonst verschwindet
+  // der Hinweis, obwohl die Karte den Bericht schon zeigt. Danach gilt der
+  // Server, auch für Berichte, die in der Liste noch fehlen.
+  const liveDuplicateId =
+    dateProbe.isSuccess && !dateProbe.isFetching
+      ? serverDuplicateId
+      : (localDuplicateId ?? serverDuplicateId);
+  const forced = forcedDuplicate && forcedDuplicate.date === draft.date ? forcedDuplicate : null;
+  const duplicate = Boolean(forced) || Boolean(liveDuplicateId);
+  const duplicateId = forced?.id ?? liveDuplicateId;
+  const duplicateDenied = deniedOnDate === draft.date && duplicate;
+
+  // Vorauswahl erst, wenn die Mitarbeiter da sind. Während des Renderns,
+  // nicht im Effekt: die Auswahl hängt an Daten, die nach dem Öffnen ankommen.
+  const staffReady =
+    !initial.id && !staffPending && !staffError && Boolean(membership?.employmentId);
+  const staffKey = staffReady
+    ? `${membership?.employmentId}|${staff.map((person) => `${person.id}:${person.endedAt ?? ''}`).join('|')}`
+    : '';
+  if (staffReady && !attendanceTouched && staffKey !== appliedStaffKey) {
+    setAppliedStaffKey(staffKey);
+    const own = staff.find((person) => person.id === membership?.employmentId && !person.endedAt);
+    const next = own ? [emptyAttendance(own.id)] : [];
+    setDraft((current) => {
+      if (current.id || attendanceTouched) return current;
+      if (sameAttendance(current.attendance, next)) return current;
+      return { ...current, attendance: next };
+    });
+  }
 
   const canTeam = hasPermission(membership?.permissions, 'canTrackTimeForTeam');
   const canOwn = hasPermission(membership?.permissions, 'canTrackTime');
@@ -186,11 +244,10 @@ function DailyReportForm({
   function set(patch: Partial<DailyReportDraft>) {
     setDraft((current) => ({ ...current, ...patch }));
     setSaveError(null);
-    setDuplicateId(null);
-    setDuplicateDenied(false);
   }
 
   function togglePerson(employmentId: string, on: boolean) {
+    setAttendanceTouched(true);
     setDraft((current) => ({
       ...current,
       attendance: on
@@ -200,14 +257,13 @@ function DailyReportForm({
         : current.attendance.filter((row) => row.employmentId !== employmentId),
     }));
     setSaveError(null);
-    setDuplicateId(null);
-    setDuplicateDenied(false);
   }
 
   function setTime(
     employmentId: string,
     patch: Partial<Pick<DailyReportAttendance, 'startTime' | 'endTime'>>,
   ) {
+    setAttendanceTouched(true);
     setDraft((current) => ({
       ...current,
       attendance: current.attendance.map((row) =>
@@ -219,12 +275,12 @@ function DailyReportForm({
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
+    if (duplicate) return;
     const nextIssue = dailyReportIssue(draft, bookable);
     if (nextIssue) {
       setRevealIssues(true);
       setRevealPulse((value) => value + 1);
       setSaveError(null);
-      setDuplicateId(null);
       return;
     }
     setRevealIssues(false);
@@ -243,20 +299,25 @@ function DailyReportForm({
     } catch (caught) {
       setRevealPulse((value) => value + 1);
       if (caught instanceof DailyReportDuplicateDateError) {
-        setDuplicateId(caught.existingId);
-        setDuplicateDenied(false);
-        setSaveError(t('domain:dailyReportForm.duplicate'));
+        setForcedDuplicate({ date: draft.date, id: caught.existingId });
+        setDeniedOnDate(null);
+        setSaveError(null);
         return;
       }
-      setDuplicateId(null);
       setSaveError(readableDbError(caught) ?? t('domain:dailyReportForm.saveError'));
     }
   }
 
-  function openExisting() {
-    if (!duplicateId) return;
-    const opened = onOpenExisting(duplicateId);
-    setDuplicateDenied(!opened);
+  async function openExisting() {
+    if (!duplicateId || openingExisting) return;
+    setOpeningExisting(true);
+    setDeniedOnDate(null);
+    try {
+      const result = await onOpenExisting(duplicateId);
+      if (result === 'denied') setDeniedOnDate(draft.date);
+    } finally {
+      setOpeningExisting(false);
+    }
   }
 
   const attendanceHint = canTeam
@@ -282,7 +343,12 @@ function DailyReportForm({
             type="date"
             required
             value={draft.date}
+            aria-invalid={duplicate || undefined}
+            aria-describedby={duplicate ? ids.duplicate : undefined}
             onChange={(event) => set({ date: event.target.value })}
+            onBlur={(event) => {
+              if (event.target.value !== draft.date) set({ date: event.target.value });
+            }}
           />
         </div>
 
@@ -414,14 +480,15 @@ function DailyReportForm({
       </SheetBody>
 
       <SheetFooter className="sm:flex-col sm:items-stretch">
-        {error ? (
-          <div role="alert" className="flex flex-col items-start gap-1">
-            <p className="text-destructive text-sm">{error}</p>
+        {duplicate ? (
+          <div id={ids.duplicate} role="alert" className="flex flex-col items-start gap-1">
+            <p className="text-destructive text-sm">{t('domain:dailyReportForm.duplicate')}</p>
             {duplicateId ? (
               <button
                 type="button"
-                className="text-sm font-medium text-primary hover:underline"
-                onClick={openExisting}
+                className="text-primary text-sm font-medium hover:underline disabled:opacity-50"
+                disabled={openingExisting}
+                onClick={() => void openExisting()}
               >
                 {t('domain:dailyReportForm.openExisting')}
               </button>
@@ -432,6 +499,11 @@ function DailyReportForm({
               </p>
             ) : null}
           </div>
+        ) : null}
+        {error && !duplicate ? (
+          <p role="alert" className="text-destructive text-sm">
+            {error}
+          </p>
         ) : null}
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
           {draft.id && canDelete ? (
@@ -448,7 +520,7 @@ function DailyReportForm({
           <Button type="button" variant="outline" onClick={onDone} disabled={busy}>
             {t('common:action.cancel')}
           </Button>
-          <Button type="submit" disabled={busy || staffPending || staffError}>
+          <Button type="submit" disabled={busy || staffPending || staffError || duplicate}>
             {save.isPending ? t('domain:dailyReportForm.saving') : t('common:action.save')}
           </Button>
         </div>
@@ -465,6 +537,17 @@ function DailyReportForm({
         />
       ) : null}
     </form>
+  );
+}
+
+function sameAttendance(left: DailyReportAttendance[], right: DailyReportAttendance[]): boolean {
+  if (left.length !== right.length) return false;
+  return left.every(
+    (row, index) =>
+      row.employmentId === right[index]?.employmentId &&
+      row.startTime === right[index]?.startTime &&
+      row.endTime === right[index]?.endTime &&
+      row.billed === right[index]?.billed,
   );
 }
 

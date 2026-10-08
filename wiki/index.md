@@ -85,6 +85,7 @@ verlinkt, nie kopiert.
 | 2026-10-08 | [Geldfelder mit zwei Nachkommastellen](logs/2026-10-08-geld-nachkommastellen.md)                |
 | 2026-10-08 | [Checkliste: Löschen abwarten, Abhaken sofort](logs/2026-10-08-checkliste-smoke.md)             |
 | 2026-10-08 | [Overlay dunkel, Löschen in der Fußleiste](logs/2026-10-08-overlay-loeschen-fussleiste.md)      |
+| 2026-10-08 | [Bautagebuch: Duplikat, Anwesenheit, Sperrtext](logs/2026-10-08-bautagebuch-smoke.md)           |
 
 ## Die drei wichtigsten Sätze
 

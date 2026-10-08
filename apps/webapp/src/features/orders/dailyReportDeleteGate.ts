@@ -3,6 +3,7 @@ import type { EmployeePermissions } from '@bautakt/core';
 import { supabase } from '@/lib/supabase';
 
 import { seesEveryReportLink } from './dailyReportAccess';
+import type { DailyReportLinkCounts } from './useOrderDailyReports';
 
 /**
  * Warum das Web den Bericht nicht löscht.
@@ -16,13 +17,21 @@ export type DailyReportDeleteBlock = 'billed' | 'linked';
 
 export class DailyReportDeleteBlockedError extends Error {
   readonly block: DailyReportDeleteBlock;
+  readonly counts: DailyReportLinkCounts;
 
-  constructor(block: DailyReportDeleteBlock) {
+  constructor(block: DailyReportDeleteBlock, counts: DailyReportLinkCounts) {
     super(block === 'billed' ? 'DAILY_REPORT_BILLED' : 'DAILY_REPORT_LINKED');
     this.name = 'DailyReportDeleteBlockedError';
     this.block = block;
+    this.counts = counts;
   }
 }
+
+/** Sperre plus die sichtbaren Anzahlen, die der Dialog unter dem Text nennt. */
+export type DailyReportDeleteReading = {
+  block: DailyReportDeleteBlock | null;
+  counts: DailyReportLinkCounts;
+};
 
 type LinkTable = 'time_entries' | 'order_materials' | 'order_images' | 'order_issues';
 
@@ -67,7 +76,7 @@ export async function readDailyReportDeleteBlock(
   companyId: string,
   reportId: string,
   permissions: Partial<EmployeePermissions> | null | undefined,
-): Promise<DailyReportDeleteBlock | null> {
+): Promise<DailyReportDeleteReading> {
   const [billedTimes, billedMaterials, times, materials, photos, issues] = await Promise.all([
     countBilled('time_entries', companyId, reportId),
     countBilled('order_materials', companyId, reportId),
@@ -77,11 +86,13 @@ export async function readDailyReportDeleteBlock(
     countRows('order_issues', companyId, reportId),
   ]);
 
-  if ((billedTimes ?? 0) > 0 || (billedMaterials ?? 0) > 0) return 'billed';
-  if (billedTimes == null || billedMaterials == null) return 'linked';
+  const counts: DailyReportLinkCounts = { times, materials, photos, issues };
 
-  const counts = [times, materials, photos, issues];
-  if (counts.some((total) => total == null || total > 0)) return 'linked';
-  if (!seesEveryReportLink(permissions)) return 'linked';
-  return null;
+  if ((billedTimes ?? 0) > 0 || (billedMaterials ?? 0) > 0) return { block: 'billed', counts };
+  if (billedTimes == null || billedMaterials == null) return { block: 'linked', counts };
+
+  const totals = [times, materials, photos, issues];
+  if (totals.some((total) => total == null || total > 0)) return { block: 'linked', counts };
+  if (!seesEveryReportLink(permissions)) return { block: 'linked', counts };
+  return { block: null, counts };
 }
