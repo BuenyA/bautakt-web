@@ -16,9 +16,10 @@ import {
   SheetTitle,
   toast,
 } from '@bautakt/ui';
-import { type FormEvent, useId, useState } from 'react';
+import { type FormEvent, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useDismissLock } from '@/components/common/useDismissLock';
 import { useEmployees } from '@/features/team/useEmployees';
 import { readableDbError } from '@/lib/dbErrors';
 
@@ -47,11 +48,16 @@ export function OrderChecklistSheet({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const dismiss = useDismissLock(onOpenChange);
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={dismiss.handleOpenChange}>
       <SheetContent className="p-0">
         {open && draft ? (
-          <ChecklistItemForm initial={draft} onDone={() => onOpenChange(false)} />
+          <ChecklistItemForm
+            initial={draft}
+            onBusyChange={dismiss.onBusyChange}
+            onDone={() => onOpenChange(false)}
+          />
         ) : null}
       </SheetContent>
     </Sheet>
@@ -62,9 +68,11 @@ type AssigneeOption = { id: string; name: string; ended: boolean };
 
 function ChecklistItemForm({
   initial,
+  onBusyChange,
   onDone,
 }: {
   initial: ChecklistItemDraft;
+  onBusyChange: (busy: boolean) => void;
   onDone: () => void;
 }) {
   const { t } = useTranslation();
@@ -74,7 +82,17 @@ function ChecklistItemForm({
   const [issue, setIssue] = useState<ChecklistFieldIssue | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deletePending, setDeletePending] = useState(false);
   const ids = { title: useId(), due: useId(), assignee: useId() };
+  const busy = save.isPending || deletePending;
+
+  useEffect(() => {
+    onBusyChange(busy);
+  }, [busy, onBusyChange]);
+
+  useEffect(() => {
+    return () => onBusyChange(false);
+  }, [onBusyChange]);
 
   function set(patch: Partial<ChecklistItemDraft>) {
     setIssue(null);
@@ -199,7 +217,9 @@ function ChecklistItemForm({
             <SelectTrigger id={ids.assignee} className="w-full">
               <SelectValue placeholder={t('domain:checklistForm.nobody')} />
             </SelectTrigger>
-            <SelectContent>
+            {/* Nach oben, mit Abstand zur Fußleiste. Sonst deckt die Liste bei
+                1280×800 den Knopf „Punkt löschen“ ab. */}
+            <SelectContent side="top" align="start" collisionPadding={{ top: 16, bottom: 120 }}>
               <SelectItem value={CHECKLIST_UNASSIGNED}>
                 {t('domain:checklistForm.nobody')}
               </SelectItem>
@@ -227,17 +247,6 @@ function ChecklistItemForm({
           )}
         </div>
 
-        {draft.id ? (
-          <Button
-            type="button"
-            variant="destructive"
-            className="w-fit"
-            onClick={() => setConfirmDelete(true)}
-          >
-            {t('domain:checklistForm.delete.action')}
-          </Button>
-        ) : null}
-
         {error ? (
           <p role="alert" className="text-destructive text-sm">
             {error}
@@ -246,10 +255,21 @@ function ChecklistItemForm({
       </SheetBody>
 
       <SheetFooter>
-        <Button type="button" variant="outline" onClick={onDone}>
+        {draft.id ? (
+          <Button
+            type="button"
+            variant="destructive"
+            className="sm:mr-auto"
+            disabled={busy}
+            onClick={() => setConfirmDelete(true)}
+          >
+            {t('domain:checklistForm.delete.action')}
+          </Button>
+        ) : null}
+        <Button type="button" variant="outline" onClick={onDone} disabled={busy}>
           {t('common:action.cancel')}
         </Button>
-        <Button type="submit" disabled={save.isPending}>
+        <Button type="submit" disabled={busy}>
           {t('common:action.save')}
         </Button>
       </SheetFooter>
@@ -261,6 +281,7 @@ function ChecklistItemForm({
           label={initial.title.trim()}
           open={confirmDelete}
           onOpenChange={setConfirmDelete}
+          onPendingChange={setDeletePending}
           onDeleted={onDone}
         />
       ) : null}

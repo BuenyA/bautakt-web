@@ -476,6 +476,29 @@ Bucket, 10 Zeilen, 10 davon verknüpft._ `order_images.order_id` verweist mit
 `ON DELETE CASCADE` auf `orders`. Die Datei im Bucket fällt dabei nicht mit.
 Das gehört nach `bautakt-app`, nicht in eine Web-Migration.
 
+## Checkliste: Löschen schließt das Panel, bevor die Liste geschrieben ist
+
+_Festgestellt 2026-10-08, Live-Smoke von #116, Issue #119._
+
+**Symptom:** Der Punkt ist sofort weg. Ein Neuladen direkt danach bringt ihn
+zurück. Der Bestätigungsdialog blendet langsam ein, der Knopf „Punkt löschen“
+scheint durch.
+
+Der Dialog ist ein zweites Radix-Dialog und liegt im Portal, außerhalb des
+Sheets. `useFocusOutside` im Sheet prüft die Layer-Reihenfolge nicht und
+schließt das Panel, sobald der Dialog den Fokus nimmt. Das Formular ist nur
+gemountet, solange das Sheet offen ist — es wird abgebaut, während
+`replaceChecklistItems` noch läuft. TanStack Query bricht die Mutation beim
+Unmount nicht ab. Ein Neuladen tut es: der Browser verwirft die offene
+Ganzlisten-Anfrage. Overlay und Sheet lagen beide auf `z-50`. Solange die
+Einblendung bei Opazität 0 startet, liegt der Knopf im Panel sichtbar darüber,
+und ein geerbtes `--tw-duration` vom Sheet (`duration-300`) streckt das.
+
+**Lösung:** Das Sheet schließt nicht, wenn das Ziel ein Dialog ist. Der Dialog
+liegt auf `z-[60]` mit `duration-150` am Element. Löschen hält Panel und
+Dialog offen, bis der Server bestätigt. Abhaken kippt nur die Checkbox vorher
+im Cache. Siehe [auftragscheckliste.md](auftragscheckliste.md).
+
 ## Checkliste: eine Änderung schreibt die ganze Liste
 
 _Festgelegt 2026-10-08, Issue #56. Dieselbe Semantik wie `checklist.upsert`

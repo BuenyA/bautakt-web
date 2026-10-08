@@ -34,7 +34,8 @@ sortiert nach `started_at` absteigend. Der `queryKey` ist
 `['timeEntries', companyId, orderId ?? 'all']`. Das dritte Segment trennt die
 Auftragsliste vom Cache der ungefilterten Liste. Nach dem Speichern und nach
 dem Löschen wird `['timeEntries', companyId]` invalidiert, dazu die
-Beleg-Caches `sales-documents` und `sales-document`.
+Beleg-Caches `sales-documents` und `sales-document`. Dialog und Panel bleiben
+offen, bis das Löschen bestätigt ist. Der Knopf zeigt „Wird gelöscht …“.
 
 Der Index `time_entries_order_id_started_at_idx` liegt auf
 `(order_id, started_at DESC)` und trifft diese Sortierung. _Stand 2026-09-24._

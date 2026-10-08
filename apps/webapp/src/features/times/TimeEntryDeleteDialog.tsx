@@ -8,7 +8,7 @@ import {
   DialogTitle,
   toast,
 } from '@bautakt/ui';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { readableDbError } from '@/lib/dbErrors';
@@ -26,17 +26,23 @@ export function TimeEntryDeleteDialog({
   description,
   open,
   onOpenChange,
+  onPendingChange,
   onDeleted,
 }: {
   entryId: string;
   description: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onPendingChange?: (pending: boolean) => void;
   onDeleted: () => void;
 }) {
   const { t } = useTranslation();
   const remove = useDeleteTimeEntry();
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    onPendingChange?.(remove.isPending);
+  }, [onPendingChange, remove.isPending]);
 
   function close() {
     setError(null);
@@ -63,6 +69,7 @@ export function TimeEntryDeleteDialog({
     <Dialog
       open={open}
       onOpenChange={(next) => {
+        if (remove.isPending) return;
         if (!next) setError(null);
         onOpenChange(next);
       }}
@@ -80,16 +87,19 @@ export function TimeEntryDeleteDialog({
         ) : null}
 
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={close}>
+          <Button type="button" variant="outline" onClick={close} disabled={remove.isPending}>
             {t('common:action.cancel')}
           </Button>
           <Button
             type="button"
             variant="destructive"
             disabled={remove.isPending}
+            aria-busy={remove.isPending}
             onClick={() => void onConfirm()}
           >
-            {t('domain:timeForm.delete.confirm')}
+            {remove.isPending
+              ? t('domain:timeForm.delete.pending')
+              : t('domain:timeForm.delete.confirm')}
           </Button>
         </DialogFooter>
       </DialogContent>

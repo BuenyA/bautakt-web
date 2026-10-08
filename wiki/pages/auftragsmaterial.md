@@ -25,7 +25,8 @@ die `company_id` der Mitgliedschaft und die `order_id`, sortiert nach
 `used_at` absteigend, danach `created_at`. Der `queryKey` ist
 `['order-materials', companyId, orderId]`. Nach dem Speichern und nach dem
 Löschen wird `['order-materials', companyId]` invalidiert, dazu die
-Beleg-Caches `sales-documents` und `sales-document`.
+Beleg-Caches `sales-documents` und `sales-document`. Dialog und Panel bleiben
+offen, bis das Löschen bestätigt ist. Der Knopf zeigt „Wird gelöscht …“.
 
 Der Index `order_materials_order_id_used_at_idx` liegt auf
 `(order_id, used_at DESC, created_at DESC)` und trifft diese Sortierung.

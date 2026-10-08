@@ -7,6 +7,23 @@ import type * as React from 'react';
 import { cn } from '../../lib/cn';
 
 /**
+ * Bestätigungsdialoge liegen im Portal, also außerhalb des Panels.
+ * `useFocusOutside` im Sheet prüft die Layer-Reihenfolge nicht und schließt
+ * das Panel, sobald der Dialog den Fokus bekommt. Damit wird das Formular
+ * abgebaut, während die Mutation noch läuft.
+ */
+function isNestedDialogTarget(target: EventTarget | null): boolean {
+  return (
+    target instanceof Element &&
+    Boolean(
+      target.closest(
+        '[data-slot="dialog-content"], [data-slot="dialog-overlay"], [data-slot="alert-dialog-content"], [data-slot="alert-dialog-overlay"]',
+      ),
+    )
+  );
+}
+
+/**
  * Seitenpanel. Traegt im Web die kurzen Formulare (Kunde, Zeiteintrag,
  * Abwesenheit) — die Liste dahinter bleibt sichtbar, damit klar ist, wozu der
  * Eintrag gehoert. Lange Belege mit Positionen bekommen dagegen eine eigene
@@ -49,6 +66,9 @@ function SheetContent({
   children,
   side = 'right',
   showCloseButton = true,
+  onFocusOutside,
+  onPointerDownOutside,
+  onInteractOutside,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: 'top' | 'right' | 'bottom' | 'left';
@@ -59,6 +79,18 @@ function SheetContent({
       <SheetOverlay />
       <SheetPrimitive.Content
         data-slot="sheet-content"
+        onFocusOutside={(event) => {
+          if (isNestedDialogTarget(event.target)) event.preventDefault();
+          onFocusOutside?.(event);
+        }}
+        onPointerDownOutside={(event) => {
+          if (isNestedDialogTarget(event.target)) event.preventDefault();
+          onPointerDownOutside?.(event);
+        }}
+        onInteractOutside={(event) => {
+          if (isNestedDialogTarget(event.target)) event.preventDefault();
+          onInteractOutside?.(event);
+        }}
         className={cn(
           'bg-card data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex min-w-0 flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-200 data-[state=open]:duration-300',
           // RemoveScroll setzt am body overflow:hidden und margin-right in der
