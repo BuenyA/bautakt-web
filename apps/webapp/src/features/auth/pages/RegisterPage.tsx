@@ -1,8 +1,9 @@
 import { Button, Input, Label } from '@bautakt/ui';
-import { type FormEvent, useState } from 'react';
+import { type FormEvent, type ReactNode, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
+import { type LegalPage, legalUrl } from '@/lib/legal';
 import { routes } from '@/lib/routes';
 
 import { signUpSchema } from '../schema';
@@ -99,7 +100,33 @@ export function RegisterPage() {
         <Button type="submit" disabled={pending}>
           {t('auth:signUp.submit')}
         </Button>
+
+        <p className="text-muted-foreground text-xs leading-relaxed">
+          <Trans
+            i18nKey="auth:signUp.legalHint"
+            components={{
+              terms: <LegalTextLink page="terms" />,
+              privacy: <LegalTextLink page="privacy" />,
+            }}
+          />
+        </p>
       </form>
     </AuthCard>
+  );
+}
+
+/** Link im Fließtext; den Text setzt `<Trans>` als `children` ein. */
+function LegalTextLink({ page, children }: { page: LegalPage; children?: ReactNode }) {
+  const { t } = useTranslation();
+  return (
+    <a
+      href={legalUrl(page)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-foreground hover:text-primary underline underline-offset-4"
+    >
+      {children}
+      <span className="sr-only"> {t('common:legal.newTab')}</span>
+    </a>
   );
 }

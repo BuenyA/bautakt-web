@@ -10,6 +10,9 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   Sidebar,
   SidebarContent,
@@ -37,6 +40,7 @@ import { BautaktLogo } from '@/components/brand/BautaktLogo';
 import { BautaktSignet } from '@/components/brand/BautaktSignet';
 import { useAuth } from '@/features/auth/useAuth';
 import { useMembership } from '@/features/company/useMembership';
+import { LEGAL_PAGES, legalUrl } from '@/lib/legal';
 import { HOME_ROUTE } from '@/lib/routes';
 
 import { Breadcrumbs } from './Breadcrumbs';
@@ -105,6 +109,23 @@ function UserMenu() {
           <DropdownMenuRadioItem value="dark">{t('common:theme.dark')}</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="system">{t('common:theme.system')}</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Uicon name="document" size={16} />
+            {t('common:legal.label')}
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            {LEGAL_PAGES.map((page) => (
+              <DropdownMenuItem key={page} asChild>
+                <a href={legalUrl(page)} target="_blank" rel="noopener noreferrer">
+                  {t(`common:legal.${page}`)}
+                  <span className="sr-only"> {t('common:legal.newTab')}</span>
+                </a>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => void signOut()}>
           <Uicon name="sign-out-alt" size={16} />
