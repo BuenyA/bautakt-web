@@ -9,7 +9,9 @@ async function expectAnchored(page: Page, section: Locator, label: string) {
   const input = section.getByRole('textbox', { name: label });
   const trigger = section.getByRole('button', { name: `Kalender öffnen: ${label}` });
   await trigger.click();
-  const popover = page.locator('[data-slot="popover-content"]');
+  // Während der Schließ-Animation bleibt ein geschlossener Popover im DOM.
+  // Gemessen wird nur der offene Kalender.
+  const popover = page.locator('[data-slot="popover-content"][data-state="open"]');
   await expect(popover).toBeVisible();
 
   const field = await input.boundingBox();
