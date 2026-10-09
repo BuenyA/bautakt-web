@@ -47,6 +47,14 @@ Der Popover liegt im Portal. Sheet, Dialog und AlertDialog schließen nicht,
 wenn der Fokus dorthin wandert (`isFloatingLayerTarget`). Der Popover steht
 auf `z-[70]`, über Dialog und AlertDialog auf `z-[60]`.
 
+Der Anker ist die ganze Zeile aus Feld und Knopf (`PopoverTrigger`). Ein
+eigenes `PopoverAnchor` daneben darf nicht dazukommen: Radix trägt den
+Trigger zuerst als Anker ein, das Anchor erst im Effect. Gibt der Trigger
+den Anker danach ab, bleibt im Popper der abgebaute Knoten. Dessen Rechteck
+ist 0×0, der Kalender öffnet oben links. Gemessen 2026-10-09: vorher
+`translate(0px, 4px)`, danach am Feld (Abstand 4px, links bündig), allein,
+im Sheet und im Dialog.
+
 Das Duplikat im Bautagebuch hängt weiter am gespeicherten Kalendertag: sobald
 ein gültiges Datum im Entwurf steht, läuft die Prüfung. Unfertiges Tippen
 ändert den Tag nicht.

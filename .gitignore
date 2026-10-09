@@ -28,6 +28,9 @@ next-env.d.ts
 # Tooling-Caches
 .turbo/
 coverage/
+test-results/
+playwright-report/
+blob-report/
 
 # Deployment
 .vercel

@@ -8,7 +8,7 @@ import { dateToIso, isoToLocalDate } from '../../lib/date-time';
 import { Button } from './button';
 import { Calendar } from './calendar';
 import { Input } from './input';
-import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from './popover';
+import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import { useMaskedField } from './use-masked-field';
 
 const DEFAULT_INVALID = 'Bitte ein gültiges Datum im Format TT.MM.JJJJ eingeben.';
@@ -98,8 +98,14 @@ function DatePicker({
   return (
     <div className={cn('grid gap-1', className)}>
       <Popover open={open} onOpenChange={setOpen}>
-        <div className="flex items-center gap-2">
-          <PopoverAnchor asChild>
+        {/* Der Trigger ist der Anker für die ganze Zeile, nicht nur der Knopf.
+            Ein zusätzliches PopoverAnchor neben dem Trigger verliert das Rennen:
+            der Trigger trägt sich zuerst als Anker ein, das Anchor meldet sich
+            erst im Effect. Wenn der Trigger den Anker dann abgibt, bleibt im
+            Popper der abgebaute Knoten. Dessen Rechteck ist 0×0, der Kalender
+            öffnet bei (0, sideOffset). */}
+        <PopoverTrigger asChild>
+          <div className="flex items-center gap-2">
             <div className="min-w-0 flex-1">
               <Input
                 ref={inputRef}
@@ -116,6 +122,7 @@ function DatePicker({
                 aria-invalid={ariaInvalid || field.invalid || undefined}
                 aria-describedby={field.describedBy}
                 className="tabular-nums"
+                onClick={(event) => event.stopPropagation()}
                 onChange={(event) => field.handleChange(event.target.value)}
                 onBlur={field.handleBlur}
                 onKeyDown={(event) => {
@@ -126,8 +133,6 @@ function DatePicker({
                 }}
               />
             </div>
-          </PopoverAnchor>
-          <PopoverTrigger asChild>
             <Button
               type="button"
               variant="outline"
@@ -140,8 +145,8 @@ function DatePicker({
             >
               <CalendarIcon />
             </Button>
-          </PopoverTrigger>
-        </div>
+          </div>
+        </PopoverTrigger>
         <PopoverContent
           align="start"
           className="w-auto p-0"
