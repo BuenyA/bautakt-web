@@ -95,7 +95,7 @@ läuft die Seite auf `<projekt>.vercel.app` — das reicht zum Entwickeln vollst
 
 ⚠️ **Ein Production-Deployment ist auch auf `.vercel.app` für Google erreichbar.**
 Nur _Preview_-Deployments bekommen automatisch `X-Robots-Tag: noindex`. Ohne Vorkehrung
-würde die Entwicklungsfassung mitsamt Platzhalter-Preisen indexiert und später mit der
+würde die Entwicklungsfassung indexiert und später mit der
 echten Domain um dieselben Inhalte konkurrieren.
 
 Drei Code-Ebenen, gesteuert von `IS_PRODUCTION_SITE` (plus optional Vercel Authentication
@@ -129,9 +129,23 @@ auf dem Alias `false` (noindex).
 Dasselbe Muster gilt für `NEXT_PUBLIC_APP_URL` / `APP_URL` (Stand 2026-09-07,
 pre-Domain-Cutover): Fallback und `.env.production` zeigen auf
 `https://bautakt-webapp.vercel.app`, weil `app.bautakt.com` noch nicht verknüpft ist.
-Marketing-CTAs (`LOGIN_URL`, `REGISTER_URL`) bauen weiter `/login` und `/registrieren`
-darauf — die Webapp-Routen sind deutsch. Eine gesetzte `NEXT_PUBLIC_APP_URL` gewinnt
-weiter über den Fallback. `IS_PRODUCTION_SITE` / noindex bleiben davon unberührt.
+Der einzige Marketing-Link in die Web-App ist `LOGIN_URL` (`${APP_URL}/login`).
+Eine gesetzte `NEXT_PUBLIC_APP_URL` gewinnt weiter über den Fallback.
+`IS_PRODUCTION_SITE` / noindex bleiben davon unberührt.
+
+## Marketing ohne Preise und ohne Registrierung
+
+_Stand 2026-10-09._ Die öffentliche Seite verlinkt keine Preise und keine
+Registrierung. `REGISTER_URL` gibt es in `lib/site.ts` nicht mehr. Die Route
+`/registrieren` der Web-App bleibt; die Login-Seite dort verlinkt sie weiter
+selbst.
+
+`/preise` und `/pricing` sind `redirects` in `apps/marketing/next.config.ts`
+mit `permanent: true` (308) auf `/`. Die Seite `app/preise` ist gelöscht.
+Sitemap und Navigation kommen aus `content/nav.ts` (`allRoutes`); „Preise“
+steht dort nicht. `robots.ts` zählt keine Einzelpfade auf, `/preise` ist
+dort also nicht eigens erlaubt. Ein `Disallow` wäre falsch: der Crawler soll
+den Redirect sehen.
 
 ### Go-live-Checkliste
 
@@ -151,7 +165,9 @@ echte Seite auf `noindex`.** Beim Schalten auf die eigene Domain deshalb der Rei
    Datenschutz und AGB behalten ihr eigenes `noindex` — das ist Absicht.
 8. `curl -sI https://bautakt.com/` und `/robots.txt`: **kein** `x-robots-tag` mit
    `noindex`. Solange der Header noch da ist, hat Schritt 2 oder 4 gefehlt.
-9. Marketing-CTAs prüfen: Login/Registrieren zeigen auf `https://app.bautakt.com/…`.
+9. Marketing-CTAs prüfen: „Anmelden“ zeigt auf `https://app.bautakt.com/login`.
+   Die Marketing-Seite verlinkt nicht auf `/registrieren`. `/preise` antwortet
+   mit 308 auf `/`.
 
 Schritt 6–9 gegen das ausgelieferte Ergebnis prüfen, nicht gegen die Einstellung.
 

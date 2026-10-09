@@ -61,7 +61,6 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     applicationCategory: 'BusinessApplication',
     description: site.description,
     url: absoluteUrl('/'),
-    offers: { '@type': 'Offer', priceCurrency: 'EUR' },
   };
 
   return (

@@ -103,7 +103,7 @@ password reset all existed. So: type-check, then run the thing and look at the r
 
 What "looking at the result" means here, since there are no tests:
 
-- Marketing — start it, click every route, check that `/sitemap.xml` lists all eight.
+- Marketing — start it, click every route, check that `/sitemap.xml` lists all seven.
 - App — sign in with a real account, **hard-reload on a protected route** (that is the
   test for the `initializing` race), sign out, sign in as a _different_ user and
   confirm no rows from the previous one are visible.

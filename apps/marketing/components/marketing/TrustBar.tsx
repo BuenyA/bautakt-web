@@ -13,7 +13,7 @@ export function TrustBar() {
             >
               <span
                 aria-hidden
-                className="inline-block size-1.5 shrink-0 rounded-full bg-[#1C1F26]/45"
+                className="inline-block size-1.5 shrink-0 rounded-full bg-foreground/45"
               />
               {item}
             </li>

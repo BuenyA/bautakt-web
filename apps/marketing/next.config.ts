@@ -39,6 +39,18 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  /**
+   * Preise gibt es auf der öffentlichen Seite nicht mehr. Alte Adressen
+   * leiten dauerhaft auf die Startseite, statt mit 404 zu enden.
+   * `permanent: true` ist ein 308.
+   */
+  async redirects() {
+    return [
+      { source: '/preise', destination: '/', permanent: true },
+      { source: '/pricing', destination: '/', permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;
