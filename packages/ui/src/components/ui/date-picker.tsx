@@ -164,6 +164,7 @@ function DatePicker({
           <Calendar
             mode="single"
             selected={selected}
+            defaultMonth={selected ?? new Date()}
             month={month}
             onMonthChange={setMonth}
             previousMonthLabel={previousMonthLabel}

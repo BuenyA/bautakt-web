@@ -255,8 +255,6 @@ function AssignmentForm({ onDone }: { onDone: () => void }) {
               id={ids.endDate}
               aria-label={t('domain:assignments.create.endDate')}
               value={draft.endDate}
-              earliest={draft.startDate}
-              rangeMessage={t('domain:assignments.create.endBeforeStart')}
               onChange={(endDate) => set({ endDate })}
             />
           </div>
@@ -269,12 +267,14 @@ function AssignmentForm({ onDone }: { onDone: () => void }) {
               onChange={(endTime) => set({ endTime })}
             />
           </div>
+          {/* Unter beiden Spalten, sonst wächst nur die Datumsspalte und
+              „Ende, Uhrzeit“ rutscht aus der Zeile. */}
+          {datesInverted || clockInverted ? (
+            <p role="alert" className="text-destructive text-sm sm:col-span-2">
+              {t('domain:assignments.create.endBeforeStart')}
+            </p>
+          ) : null}
         </div>
-        {clockInverted ? (
-          <p role="alert" className="text-destructive text-sm">
-            {t('domain:assignments.create.endBeforeStart')}
-          </p>
-        ) : null}
 
         <fieldset className="grid gap-2">
           <legend className="text-sm leading-none font-medium">
@@ -336,7 +336,7 @@ function AssignmentForm({ onDone }: { onDone: () => void }) {
         <Button type="button" variant="outline" onClick={onDone}>
           {t('common:action.cancel')}
         </Button>
-        <Button type="submit" disabled={create.isPending}>
+        <Button type="submit" disabled={create.isPending || datesInverted || clockInverted}>
           {t('common:action.save')}
         </Button>
       </SheetFooter>

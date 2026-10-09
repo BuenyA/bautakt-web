@@ -86,6 +86,33 @@ export function DatePickerHarness() {
         />
       </section>
 
+      <section data-testid="assignment-grid" className="max-w-xl">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-2">
+            <span>Beginn, Datum</span>
+            <DatePicker aria-label="Einsatz Beginn" value="2026-10-10" onChange={() => undefined} />
+          </div>
+          <div className="grid gap-2">
+            <span>Beginn, Uhrzeit</span>
+            <div className="border-border h-11 rounded-sm border px-3 py-2 text-sm">07:00</div>
+          </div>
+          <div className="grid gap-2">
+            <span data-testid="end-date-label">Ende, Datum</span>
+            <DatePicker aria-label="Einsatz Ende" value="2026-10-09" onChange={() => undefined} />
+          </div>
+          <div className="grid gap-2">
+            <span data-testid="end-time-label">Ende, Uhrzeit</span>
+            <div className="border-border h-11 rounded-sm border px-3 py-2 text-sm">16:00</div>
+          </div>
+          <p role="alert" className="text-destructive text-sm sm:col-span-2">
+            Das Ende liegt vor dem Beginn.
+          </p>
+        </div>
+        <button type="button" disabled className="mt-4">
+          Speichern
+        </button>
+      </section>
+
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent side="right">
           <SheetTitle>Zeiteintrag</SheetTitle>

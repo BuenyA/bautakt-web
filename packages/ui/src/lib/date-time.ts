@@ -78,13 +78,25 @@ export function maskGermanDate(raw: string): string {
   const cleaned = raw.replace(/[^\d.]/g, '');
   if (cleaned.includes('.')) {
     const parts = cleaned.split('.');
-    const day = (parts[0] ?? '').slice(0, 2);
-    const month = (parts[1] ?? '').slice(0, 2);
-    const year = (parts[2] ?? '').slice(0, 4);
-    const dots = parts.length - 1;
-    if (dots === 1 && parts[1] === '' && cleaned.endsWith('.')) return `${day}.`;
-    if (dots === 1) return month ? `${day}.${month}` : `${day}.`;
-    if ((parts[2] ?? '') === '' && cleaned.endsWith('.')) return `${day}.${month}.`;
+    let day = parts[0] ?? '';
+    let month = parts[1] ?? '';
+    // Ziffern, die nach dem gesetzten Punkt weitergetippt werden, gehören
+    // ins nächste Feld. Sonst bleibt aus 15082026 nur 15.08 stehen.
+    let year = parts.slice(2).join('');
+    if (day.length > 2) {
+      month = `${day.slice(2)}${month}`;
+      day = day.slice(0, 2);
+    }
+    if (month.length > 2) {
+      year = `${month.slice(2)}${year}`;
+      month = month.slice(0, 2);
+    }
+    year = year.slice(0, 4);
+    const trailingDot = cleaned.endsWith('.');
+    if (!month && trailingDot) return `${day}.`;
+    if (!year && trailingDot && month) return `${day}.${month}.`;
+    if (!month) return day;
+    if (!year) return `${day}.${month}`;
     return `${day}.${month}.${year}`;
   }
 

@@ -38,6 +38,16 @@ async function expectAnchored(page: Page, section: Locator, label: string) {
   ).toBe(true);
   expect(Math.abs(box.x - field.x), `${label} horizontal`).toBeLessThanOrEqual(40);
   expect(box.x + box.y, `${label} nicht bei (0,0)`).toBeGreaterThan(20);
+
+  return popover;
+}
+
+/** Gewählter Tag: Primary-Fläche und helle Schrift. Heute bleibt der Ring. */
+async function expectSelectedDay(popover: Locator, dayText: string) {
+  const selected = popover.locator('[data-selected="true"] button');
+  await expect(selected).toHaveText(dayText);
+  await expect(selected).toHaveCSS('background-color', 'rgb(0, 100, 224)');
+  await expect(selected).toHaveCSS('color', 'rgb(255, 255, 255)');
 }
 
 test('Kalender hängt am Feld, allein, im Sheet und im Dialog', async ({ page }) => {
@@ -51,11 +61,18 @@ test('Kalender hängt am Feld, allein, im Sheet und im Dialog', async ({ page })
       fullPage: true,
     });
 
-    await expectAnchored(page, page.getByTestId('picker-standalone'), 'Datum allein');
+    const alone = await expectAnchored(page, page.getByTestId('picker-standalone'), 'Datum allein');
+    await expect(alone).toContainText('August');
+    await expectSelectedDay(alone, '15');
     await page.screenshot({ path: `/tmp/date-picker-${theme}-standalone.png` });
     await page.keyboard.press('Escape');
 
-    await expectAnchored(page, page.getByTestId('picker-range'), 'Bereich Beginn');
+    const range = await expectAnchored(page, page.getByTestId('picker-range'), 'Bereich Beginn');
+    await expect(range).toContainText('Oktober');
+    await expectSelectedDay(range, '1');
+    const today = range.locator('[data-today="true"]:not([data-selected="true"]) button');
+    await expect(today).toHaveCount(1);
+    await expect(today).not.toHaveCSS('background-color', 'rgb(0, 100, 224)');
     await page.keyboard.press('Escape');
 
     await page.getByTestId('open-sheet').click();
@@ -64,6 +81,16 @@ test('Kalender hängt am Feld, allein, im Sheet und im Dialog', async ({ page })
     await page.keyboard.press('Escape');
     await page.getByRole('button', { name: 'Schließen' }).click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
+
+    if (theme === 'light') {
+      const dateLabel = await page.getByTestId('end-date-label').boundingBox();
+      const timeLabel = await page.getByTestId('end-time-label').boundingBox();
+      if (!dateLabel || !timeLabel) throw new Error('Einsatz-Raster ohne Beschriftung');
+      expect(Math.abs(dateLabel.y - timeLabel.y)).toBeLessThanOrEqual(1);
+      await page
+        .getByTestId('assignment-grid')
+        .screenshot({ path: '/tmp/date-picker-assignment-grid.png' });
+    }
 
     await page.getByTestId('open-dialog').click();
     await expectAnchored(page, page.getByTestId('picker-dialog'), 'Datum im Dialog');

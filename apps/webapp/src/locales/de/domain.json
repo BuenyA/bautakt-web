@@ -746,7 +746,8 @@
     "lockedDescription": "Ein festgeschriebener Beleg lässt sich nicht mehr ändern. Für eine Korrektur wird eine Storno- oder Gutschrift erstellt.",
     "toDocument": "Zum Beleg",
     "serviceDateRequired": "Bitte das Leistungsdatum angeben — ohne es lässt sich die Rechnung später nicht festschreiben.",
-    "serviceDateRequiredLabel": "Leistungsdatum *"
+    "serviceDateRequiredLabel": "Leistungsdatum *",
+    "dueBeforeIssue": "Das Fälligkeitsdatum liegt vor dem Rechnungsdatum."
   },
   "customerForm": {
     "newTitle": "Neuer Kunde",
