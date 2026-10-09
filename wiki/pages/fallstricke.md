@@ -594,6 +594,31 @@ bleibt ein satter Blauton (`#104281`). Das Preflight setzt `button` auf
 für jede Variante. Hell bleibt bei 50 %. Siehe
 [webapp-shell.md](webapp-shell.md).
 
+## Kalender öffnet oben links bei (0, 0)
+
+_Festgestellt 2026-10-09, Issue #129. Smoke von #128._
+
+**Symptom:** Der Monatskalender von `DatePicker` und `DateRangePicker` öffnet
+immer in der linken oberen Ecke und überdeckt Sidebar und Inhalt. Light und
+Dark, im Sheet und im Dialog und auch ohne Panel.
+
+Der Popper setzt `position: fixed; left: 0; top: 0` und schiebt den Inhalt
+per `transform: translate(x, y)`. Gemessen stand dort `translate(0px, 4px)` —
+also nur der `sideOffset`, das Anker-Rechteck war 0×0. Das sichtbare Feld lag
+derweil bei x=160, y=206. Der Anker im DOM (`data-radix-popper-side`) zeigte
+auf das richtige Feld; der Popper maß einen anderen, schon abgebauten Knoten.
+
+Ursache: `PopoverAnchor` neben `PopoverTrigger`. Der Trigger trägt sich im
+ersten Render selbst als Anker ein. Das Anchor meldet `hasCustomAnchor` erst
+im Effect. Danach legt der Trigger seinen Anker ab, ohne den Zustand zu
+leeren (`onAnchorChange` läuft bei `null` nicht). Der echte Anker hängt
+weiter im Baum, sein Ref feuert nicht noch einmal.
+
+**Lösung:** Die Zeile aus Feld und Knopf ist der Trigger und damit der Anker.
+Kein zweites `PopoverAnchor`. Klick ins Textfeld blubbert nicht, der Kalender
+geht nur über den Knopf und Pfeil-runter auf. Siehe
+[datumseingabe.md](datumseingabe.md).
+
 ## Kalender im Sheet schließt das Panel
 
 _Festgestellt 2026-10-09, Issue #93. Dieselbe Falle wie der Löschdialog über

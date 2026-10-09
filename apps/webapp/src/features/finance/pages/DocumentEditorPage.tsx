@@ -134,6 +134,10 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
   if (!state || !totals) return <PageSpinner />;
 
+  const dueBeforeIssue = Boolean(
+    state.issueDate && state.dueDate && state.dueDate < state.issueDate,
+  );
+
   function update(patch: Partial<EditorState>) {
     setState((current) => (current ? { ...current, ...patch } : current));
   }
@@ -157,6 +161,10 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     // den Beleg fertig tippen lassen und erst am Ende scheitern.
     if (state.type === 'invoice' && !state.serviceDate) {
       setError(t('domain:editor.serviceDateRequired'));
+      return;
+    }
+    if (state.issueDate && state.dueDate && state.dueDate < state.issueDate) {
+      setError(t('domain:editor.dueBeforeIssue'));
       return;
     }
 
@@ -184,7 +192,11 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                 {t('common:action.cancel')}
               </Link>
             </Button>
-            <Button size="sm" disabled={save.isPending} onClick={() => void onSave()}>
+            <Button
+              size="sm"
+              disabled={save.isPending || dueBeforeIssue}
+              onClick={() => void onSave()}
+            >
               {t('common:action.save')}
             </Button>
           </div>
@@ -242,6 +254,8 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
             label={t('domain:invoices.columns.dueDate')}
             value={state.dueDate}
             onChange={(value) => update({ dueDate: value })}
+            earliest={state.issueDate}
+            rangeMessage={t('domain:editor.dueBeforeIssue')}
           />
         </CardContent>
       </Card>
@@ -411,16 +425,27 @@ function DateField({
   label,
   value,
   onChange,
+  earliest,
+  rangeMessage,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  earliest?: string;
+  rangeMessage?: string;
 }) {
   const id = useId();
   return (
     <div className="grid gap-2">
       <Label htmlFor={id}>{label}</Label>
-      <DatePicker id={id} aria-label={label} value={value} onChange={onChange} />
+      <DatePicker
+        id={id}
+        aria-label={label}
+        value={value}
+        onChange={onChange}
+        earliest={earliest}
+        rangeMessage={rangeMessage}
+      />
     </div>
   );
 }

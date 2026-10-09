@@ -16,10 +16,18 @@ if (!rootElement) throw new Error('#root nicht gefunden.');
 const root = createRoot(rootElement);
 
 /**
- * Fehlende VITE_* zur Build-Zeit darf keine weisse Seite erzeugen.
- * Frueher warf `supabase.ts` beim Import — bevor React mountet.
+ * Messseite für den Kalender. Nur im Dev-Server, ohne Anmeldung.
+ * `import.meta.env.DEV` ist im Produktionsbuild `false`, der Import fällt weg.
  */
-if (supabaseBootError) {
+if (import.meta.env.DEV && window.location.pathname.startsWith('/dev/datum')) {
+  void import('@/dev/DatePickerHarness').then(({ DatePickerHarness }) => {
+    root.render(
+      <StrictMode>
+        <DatePickerHarness />
+      </StrictMode>,
+    );
+  });
+} else if (supabaseBootError) {
   root.render(
     <StrictMode>
       <BootErrorPage message={supabaseBootError} />

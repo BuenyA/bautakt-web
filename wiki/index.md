@@ -88,6 +88,7 @@ verlinkt, nie kopiert.
 | 2026-10-08 | [Overlay dunkel, Löschen in der Fußleiste](logs/2026-10-08-overlay-loeschen-fussleiste.md)        |
 | 2026-10-08 | [Bautagebuch: Duplikat, Anwesenheit, Sperrtext](logs/2026-10-08-bautagebuch-smoke.md)             |
 | 2026-10-09 | [Löschtext und gesperrtes Primary im Dunkelmodus](logs/2026-10-09-loeschtext-disabled-primary.md) |
+| 2026-10-09 | [Kalender hängt wieder am Feld](logs/2026-10-09-kalender-anker.md)                                |
 | 2026-10-09 | [Deutsche Datums- und Uhrzeitfelder](logs/2026-10-09-datumseingabe.md)                            |
 
 ## Die drei wichtigsten Sätze

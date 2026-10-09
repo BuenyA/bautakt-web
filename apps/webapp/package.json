@@ -29,6 +29,7 @@
   "devDependencies": {
     "@bautakt/eslint-config": "*",
     "@bautakt/tsconfig": "*",
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-query-devtools": "^5.102.5",
     "@vitejs/plugin-react": "^6.1.0",

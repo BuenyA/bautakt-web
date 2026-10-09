@@ -50,9 +50,11 @@ function Calendar({
           'inline-flex size-9 items-center justify-center rounded-md text-sm',
           'hover:bg-accent hover:text-accent-foreground',
           'focus-visible:ring-ring focus-visible:ring-[3px] focus-visible:outline-none',
-          'aria-selected:bg-primary aria-selected:text-primary-foreground',
-          'aria-selected:hover:bg-primary aria-selected:hover:text-primary-foreground',
         ),
+        // `aria-selected` steht an der Zelle, nicht am Knopf. Die Markierung
+        // muss deshalb die Zelle treffen, sonst bleibt der gewählte Tag leer.
+        selected:
+          '[&>button]:bg-primary [&>button]:text-primary-foreground [&>button]:hover:bg-primary [&>button]:hover:text-primary-foreground',
         today: '[&>button]:ring-primary [&>button]:ring-1',
         outside: '[&>button]:text-muted-foreground [&>button]:opacity-50',
         disabled: '[&>button]:pointer-events-none [&>button]:opacity-40',

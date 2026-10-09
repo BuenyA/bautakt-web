@@ -67,6 +67,17 @@ describe('maskGermanDate', () => {
     expect(maskGermanDate('abc')).toBe('');
   });
 
+  it('behält das Jahr, wenn die Punkte erst beim Tippen entstehen', () => {
+    let text = '';
+    for (const digit of '15082026') {
+      text = maskGermanDate(text + digit);
+    }
+    expect(text).toBe('15.08.2026');
+    expect(maskGermanDate('15082026')).toBe('15.08.2026');
+    expect(maskGermanDate('15.082026')).toBe('15.08.2026');
+    expect(maskGermanDate('150820269')).toBe('15.08.2026');
+  });
+
   it('übersetzt einen eingefügten ISO-Tag', () => {
     expect(maskGermanDate('2026-10-09')).toBe('09.10.2026');
   });
