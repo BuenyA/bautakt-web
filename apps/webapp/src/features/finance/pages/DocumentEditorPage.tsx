@@ -16,13 +16,14 @@ import {
   toast,
   Uicon,
 } from '@bautakt/ui';
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { DatePicker } from '@/components/form/dateTime';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { customerDisplayName, useCustomers } from '@/features/customers/useCustomers';
 import { readableDbError } from '@/lib/dbErrors';
@@ -415,10 +416,11 @@ function DateField({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const id = useId();
   return (
     <div className="grid gap-2">
-      <Label>{label}</Label>
-      <Input type="date" value={value} onChange={(event) => onChange(event.target.value)} />
+      <Label htmlFor={id}>{label}</Label>
+      <DatePicker id={id} aria-label={label} value={value} onChange={onChange} />
     </div>
   );
 }

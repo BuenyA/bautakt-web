@@ -36,6 +36,7 @@ verlinkt, nie kopiert.
 | [einsatz-anlegen.md](pages/einsatz-anlegen.md)             | Einsatz anlegen und löschen, Zeiten bleiben stehen.           |
 | [kostenstellen.md](pages/kostenstellen.md)                 | Kostenstelle anlegen und löschen, Auftragssumme je Zeile.     |
 | [demo-gf-2026-10-10.md](pages/demo-gf-2026-10-10.md)       | Klickpfad GF-Demo 10.10.2026 (Spahrbau).                      |
+| [datumseingabe.md](pages/datumseingabe.md)                 | Deutsche Datums- und Uhrzeitfelder, Wert bleibt ISO.          |
 
 ## Protokolle
 
@@ -87,6 +88,7 @@ verlinkt, nie kopiert.
 | 2026-10-08 | [Overlay dunkel, Löschen in der Fußleiste](logs/2026-10-08-overlay-loeschen-fussleiste.md)        |
 | 2026-10-08 | [Bautagebuch: Duplikat, Anwesenheit, Sperrtext](logs/2026-10-08-bautagebuch-smoke.md)             |
 | 2026-10-09 | [Löschtext und gesperrtes Primary im Dunkelmodus](logs/2026-10-09-loeschtext-disabled-primary.md) |
+| 2026-10-09 | [Deutsche Datums- und Uhrzeitfelder](logs/2026-10-09-datumseingabe.md)                            |
 
 ## Die drei wichtigsten Sätze
 

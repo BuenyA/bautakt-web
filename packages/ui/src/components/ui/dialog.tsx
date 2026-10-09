@@ -5,6 +5,7 @@ import { XIcon } from 'lucide-react';
 import type * as React from 'react';
 
 import { cn } from '../../lib/cn';
+import { isFloatingLayerTarget } from '../../lib/floating-layer';
 
 function Dialog(props: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
@@ -46,6 +47,9 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  onFocusOutside,
+  onPointerDownOutside,
+  onInteractOutside,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & { showCloseButton?: boolean }) {
   return (
@@ -53,6 +57,18 @@ function DialogContent({
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
+        onFocusOutside={(event) => {
+          if (isFloatingLayerTarget(event.target)) event.preventDefault();
+          onFocusOutside?.(event);
+        }}
+        onPointerDownOutside={(event) => {
+          if (isFloatingLayerTarget(event.target)) event.preventDefault();
+          onPointerDownOutside?.(event);
+        }}
+        onInteractOutside={(event) => {
+          if (isFloatingLayerTarget(event.target)) event.preventDefault();
+          onInteractOutside?.(event);
+        }}
         className={cn(
           'bg-card data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 duration-150 border-border fixed top-1/2 left-1/2 z-[60] grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border p-6 shadow-lg sm:max-w-lg',
           className,

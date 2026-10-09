@@ -22,6 +22,7 @@ import { type FormEvent, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useDismissLock } from '@/components/common/useDismissLock';
+import { DatePicker } from '@/components/form/dateTime';
 import { useArticles } from '@/features/masterdata/useMasterData';
 import { readableDbError } from '@/lib/dbErrors';
 import { formatCurrency } from '@/lib/format';
@@ -357,13 +358,13 @@ function OrderMaterialForm({
 
         <div className="grid gap-2" data-material-field="date">
           <Label htmlFor={ids.date}>{t('domain:materialForm.usedAt')}</Label>
-          <Input
+          <DatePicker
             id={ids.date}
-            type="date"
             disabled={locked}
+            aria-label={t('domain:materialForm.usedAt')}
             aria-invalid={issue === 'date'}
             value={draft.usedAt}
-            onChange={(event) => set({ usedAt: event.target.value })}
+            onChange={(usedAt) => set({ usedAt })}
           />
           {issue === 'date' ? <FieldAlert message={t(ISSUE_KEY.date)} /> : null}
         </div>

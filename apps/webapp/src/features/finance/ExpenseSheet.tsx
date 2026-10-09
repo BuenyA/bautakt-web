@@ -28,6 +28,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { DatePicker } from '@/components/form/dateTime';
 import { useMembership } from '@/features/company/useMembership';
 import { readableDbError } from '@/lib/dbErrors';
 import { supabase } from '@/lib/supabase';
@@ -203,11 +204,11 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
 
         <div className="grid gap-2">
           <Label htmlFor={ids.date}>{t('domain:expenses.columns.date')}</Label>
-          <Input
+          <DatePicker
             id={ids.date}
-            type="date"
+            aria-label={t('domain:expenses.columns.date')}
             value={invoiceDate}
-            onChange={(event) => setInvoiceDate(event.target.value)}
+            onChange={setInvoiceDate}
           />
         </div>
 

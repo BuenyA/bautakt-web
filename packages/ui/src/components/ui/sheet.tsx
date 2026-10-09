@@ -5,23 +5,7 @@ import { XIcon } from 'lucide-react';
 import type * as React from 'react';
 
 import { cn } from '../../lib/cn';
-
-/**
- * Bestätigungsdialoge liegen im Portal, also außerhalb des Panels.
- * `useFocusOutside` im Sheet prüft die Layer-Reihenfolge nicht und schließt
- * das Panel, sobald der Dialog den Fokus bekommt. Damit wird das Formular
- * abgebaut, während die Mutation noch läuft.
- */
-function isNestedDialogTarget(target: EventTarget | null): boolean {
-  return (
-    target instanceof Element &&
-    Boolean(
-      target.closest(
-        '[data-slot="dialog-content"], [data-slot="dialog-overlay"], [data-slot="alert-dialog-content"], [data-slot="alert-dialog-overlay"]',
-      ),
-    )
-  );
-}
+import { isFloatingLayerTarget } from '../../lib/floating-layer';
 
 /**
  * Seitenpanel. Traegt im Web die kurzen Formulare (Kunde, Zeiteintrag,
@@ -80,15 +64,15 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         onFocusOutside={(event) => {
-          if (isNestedDialogTarget(event.target)) event.preventDefault();
+          if (isFloatingLayerTarget(event.target)) event.preventDefault();
           onFocusOutside?.(event);
         }}
         onPointerDownOutside={(event) => {
-          if (isNestedDialogTarget(event.target)) event.preventDefault();
+          if (isFloatingLayerTarget(event.target)) event.preventDefault();
           onPointerDownOutside?.(event);
         }}
         onInteractOutside={(event) => {
-          if (isNestedDialogTarget(event.target)) event.preventDefault();
+          if (isFloatingLayerTarget(event.target)) event.preventDefault();
           onInteractOutside?.(event);
         }}
         className={cn(

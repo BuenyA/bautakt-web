@@ -24,6 +24,7 @@ import { type FormEvent, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useDismissLock } from '@/components/common/useDismissLock';
+import { DatePicker, TimeInput } from '@/components/form/dateTime';
 import { useMembership } from '@/features/company/useMembership';
 import { useOrders } from '@/features/orders/useOrders';
 import { useEmployees } from '@/features/team/useEmployees';
@@ -306,37 +307,40 @@ function TimeEntryForm({
 
         <div className="grid gap-2">
           <Label htmlFor={ids.date}>{t('domain:timeForm.date')}</Label>
-          <Input
+          <DatePicker
             id={ids.date}
-            type="date"
             required
+            requiredMessage={t('domain:timeForm.dateRequired')}
             disabled={locked}
+            aria-label={t('domain:timeForm.date')}
             value={draft.date}
-            onChange={(event) => set({ date: event.target.value })}
+            onChange={(date) => set({ date })}
           />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="grid gap-2">
             <Label htmlFor={ids.start}>{t('domain:timeForm.start')}</Label>
-            <Input
+            <TimeInput
               id={ids.start}
-              type="time"
               required
+              requiredMessage={t('domain:timeForm.startRequired')}
               disabled={locked}
+              aria-label={t('domain:timeForm.start')}
               value={draft.startTime}
-              onChange={(event) => set({ startTime: event.target.value })}
+              onChange={(startTime) => set({ startTime })}
             />
           </div>
           <div className="grid gap-2">
             <Label htmlFor={ids.end}>{t('domain:timeForm.end')}</Label>
-            <Input
+            <TimeInput
               id={ids.end}
-              type="time"
               required
+              requiredMessage={t('domain:timeForm.endRequired')}
               disabled={locked}
+              aria-label={t('domain:timeForm.end')}
               value={draft.endTime}
-              onChange={(event) => set({ endTime: event.target.value })}
+              onChange={(endTime) => set({ endTime })}
             />
           </div>
           <div className="grid gap-2">

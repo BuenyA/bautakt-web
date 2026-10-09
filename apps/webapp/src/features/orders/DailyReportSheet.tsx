@@ -24,6 +24,7 @@ import { type FormEvent, useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useDismissLock } from '@/components/common/useDismissLock';
+import { DatePicker, TimeInput } from '@/components/form/dateTime';
 import { useAuth } from '@/features/auth/useAuth';
 import { useMembership } from '@/features/company/useMembership';
 import { readableDbError } from '@/lib/dbErrors';
@@ -338,17 +339,15 @@ function DailyReportForm({
       <SheetBody className="flex flex-col gap-4">
         <div ref={dateRef} className="grid gap-2">
           <Label htmlFor={ids.date}>{t('domain:dailyReportForm.date')}</Label>
-          <Input
+          <DatePicker
             id={ids.date}
-            type="date"
             required
+            requiredMessage={t('domain:dailyReportForm.dateRequired')}
             value={draft.date}
+            aria-label={t('domain:dailyReportForm.date')}
             aria-invalid={duplicate || undefined}
             aria-describedby={duplicate ? ids.duplicate : undefined}
-            onChange={(event) => set({ date: event.target.value })}
-            onBlur={(event) => {
-              if (event.target.value !== draft.date) set({ date: event.target.value });
-            }}
+            onChange={(date) => set({ date })}
           />
         </div>
 
@@ -425,23 +424,25 @@ function DailyReportForm({
                     {showTime && row && !row.billed ? (
                       <div className="grid grid-cols-2 gap-2 pl-6">
                         <div className="grid gap-1">
-                          <Label className="text-xs">{t('domain:dailyReportForm.start')}</Label>
-                          <Input
-                            type="time"
+                          <Label htmlFor={`${person.id}-start`} className="text-xs">
+                            {t('domain:dailyReportForm.start')}
+                          </Label>
+                          <TimeInput
+                            id={`${person.id}-start`}
+                            aria-label={`${person.name || t('domain:employees.unnamed')}: ${t('domain:dailyReportForm.start')}`}
                             value={row.startTime}
-                            onChange={(event) =>
-                              setTime(person.id, { startTime: event.target.value })
-                            }
+                            onChange={(startTime) => setTime(person.id, { startTime })}
                           />
                         </div>
                         <div className="grid gap-1">
-                          <Label className="text-xs">{t('domain:dailyReportForm.end')}</Label>
-                          <Input
-                            type="time"
+                          <Label htmlFor={`${person.id}-end`} className="text-xs">
+                            {t('domain:dailyReportForm.end')}
+                          </Label>
+                          <TimeInput
+                            id={`${person.id}-end`}
+                            aria-label={`${person.name || t('domain:employees.unnamed')}: ${t('domain:dailyReportForm.end')}`}
                             value={row.endTime}
-                            onChange={(event) =>
-                              setTime(person.id, { endTime: event.target.value })
-                            }
+                            onChange={(endTime) => setTime(person.id, { endTime })}
                           />
                         </div>
                       </div>
