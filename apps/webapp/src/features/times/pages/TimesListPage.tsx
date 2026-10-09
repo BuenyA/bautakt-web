@@ -16,6 +16,7 @@ import { useEmployees } from '@/features/team/useEmployees';
 import { formatDateTime, formatNetDuration } from '@/lib/format';
 import { routes, timesOrderParam } from '@/lib/routes';
 
+import { formatBreakLabel } from '../formatBreakLabel';
 import { canCreateTimeEntry, canEditTimeEntry } from '../timeEntryAccess';
 import { draftFromTimeEntry, emptyTimeEntry, type TimeEntryDraft } from '../timeEntryDraft';
 import { TimeEntrySheet } from '../TimeEntrySheet';
@@ -152,11 +153,11 @@ export function TimesListPage() {
       {
         accessorKey: 'break_minutes',
         header: t('domain:times.columns.break'),
-        cell: ({ row }) => (
-          <span className="text-muted-foreground">
-            {t('domain:times.breakMinutes', { count: row.original.break_minutes })}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const pause = formatBreakLabel(row.original.break_minutes, t);
+          if (!pause) return null;
+          return <span className="text-muted-foreground whitespace-nowrap">{pause}</span>;
+        },
       },
       {
         id: 'duration',

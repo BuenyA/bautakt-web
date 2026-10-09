@@ -304,7 +304,7 @@
     "noEnd": "Offen",
     "noNote": "Keine Notiz",
     "billed": "Abgerechnet",
-    "breakMinutes": "{{count}} Min.",
+    "breakLabel": "Pause {{duration}}",
     "emptyTitle": "Noch keine Zeiten",
     "emptyDescription": "Sobald Zeiten erfasst sind, erscheinen sie hier.",
     "emptyForOrderTitle": "Keine Zeiten für diesen Auftrag",

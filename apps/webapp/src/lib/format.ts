@@ -88,9 +88,27 @@ export function formatNetDuration(
     0,
     Math.round((end.getTime() - start.getTime() - breakMs) / 60_000),
   );
+  return formatClockDuration(totalMinutes);
+}
+
+/**
+ * Minuten im Stil der Nettodauer: „8:00 Std.“, „0:45 Std.“.
+ * Nur die Zeichenkette — die Nettorechnung bleibt in {@link formatNetDuration}.
+ */
+function formatClockDuration(totalMinutes: number): string {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
   return `${hours}:${minutes.toString().padStart(2, '0')} Std.`;
+}
+
+/**
+ * Pausenminuten für die Anzeige, im selben Stil wie die Nettodauer
+ * („0:30 Std.“, „1:15 Std.“). 0, negativ und fehlend bleiben leer: sonst
+ * trägt jede Zeile eine Extra-Zeile „0 Min.“.
+ */
+export function formatBreakDuration(breakMinutes: number | null | undefined): string {
+  if (breakMinutes == null || !Number.isFinite(breakMinutes) || breakMinutes <= 0) return '';
+  return formatClockDuration(Math.round(breakMinutes));
 }
 
 const currencyFormatter = new Intl.NumberFormat('de-DE', {

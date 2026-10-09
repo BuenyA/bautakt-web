@@ -10,9 +10,15 @@ Tabelle, die die Handy-App liest und per Sync schreibt.
 `OrderTimes` steht unter der Stammdatenkarte auf `OrderDetailPage`, direkt
 unter den Notizen. Vier Zustände: Skelett beim Laden, Fehler mit „Erneut
 versuchen", leerer Hinweis („Noch keine Zeiten"), Liste der Einträge. Jede
-Karte zeigt Mitarbeiter, Zeitraum, Pause, Nettodauer (ohne Ende: „Offen") und
-die Notiz, soweit sie nicht leer ist, und ist eine weiche Card (`rounded-xl`,
-`bg-card`, `shadow-sm`). Ein abgerechneter Eintrag trägt zusätzlich „Abgerechnet“.
+Karte zeigt Mitarbeiter, Zeitraum, Nettodauer (ohne Ende: „Offen") und die
+Notiz, soweit sie nicht leer ist, und ist eine weiche Card (`rounded-xl`,
+`bg-card`, `shadow-sm`). Die Pause steht in derselben Meta-Zeile wie der
+Zeitraum, nur wenn sie größer als 0 ist, als „Pause 0:30 Std.“ — derselbe
+Dauer-Stil wie die Nettodauer (`formatBreakDuration` in `lib/format.ts`,
+Beschriftung über `formatBreakLabel`). Eine Pause von 0 bleibt weg. Die
+Spalte Pause auf `/zeiten` nutzt dieselbe Zeichenkette; 0 bleibt dort eine
+leere Zelle. Der CSV-Export schreibt weiter die Rohzahl `break_minutes`,
+nicht den Anzeigetext. Ein abgerechneter Eintrag trägt zusätzlich „Abgerechnet“.
 Neueste zuerst. Die Optik steht in [webapp-shell.md](webapp-shell.md#detailflächen).
 
 Wer den Eintrag ändern darf, öffnet die Karte als Knopf das Panel. Wer ihn nur
