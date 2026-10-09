@@ -94,6 +94,7 @@ verlinkt, nie kopiert.
 | 2026-10-09 | [Pause nur anzeigen, wenn sie größer als 0 ist](logs/2026-10-09-pause-anzeige.md)                 |
 | 2026-10-09 | [Marketing ohne Preise und Registrierung](logs/2026-10-09-marketing-nicht-kommerziell.md)         |
 | 2026-10-09 | [Login ohne Registrierungslink](logs/2026-10-09-login-ohne-registrierung.md)                      |
+| 2026-10-09 | [Browser-Tab-Titel je Seite](logs/2026-10-09-tab-titel.md)                                        |
 
 ## Die drei wichtigsten Sätze
 

@@ -7,6 +7,7 @@ import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { usePageTitle } from '@/components/layout/pageTitle';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatCurrency, formatDate } from '@/lib/format';
@@ -30,6 +31,8 @@ export function OrderDetailPage() {
   const order = useOrder(id);
   const { data, isError, refetch } = order;
   const isLoading = useCompanyListLoading(order);
+
+  usePageTitle(data?.name);
 
   if (isLoading) {
     return (

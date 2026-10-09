@@ -67,6 +67,26 @@ Die graue Active-Pill gilt auch für den Hub, solange eine seiner Zielrouten
 offen ist: `/rechnungen` hält „Finanzen“ markiert, `/mitarbeiter` hält
 „Mitarbeiter“.
 
+### Tab-Titel
+
+Der Browser-Tab heißt „<Seite> · Bautakt“ (#94). Es gibt eine Quelle,
+`components/layout/pageTitle.ts`:
+
+- **Listen und Hubs** tun nichts. `PageTitleProvider` in der Shell nimmt die
+  letzte Brotkrume aus `breadcrumbModel`, also denselben Namen wie in der
+  Seitenleiste: „Aufträge“, „Rechnungen“.
+- **Detail- und Anlegeseiten** melden den Objektnamen mit
+  `usePageTitle(name)`: Auftragsname, Kundenname, Einsatzzeitraum,
+  Belegnummer bzw. „Entwurf“, „Neue Rechnung“. Während des Ladens übergeben
+  sie `null`, dann bleibt der Bereichsname stehen statt eines falschen Namens.
+  Der Hook steht vor den frühen `return`s der Seite (Hook-Regeln).
+- **Seiten außerhalb der Shell** (Anmelden, Registrieren, Passwort, 404)
+  setzen den Titel mit `useDocumentTitle`; `AuthCard` erledigt das für alle
+  Auth-Seiten. Die Druckansicht setzt `document.title` weiter selbst.
+
+Die Brotkrume soll denselben Objektnamen zeigen (#104) und liest ihn mit
+`useDetailTitle()` aus demselben Kontext.
+
 ## Hub-Seiten
 
 `/finanzen`, `/personal` und `/material` sind Landings (`HubPage`): `PageHeader`

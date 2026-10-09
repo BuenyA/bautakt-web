@@ -23,6 +23,7 @@ import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { usePageTitle } from '@/components/layout/pageTitle';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
@@ -50,6 +51,8 @@ export function InvoiceDetailPage() {
   const finalize = useFinalizeDocument(id);
   const { blockers } = useFinalizeBlockers(data);
   const [paymentOpen, setPaymentOpen] = useState(false);
+
+  usePageTitle(data ? data.document_number || t('domain:invoices.draftTitle') : null);
 
   if (isLoading) {
     return (

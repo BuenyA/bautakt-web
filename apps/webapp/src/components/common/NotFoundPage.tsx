@@ -2,10 +2,13 @@ import { Button } from '@bautakt/ui';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
+import { useDocumentTitle } from '@/components/layout/pageTitle';
 import { HOME_ROUTE } from '@/lib/routes';
 
 export function NotFoundPage() {
   const { t } = useTranslation();
+  useDocumentTitle(t('common:notFound.title'));
+
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background p-6 text-center">
       <p className="text-sm font-medium text-primary">404</p>

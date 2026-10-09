@@ -1,6 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@bautakt/ui';
 import type { ReactNode } from 'react';
 
+import { useDocumentTitle } from '@/components/layout/pageTitle';
+
 export function AuthCard({
   title,
   subtitle,
@@ -12,6 +14,8 @@ export function AuthCard({
   children: ReactNode;
   footer?: ReactNode;
 }) {
+  useDocumentTitle(title);
+
   return (
     <main className="bg-background flex min-h-svh items-center justify-center p-6">
       <div className="flex w-full max-w-sm flex-col gap-6">

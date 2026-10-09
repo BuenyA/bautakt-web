@@ -7,6 +7,7 @@ import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { usePageTitle } from '@/components/layout/pageTitle';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate, formatDateTimeRange } from '@/lib/format';
@@ -23,6 +24,12 @@ export function AssignmentDetailPage() {
   const assignment = useAssignment(id);
   const { data, isError, refetch } = assignment;
   const isLoading = useCompanyListLoading(assignment);
+
+  usePageTitle(
+    data
+      ? formatDateTimeRange(data.starts_at, data.ends_at) || t('domain:assignments.detailTitle')
+      : null,
+  );
 
   if (isLoading) {
     return (

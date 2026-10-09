@@ -24,6 +24,7 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { DatePicker } from '@/components/form/dateTime';
+import { usePageTitle } from '@/components/layout/pageTitle';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { customerDisplayName, useCustomers } from '@/features/customers/useCustomers';
 import { readableDbError } from '@/lib/dbErrors';
@@ -118,6 +119,14 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   }
 
   const totals = useMemo(() => (state ? editorTotals(state.lines) : null), [state]);
+
+  // Gleicher Text wie die Überschrift: „Neue Rechnung“ bzw. beim Bearbeiten
+  // die Belegnummer — ein Entwurf hat noch keine, dann „Entwurf bearbeiten“.
+  usePageTitle(
+    id
+      ? existing.data?.document_number || t('domain:editor.editTitle')
+      : t(`domain:editor.newTitle.${type}`),
+  );
 
   if (id && existingLoading) return <PageSpinner />;
 

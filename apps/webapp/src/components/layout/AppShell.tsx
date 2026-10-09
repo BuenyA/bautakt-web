@@ -41,6 +41,7 @@ import { HOME_ROUTE } from '@/lib/routes';
 
 import { Breadcrumbs } from './Breadcrumbs';
 import { isNavActive, settingsNavItem } from './navItems';
+import { PageTitleProvider } from './PageTitleProvider';
 import { SidebarNav } from './SidebarNav';
 
 /** Zustand der Leiste aus dem Cookie, damit sie beim Laden nicht springt. */
@@ -121,67 +122,69 @@ export function AppShell() {
   const { pathname } = useLocation();
 
   return (
-    <SidebarProvider defaultOpen={readSidebarCookie()}>
-      <Sidebar collapsible="icon">
-        <BrandHeader />
-        <SidebarSeparator />
+    <PageTitleProvider>
+      <SidebarProvider defaultOpen={readSidebarCookie()}>
+        <Sidebar collapsible="icon">
+          <BrandHeader />
+          <SidebarSeparator />
 
-        <SidebarContent>
-          <SidebarNav />
-        </SidebarContent>
+          <SidebarContent>
+            <SidebarNav />
+          </SidebarContent>
 
-        <SidebarSeparator />
-        <SidebarFooter>
-          <SidebarGroup className="p-0">
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={t(settingsNavItem.labelKey)}
-                    isActive={isNavActive(pathname, settingsNavItem)}
-                  >
-                    <Link to={settingsNavItem.to}>
-                      <Uicon name={settingsNavItem.icon} size={18} />
-                      <span>{t(settingsNavItem.labelKey)}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <UserMenu />
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarFooter>
+          <SidebarSeparator />
+          <SidebarFooter>
+            <SidebarGroup className="p-0">
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={t(settingsNavItem.labelKey)}
+                      isActive={isNavActive(pathname, settingsNavItem)}
+                    >
+                      <Link to={settingsNavItem.to}>
+                        <Uicon name={settingsNavItem.icon} size={18} />
+                        <span>{t(settingsNavItem.labelKey)}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <UserMenu />
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarFooter>
 
-        <SidebarRail />
-      </Sidebar>
+          <SidebarRail />
+        </Sidebar>
 
-      <SidebarInset>
-        <header className="border-border bg-background sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b px-3">
-          <SidebarTrigger />
-          <Breadcrumbs className="hidden min-w-0 sm:flex" />
+        <SidebarInset>
+          <header className="border-border bg-background sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b px-3">
+            <SidebarTrigger />
+            <Breadcrumbs className="hidden min-w-0 sm:flex" />
 
-          <span className="text-muted-foreground ml-auto hidden truncate text-sm lg:block">
-            {membership?.companyName}
-          </span>
+            <span className="text-muted-foreground ml-auto hidden truncate text-sm lg:block">
+              {membership?.companyName}
+            </span>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-9"
-            aria-label={t('common:nav.notifications')}
-            title={t('common:nav.notificationsComingSoon')}
-          >
-            <Uicon name="bell" size={18} />
-          </Button>
-        </header>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-9"
+              aria-label={t('common:nav.notifications')}
+              title={t('common:nav.notificationsComingSoon')}
+            >
+              <Uicon name="bell" size={18} />
+            </Button>
+          </header>
 
-        <div className="min-w-0 flex-1 p-4 sm:p-6">
-          <Outlet />
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+          <div className="min-w-0 flex-1 p-4 sm:p-6">
+            <Outlet />
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
+    </PageTitleProvider>
   );
 }

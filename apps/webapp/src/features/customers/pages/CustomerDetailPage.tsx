@@ -7,6 +7,7 @@ import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { usePageTitle } from '@/components/layout/pageTitle';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
@@ -37,6 +38,8 @@ export function CustomerDetailPage() {
   const customer = useCustomer(id);
   const { data, isError, refetch } = customer;
   const isLoading = useCompanyListLoading(customer);
+
+  usePageTitle(data ? customerDisplayName(data) || t('domain:customers.unnamed') : null);
 
   if (isLoading) {
     return (
