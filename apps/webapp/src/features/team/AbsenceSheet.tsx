@@ -1,7 +1,6 @@
 import { todayIso } from '@bautakt/finance';
 import {
   Button,
-  Input,
   Label,
   Select,
   SelectContent,
@@ -22,6 +21,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { DateRangePicker } from '@/components/form/dateTime';
 import { useMembership } from '@/features/company/useMembership';
 import { readableDbError } from '@/lib/dbErrors';
 import { supabase } from '@/lib/supabase';
@@ -163,26 +163,19 @@ function AbsenceForm({ onDone }: { onDone: () => void }) {
           </Select>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="grid gap-2">
-            <Label htmlFor={ids.start}>{t('domain:absenceForm.start')}</Label>
-            <Input
-              id={ids.start}
-              type="date"
-              value={startDate}
-              onChange={(event) => setStartDate(event.target.value)}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor={ids.end}>{t('domain:absenceForm.end')}</Label>
-            <Input
-              id={ids.end}
-              type="date"
-              value={endDate}
-              onChange={(event) => setEndDate(event.target.value)}
-            />
-          </div>
-        </div>
+        <DateRangePicker
+          startId={ids.start}
+          endId={ids.end}
+          startLabel={t('domain:absenceForm.start')}
+          endLabel={t('domain:absenceForm.end')}
+          startAriaLabel={t('domain:absenceForm.start')}
+          endAriaLabel={t('domain:absenceForm.end')}
+          start={startDate}
+          end={endDate}
+          onStartChange={setStartDate}
+          onEndChange={setEndDate}
+          rangeMessage={t('domain:absenceForm.endBeforeStart')}
+        />
 
         <div className="grid gap-2">
           <Label htmlFor={ids.note}>{t('domain:customerForm.notes')}</Label>
@@ -194,7 +187,11 @@ function AbsenceForm({ onDone }: { onDone: () => void }) {
           />
         </div>
 
-        {error ? <p className="text-destructive text-sm">{error}</p> : null}
+        {error && error !== t('domain:absenceForm.endBeforeStart') ? (
+          <p role="alert" className="text-destructive text-sm">
+            {error}
+          </p>
+        ) : null}
       </SheetBody>
 
       <SheetFooter>

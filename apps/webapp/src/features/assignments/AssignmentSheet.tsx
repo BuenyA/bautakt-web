@@ -1,7 +1,6 @@
 import {
   Button,
   Checkbox,
-  Input,
   Label,
   Select,
   SelectContent,
@@ -23,6 +22,7 @@ import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { DatePicker, TimeInput } from '@/components/form/dateTime';
 import { useAuth } from '@/features/auth/useAuth';
 import { useMembership } from '@/features/company/useMembership';
 import { useOrders } from '@/features/orders/useOrders';
@@ -138,6 +138,15 @@ function AssignmentForm({ onDone }: { onDone: () => void }) {
     note: useId(),
   };
 
+  const startsAt = toTimestamp(draft.startDate, draft.startTime);
+  const endsAt = toTimestamp(draft.endDate, draft.endTime);
+  const datesInverted = Boolean(
+    draft.startDate && draft.endDate && draft.endDate < draft.startDate,
+  );
+  // Gleicher oder späterer Tag, aber die Uhrzeit macht das Ende nicht später.
+  // Ein früherer Tag zeigt die Meldung schon am Datumsfeld.
+  const clockInverted = !datesInverted && Boolean(startsAt && endsAt && endsAt <= startsAt);
+
   // Ausgeschiedene stehen nicht zur Auswahl — fuer sie wird nichts mehr geplant.
   const selectableEmployees = (employees.data ?? []).filter((employee) => !employee.ended_at);
   const orderOptions = [...(orders.data ?? [])].sort((a, b) => a.name.localeCompare(b.name, 'de'));
@@ -224,41 +233,48 @@ function AssignmentForm({ onDone }: { onDone: () => void }) {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="grid gap-2">
             <Label htmlFor={ids.startDate}>{t('domain:assignments.create.startDate')}</Label>
-            <Input
+            <DatePicker
               id={ids.startDate}
-              type="date"
+              aria-label={t('domain:assignments.create.startDate')}
               value={draft.startDate}
-              onChange={(event) => set({ startDate: event.target.value })}
+              onChange={(startDate) => set({ startDate })}
             />
           </div>
           <div className="grid gap-2">
             <Label htmlFor={ids.startTime}>{t('domain:assignments.create.startTime')}</Label>
-            <Input
+            <TimeInput
               id={ids.startTime}
-              type="time"
+              aria-label={t('domain:assignments.create.startTime')}
               value={draft.startTime}
-              onChange={(event) => set({ startTime: event.target.value })}
+              onChange={(startTime) => set({ startTime })}
             />
           </div>
           <div className="grid gap-2">
             <Label htmlFor={ids.endDate}>{t('domain:assignments.create.endDate')}</Label>
-            <Input
+            <DatePicker
               id={ids.endDate}
-              type="date"
+              aria-label={t('domain:assignments.create.endDate')}
               value={draft.endDate}
-              onChange={(event) => set({ endDate: event.target.value })}
+              earliest={draft.startDate}
+              rangeMessage={t('domain:assignments.create.endBeforeStart')}
+              onChange={(endDate) => set({ endDate })}
             />
           </div>
           <div className="grid gap-2">
             <Label htmlFor={ids.endTime}>{t('domain:assignments.create.endTime')}</Label>
-            <Input
+            <TimeInput
               id={ids.endTime}
-              type="time"
+              aria-label={t('domain:assignments.create.endTime')}
               value={draft.endTime}
-              onChange={(event) => set({ endTime: event.target.value })}
+              onChange={(endTime) => set({ endTime })}
             />
           </div>
         </div>
+        {clockInverted ? (
+          <p role="alert" className="text-destructive text-sm">
+            {t('domain:assignments.create.endBeforeStart')}
+          </p>
+        ) : null}
 
         <fieldset className="grid gap-2">
           <legend className="text-sm leading-none font-medium">
@@ -305,7 +321,11 @@ function AssignmentForm({ onDone }: { onDone: () => void }) {
           />
         </div>
 
-        {error ? (
+        {error &&
+        !(
+          error === t('domain:assignments.create.endBeforeStart') &&
+          (datesInverted || clockInverted)
+        ) ? (
           <p role="alert" className="text-destructive text-sm">
             {error}
           </p>

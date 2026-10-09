@@ -20,6 +20,7 @@ import { type FormEvent, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useDismissLock } from '@/components/common/useDismissLock';
+import { DatePicker } from '@/components/form/dateTime';
 import { useEmployees } from '@/features/team/useEmployees';
 import { readableDbError } from '@/lib/dbErrors';
 
@@ -189,12 +190,12 @@ function ChecklistItemForm({
 
         <div className="grid gap-2">
           <Label htmlFor={ids.due}>{t('domain:checklistForm.due')}</Label>
-          <Input
+          <DatePicker
             id={ids.due}
-            type="date"
-            value={draft.dueDate}
+            aria-label={t('domain:checklistForm.due')}
             aria-invalid={issue === 'date'}
-            onChange={(event) => set({ dueDate: event.target.value })}
+            value={draft.dueDate}
+            onChange={(dueDate) => set({ dueDate })}
           />
           {issue === 'date' ? (
             <p role="alert" className="text-destructive text-sm">

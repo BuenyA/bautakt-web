@@ -22,6 +22,7 @@ import { type FormEvent, type Ref, useEffect, useId, useRef, useState } from 're
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { DateRangePicker } from '@/components/form/dateTime';
 import { useMembership } from '@/features/company/useMembership';
 import { customerDisplayName, useCustomers } from '@/features/customers/useCustomers';
 import { useCostCenters } from '@/features/masterdata/useMasterData';
@@ -452,26 +453,19 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
           </Select>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="grid gap-2">
-            <Label htmlFor={ids.start}>{t('domain:orders.fields.start')}</Label>
-            <Input
-              id={ids.start}
-              type="date"
-              value={draft.start_date}
-              onChange={(event) => set({ start_date: event.target.value })}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor={ids.end}>{t('domain:orders.fields.end')}</Label>
-            <Input
-              id={ids.end}
-              type="date"
-              value={draft.end_date}
-              onChange={(event) => set({ end_date: event.target.value })}
-            />
-          </div>
-        </div>
+        <DateRangePicker
+          startId={ids.start}
+          endId={ids.end}
+          startLabel={t('domain:orders.fields.start')}
+          endLabel={t('domain:orders.fields.end')}
+          startAriaLabel={t('domain:orders.fields.start')}
+          endAriaLabel={t('domain:orders.fields.end')}
+          start={draft.start_date}
+          end={draft.end_date}
+          onStartChange={(start_date) => set({ start_date })}
+          onEndChange={(end_date) => set({ end_date })}
+          rangeMessage={t('domain:orders.edit.endBeforeStart')}
+        />
 
         <div className="grid gap-2">
           <Label htmlFor={ids.description}>{t('domain:orders.create.notes')}</Label>
@@ -483,7 +477,7 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
           />
         </div>
 
-        {error ? (
+        {error && error !== t('domain:orders.edit.endBeforeStart') ? (
           <p role="alert" className="text-destructive text-sm">
             {error}
           </p>

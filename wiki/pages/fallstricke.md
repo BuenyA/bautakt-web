@@ -593,3 +593,21 @@ bleibt ein satter Blauton (`#104281`). Das Preflight setzt `button` auf
 **Lösung:** Im gemeinsamen `Button` zusätzlich `dark:disabled:opacity-30`,
 für jede Variante. Hell bleibt bei 50 %. Siehe
 [webapp-shell.md](webapp-shell.md).
+
+## Kalender im Sheet schließt das Panel
+
+_Festgestellt 2026-10-09, Issue #93. Dieselbe Falle wie der Löschdialog über
+der Checkliste (#121)._
+
+**Symptom:** Man öffnet den Kalender an einem Datumsfeld im Sheet. Das Panel
+geht zu, der Kalender gleich mit. Oder der Kalender liegt hinter dem Dialog
+und lässt sich nicht anklicken.
+
+Der Popover hängt im Portal, außerhalb des Sheets. Radix behandelt den Fokus
+dort als „draußen“ und schließt das Panel. Dialog und AlertDialog liegen auf
+`z-[60]`, der Popover stand auf `z-50`.
+
+**Lösung:** `isFloatingLayerTarget` in Sheet, Dialog und AlertDialog. Fokus
+oder Klick auf Popover, Dialog oder den Popper-Wrapper schließt die Ebene
+darunter nicht. Der Popover liegt auf `z-[70]`. Siehe
+[datumseingabe.md](datumseingabe.md).

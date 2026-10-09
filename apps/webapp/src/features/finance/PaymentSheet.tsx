@@ -28,6 +28,7 @@ import {
 import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { DatePicker } from '@/components/form/dateTime';
 import { readableDbError } from '@/lib/dbErrors';
 
 import { useAddPayment } from './useSalesDocument';
@@ -189,11 +190,11 @@ function PaymentForm({
 
         <div className="grid gap-2">
           <Label htmlFor={dateId}>{t('domain:payments.paidAt')}</Label>
-          <Input
+          <DatePicker
             id={dateId}
-            type="date"
+            aria-label={t('domain:payments.paidAt')}
             value={paidAt}
-            onChange={(event) => setPaidAt(event.target.value)}
+            onChange={setPaidAt}
           />
         </div>
 
