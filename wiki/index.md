@@ -91,6 +91,7 @@ verlinkt, nie kopiert.
 | 2026-10-09 | [Kalender hängt wieder am Feld](logs/2026-10-09-kalender-anker.md)                                |
 | 2026-10-09 | [Deutsche Datums- und Uhrzeitfelder](logs/2026-10-09-datumseingabe.md)                            |
 | 2026-10-09 | [Fällig-Meldung und leeres Rechnungsdatum](logs/2026-10-09-beleg-faellig-meldung.md)              |
+| 2026-10-09 | [Pause nur anzeigen, wenn sie größer als 0 ist](logs/2026-10-09-pause-anzeige.md)                 |
 | 2026-10-09 | [Marketing ohne Preise und Registrierung](logs/2026-10-09-marketing-nicht-kommerziell.md)         |
 
 ## Die drei wichtigsten Sätze

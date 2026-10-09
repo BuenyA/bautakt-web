@@ -10,6 +10,7 @@ import { useCompanyListLoading } from '@/features/company/useCompanyListLoading'
 import { useMembership } from '@/features/company/useMembership';
 import { useOrders } from '@/features/orders/useOrders';
 import { useEmployees } from '@/features/team/useEmployees';
+import { formatBreakLabel } from '@/features/times/formatBreakLabel';
 import { canCreateTimeEntry, canEditTimeEntry } from '@/features/times/timeEntryAccess';
 import {
   draftFromTimeEntry,
@@ -151,6 +152,7 @@ function TimeCard({
   const duration =
     formatNetDuration(entry.started_at, entry.ended_at, entry.break_minutes) ||
     t('domain:times.noEnd');
+  const pause = formatBreakLabel(entry.break_minutes, t);
   const note = entry.note.trim();
   const className =
     'flex w-full flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3 text-left shadow-sm transition-colors';
@@ -164,10 +166,12 @@ function TimeCard({
         </span>
         <span className="text-muted-foreground text-sm whitespace-nowrap">{duration}</span>
       </div>
-      <p className="text-muted-foreground flex flex-wrap gap-x-2 text-xs">
-        {period ? <time dateTime={entry.started_at}>{period}</time> : null}
-        <span>{t('domain:times.breakMinutes', { count: entry.break_minutes })}</span>
-      </p>
+      {period || pause ? (
+        <p className="text-muted-foreground flex flex-wrap gap-x-2 text-xs">
+          {period ? <time dateTime={entry.started_at}>{period}</time> : null}
+          {pause ? <span>{pause}</span> : null}
+        </p>
+      ) : null}
       {note ? (
         <p className="text-foreground text-sm break-words whitespace-pre-wrap">{note}</p>
       ) : null}
