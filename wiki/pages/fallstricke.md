@@ -619,6 +619,33 @@ Kein zweites `PopoverAnchor`. Klick ins Textfeld blubbert nicht, der Kalender
 geht nur über den Knopf und Pfeil-runter auf. Siehe
 [datumseingabe.md](datumseingabe.md).
 
+## Fällig-Meldung verschwindet hinter dem Kalender
+
+_Festgestellt 2026-10-09, Issue #131. Smoke von #130._
+
+**Symptom:** Im Belegeditor liegt „Das Fälligkeitsdatum liegt vor dem
+Rechnungsdatum.“ direkt unter dem Fällig-Feld. Der offene Kalender deckt die
+Zeile zu.
+
+**Lösung:** Die Meldung steht in einer eigenen Zeile über den Datumsfeldern.
+Der Kalender bleibt am Feld und öffnet weiter nach unten. Siehe
+[datumseingabe.md](datumseingabe.md).
+
+## Entwurf zeigt heute, die Liste „Nicht ausgestellt“
+
+_Festgestellt 2026-10-09, Issue #131._
+
+**Symptom:** `issue_date` ist NULL. Die Liste sagt „Nicht ausgestellt“, der
+Editor zeigt das heutige Datum. Speichern schreibt diesen Tag, obwohl niemand
+ein Datum gewählt hat.
+
+Ursache war `issue_date ?? todayIso()` beim Laden des Entwurfs.
+
+**Lösung:** NULL bleibt leer. Speichern schreibt NULL. Das Festschreiben setzt
+das Datum selbst (`coalesce(issue_date, CURRENT_DATE)` in
+`finalize_sales_document`). Ein neuer Beleg startet weiter mit heute als
+sichtbarem Vorschlag. Siehe [datumseingabe.md](datumseingabe.md).
+
 ## Kalender im Sheet schließt das Panel
 
 _Festgestellt 2026-10-09, Issue #93. Dieselbe Falle wie der Löschdialog über

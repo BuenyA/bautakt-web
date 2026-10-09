@@ -747,7 +747,9 @@
     "toDocument": "Zum Beleg",
     "serviceDateRequired": "Bitte das Leistungsdatum angeben — ohne es lässt sich die Rechnung später nicht festschreiben.",
     "serviceDateRequiredLabel": "Leistungsdatum *",
-    "dueBeforeIssue": "Das Fälligkeitsdatum liegt vor dem Rechnungsdatum."
+    "dueBeforeIssue": "Das Fälligkeitsdatum liegt vor dem Rechnungsdatum.",
+    "issueDatePlaceholder": "Wird beim Ausstellen gesetzt",
+    "issueDateEmptyHint": "Noch nicht ausgestellt"
   },
   "customerForm": {
     "newTitle": "Neuer Kunde",
