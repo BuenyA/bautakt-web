@@ -290,7 +290,11 @@ export function InvoiceDetailPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <DetailCard title={t('domain:invoices.details')}>
           <DetailRow
-            label={t('domain:invoices.columns.issueDate')}
+            label={
+              data.type === 'quote'
+                ? t('domain:quotes.issueDate')
+                : t('domain:invoices.columns.issueDate')
+            }
             value={formatDate(data.issue_date)}
           />
           <DetailRow
