@@ -6,7 +6,8 @@
     "emailNotConfirmed": "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse.",
     "userAlreadyExists": "Zu dieser E-Mail-Adresse gibt es bereits ein Konto.",
     "weakPassword": "Dieses Passwort ist zu schwach.",
-    "rateLimited": "Zu viele Versuche. Bitte warten Sie einen Moment."
+    "rateLimited": "Zu viele Versuche. Bitte warten Sie einen Moment.",
+    "signupDisabled": "Die Registrierung ist derzeit nur auf Einladung möglich."
   },
   "boundary": {
     "title": "Unerwarteter Fehler",

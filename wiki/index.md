@@ -93,6 +93,7 @@ verlinkt, nie kopiert.
 | 2026-10-09 | [Fällig-Meldung und leeres Rechnungsdatum](logs/2026-10-09-beleg-faellig-meldung.md)              |
 | 2026-10-09 | [Pause nur anzeigen, wenn sie größer als 0 ist](logs/2026-10-09-pause-anzeige.md)                 |
 | 2026-10-09 | [Marketing ohne Preise und Registrierung](logs/2026-10-09-marketing-nicht-kommerziell.md)         |
+| 2026-10-09 | [Login ohne Registrierungslink](logs/2026-10-09-login-ohne-registrierung.md)                      |
 
 ## Die drei wichtigsten Sätze
 

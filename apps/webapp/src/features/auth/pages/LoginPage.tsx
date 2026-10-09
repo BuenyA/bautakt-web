@@ -1,6 +1,6 @@
 import { Button, Input, Label } from '@bautakt/ui';
 import { type FormEvent, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { routes } from '@/lib/routes';
@@ -35,17 +35,8 @@ export function LoginPage() {
     if (error) setErrorKey(error);
   }
 
-  const footer = (
-    <Trans
-      i18nKey="auth:signIn.noAccount"
-      components={{
-        register: <Link to={routes.register} className="text-primary hover:underline" />,
-      }}
-    />
-  );
-
   return (
-    <AuthCard title={t('auth:signIn.title')} subtitle={t('auth:signIn.subtitle')} footer={footer}>
+    <AuthCard title={t('auth:signIn.title')} subtitle={t('auth:signIn.subtitle')}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
         <FormError messageKey={errorKey} />
 
