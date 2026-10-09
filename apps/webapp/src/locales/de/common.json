@@ -90,6 +90,13 @@
       "costCentersDescription": "Kostenstellen"
     }
   },
+  "legal": {
+    "label": "Rechtliches",
+    "imprint": "Impressum",
+    "privacy": "Datenschutz",
+    "terms": "AGB",
+    "newTab": "(öffnet in neuem Tab)"
+  },
   "notFound": {
     "title": "Seite nicht gefunden",
     "description": "Diese Adresse gibt es nicht.",
