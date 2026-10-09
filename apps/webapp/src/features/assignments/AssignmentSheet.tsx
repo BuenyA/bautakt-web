@@ -123,6 +123,7 @@ export function AssignmentSheet({
 }
 
 function AssignmentForm({ onDone }: { onDone: () => void }) {
+  const orderFieldId = useId();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const create = useCreateAssignment();
@@ -208,9 +209,9 @@ function AssignmentForm({ onDone }: { onDone: () => void }) {
 
       <SheetBody className="flex flex-col gap-4">
         <div className="grid gap-2">
-          <Label>{t('domain:assignments.fields.order')}</Label>
+          <Label htmlFor={orderFieldId}>{t('domain:assignments.fields.order')}</Label>
           <Select value={draft.orderId} onValueChange={(value) => set({ orderId: value })}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger id={orderFieldId} className="w-full">
               <SelectValue placeholder={t('domain:assignments.create.chooseOrder')} />
             </SelectTrigger>
             <SelectContent>

@@ -88,6 +88,8 @@ export function AbsenceSheet({
 }
 
 function AbsenceForm({ onDone }: { onDone: () => void }) {
+  const typeFieldId = useId();
+  const employeeFieldId = useId();
   const { t } = useTranslation();
   const create = useCreateAbsence();
   const employees = useEmployees();
@@ -132,9 +134,9 @@ function AbsenceForm({ onDone }: { onDone: () => void }) {
 
       <SheetBody className="flex flex-col gap-4">
         <div className="grid gap-2">
-          <Label>{t('domain:absences.columns.employee')}</Label>
+          <Label htmlFor={employeeFieldId}>{t('domain:absences.columns.employee')}</Label>
           <Select value={employmentId} onValueChange={setEmploymentId}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger id={employeeFieldId} className="w-full">
               <SelectValue placeholder={t('domain:timeForm.choose')} />
             </SelectTrigger>
             <SelectContent>
@@ -148,9 +150,9 @@ function AbsenceForm({ onDone }: { onDone: () => void }) {
         </div>
 
         <div className="grid gap-2">
-          <Label>{t('domain:absences.columns.type')}</Label>
+          <Label htmlFor={typeFieldId}>{t('domain:absences.columns.type')}</Label>
           <Select value={type} onValueChange={setType}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger id={typeFieldId} className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

@@ -88,6 +88,7 @@ function OrderMaterialForm({
   onBusyChange: (busy: boolean) => void;
   onDone: () => void;
 }) {
+  const articleFieldId = useId();
   const { t } = useTranslation();
   const save = useSaveOrderMaterial();
   const articles = useArticles();
@@ -252,14 +253,18 @@ function OrderMaterialForm({
 
         {draft.mode === 'article' ? (
           <div className="grid gap-2" data-material-field="article">
-            <Label>{t('domain:materialForm.article')}</Label>
+            <Label htmlFor={articleFieldId}>{t('domain:materialForm.article')}</Label>
             <Select
               key={articleSelectKey}
               value={draft.articleId || undefined}
               onValueChange={onArticle}
               disabled={locked}
             >
-              <SelectTrigger className="w-full" aria-invalid={issue === 'article'}>
+              <SelectTrigger
+                id={articleFieldId}
+                className="w-full"
+                aria-invalid={issue === 'article'}
+              >
                 <SelectValue
                   placeholder={
                     articles.isPending

@@ -561,13 +561,14 @@ function WeatherField({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const fieldId = useId();
   const { t } = useTranslation();
   const choices = weatherChoices(value);
   return (
     <div className="grid gap-2">
-      <Label>{label}</Label>
+      <Label htmlFor={fieldId}>{label}</Label>
       <Select value={value || undefined} onValueChange={(next) => next && onChange(next)}>
-        <SelectTrigger className="w-full">
+        <SelectTrigger id={fieldId} className="w-full">
           <SelectValue placeholder={t('domain:dailyReportForm.chooseWeather')} />
         </SelectTrigger>
         <SelectContent>

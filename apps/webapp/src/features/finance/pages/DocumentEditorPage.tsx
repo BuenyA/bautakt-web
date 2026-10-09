@@ -71,6 +71,9 @@ function initialState(type: EditableDocumentType): EditorState {
  * hiesse, dem Nutzer einen Speichern-Knopf zu zeigen, der scheitern muss.
  */
 export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
+  const footerFieldId = useId();
+  const introFieldId = useId();
+  const customerFieldId = useId();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -232,14 +235,14 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
             </p>
           ) : null}
           <div className="grid gap-2">
-            <Label>{t('domain:invoices.columns.customer')}</Label>
+            <Label htmlFor={customerFieldId}>{t('domain:invoices.columns.customer')}</Label>
             <Select
               value={state.customerId ?? NO_CUSTOMER}
               onValueChange={(value) =>
                 update({ customerId: value === NO_CUSTOMER ? null : value })
               }
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger id={customerFieldId} className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -295,14 +298,14 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                 onChange={(value) => updateLine(line.key, { title: value })}
               />
               <div className="grid gap-2">
-                <Label>{t('domain:editor.kind')}</Label>
+                <Label htmlFor={`line-${line.key}-kind`}>{t('domain:editor.kind')}</Label>
                 <Select
                   value={line.kind}
                   onValueChange={(value) =>
                     updateLine(line.key, { kind: value as EditorLine['kind'] })
                   }
                 >
-                  <SelectTrigger size="sm" className="w-full">
+                  <SelectTrigger id={`line-${line.key}-kind`} size="sm" className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -395,16 +398,18 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
         </CardHeader>
         <CardContent className="grid gap-4 lg:grid-cols-2">
           <div className="grid gap-2">
-            <Label>{t('domain:editor.intro')}</Label>
+            <Label htmlFor={introFieldId}>{t('domain:editor.intro')}</Label>
             <Textarea
+              id={introFieldId}
               rows={3}
               value={state.introText}
               onChange={(event) => update({ introText: event.target.value })}
             />
           </div>
           <div className="grid gap-2">
-            <Label>{t('domain:editor.footer')}</Label>
+            <Label htmlFor={footerFieldId}>{t('domain:editor.footer')}</Label>
             <Textarea
+              id={footerFieldId}
               rows={3}
               value={state.footerText}
               onChange={(event) => update({ footerText: event.target.value })}
@@ -427,10 +432,12 @@ function Field({
   onChange: (value: string) => void;
   numeric?: boolean;
 }) {
+  const fieldId = useId();
   return (
     <div className="grid gap-2">
-      <Label>{label}</Label>
+      <Label htmlFor={fieldId}>{label}</Label>
       <Input
+        id={fieldId}
         className={numeric ? 'h-9 text-right tabular-nums' : 'h-9'}
         inputMode={numeric ? 'decimal' : undefined}
         value={value}

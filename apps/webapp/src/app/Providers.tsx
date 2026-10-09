@@ -1,6 +1,7 @@
 import { Toaster } from '@bautakt/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { AuthProvider } from '@/features/auth/AuthProvider';
 
@@ -16,8 +17,14 @@ export function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>{children}</AuthProvider>
-        <Toaster />
+        <LocalizedToaster />
       </ThemeProvider>
     </QueryClientProvider>
   );
+}
+
+/** Sonner beschriftet seine Region sonst englisch („Notifications alt+T“). */
+function LocalizedToaster() {
+  const { t } = useTranslation();
+  return <Toaster customAriaLabel={t('common:toaster.label')} />;
 }

@@ -113,6 +113,8 @@ export function ExpenseSheet({
 }
 
 function ExpenseForm({ onDone }: { onDone: () => void }) {
+  const vatRateFieldId = useId();
+  const categoryFieldId = useId();
   const { t } = useTranslation();
   const create = useCreateExpense();
   const categories = useCostCategories();
@@ -187,9 +189,9 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
         </div>
 
         <div className="grid gap-2">
-          <Label>{t('domain:expenses.columns.category')}</Label>
+          <Label htmlFor={categoryFieldId}>{t('domain:expenses.columns.category')}</Label>
           <Select value={categoryId} onValueChange={setCategoryId}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger id={categoryFieldId} className="w-full">
               <SelectValue placeholder={t('domain:timeForm.choose')} />
             </SelectTrigger>
             <SelectContent>
@@ -225,9 +227,9 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
             />
           </div>
           <div className="grid gap-2">
-            <Label>{t('domain:expenseForm.vatRate')}</Label>
+            <Label htmlFor={vatRateFieldId}>{t('domain:expenseForm.vatRate')}</Label>
             <Select value={vatRate} onValueChange={setVatRate}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger id={vatRateFieldId} className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

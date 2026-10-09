@@ -86,6 +86,8 @@ function TimeEntryForm({
   onBusyChange: (busy: boolean) => void;
   onDone: () => void;
 }) {
+  const employeeFieldId = useId();
+  const orderFieldId = useId();
   const { t } = useTranslation();
   const save = useSaveTimeEntry();
   const { data: membership } = useMembership();
@@ -210,14 +212,14 @@ function TimeEntryForm({
         ) : null}
 
         <div className="grid gap-2">
-          <Label>{t('domain:times.columns.order')}</Label>
+          <Label htmlFor={orderFieldId}>{t('domain:times.columns.order')}</Label>
           <Select
             key={orderSelectKey}
             value={draft.orderId}
             onValueChange={chooseOrder}
             disabled={locked || draft.lockOrder}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger id={orderFieldId} className="w-full">
               <SelectValue
                 placeholder={
                   draft.orderId && orders.isPending
@@ -275,7 +277,7 @@ function TimeEntryForm({
           </fieldset>
         ) : canTeam ? (
           <div className="grid gap-2">
-            <Label>{t('domain:times.columns.employee')}</Label>
+            <Label htmlFor={employeeFieldId}>{t('domain:times.columns.employee')}</Label>
             <Select
               value={draft.employmentIds[0] ?? ''}
               onValueChange={(value) => {
@@ -284,7 +286,7 @@ function TimeEntryForm({
               }}
               disabled={locked}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger id={employeeFieldId} className="w-full">
                 <SelectValue placeholder={t('domain:timeForm.choose')} />
               </SelectTrigger>
               <SelectContent>

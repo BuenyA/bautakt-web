@@ -118,6 +118,7 @@ export function EmployeeSheet({
 }
 
 function EmployeeForm({ initial, onDone }: { initial: EmployeeDraft; onDone: () => void }) {
+  const roleFieldId = useId();
   const { t } = useTranslation();
   const save = useSaveEmployee();
   const roles = useCompanyRoles();
@@ -181,9 +182,9 @@ function EmployeeForm({ initial, onDone }: { initial: EmployeeDraft; onDone: () 
         </div>
 
         <div className="grid gap-2">
-          <Label>{t('domain:employees.columns.role')}</Label>
+          <Label htmlFor={roleFieldId}>{t('domain:employees.columns.role')}</Label>
           <Select value={draft.role} onValueChange={(value) => set({ role: value })}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger id={roleFieldId} className="w-full">
               <SelectValue placeholder={t('domain:timeForm.choose')} />
             </SelectTrigger>
             <SelectContent>

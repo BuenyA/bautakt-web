@@ -54,6 +54,8 @@ export type DataTableLabels = {
   rows: string;
   previous: string;
   next: string;
+  /** Unsichtbare Überschrift der Aktionsspalte (`header: ''`), für Screenreader. */
+  actions: string;
 };
 
 const DEFAULT_LABELS: DataTableLabels = {
@@ -64,7 +66,32 @@ const DEFAULT_LABELS: DataTableLabels = {
   rows: 'Einträge',
   previous: 'Zurück',
   next: 'Weiter',
+  actions: 'Aktionen',
 };
+
+/**
+ * Eine Spalte mit leerer Überschrift ist eine Aktionsspalte (Knöpfe je Zeile).
+ * Sie ist nicht sortierbar, nicht ausblendbar und trägt für Screenreader die
+ * Überschrift „Aktionen“ — ein leerer Spaltenkopf liest sich sonst als Lücke.
+ */
+function isActionColumn(header: unknown): boolean {
+  return header === '';
+}
+
+function ariaSort(sorted: false | 'asc' | 'desc'): 'ascending' | 'descending' | 'none' {
+  if (sorted === 'asc') return 'ascending';
+  if (sorted === 'desc') return 'descending';
+  return 'none';
+}
+
+/** Enter und Leertaste auf der Zeile selbst — nicht auf Links oder Knöpfen in einer Zelle. */
+function activateOnKey(event: React.KeyboardEvent<HTMLTableRowElement>, activate: () => void) {
+  if (event.target !== event.currentTarget) return;
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    activate();
+  }
+}
 
 /**
  * Spaltendefinition fuer diese Tabelle. Die Seiten sollen den
@@ -170,7 +197,7 @@ export function DataTable<TData extends RowData>({
               <DropdownMenuSeparator />
               {table
                 .getAllColumns()
-                .filter((column) => column.getCanHide())
+                .filter((column) => column.getCanHide() && !isActionColumn(column.columnDef.header))
                 .map((column) => (
                   <DropdownMenuCheckboxItem
                     key={column.id}
@@ -192,11 +219,17 @@ export function DataTable<TData extends RowData>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header) => {
-                  const canSort = header.column.getCanSort();
+                  const action = isActionColumn(header.column.columnDef.header);
+                  const canSort = header.column.getCanSort() && !action;
                   const sorted = header.column.getIsSorted();
                   return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder ? null : canSort ? (
+                    <TableHead
+                      key={header.id}
+                      aria-sort={canSort && !header.isPlaceholder ? ariaSort(sorted) : undefined}
+                    >
+                      {header.isPlaceholder ? null : action ? (
+                        <span className="sr-only">{labels.actions}</span>
+                      ) : canSort ? (
                         <button
                           type="button"
                           onClick={header.column.getToggleSortingHandler()}
@@ -255,7 +288,17 @@ export function DataTable<TData extends RowData>({
                     ) : null}
                     <TableRow
                       onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-                      className={onRowClick ? 'cursor-pointer' : undefined}
+                      onKeyDown={
+                        onRowClick
+                          ? (event) => activateOnKey(event, () => onRowClick(row.original))
+                          : undefined
+                      }
+                      tabIndex={onRowClick ? 0 : undefined}
+                      className={
+                        onRowClick
+                          ? 'focus-visible:outline-ring cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2'
+                          : undefined
+                      }
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>

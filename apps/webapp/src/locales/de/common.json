@@ -28,7 +28,11 @@
     "of": "von",
     "rows": "Einträge",
     "previous": "Zurück",
-    "next": "Weiter"
+    "next": "Weiter",
+    "actions": "Aktionen"
+  },
+  "toaster": {
+    "label": "Benachrichtigungen (Alt+T)"
   },
   "forbidden": {
     "title": "Kein Zugriff",

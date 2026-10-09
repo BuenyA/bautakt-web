@@ -96,6 +96,7 @@ export function CustomerSheet({
 }
 
 function CustomerForm({ initial, onDone }: { initial: CustomerDraft; onDone: () => void }) {
+  const typeFieldId = useId();
   const { t } = useTranslation();
   const save = useSaveCustomer();
   const [draft, setDraft] = useState<CustomerDraft>(initial);
@@ -151,12 +152,12 @@ function CustomerForm({ initial, onDone }: { initial: CustomerDraft; onDone: () 
 
       <SheetBody className="flex flex-col gap-4">
         <div className="grid gap-2">
-          <Label>{t('domain:customerForm.type')}</Label>
+          <Label htmlFor={typeFieldId}>{t('domain:customerForm.type')}</Label>
           <Select
             value={draft.customer_type}
             onValueChange={(value) => set({ customer_type: value as 'b2b' | 'b2c' })}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger id={typeFieldId} className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

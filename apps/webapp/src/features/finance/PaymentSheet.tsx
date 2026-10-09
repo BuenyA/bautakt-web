@@ -98,6 +98,7 @@ function PaymentForm({
   openMinor: number;
   onDone: () => void;
 }) {
+  const methodFieldId = useId();
   const { t } = useTranslation();
   const addPayment = useAddPayment(documentId);
   const amountId = useId();
@@ -199,9 +200,9 @@ function PaymentForm({
         </div>
 
         <div className="grid gap-2">
-          <Label>{t('domain:payments.method')}</Label>
+          <Label htmlFor={methodFieldId}>{t('domain:payments.method')}</Label>
           <Select value={method} onValueChange={setMethod}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger id={methodFieldId} className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
