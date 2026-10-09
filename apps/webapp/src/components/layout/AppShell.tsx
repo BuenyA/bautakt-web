@@ -1,7 +1,6 @@
 import {
   Avatar,
   AvatarFallback,
-  Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -41,6 +40,7 @@ import { HOME_ROUTE } from '@/lib/routes';
 
 import { Breadcrumbs } from './Breadcrumbs';
 import { isNavActive, settingsNavItem } from './navItems';
+import { NotificationsBell } from './NotificationsBell';
 import { SidebarNav } from './SidebarNav';
 
 /** Zustand der Leiste aus dem Cookie, damit sie beim Laden nicht springt. */
@@ -167,15 +167,7 @@ export function AppShell() {
             {membership?.companyName}
           </span>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-9"
-            aria-label={t('common:nav.notifications')}
-            title={t('common:nav.notificationsComingSoon')}
-          >
-            <Uicon name="bell" size={18} />
-          </Button>
+          <NotificationsBell />
         </header>
 
         <div className="min-w-0 flex-1 p-4 sm:p-6">

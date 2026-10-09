@@ -57,11 +57,14 @@
     "costCenters": "Kostenstellen",
     "settings": "Einstellungen",
     "detail": "Detail",
-    "notifications": "Benachrichtigungen",
-    "notificationsComingSoon": "Benachrichtigungen folgen in einer späteren Welle.",
     "openMenu": "Menü öffnen",
     "closeMenu": "Menü schließen",
     "main": "Hauptnavigation"
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "emptyTitle": "Keine neuen Benachrichtigungen",
+    "emptyDescription": "Neue Hinweise erscheinen hier."
   },
   "hub": {
     "emptyTitle": "Keine Bereiche freigeschaltet",
