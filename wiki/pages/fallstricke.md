@@ -470,11 +470,18 @@ Zeilen, die seine Select-Policy nicht zeigt — einschließlich abgerechneter
 Zeiten. Der Unique-Index `daily_reports_order_id_report_date_uidx` lässt nur
 einen Bericht je Auftrag und Tag zu. `daily_reports.id` hat kein Default.
 
-**Lösung:** Die Oberfläche löscht im Web nur einen Bericht ohne jede
-verknüpfte Zeit, ohne Material, ohne Foto und ohne Mangel, und nur wenn das
-Konto diese vier Tabellen vollständig sieht. Abgerechnete Zeiten oder
-abgerechnetes Material (`billed_document_id`) sperren immer. Der Bericht
-verschwindet erst nach der Server-Antwort. Die Datenbank kaskadiert weiter;
+**Lösung:** Die Oberfläche löscht im Web nur einen Bericht ohne sichtbare
+verknüpfte Zeit, ohne sichtbares Material, ohne Foto und ohne Mangel, und nur
+wenn das Konto Material vollständig sieht. Abgerechnete Zeiten oder
+abgerechnetes Material (`billed_document_id`) sperren immer. Die Zählung läuft
+als Client-Select unter der RLS des Kontos; eine 0 ist nur für vollständig
+sichtbare Tabellen ein Beweis. Für den Löschen-Knopf sind Zeiten, Fotos,
+Mängel und Anwesenheit vollständig sichtbar. Material nur mit Finanzrecht oder
+mit `canRecordMaterials` und `canManageOrders`. Fehlt diese Sicht, bleibt der
+Knopf aus, auch bei Zählung 0: fremdes Material kann abgerechnet sein, und die
+Kaskade würde es löschen. Der Text nennt nur diese fehlende Sicht, keine
+verknüpften Einträge und keine abgerechneten Zeiten. Der Bericht verschwindet
+erst nach der Server-Antwort. Die Datenbank kaskadiert weiter;
 die Sperre dort kommt über bautakt-app #104. Den zweiten Bericht am selben
 Tag lehnt die Oberfläche mit einer Klartextmeldung ab, und zwar schon beim
 Wechsel des Datums: die geladene Liste und eine Abfrage auf
@@ -566,4 +573,23 @@ Overlay-Token, deshalb an jeder Seite dieselbe Klasse.
 **Lösung:** `--overlay` in `theme.css`. Light bleibt die Vordergrundfarbe bei
 40 %. Dark ist Schwarz bei 65 %. `Dialog`, `AlertDialog` und `Sheet` lesen
 `bg-overlay`. `z-[60]` und `duration-150` aus #121 bleiben. Siehe
+[webapp-shell.md](webapp-shell.md).
+
+## Gesperrter Primary-Knopf im Dunkelmodus bleibt satt blau
+
+_Festgestellt 2026-10-09, Issue #126. Speichern im Bautagebuch bei einem
+belegten Tag._
+
+**Symptom:** Ein gesperrter Primary-Knopf ist im Hellen blass und im Dunkeln
+trotzdem voll blau. Destructive zeigt dasselbe mit Rot. Secondary und Outline
+wirken schon bei 50 % zurückgenommen, weil ihre Fläche nah an der Karte liegt.
+
+`disabled:opacity-50` gilt in beiden Modi. Nichts setzt die Deckkraft im
+Dunkelmodus zurück, und `--primary` ist dort dasselbe Electric `#0064E0`.
+50 % davon auf Weiss wird blass (`#80B2F0`). 50 % auf der Karte `#1F1F22`
+bleibt ein satter Blauton (`#104281`). Das Preflight setzt `button` auf
+`opacity: 1`; die Utility gewinnt dagegen.
+
+**Lösung:** Im gemeinsamen `Button` zusätzlich `dark:disabled:opacity-30`,
+für jede Variante. Hell bleibt bei 50 %. Siehe
 [webapp-shell.md](webapp-shell.md).

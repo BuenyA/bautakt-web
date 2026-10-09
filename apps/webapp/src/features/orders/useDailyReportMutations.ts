@@ -276,9 +276,11 @@ export function useSaveDailyReport() {
  * `time_entries`, `order_materials`, `order_images` und `order_issues`
  * verweisen mit ON DELETE CASCADE. RLS ist dort nicht FORCE (gemessen
  * 2026-10-08). Deshalb löscht das Web nur, wenn die frische Lesung keine
- * abgerechnete Zeit, kein abgerechnetes Material und keine andere
- * Verknüpfung zeigt und das Konto alle vier Tabellen vollständig sieht.
- * Die Datenbank selbst sperrt das noch nicht; das kommt über bautakt-app #104.
+ * abgerechnete Zeit, kein abgerechnetes Material und keine sichtbare
+ * Verknüpfung zeigt und das Konto Material vollständig sieht. Fehlt die
+ * Materialsicht, bleibt der Knopf aus: fremdes Material kann abgerechnet
+ * sein. Die Datenbank selbst sperrt das noch nicht; das kommt über
+ * bautakt-app #104.
  */
 export function useDeleteDailyReport() {
   const queryClient = useQueryClient();
@@ -309,7 +311,14 @@ export function useDeleteDailyReport() {
         reportId,
         membership?.permissions,
       );
-      if (reading.block) throw new DailyReportDeleteBlockedError(reading.block, reading.counts);
+      if (reading.block) {
+        throw new DailyReportDeleteBlockedError(
+          reading.block,
+          reading.counts,
+          reading.attendance,
+          reading.materialsComplete,
+        );
+      }
 
       const { data, error } = await supabase
         .from('daily_reports')

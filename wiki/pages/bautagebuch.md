@@ -117,29 +117,48 @@ Fußleiste, Abbrechen und Speichern rechts. Die Fehlermeldung zum doppelten
 Tag bleibt darüber, über die volle Breite.
 
 Unmittelbar vor dem DELETE, und schon beim Öffnen des Dialogs, liest das Web
-frisch vom Server, nicht aus dem Listen-Cache. Eine Zeit oder ein Material mit
-`billed_document_id` sperrt den Knopf. Der Hinweis lautet dann: „Dieser
-Bericht enthält abgerechnete Zeiten oder Material und kann nicht gelöscht
-werden.“
+frisch vom Server, nicht aus dem Listen-Cache. Die Zählung ist ein
+`select` mit `count: 'exact'` und `head: true` auf dem Browser-Client, unter
+der Select-Policy des angemeldeten Kontos. Eine Security-Definer-Funktion, die
+auch unsichtbare Zeilen zählte, gibt es nicht (geprüft 2026-10-09). Eine 0
+beweist deshalb nur, was dieses Konto sehen darf.
 
-Dieselbe Sperre gilt, sobald irgendeine Zeit, ein Material, ein Foto oder ein
-Mangel am Bericht hängt, auch ohne Abrechnung. Grund: die Select-Policy auf
-`order_materials` zeigt einem Konto mit Team-Zeit und Bearbeitungsrecht nicht
-jede Zeile (gemessen 2026-10-08). Eine Zählung von 0 gilt nur, wenn das Konto
-alle vier Tabellen vollständig sieht (`seesEveryReportLink`). Sonst bleibt der
-Knopf aus, mit dem Hinweis: „Dieser Bericht hat verknüpfte Einträge und kann
-im Web noch nicht gelöscht werden.“ Unter beiden Sperrtexten stehen die
-sichtbaren Anzahlen wie auf der Karte, nur Werte über 0, mit Singular und
-Plural („6 Zeiten · 1 Material · 1 Foto“). Eine fehlgeschlagene Zählung fehlt
-in der Zeile. Die Datenbank selbst löscht weiter per CASCADE; die Sperre dort
-kommt über
+Für den Löschen-Knopf reicht das bei Zeiten, Fotos, Mängeln und Anwesenheit:
+`canTrackTimeForTeam` zeigt jede Zeit, jedes Mitglied sieht jedes Foto,
+`canCreateAndViewReports` — nötig, um den Bericht überhaupt zu sehen — zeigt
+jeden Mangel und jede Anwesenheit. Material ist die Ausnahme. Vollständig
+sichtbar ist es nur mit `canViewCompanyFinance`, `canViewOrderFinance`, oder
+`canRecordMaterials` zusammen mit `canManageOrders` (`seesAllOrderMaterials`).
+Sonst bleiben fremde Zeilen verborgen. Policies stehen im Wiki von
+`bautakt-app` und werden hier nicht kopiert.
+
+Eine Zeit oder ein Material mit `billed_document_id` sperrt den Knopf. Der
+Hinweis lautet dann: „Dieser Bericht enthält abgerechnete Zeiten oder Material
+und kann nicht gelöscht werden.“ Dieselbe Sperre gilt, sobald eine sichtbare
+Zeit, ein sichtbares Material, ein Foto oder ein Mangel am Bericht hängt, oder
+eine Zählung fehlschlägt, oder das Konto Zeiten oder Mängel nicht vollständig
+sieht. Der Hinweis: „Dieser Bericht hat verknüpfte Einträge und kann im Web
+noch nicht gelöscht werden.“ Darunter stehen die sichtbaren Anzahlen wie auf
+der Karte, nur Werte über 0, mit Singular und Plural („6 Zeiten · 1 Material ·
+1 Foto“). Eine fehlgeschlagene Zählung fehlt in der Zeile. Die Datenbank
+selbst löscht weiter per CASCADE; die Sperre dort kommt über
 [bautakt-app #104](https://github.com/BuenyA/bautakt-app/issues/104).
 
-Ist nichts verknüpft und das Konto sieht alle vier Tabellen, nennt der Dialog
-weiter die CASCADE. Der Knopf trägt „Wird gelöscht …“ und ist gesperrt,
-solange die Anfrage läuft. Der Bericht verschwindet aus der Liste erst, wenn
-die Antwort eine gelöschte `id` enthält. Scheitert das DELETE an der
-Datenbank, bleibt die Karte stehen und der Dialog zeigt den Fehler.
+Sind alle vier Zählungen 0 und das Konto sieht jedes Material, darf gelöscht
+werden. Der Text lautet: „Der Bericht vom TT.MM.JJJJ wird gelöscht. Das lässt
+sich nicht rückgängig machen.“ Hängt Anwesenheit am Bericht, folgt „Die
+Anwesenheit wird entfernt.“ oder „Die n Anwesenheiten werden entfernt.“
+Anwesenheit sperrt das Löschen nicht. Der Knopf trägt „Wird gelöscht …“ und
+ist gesperrt, solange die Anfrage läuft. Der Bericht verschwindet aus der
+Liste erst, wenn die Antwort eine gelöschte `id` enthält. Scheitert das DELETE
+an der Datenbank, bleibt die Karte stehen und der Dialog zeigt den Fehler.
+
+Sieht das Konto Material nicht vollständig, bleibt der Knopf aus, auch bei
+Zählung 0. Fremdes Material kann abgerechnet sein, und die Kaskade würde es
+löschen. Der Text sagt das so: „Dieser Bericht kann mit deinen Rechten nicht
+gelöscht werden, weil Material anderer Personen für dich nicht sichtbar ist.“
+Er behauptet keine verknüpften Einträge und keine abgerechneten Zeiten.
+Abgerechnete Zeiten wären in der Zählung aufgetaucht.
 
 Panel und Dialog bleiben offen, solange Speichern oder Löschen läuft.
 `useDismissLock` lässt Fokus, Escape und einen Klick daneben in der Zeit

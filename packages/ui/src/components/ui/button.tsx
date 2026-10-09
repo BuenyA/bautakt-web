@@ -6,8 +6,18 @@ import type * as React from 'react';
 
 import { cn } from '../../lib/cn';
 
+/**
+ * Gesperrte Fläche.
+ *
+ * `disabled:opacity-50` gilt im Hellen: 50 % von `--primary` auf Weiss wird
+ * blass. Im Dunkeln liegt dieselbe Deckkraft auf Anthrazit (`--card`
+ * `#1F1F22`), und Electric `#0064E0` bleibt ein satter blauer Knopf. Die
+ * Klasse gewinnt gegen das Preflight-`opacity: 1` auf `button`; kein
+ * `dark:`-Token setzt sie zurück. Deshalb im Dunkelmodus 30 %, für jede
+ * Variante. Hell bleibt bei 50 %.
+ */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] cursor-pointer",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 dark:disabled:opacity-30 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] cursor-pointer",
   {
     variants: {
       variant: {
