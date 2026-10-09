@@ -857,7 +857,10 @@
     "delete": {
       "action": "Bericht löschen",
       "title": "Bericht löschen?",
-      "description": "Der Bericht vom {{date}} wird gelöscht. Zeiten, Material, Fotos und Mängel, die an diesem Bericht hängen, werden mitgelöscht — auch Einträge, die dieses Konto nicht sieht, und auch bereits abgerechnete Zeiten. Das lässt sich nicht rückgängig machen.",
+      "description": "Der Bericht vom {{date}} wird gelöscht. Das lässt sich nicht rückgängig machen.",
+      "descriptionHiddenMaterial": "Der Bericht vom {{date}} wird gelöscht. Das lässt sich nicht rückgängig machen. Material, das dieses Konto nicht sehen kann, wird dabei mitgelöscht.",
+      "attendanceRemoved_one": "Die Anwesenheit wird entfernt.",
+      "attendanceRemoved_other": "Die {{count}} Anwesenheiten werden entfernt.",
       "visible": "Hier sichtbar: {{summary}}.",
       "countsLoading": "Verknüpfte Einträge werden gezählt …",
       "confirm": "Endgültig löschen",

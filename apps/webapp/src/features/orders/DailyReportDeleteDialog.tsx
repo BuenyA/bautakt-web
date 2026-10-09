@@ -34,9 +34,14 @@ import { formatDailyReportLinkCounts } from './useOrderDailyReports';
  * währenddessen nicht.
  *
  * Beim Öffnen und noch einmal unmittelbar vor dem DELETE liest der Dialog
- * abgerechnete Zeiten und Material sowie jede Verknüpfung frisch vom Server.
- * Trifft eine Sperre zu, bleibt der Knopf aus, der Text nennt den Grund, und
- * darunter stehen die Anzahlen, die größer als 0 sind. Die Karte bleibt.
+ * abgerechnete Zeiten und Material sowie jede Verknüpfung frisch vom Server,
+ * als normale Abfrage unter der RLS des Kontos. Sind alle Zählungen 0 und
+ * das Konto sieht jedes Material, steht nur der Löschsatz und — wenn welche
+ * da sind — der Satz zur Anwesenheit. Sieht es Material nicht vollständig,
+ * warnt der Text genau davor, ohne von abgerechneten Zeiten oder anderen
+ * unsichtbaren Einträgen zu sprechen. Trifft eine Sperre zu, bleibt der
+ * Knopf aus, der Text nennt den Grund, und darunter stehen die Anzahlen, die
+ * größer als 0 sind. Die Karte bleibt.
  */
 export function DailyReportDeleteDialog({
   reportId,
@@ -105,19 +110,34 @@ export function DailyReportDeleteDialog({
       onDeleted();
     } catch (caught) {
       if (caught instanceof DailyReportDeleteBlockedError) {
-        setForced({ block: caught.block, counts: caught.counts });
+        setForced({
+          block: caught.block,
+          counts: caught.counts,
+          attendance: caught.attendance,
+          materialsComplete: caught.materialsComplete,
+        });
         return;
       }
       setError(readableDbError(caught) ?? t('domain:dailyReportForm.delete.error'));
     }
   }
 
-  const block = forced?.block ?? probe.data?.block ?? (probe.isError ? 'linked' : null);
-  const counts = forced?.counts ?? probe.data?.counts ?? null;
+  const reading = forced ?? probe.data ?? null;
+  const block = reading?.block ?? (probe.isError ? 'linked' : null);
+  const counts = reading?.counts ?? null;
   const summary =
     block && counts ? formatDailyReportLinkCounts(counts, (key, options) => t(key, options)) : '';
   const waiting = probe.isPending || probe.isFetching;
   const allowed = !waiting && block == null && !probe.isError;
+
+  function confirmDescription(): string {
+    const base = reading?.materialsComplete
+      ? t('domain:dailyReportForm.delete.description', { date: dateLabel })
+      : t('domain:dailyReportForm.delete.descriptionHiddenMaterial', { date: dateLabel });
+    const attendance = reading?.attendance ?? null;
+    if (attendance == null || attendance < 1) return base;
+    return `${base} ${t('domain:dailyReportForm.delete.attendanceRemoved', { count: attendance })}`;
+  }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -128,7 +148,7 @@ export function DailyReportDeleteDialog({
             {block
               ? blockMessage(block)
               : allowed
-                ? t('domain:dailyReportForm.delete.description', { date: dateLabel })
+                ? confirmDescription()
                 : t('domain:dailyReportForm.delete.countsLoading')}
           </DialogDescription>
         </DialogHeader>

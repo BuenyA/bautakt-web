@@ -54,31 +54,72 @@ export function canDeleteDailyReport(
 }
 
 /**
+ * Sieht dieses Konto jede Zeit?
+ *
+ * SELECT auf `time_entries`: eigene Zeile, oder `canTrackTimeForTeam`, oder
+ * `canViewCompanyFinance`, oder `canViewWageCosts`. Der Löschen-Knopf verlangt
+ * das Team-Recht, deshalb ist die Zählung dort vollständig. Gemessen
+ * 2026-10-08.
+ */
+export function seesAllReportTimes(
+  permissions: Partial<EmployeePermissions> | null | undefined,
+): boolean {
+  return (
+    hasPermission(permissions, 'canTrackTimeForTeam') ||
+    hasPermission(permissions, 'canViewCompanyFinance') ||
+    hasPermission(permissions, 'canViewWageCosts')
+  );
+}
+
+/**
+ * Sieht dieses Konto jeden Mangel und jede Anwesenheit am Bericht?
+ *
+ * SELECT auf `order_issues` und `daily_report_employees` verlangt
+ * `canCreateAndViewReports`. Dieselbe Berechtigung braucht die Liste der
+ * Berichte. Gemessen 2026-10-08.
+ */
+export function seesAllReportIssues(
+  permissions: Partial<EmployeePermissions> | null | undefined,
+): boolean {
+  return hasPermission(permissions, 'canCreateAndViewReports');
+}
+
+/**
+ * Sieht dieses Konto jede Materialzeile, nicht nur die eigene?
+ *
+ * SELECT auf `order_materials`, gemessen 2026-10-08: vollständig nur mit
+ * `canViewCompanyFinance`, `canViewOrderFinance`, oder `canRecordMaterials`
+ * zusammen mit `canManageOrders`. Sonst fehlen fremde Zeilen, und eine
+ * Zählung von 0 beweist nicht, dass keine Zeile hängt. Fotos sieht jedes
+ * Mitglied (`is_company_member`), ohne weiteres Recht.
+ */
+export function seesAllOrderMaterials(
+  permissions: Partial<EmployeePermissions> | null | undefined,
+): boolean {
+  return (
+    hasPermission(permissions, 'canViewCompanyFinance') ||
+    hasPermission(permissions, 'canViewOrderFinance') ||
+    (hasPermission(permissions, 'canRecordMaterials') &&
+      hasPermission(permissions, 'canManageOrders'))
+  );
+}
+
+/**
  * Sieht dieses Konto jede Zeile, die ein Löschen per CASCADE mitnehmen würde?
  *
- * Gemessen 2026-10-08, SELECT-Policies. `canTrackTimeForTeam` reicht dafür
- * nicht. Material ist nur vollständig sichtbar mit Finanzrecht oder mit
- * `canRecordMaterials` zusammen mit `canManageOrders`. Sonst ist eine Zählung
- * von 0 kein Beweis, dass keine Zeile hängt.
- *
- * Fotos: `is_company_member(company_id)`, ohne weiteres Recht. Mängel:
- * Mitglied und `canCreateAndViewReports`. Zeiten: `canTrackTimeForTeam` oder
- * Finanz- bzw. Lohnrecht.
+ * Zeiten, Mängel und Material wie oben. Fotos sieht jedes Mitglied. Eine
+ * fehlende Materialsicht sperrt das Löschen nicht mehr: der Dialog warnt
+ * dann, dass unsichtbares Material mitfällt. Zeiten oder Mängel, die das
+ * Konto nicht vollständig sieht, bleiben eine Sperre.
  */
 export function seesEveryReportLink(
   permissions: Partial<EmployeePermissions> | null | undefined,
 ): boolean {
-  const times =
-    hasPermission(permissions, 'canTrackTimeForTeam') ||
-    hasPermission(permissions, 'canViewCompanyFinance') ||
-    hasPermission(permissions, 'canViewWageCosts');
-  const issues = hasPermission(permissions, 'canCreateAndViewReports');
-  const materials =
-    hasPermission(permissions, 'canViewCompanyFinance') ||
-    hasPermission(permissions, 'canViewOrderFinance') ||
-    (hasPermission(permissions, 'canRecordMaterials') &&
-      hasPermission(permissions, 'canManageOrders'));
-  return times && issues && materials;
+  return (
+    seesAllReportTimes(permissions) &&
+    seesAllReportIssues(permissions) &&
+    seesAllOrderMaterials(permissions)
+  );
 }
 
 /**
