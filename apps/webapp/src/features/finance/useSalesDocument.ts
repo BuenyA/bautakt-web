@@ -166,11 +166,13 @@ export function useFinalizeDocument(documentId: string | undefined) {
   const { data: membership } = useMembership();
 
   return useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.rpc('finalize_sales_document', {
+    /** Gibt die vergebene Belegnummer zurück, damit der Toast sie nennen kann. */
+    mutationFn: async (): Promise<string | null> => {
+      const { data, error } = await supabase.rpc('finalize_sales_document', {
         p_document_id: documentId!,
       });
       if (error) throw error;
+      return data?.document_number ?? null;
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({

@@ -395,12 +395,18 @@
     "print": "Druckansicht",
     "finalize": "Festschreiben",
     "finalizeSuccess": "Beleg festgeschrieben und nummeriert.",
+    "finalizeSuccessNumber": "Belegnummer: {{number}}",
+    "finalizeDialog": {
+      "title": "Beleg festschreiben?",
+      "description": "Der Entwurf erhält eine Belegnummer und kann danach nicht mehr bearbeitet werden. Fortfahren?"
+    },
     "finalizeError": "Festschreiben nicht möglich",
     "notFoundTitle": "Beleg nicht gefunden",
     "notFoundDescription": "Dieser Beleg existiert nicht oder ist für Sie nicht sichtbar.",
     "new": "Neue Rechnung",
     "blockersTitle": "Vor dem Festschreiben fehlt noch etwas",
     "blockers": {
+      "lines": "Der Beleg hat noch keine Positionen.",
       "serviceDate": "Das Leistungsdatum fehlt. Es steht auf jeder Rechnung und ist Pflicht.",
       "sellerTaxId": "Dem Betrieb fehlt Steuernummer und USt-IdNr. Ohne eine der beiden ist die Rechnung nach EN16931 nicht gültig."
     },

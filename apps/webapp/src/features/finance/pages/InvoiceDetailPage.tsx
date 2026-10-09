@@ -12,7 +12,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  toast,
   Uicon,
 } from '@bautakt/ui';
 import { useState } from 'react';
@@ -24,21 +23,15 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
-import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
 import { DocumentStatusBadge } from '../DocumentStatusBadge';
+import { FinalizeDocumentDialog } from '../FinalizeDocumentDialog';
 import { PaymentSheet } from '../PaymentSheet';
-import { useFinalizeBlockers } from '../useFinalizeBlockers';
+import { type FinalizeBlocker, useFinalizeBlockers } from '../useFinalizeBlockers';
 import { useFinanceAccess } from '../useFinanceAccess';
-import {
-  openMinorOf,
-  overpaidMinorOf,
-  paidMinorOf,
-  useFinalizeDocument,
-  useSalesDocument,
-} from '../useSalesDocument';
+import { openMinorOf, overpaidMinorOf, paidMinorOf, useSalesDocument } from '../useSalesDocument';
 
 export function InvoiceDetailPage() {
   const { t } = useTranslation();
@@ -47,9 +40,9 @@ export function InvoiceDetailPage() {
   const document = useSalesDocument(id);
   const { data, isError, refetch } = document;
   const isLoading = useCompanyListLoading(document);
-  const finalize = useFinalizeDocument(id);
-  const { blockers } = useFinalizeBlockers(data);
+  const { blockers: dataBlockers } = useFinalizeBlockers(data);
   const [paymentOpen, setPaymentOpen] = useState(false);
+  const [finalizeOpen, setFinalizeOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -95,19 +88,11 @@ export function InvoiceDetailPage() {
   const openMinor = openMinorOf(data);
   const paidMinor = paidMinorOf(data);
   const overpaidMinor = overpaidMinorOf(data);
-
-  async function onFinalize() {
-    try {
-      await finalize.mutateAsync();
-      toast.success(t('domain:invoices.finalizeSuccess'));
-    } catch (error) {
-      // Die Datenbank prueft Pflichtangaben (u. a. Steuernummer des Betriebs)
-      // und lehnt sonst ab. Ihre Meldung ist praeziser als jeder Text hier.
-      toast.error(t('domain:invoices.finalizeError'), {
-        description: readableDbError(error) ?? undefined,
-      });
-    }
-  }
+  // Ohne Positionen gibt es nichts festzuschreiben; die App sperrt den
+  // Knopf ebenso. Der Grund steht sichtbar in der Hinweisbox, nicht nur in
+  // einem Tooltip an einem deaktivierten Knopf, den die Tastatur nicht erreicht.
+  const blockers: (FinalizeBlocker | 'lines')[] =
+    data.lines.length === 0 ? ['lines', ...dataBlockers] : dataBlockers;
 
   return (
     <div className="flex flex-col gap-8">
@@ -141,8 +126,9 @@ export function InvoiceDetailPage() {
             {access.canWriteSalesDocuments && isDraft ? (
               <Button
                 size="sm"
-                disabled={finalize.isPending || blockers.length > 0}
-                onClick={() => void onFinalize()}
+                disabled={blockers.length > 0}
+                aria-describedby={blockers.length > 0 ? 'finalize-blockers' : undefined}
+                onClick={() => setFinalizeOpen(true)}
               >
                 <Uicon name="badge-check" size={16} />
                 {t('domain:invoices.finalize')}
@@ -160,7 +146,10 @@ export function InvoiceDetailPage() {
       />
 
       {isDraft && blockers.length > 0 ? (
-        <div className="border-warning-border bg-warning-bg text-text-secondary flex flex-col gap-1 rounded-xl border p-4 text-sm">
+        <div
+          id="finalize-blockers"
+          className="border-warning-border bg-warning-bg text-text-secondary flex flex-col gap-1 rounded-xl border p-4 text-sm"
+        >
           <span className="text-foreground font-medium">{t('domain:invoices.blockersTitle')}</span>
           <ul className="list-inside list-disc">
             {blockers.map((blocker) => (
@@ -355,6 +344,14 @@ export function InvoiceDetailPage() {
         onOpenChange={setPaymentOpen}
         openMinor={openMinor}
       />
+
+      {access.canWriteSalesDocuments && isDraft ? (
+        <FinalizeDocumentDialog
+          documentId={data.id}
+          open={finalizeOpen}
+          onOpenChange={setFinalizeOpen}
+        />
+      ) : null}
     </div>
   );
 }
