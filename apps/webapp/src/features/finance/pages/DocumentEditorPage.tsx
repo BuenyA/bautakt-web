@@ -47,6 +47,8 @@ function initialState(type: EditableDocumentType): EditorState {
   return {
     type,
     customerId: null,
+    // Sichtbarer Vorschlag fuer einen neuen Beleg. Ein geladener Entwurf mit
+    // leerem issue_date bleibt leer — sonst schreibt Speichern still heute.
     issueDate: todayIso(),
     serviceDate: '',
     dueDate: '',
@@ -72,6 +74,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const dueAlertId = useId();
 
   const existing = useSalesDocument(id);
   const customers = useCustomers();
@@ -87,7 +90,10 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     setState({
       type: (existing.data.type as EditableDocumentType) ?? type,
       customerId: existing.data.customer_id,
-      issueDate: existing.data.issue_date ?? todayIso(),
+      // NULL nicht durch heute ersetzen. Die Liste sagt dann „Nicht
+      // ausgestellt“, und Speichern wuerde das Datum festschreiben.
+      // Festschreiben setzt es selbst: coalesce(issue_date, CURRENT_DATE).
+      issueDate: existing.data.issue_date ?? '',
       serviceDate: existing.data.service_date ?? '',
       dueDate: existing.data.due_date ?? '',
       introText: existing.data.intro_text,
@@ -214,6 +220,17 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
           <CardTitle className="text-base">{t('domain:editor.head')}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {/* Ueber den Feldern: der Kalender oeffnet nach unten und wuerde
+              die Meldung direkt unter dem Faellig-Feld verdecken. */}
+          {dueBeforeIssue ? (
+            <p
+              id={dueAlertId}
+              role="alert"
+              className="text-destructive text-sm sm:col-span-2 xl:col-span-4"
+            >
+              {t('domain:editor.dueBeforeIssue')}
+            </p>
+          ) : null}
           <div className="grid gap-2">
             <Label>{t('domain:invoices.columns.customer')}</Label>
             <Select
@@ -240,6 +257,8 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
             label={t('domain:invoices.columns.issueDate')}
             value={state.issueDate}
             onChange={(value) => update({ issueDate: value })}
+            placeholder={t('domain:editor.issueDatePlaceholder')}
+            hint={state.issueDate ? undefined : t('domain:editor.issueDateEmptyHint')}
           />
           <DateField
             label={
@@ -254,8 +273,8 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
             label={t('domain:invoices.columns.dueDate')}
             value={state.dueDate}
             onChange={(value) => update({ dueDate: value })}
-            earliest={state.issueDate}
-            rangeMessage={t('domain:editor.dueBeforeIssue')}
+            describedBy={dueBeforeIssue ? dueAlertId : undefined}
+            invalid={dueBeforeIssue}
           />
         </CardContent>
       </Card>
@@ -425,27 +444,39 @@ function DateField({
   label,
   value,
   onChange,
-  earliest,
-  rangeMessage,
+  placeholder,
+  hint,
+  describedBy,
+  invalid,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
-  earliest?: string;
-  rangeMessage?: string;
+  placeholder?: string;
+  hint?: string;
+  describedBy?: string;
+  invalid?: boolean;
 }) {
   const id = useId();
+  const hintId = useId();
+  const described = [describedBy, hint ? hintId : null].filter(Boolean).join(' ') || undefined;
   return (
     <div className="grid gap-2">
       <Label htmlFor={id}>{label}</Label>
       <DatePicker
         id={id}
         aria-label={label}
+        aria-describedby={described}
+        aria-invalid={invalid || undefined}
         value={value}
         onChange={onChange}
-        earliest={earliest}
-        rangeMessage={rangeMessage}
+        placeholder={placeholder}
       />
+      {hint ? (
+        <p id={hintId} className="text-muted-foreground text-sm">
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }

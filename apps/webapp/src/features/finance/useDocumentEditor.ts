@@ -122,6 +122,8 @@ export function useSaveDraft(documentId?: string) {
         type: state.type,
         status: 'draft',
         customer_id: state.customerId,
+        // Leer bleibt null. Heute setzt erst finalize_sales_document
+        // (coalesce(issue_date, CURRENT_DATE)), nicht das Speichern.
         issue_date: state.issueDate || null,
         service_date: state.serviceDate || null,
         due_date: state.dueDate || null,

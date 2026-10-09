@@ -69,6 +69,46 @@ export function DatePickerHarness() {
         </button>
       </div>
 
+      {/* Wie der Belegeditor: die Fällig-Meldung steht über den Feldern,
+          der Kalender öffnet nach unten und darf sie nicht zudecken. */}
+      <section data-testid="due-before-issue" className="max-w-5xl">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <p
+            role="alert"
+            data-testid="due-before-issue-message"
+            className="text-destructive text-sm sm:col-span-2 xl:col-span-4"
+          >
+            Das Fälligkeitsdatum liegt vor dem Rechnungsdatum.
+          </p>
+          <div className="grid gap-2">
+            <span>Kunde</span>
+            <div className="border-border flex h-11 items-center rounded-sm border px-3 text-sm">
+              Ohne Kunde
+            </div>
+          </div>
+          <div className="grid gap-2">
+            <span>Rechnungsdatum</span>
+            <DatePicker
+              aria-label="Rechnungsdatum leer"
+              value=""
+              placeholder="Wird beim Ausstellen gesetzt"
+              onChange={() => undefined}
+            />
+            <p data-testid="empty-issue-hint" className="text-muted-foreground text-sm">
+              Noch nicht ausgestellt
+            </p>
+          </div>
+          <div className="grid gap-2">
+            <span>Leistungsdatum</span>
+            <DatePicker aria-label="Leistungsdatum" value="" onChange={() => undefined} />
+          </div>
+          <div className="grid gap-2">
+            <span>Fällig</span>
+            <DatePicker aria-label="Fällig" value="2026-09-06" onChange={() => undefined} />
+          </div>
+        </div>
+      </section>
+
       <section data-testid="picker-standalone" className="max-w-sm">
         <DatePicker aria-label="Datum allein" value={alone} onChange={setAlone} />
       </section>

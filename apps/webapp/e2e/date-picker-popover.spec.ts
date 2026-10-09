@@ -100,3 +100,47 @@ test('Kalender hängt am Feld, allein, im Sheet und im Dialog', async ({ page })
     await expect(page.getByRole('dialog')).toHaveCount(0);
   }
 });
+
+function boxesOverlap(
+  a: { x: number; y: number; width: number; height: number },
+  b: { x: number; y: number; width: number; height: number },
+) {
+  return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+}
+
+test('Fällig-Meldung bleibt sichtbar, wenn der Kalender offen ist', async ({ page }) => {
+  await page.goto('/dev/datum');
+  const section = page.getByTestId('due-before-issue');
+  const message = page.getByTestId('due-before-issue-message');
+  await expect(message).toBeVisible();
+  await expect(message).toHaveText('Das Fälligkeitsdatum liegt vor dem Rechnungsdatum.');
+  const emptyIssue = page.getByRole('textbox', { name: 'Rechnungsdatum leer' });
+  await expect(emptyIssue).toHaveValue('');
+  await expect(emptyIssue).toHaveAttribute('placeholder', 'Wird beim Ausstellen gesetzt');
+  await expect(page.getByTestId('empty-issue-hint')).toHaveText('Noch nicht ausgestellt');
+
+  for (const theme of ['light', 'dark'] as const) {
+    await page.getByTestId(theme === 'light' ? 'theme-light' : 'theme-dark').click();
+    const popover = await expectAnchored(page, section, 'Fällig');
+    const messageBox = await message.boundingBox();
+    const popBox = await popover.boundingBox();
+    if (!messageBox || !popBox) throw new Error('Fällig-Meldung ohne Bounding-Box');
+    expect(
+      boxesOverlap(messageBox, popBox),
+      `Meldung ${JSON.stringify(messageBox)} Kalender ${JSON.stringify(popBox)}`,
+    ).toBe(false);
+
+    const covered = await message.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      return !(hit === element || element.contains(hit));
+    });
+    expect(covered, 'Meldung liegt unter einem anderen Element').toBe(false);
+
+    if (theme === 'light') {
+      await page.screenshot({ path: '/tmp/date-picker-due-before-issue.png' });
+    }
+    await page.keyboard.press('Escape');
+    await expect(popover).toBeHidden();
+  }
+});

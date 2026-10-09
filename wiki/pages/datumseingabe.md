@@ -50,9 +50,21 @@ gilt dieselbe Meldung und Speichern ist gesperrt. Die Meldung steht in einer
 eigenen Zeile unter beiden Spalten, damit „Ende, Uhrzeit“ bündig bleibt.
 Ein Einsatz über mehrere Tage bleibt erlaubt.
 
-Im Belegeditor gilt dasselbe für Fällig vor dem Rechnungsdatum. Ein Entwurf
-ohne gespeichertes Rechnungsdatum zeigt weiter das heutige Datum — das war
-schon vor den deutschen Feldern so, weil `issue_date` leer sein kann.
+Im Belegeditor gilt dasselbe für Fällig vor dem Rechnungsdatum. Die Meldung
+steht in einer eigenen Zeile über den Datumsfeldern. Direkt unter dem
+Fällig-Feld deckt sie der Kalender zu, der nach unten aufgeht.
+
+Ein gespeicherter Entwurf ohne Rechnungsdatum bleibt im Editor leer.
+Platzhalter: „Wird beim Ausstellen gesetzt“. Hinweis: „Noch nicht
+ausgestellt“. Die Liste sagt dann „Nicht ausgestellt“. Speichern schreibt
+`null` (`issueDate || null` in `useDocumentEditor.ts`), nicht stillschweigend
+heute. `finalize_sales_document` setzt das Datum beim Festschreiben selbst
+(`issue_date = coalesce(issue_date, CURRENT_DATE)`). Nummernvergabe und
+Fälligkeitsdatum hängen daran nicht; die Druckansicht zeigt das gespeicherte
+Datum. Ein neuer Beleg startet weiter mit dem heutigen Datum als sichtbarem
+Vorschlag — das ist eine Vorbelegung, kein Ersatz für ein leeres gespeichertes
+Datum. Die Prüfung „Fällig vor Rechnungsdatum“ läuft nur, wenn ein
+Rechnungsdatum gesetzt ist.
 
 Zeit am Auftrag und Von/Bis im Bautagebuch sind keine solchen Bereiche. Liegt
 die Uhrzeit des Endes vor der des Beginns, ist das eine Nachtschicht und endet
