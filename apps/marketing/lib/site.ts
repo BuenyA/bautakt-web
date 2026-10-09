@@ -61,7 +61,7 @@ const PRODUCTION_HOST = 'bautakt.com';
  * ⚠️ Steuert die Indexierung. Ein Vercel-**Production**-Deployment ist auch auf
  * einer `.vercel.app`-Domain fuer Google erreichbar — nur *Preview*-Deployments
  * bekommen automatisch `X-Robots-Tag: noindex`. Ohne diese Pruefung wuerde die
- * Entwicklungsfassung mitsamt Platzhalter-Preisen indexiert und spaeter mit der
+ * Entwicklungsfassung indexiert und spaeter mit der
  * echten Domain um dieselben Inhalte konkurrieren. Meta und robots.txt allein
  * reichen nicht — `next.config.ts` setzt deshalb zusaetzlich `X-Robots-Tag`.
  *
@@ -92,8 +92,12 @@ export const IS_PRODUCTION_SITE = ((): boolean => {
   }
 })();
 
+/**
+ * Anmeldung für bestehende Nutzer. Die Registrierungsroute der Web-App
+ * (`/registrieren`) bleibt dort, wird von der Marketing-Seite aber nicht
+ * verlinkt: die öffentliche Seite ist nicht-kommerziell.
+ */
 export const LOGIN_URL = `${APP_URL}/login`;
-export const REGISTER_URL = `${APP_URL}/registrieren`;
 
 export const site = {
   name: 'Bautakt',

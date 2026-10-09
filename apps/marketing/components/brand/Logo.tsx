@@ -12,6 +12,8 @@ type LogoProps = {
 /**
  * Kanonisches Lockup v4.4 aus `/public/bautakt-logo.svg`.
  * Anthrazit #1C1F26. Blau bleibt den CTAs vorbehalten.
+ * Im Dunkelmodus wird das Lockup invertiert, sonst verschwindet Anthrazit
+ * auf der dunklen Fläche.
  */
 export function Logo({ className, linked = true }: LogoProps) {
   const mark = (
@@ -21,7 +23,7 @@ export function Logo({ className, linked = true }: LogoProps) {
       alt={site.name}
       width={220}
       height={40}
-      className={cn('h-8 w-auto', className)}
+      className={cn('h-8 w-auto dark:brightness-0 dark:invert', className)}
     />
   );
 

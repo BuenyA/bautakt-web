@@ -2,7 +2,7 @@ import { Button } from '@bautakt/ui';
 import Link from 'next/link';
 
 import { Container } from '@/components/layout/Container';
-import { REGISTER_URL, site } from '@/lib/site';
+import { LOGIN_URL, site } from '@/lib/site';
 
 import { HeroDevice } from './HeroDevice';
 
@@ -31,7 +31,7 @@ export function Hero() {
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Button asChild size="lg" className="rounded-full px-7">
-              <a href={REGISTER_URL}>Kostenlos testen</a>
+              <a href={LOGIN_URL}>Anmelden</a>
             </Button>
             <Button asChild size="lg" variant="outline" className="rounded-full px-7">
               <Link href="/#funktionen">Funktionen ansehen</Link>

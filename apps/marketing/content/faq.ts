@@ -15,13 +15,4 @@ export const faq: FaqItem[] = [
     question: 'Wo liegen unsere Daten?',
     answer: 'Auf Servern in der EU (Frankfurt). Details stehen in der Datenschutzerklärung.',
   },
-  {
-    question: 'Können wir Bautakt testen?',
-    answer: 'Ja. Sie können ein Konto anlegen und den Betrieb unverbindlich einrichten.',
-  },
-  {
-    question: 'Wie wird abgerechnet?',
-    answer:
-      'Pro Nutzer und Monat, auf Anfrage. Sie zahlen nur für Mitarbeiter, die Bautakt tatsächlich nutzen. Monatlich kündbar.',
-  },
 ];
