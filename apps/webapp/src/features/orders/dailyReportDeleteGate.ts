@@ -13,12 +13,14 @@ import type { DailyReportLinkCounts } from './useOrderDailyReports';
  * Warum das Web den Bericht nicht löscht.
  *
  * `billed`: frisch gelesene Zeit oder Material mit `billed_document_id`.
- * `linked`: irgendeine sichtbare Verknüpfung, eine fehlgeschlagene Zählung,
- * oder Zeiten bzw. Mängel, die das Konto nicht vollständig sieht.
- * Abgerechnetes gewinnt, wenn beides zutrifft. Fehlende Materialsicht ist
- * keine Sperre: der Dialog sagt dann, dass unsichtbares Material mitfällt.
+ * `linked`: eine sichtbare Verknüpfung, eine fehlgeschlagene Zählung, oder
+ * Zeiten bzw. Mängel, die das Konto nicht vollständig sieht.
+ * `materialsHidden`: alle sichtbaren Zählungen sind 0, aber fremdes Material
+ * kann verborgen sein. Das sperrt, weil die Kaskade abgerechnetes Material
+ * mitlöschen würde, das dieses Konto nicht sieht (GoBD).
+ * Abgerechnetes gewinnt, wenn beides zutrifft.
  */
-export type DailyReportDeleteBlock = 'billed' | 'linked';
+export type DailyReportDeleteBlock = 'billed' | 'linked' | 'materialsHidden';
 
 export class DailyReportDeleteBlockedError extends Error {
   readonly block: DailyReportDeleteBlock;
@@ -32,7 +34,13 @@ export class DailyReportDeleteBlockedError extends Error {
     attendance: number | null,
     materialsComplete: boolean,
   ) {
-    super(block === 'billed' ? 'DAILY_REPORT_BILLED' : 'DAILY_REPORT_LINKED');
+    super(
+      block === 'billed'
+        ? 'DAILY_REPORT_BILLED'
+        : block === 'materialsHidden'
+          ? 'DAILY_REPORT_MATERIALS_HIDDEN'
+          : 'DAILY_REPORT_LINKED',
+    );
     this.name = 'DailyReportDeleteBlockedError';
     this.block = block;
     this.counts = counts;
@@ -117,8 +125,11 @@ async function countAttendance(reportId: string): Promise<number | null> {
  * Zeiten und Material mit gesetztem `billed_document_id` sperren immer.
  * Sonst sperrt jede sichtbare Verknüpfung auf Zeit, Material, Foto oder
  * Mangel, und eine fehlgeschlagene Zählung. Eine 0 bei unvollständiger
- * Materialsicht sperrt nicht: CASCADE löscht das unsichtbare Material mit,
- * der Dialog sagt das. Anwesenheit sperrt nie, sie wird nur genannt.
+ * Materialsicht sperrt ebenfalls: fremdes Material kann abgerechnet sein,
+ * und die Kaskade würde es löschen. Der Text nennt dann nur die fehlende
+ * Sicht, keine verknüpften Einträge und keine abgerechneten Zeiten.
+ * Anwesenheit sperrt nie. Sie wird nur genannt, wenn der Bericht wirklich
+ * gelöscht werden darf.
  */
 export async function readDailyReportDeleteBlock(
   companyId: string,
@@ -150,5 +161,6 @@ export async function readDailyReportDeleteBlock(
   if (!seesAllReportTimes(permissions) || !seesAllReportIssues(permissions)) {
     return { block: 'linked', ...reading };
   }
+  if (!materialsComplete) return { block: 'materialsHidden', ...reading };
   return { block: null, ...reading };
 }

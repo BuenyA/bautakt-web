@@ -6,16 +6,15 @@ gesperrte Speichern-Knopf im Bautagebuch war im Dunkelmodus satt blau.
 
 ## Was geändert wurde
 
-- Der Löschdialog sagt bei Zählung 0 nur noch, dass der Bericht vom genannten
-  Tag gelöscht wird und das nicht rückgängig zu machen ist. Anwesenheit kommt
-  als eigener Satz dazu, Singular und Plural. Sieht das Konto Material nicht
-  vollständig, steht zusätzlich, dass dieses Material mitgelöscht wird. Der
-  alte Satz über abgerechnete Zeiten und beliebige unsichtbare Einträge ist
-  bei Zählung 0 weg.
-- Fehlt die Materialsicht, sperrt das den Knopf nicht mehr, solange die
-  sichtbaren Zählungen 0 sind. Sichtbare Verknüpfungen und Abgerechnetes
-  sperren weiter. Der Knopf bleibt an `canTrackTimeForTeam` und dem
-  Bearbeitungsrecht.
+- Sieht das Konto jedes Material und sind die Zählungen 0, sagt der Dialog
+  nur noch, dass der Bericht vom genannten Tag gelöscht wird und das nicht
+  rückgängig zu machen ist. Anwesenheit kommt als eigener Satz dazu, Singular
+  und Plural. Der alte Satz über abgerechnete Zeiten und beliebige unsichtbare
+  Einträge ist dabei weg.
+- Fehlt die Materialsicht, bleibt der Knopf aus, auch bei Zählung 0. Fremdes
+  Material kann abgerechnet sein, die Kaskade würde es löschen. Der Text sagt
+  nur, dass Material anderer Personen nicht sichtbar ist. Eine Zwischenfassung
+  hat den Knopf in diesem Fall freigegeben; das ist am selben Tag zurückgenommen.
 - Gesperrte Knöpfe im Dunkelmodus liegen bei 30 % Deckkraft, im Hellen weiter
   bei 50 %. Das gilt für jede Variante des gemeinsamen `Button`.
 
@@ -24,7 +23,9 @@ gesperrte Speichern-Knopf im Bautagebuch war im Dunkelmodus satt blau.
 Die Zählung ist ein Client-Select unter der RLS des Kontos. Für den
 Löschen-Knopf sind Zeiten, Fotos, Mängel und Anwesenheit vollständig
 sichtbar. Nur Material kann fremde Zeilen verbergen. Eine 0 dort ist kein
-Beweis, der Text darf das aber nicht als abgerechnete Zeiten verkaufen.
+Beweis, und weil solches Material abgerechnet sein kann, bleibt der Knopf aus.
+Der Text darf das nicht als verknüpfte Einträge oder abgerechnete Zeiten
+verkaufen.
 50 % Electric auf Anthrazit liest sich als aktiver blauer Knopf.
 
 Issue: [#126](https://github.com/BuenyA/bautakt-web/issues/126).

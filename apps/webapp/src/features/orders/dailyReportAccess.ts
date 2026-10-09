@@ -107,10 +107,10 @@ export function seesAllOrderMaterials(
 /**
  * Sieht dieses Konto jede Zeile, die ein Löschen per CASCADE mitnehmen würde?
  *
- * Zeiten, Mängel und Material wie oben. Fotos sieht jedes Mitglied. Eine
- * fehlende Materialsicht sperrt das Löschen nicht mehr: der Dialog warnt
- * dann, dass unsichtbares Material mitfällt. Zeiten oder Mängel, die das
- * Konto nicht vollständig sieht, bleiben eine Sperre.
+ * Zeiten, Mängel und Material wie oben. Fotos sieht jedes Mitglied. Fehlt
+ * die Materialsicht, bleibt der Löschen-Knopf aus: fremdes Material kann
+ * abgerechnet sein, und die Kaskade würde es mitnehmen. Zeiten oder Mängel,
+ * die das Konto nicht vollständig sieht, sperren ebenfalls.
  */
 export function seesEveryReportLink(
   permissions: Partial<EmployeePermissions> | null | undefined,

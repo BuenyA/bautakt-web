@@ -38,10 +38,10 @@ import { formatDailyReportLinkCounts } from './useOrderDailyReports';
  * als normale Abfrage unter der RLS des Kontos. Sind alle Zählungen 0 und
  * das Konto sieht jedes Material, steht nur der Löschsatz und — wenn welche
  * da sind — der Satz zur Anwesenheit. Sieht es Material nicht vollständig,
- * warnt der Text genau davor, ohne von abgerechneten Zeiten oder anderen
- * unsichtbaren Einträgen zu sprechen. Trifft eine Sperre zu, bleibt der
- * Knopf aus, der Text nennt den Grund, und darunter stehen die Anzahlen, die
- * größer als 0 sind. Die Karte bleibt.
+ * bleibt der Knopf aus. Der Text sagt, dass Material anderer Personen nicht
+ * sichtbar ist, und behauptet weder verknüpfte Einträge noch abgerechnete
+ * Zeiten. Trifft eine andere Sperre zu, nennt der Text den Grund, und
+ * darunter stehen die Anzahlen, die größer als 0 sind. Die Karte bleibt.
  */
 export function DailyReportDeleteDialog({
   reportId,
@@ -95,9 +95,9 @@ export function DailyReportDeleteDialog({
   }
 
   function blockMessage(block: DailyReportDeleteBlock): string {
-    return block === 'billed'
-      ? t('domain:dailyReportForm.delete.billedBlocked')
-      : t('domain:dailyReportForm.delete.linkedBlocked');
+    if (block === 'billed') return t('domain:dailyReportForm.delete.billedBlocked');
+    if (block === 'materialsHidden') return t('domain:dailyReportForm.delete.materialsHidden');
+    return t('domain:dailyReportForm.delete.linkedBlocked');
   }
 
   async function onConfirm() {
@@ -131,9 +131,7 @@ export function DailyReportDeleteDialog({
   const allowed = !waiting && block == null && !probe.isError;
 
   function confirmDescription(): string {
-    const base = reading?.materialsComplete
-      ? t('domain:dailyReportForm.delete.description', { date: dateLabel })
-      : t('domain:dailyReportForm.delete.descriptionHiddenMaterial', { date: dateLabel });
+    const base = t('domain:dailyReportForm.delete.description', { date: dateLabel });
     const attendance = reading?.attendance ?? null;
     if (attendance == null || attendance < 1) return base;
     return `${base} ${t('domain:dailyReportForm.delete.attendanceRemoved', { count: attendance })}`;

@@ -144,20 +144,21 @@ der Karte, nur Werte über 0, mit Singular und Plural („6 Zeiten · 1 Material
 selbst löscht weiter per CASCADE; die Sperre dort kommt über
 [bautakt-app #104](https://github.com/BuenyA/bautakt-app/issues/104).
 
-Sind alle vier Zählungen 0, darf gelöscht werden — auch wenn Material nicht
-vollständig sichtbar ist. Bis 2026-10-09 hat eine unvollständige Sicht den
-Knopf gesperrt und der Text von unsichtbaren Einträgen und abgerechneten
-Zeiten gesprochen, obwohl die Zählung 0 war. Das war für dieses Konto falsch:
-abgerechnete Zeiten wären in der Zählung aufgetaucht. Sieht das Konto jedes
-Material, lautet der Text: „Der Bericht vom TT.MM.JJJJ wird gelöscht. Das
-lässt sich nicht rückgängig machen.“ Sieht es Material nicht vollständig,
-kommt derselbe Satz und danach: „Material, das dieses Konto nicht sehen kann,
-wird dabei mitgelöscht.“ Hängt Anwesenheit am Bericht, folgt „Die Anwesenheit
-wird entfernt.“ oder „Die n Anwesenheiten werden entfernt.“ Anwesenheit sperrt
-das Löschen nicht. Der Knopf trägt „Wird gelöscht …“ und ist gesperrt,
-solange die Anfrage läuft. Der Bericht verschwindet aus der Liste erst, wenn
-die Antwort eine gelöschte `id` enthält. Scheitert das DELETE an der
-Datenbank, bleibt die Karte stehen und der Dialog zeigt den Fehler.
+Sind alle vier Zählungen 0 und das Konto sieht jedes Material, darf gelöscht
+werden. Der Text lautet: „Der Bericht vom TT.MM.JJJJ wird gelöscht. Das lässt
+sich nicht rückgängig machen.“ Hängt Anwesenheit am Bericht, folgt „Die
+Anwesenheit wird entfernt.“ oder „Die n Anwesenheiten werden entfernt.“
+Anwesenheit sperrt das Löschen nicht. Der Knopf trägt „Wird gelöscht …“ und
+ist gesperrt, solange die Anfrage läuft. Der Bericht verschwindet aus der
+Liste erst, wenn die Antwort eine gelöschte `id` enthält. Scheitert das DELETE
+an der Datenbank, bleibt die Karte stehen und der Dialog zeigt den Fehler.
+
+Sieht das Konto Material nicht vollständig, bleibt der Knopf aus, auch bei
+Zählung 0. Fremdes Material kann abgerechnet sein, und die Kaskade würde es
+löschen. Der Text sagt das so: „Dieser Bericht kann mit deinen Rechten nicht
+gelöscht werden, weil Material anderer Personen für dich nicht sichtbar ist.“
+Er behauptet keine verknüpften Einträge und keine abgerechneten Zeiten.
+Abgerechnete Zeiten wären in der Zählung aufgetaucht.
 
 Panel und Dialog bleiben offen, solange Speichern oder Löschen läuft.
 `useDismissLock` lässt Fokus, Escape und einen Klick daneben in der Zeit

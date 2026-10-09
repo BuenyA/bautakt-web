@@ -277,9 +277,10 @@ export function useSaveDailyReport() {
  * verweisen mit ON DELETE CASCADE. RLS ist dort nicht FORCE (gemessen
  * 2026-10-08). Deshalb löscht das Web nur, wenn die frische Lesung keine
  * abgerechnete Zeit, kein abgerechnetes Material und keine sichtbare
- * Verknüpfung zeigt. Fehlt die Materialsicht, bleibt der Knopf frei und der
- * Dialog sagt, dass unsichtbares Material mitfällt. Die Datenbank selbst
- * sperrt das noch nicht; das kommt über bautakt-app #104.
+ * Verknüpfung zeigt und das Konto Material vollständig sieht. Fehlt die
+ * Materialsicht, bleibt der Knopf aus: fremdes Material kann abgerechnet
+ * sein. Die Datenbank selbst sperrt das noch nicht; das kommt über
+ * bautakt-app #104.
  */
 export function useDeleteDailyReport() {
   const queryClient = useQueryClient();

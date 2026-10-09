@@ -858,7 +858,7 @@
       "action": "Bericht löschen",
       "title": "Bericht löschen?",
       "description": "Der Bericht vom {{date}} wird gelöscht. Das lässt sich nicht rückgängig machen.",
-      "descriptionHiddenMaterial": "Der Bericht vom {{date}} wird gelöscht. Das lässt sich nicht rückgängig machen. Material, das dieses Konto nicht sehen kann, wird dabei mitgelöscht.",
+      "materialsHidden": "Dieser Bericht kann mit deinen Rechten nicht gelöscht werden, weil Material anderer Personen für dich nicht sichtbar ist.",
       "attendanceRemoved_one": "Die Anwesenheit wird entfernt.",
       "attendanceRemoved_other": "Die {{count}} Anwesenheiten werden entfernt.",
       "visible": "Hier sichtbar: {{summary}}.",
