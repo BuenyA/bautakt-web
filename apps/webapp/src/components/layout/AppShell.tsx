@@ -54,8 +54,16 @@ function BrandHeader() {
   const { state, isMobile } = useSidebar();
   const collapsed = state === 'collapsed' && !isMobile;
 
+  // Die Linie unter dem Logo ist eine `border-b` innerhalb der 56px, genau
+  // wie am Seitenkopf rechts. Ein `SidebarSeparator` darunter lag 1px tiefer
+  // und endete wegen `mx-3` 12px vor der senkrechten Kante (#135).
   return (
-    <SidebarHeader className={cn('h-14 justify-center', collapsed && 'items-center px-0')}>
+    <SidebarHeader
+      className={cn(
+        'border-sidebar-border h-14 shrink-0 justify-center border-b',
+        collapsed && 'items-center px-0',
+      )}
+    >
       <Link
         to={HOME_ROUTE}
         className={cn('flex items-center rounded-md', collapsed ? 'justify-center' : 'px-2.5')}
@@ -124,7 +132,6 @@ export function AppShell() {
     <SidebarProvider defaultOpen={readSidebarCookie()}>
       <Sidebar collapsible="icon">
         <BrandHeader />
-        <SidebarSeparator />
 
         <SidebarContent>
           <SidebarNav />
