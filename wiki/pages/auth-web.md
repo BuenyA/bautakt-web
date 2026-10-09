@@ -63,6 +63,31 @@ Redirect-Allowlist von Supabase stehen. Siehe
 über die englische `error.message`. Die Meldungstexte sind nicht Teil der API-Zusage und
 ändern sich zwischen Versionen.
 
+Eine Ausnahme, Stand 09.10.2026: `signup_disabled`. GoTrue schickt diesen Code als
+`AuthApiError` mit dem festen Satz „Signups not allowed for this instance“ (HTTP 422,
+ältere Instanzen auch 400). Fehlt der Code, zählt dieser Satz trotzdem — aber nur, wenn
+kein anderer Code gesetzt ist. Der Schlüssel ist `errors:auth.signupDisabled`. Die
+Registrierseite zeigt ihn über `FormError` (`role="alert"`), dieselbe Komponente wie die
+übrigen Auth-Formulare.
+
 `/passwort-vergessen` bestätigt bewusst auch dann, wenn kein Konto existiert. Ob es zu
 einer Adresse ein Konto gibt, darf die Seite nicht verraten. Nur Rate-Limit-Fehler
 werden gezeigt.
+
+## Registrierung
+
+Öffentliche Registrierung ist in Supabase Auth seit 09.10.2026 12:04 abgeschaltet
+(Owner-Entscheidung, keine Änderung an Config oder Schema in diesem Repo). Die
+Login-Seite verlinkt `/registrieren` nicht mehr. Die Route und `RegisterPage` bleiben,
+damit ein direkter Aufruf nicht ins Leere fällt. Das Formular wird nicht vorab
+gesperrt; erst die Antwort von `supabase.auth.signUp` wird übersetzt.
+
+`signUp` in `AuthProvider` ruft nur die öffentliche `signUp`-Methode auf und wird nur
+von `RegisterPage` benutzt.
+
+Mitarbeiter-Einladungen teilen sich diesen Aufruf nicht. Gemessen am 09.10.2026 an
+`accept_employment_invitation(p_token)`: die Funktion verlangt `auth.uid()` und legt
+dann eine Beschäftigung an. Sie erzeugt keinen Auth-Benutzer. Die Web-App ruft sie
+nicht auf. Passwort setzen auf `/passwort-zuruecksetzen` geht über `updateUser`. Der
+Hinweis im Mitarbeiter-Sheet, dass die Einladung in die App über die Handy-App läuft,
+bleibt.
