@@ -7,6 +7,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
+import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
@@ -24,6 +25,8 @@ export function OrdersListPage() {
   const labels = useDataTableLabels();
   const canCreate = usePermission('canCreateOrders');
   const [sheetOpen, setSheetOpen] = useState(false);
+  // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel.
+  useCreateFromUrl(canCreate, () => setSheetOpen(true));
   const [searchParams, setSearchParams] = useSearchParams();
   const kind = orderKindFromSearch(searchParams.get('status'));
   const orders = useOrders();

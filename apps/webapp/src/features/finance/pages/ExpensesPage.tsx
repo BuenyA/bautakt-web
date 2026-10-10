@@ -8,6 +8,7 @@ import { useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
+import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
@@ -37,6 +38,8 @@ export function ExpensesPage() {
 
   const canManage = usePermission('canManageOverheadCosts');
   const [sheetOpen, setSheetOpen] = useState(false);
+  // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel.
+  useCreateFromUrl(canManage, () => setSheetOpen(true));
   const incoming = useIncomingInvoiceList();
   const expenses = useExpenses();
 

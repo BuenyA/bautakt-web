@@ -10,6 +10,7 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { LinkButton } from '@/components/common/LinkButton';
 import { ListFilterChips } from '@/components/common/ListFilterChips';
 import { PageHeader } from '@/components/common/PageHeader';
+import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useAuth } from '@/features/auth/useAuth';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
@@ -40,6 +41,8 @@ export function TimesListPage() {
   const orderId = searchParams.get(timesOrderParam)?.trim() || undefined;
   const period = timePeriodFromSearch(searchParams.get('period'));
   const [draft, setDraft] = useState<TimeEntryDraft | null>(null);
+  // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel.
+  useCreateFromUrl(canCreate, openNew);
   const entries = useTimeEntries(orderId);
   const { data, isError, refetch } = entries;
   const orderName = data?.find((row) => row.order_name)?.order_name ?? '';

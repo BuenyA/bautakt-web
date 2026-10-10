@@ -6,6 +6,8 @@ import {
   CardHeader,
   Input,
   Label,
+  MessageBar,
+  MessageBarBody,
   Select,
   Text,
   Textarea,
@@ -203,9 +205,9 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       />
 
       {error ? (
-        <p className="border-destructive/30 bg-destructive-bg text-destructive rounded-lg border p-3 text-sm">
-          {error}
-        </p>
+        <MessageBar intent="error" role="alert">
+          <MessageBarBody>{error}</MessageBarBody>
+        </MessageBar>
       ) : null}
 
       <Card size="large">

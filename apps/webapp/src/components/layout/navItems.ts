@@ -25,7 +25,6 @@ import {
 
 import {
   hubById,
-  hubDestinationForPath,
   type HubId,
   passesGate,
   pathMatches,
@@ -122,33 +121,4 @@ export function isNavActive(pathname: string, item: NavItem): boolean {
   if (pathMatches(pathname, item.to)) return true;
   if (!item.hubId) return false;
   return hubById(item.hubId).cards.some((card) => pathMatches(pathname, card.to));
-}
-
-export type BreadcrumbCrumb = { to: string; labelKey: string };
-
-/**
- * Brotkrume aus der Nav. Hub-Ziele (`/rechnungen`) haengen nicht am Hub-Pfad,
- * deshalb steht davor der Hub-Name.
- */
-export function breadcrumbModel(
-  pathname: string,
-): { crumbs: BreadcrumbCrumb[]; detail: boolean } | null {
-  const top = [...navItems, settingsNavItem].find((item) => pathMatches(pathname, item.to));
-  if (top) {
-    return {
-      crumbs: [{ to: top.to, labelKey: top.labelKey }],
-      detail: pathname !== top.to,
-    };
-  }
-
-  const destination = hubDestinationForPath(pathname);
-  if (!destination) return null;
-
-  return {
-    crumbs: [
-      { to: destination.hub.to, labelKey: destination.hub.titleKey },
-      { to: destination.card.to, labelKey: destination.card.titleKey },
-    ],
-    detail: pathname !== destination.card.to,
-  };
 }

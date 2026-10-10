@@ -11,6 +11,8 @@ import {
   DrawerHeader,
   Input,
   Label,
+  MessageBar,
+  MessageBarBody,
   Select,
   Textarea,
 } from '@fluentui/react-components';
@@ -388,9 +390,9 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
             <p className="text-muted-foreground text-sm">{t('domain:orders.edit.noCustomers')}</p>
           ) : null}
           {showDocumentWarning ? (
-            <p className="border-warning-border bg-warning-bg text-text-secondary rounded-xl border p-3 text-sm">
-              {t('domain:orders.edit.documentWarning')}
-            </p>
+            <MessageBar intent="warning" layout="multiline">
+              <MessageBarBody>{t('domain:orders.edit.documentWarning')}</MessageBarBody>
+            </MessageBar>
           ) : null}
         </div>
 

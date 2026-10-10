@@ -5,6 +5,9 @@ import {
   Card,
   CardHeader,
   Link as FluentLink,
+  MessageBar,
+  MessageBarBody,
+  MessageBarTitle,
   Table,
   TableBody,
   TableCell,
@@ -44,6 +47,12 @@ import {
   useFinalizeDocument,
   useSalesDocument,
 } from '../useSalesDocument';
+
+/**
+ * Zahlenspalten: Fluents Kopfzelle legt den Text in einen Flex-Knopf, `text-right`
+ * an der Zelle wirkt darauf nicht. Ausgerichtet wird der Knopf selbst.
+ */
+const END_ALIGNED = { style: { justifyContent: 'flex-end' } } as const;
 
 export function InvoiceDetailPage() {
   const { t } = useTranslation();
@@ -160,26 +169,33 @@ export function InvoiceDetailPage() {
       />
 
       {isDraft && blockers.length > 0 ? (
-        <div className="border-warning-border bg-warning-bg text-text-secondary flex flex-col gap-1 rounded-xl border p-4 text-sm">
-          <span className="text-foreground font-medium">{t('domain:invoices.blockersTitle')}</span>
-          <ul className="list-inside list-disc">
-            {blockers.map((blocker) => (
-              <li key={blocker}>{t(`domain:invoices.blockers.${blocker}`)}</li>
-            ))}
-          </ul>
-          {blockers.includes('sellerTaxId') ? (
-            <Link to={routes.settings} className="text-brand mt-1 font-medium hover:underline">
-              {t('domain:invoices.toSettings')}
-            </Link>
-          ) : null}
-        </div>
+        <MessageBar intent="warning" layout="multiline">
+          <MessageBarBody>
+            <MessageBarTitle>{t('domain:invoices.blockersTitle')}</MessageBarTitle>
+            <ul className="mt-1 list-inside list-disc">
+              {blockers.map((blocker) => (
+                <li key={blocker}>{t(`domain:invoices.blockers.${blocker}`)}</li>
+              ))}
+            </ul>
+            {blockers.includes('sellerTaxId') ? (
+              <Link
+                to={routes.settings}
+                className="text-brand mt-1 inline-block font-medium hover:underline"
+              >
+                {t('domain:invoices.toSettings')}
+              </Link>
+            ) : null}
+          </MessageBarBody>
+        </MessageBar>
       ) : null}
 
       {overpaidMinor > 0 ? (
-        <div className="border-warning-border bg-warning-bg text-text-secondary flex flex-col gap-1 rounded-xl border p-4 text-sm">
-          <span className="text-foreground font-medium">{t('domain:invoices.overpaid')}</span>
-          <p>{t('domain:invoices.overpaidWarning', { amount: formatMoney(overpaidMinor) })}</p>
-        </div>
+        <MessageBar intent="warning" layout="multiline">
+          <MessageBarBody>
+            <MessageBarTitle>{t('domain:invoices.overpaid')}</MessageBarTitle>
+            {t('domain:invoices.overpaidWarning', { amount: formatMoney(overpaidMinor) })}
+          </MessageBarBody>
+        </MessageBar>
       ) : null}
 
       <div className="flex flex-wrap items-center gap-3">
@@ -214,16 +230,16 @@ export function InvoiceDetailPage() {
               <TableHeader>
                 <TableRow>
                   <TableHeaderCell>{t('domain:invoices.lineColumns.title')}</TableHeaderCell>
-                  <TableHeaderCell className="text-right">
+                  <TableHeaderCell button={END_ALIGNED}>
                     {t('domain:invoices.lineColumns.quantity')}
                   </TableHeaderCell>
-                  <TableHeaderCell className="text-right">
+                  <TableHeaderCell button={END_ALIGNED}>
                     {t('domain:invoices.lineColumns.unitPrice')}
                   </TableHeaderCell>
-                  <TableHeaderCell className="text-right">
+                  <TableHeaderCell button={END_ALIGNED}>
                     {t('domain:invoices.lineColumns.tax')}
                   </TableHeaderCell>
-                  <TableHeaderCell className="text-right">
+                  <TableHeaderCell button={END_ALIGNED}>
                     {t('domain:invoices.lineColumns.net')}
                   </TableHeaderCell>
                 </TableRow>

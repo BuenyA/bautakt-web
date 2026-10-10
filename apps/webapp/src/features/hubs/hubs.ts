@@ -210,13 +210,3 @@ export function visibleHubCards(
 ): HubCard[] {
   return hub.cards.filter((card) => passesGate(card, permissions));
 }
-
-/** Zielseite hinter einem Hub, fuer die Brotkrume. Die Hub-Seite selbst nicht. */
-export function hubDestinationForPath(pathname: string): { hub: Hub; card: HubCard } | null {
-  for (const hub of hubs) {
-    if (pathMatches(pathname, hub.to)) continue;
-    const card = hub.cards.find((item) => !item.duplicate && pathMatches(pathname, item.to));
-    if (card) return { hub, card };
-  }
-  return null;
-}

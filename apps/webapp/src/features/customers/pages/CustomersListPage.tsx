@@ -8,6 +8,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ListFilterChips } from '@/components/common/ListFilterChips';
 import { PageHeader } from '@/components/common/PageHeader';
+import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
@@ -30,6 +31,8 @@ export function CustomersListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = customerFilterFromSearch(searchParams.get('filter'));
   const [draft, setDraft] = useState<CustomerDraft | null>(null);
+  // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel.
+  useCreateFromUrl(canManage, () => setDraft(emptyCustomer()));
   const customers = useCustomers();
   const { data, isError, refetch } = customers;
 

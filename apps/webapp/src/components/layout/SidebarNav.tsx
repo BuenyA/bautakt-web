@@ -17,10 +17,12 @@ export function SidebarNavItem({
   item,
   collapsed,
   onNavigate,
+  className,
 }: {
   item: NavItemConfig;
   collapsed: boolean;
   onNavigate?: () => void;
+  className?: string;
 }) {
   const { t } = useTranslation();
   const link = useRouterLink(item.to);
@@ -32,6 +34,7 @@ export function SidebarNavItem({
       value={item.to}
       href={link.href}
       icon={<Icon />}
+      className={className}
       onClick={(event) => {
         link.onClick(event);
         onNavigate?.();

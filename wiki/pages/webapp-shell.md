@@ -13,34 +13,51 @@ Zweifel: dichte Tabellen und Tastaturbedienung schlagen große Touch-Ziele.
 
 ## Layout
 
-Stand 2026-10-10 (zweiter Durchgang nach Owner-Rückmeldung). `AppShell.tsx`
-folgt Fluents eigenem Muster für die Navigation: `NavDrawer` mit
-`NavDrawerHeader` (darin der `Hamburger`), `NavDrawerBody` (zuerst der App-Name
-als `AppItem` mit Signet, dann die `NavItem`s) und `NavDrawerFooter`
-(Einstellungen, `NavDivider`, Benutzermenü als Fluent-`Persona` mit Firma und
-E-Mail). Farben, Abstände und die Auswahl (neutrale Fläche plus
-Brand-Indikator) sind Fluents Standard; eigene Regeln gibt es nur für die
-Icon-Leiste und das Polster im Footer.
+Stand 2026-10-10 (dritter Durchgang nach Owner-Rückmeldung). `AppShell.tsx`
+baut die Leiste aus Fluents `NavDrawer`:
 
-Desktop: Leiste links, 260px (Fluents feste Breite). Der Hamburger oben in der
-Leiste klappt sie auf eine 68px-Icon-Leiste ein; die Breite setzt eine eigene
-Klasse, weil Fluent keine schmale Variante kennt und `--fui-Drawer--size` am
-`NavDrawer` nicht greift (gemessen 2026-10-10: Variable gesetzt, Breite blieb
-260px). Eingeklappt bleiben Signet, Icons und Avatar; der Name steht für
-Screenreader im Eintrag (`sr-only`) und sichtbar als Tooltip. Der Zustand
-steht im Cookie `bautakt_sidebar_state` (beim ersten Render bekannt, die Leiste
-springt nicht).
+- **Kopf in einer Zeile:** links Signet und „Bautakt“ (`AppItem`, führt zur
+  Übersicht), rechts das Einklapp-Symbol (`PanelLeftContract20Regular`, eingeklappt
+  `PanelLeftExpand20Regular`). Kein Hamburger in der Leiste — Owner-Vorgabe:
+  wie in anderen Apps, und am Symbol soll man sehen, dass hier etwas einklappt.
+- **Body:** die `NavItem`s mit 20px-Icons (`bundleIcon`, aktiv gefüllt).
+- **Footer:** Einstellungen, `NavDivider`, Benutzermenü als Fluent-`Persona`
+  (Firma, E-Mail, Avatar).
 
-Unter 768px ist dieselbe Leiste ein Overlay; dann steht ein Hamburger in der
-Kopfzeile, weil die Leiste zu ist. Die Kopfzeile (56px) trägt sonst nur
-Brotkrumen und die Glocke.
+Farben, Abstände und Auswahl (neutrale Fläche plus Brand-Indikator) sind
+Fluents Standard. Eigene Regeln gibt es für den Kopf, das Footer-Polster und
+die Icon-Leiste.
 
-Icons der Leiste sind die 20px-Varianten (`Home20Regular` …) als
-`bundleIcon`, aktiv gefüllt. Ungrößte Icons (`HomeRegular`) erben die
-Schriftgröße und waren mit 14px kaum zu erkennen.
+**Icon-Leiste (eingeklappt, 68px):** Fluent kennt keine schmale Variante; die
+Breite setzt eine eigene Klasse (`--fui-Drawer--size` greift am `NavDrawer`
+nicht, gemessen 2026-10-10). Body und Footer verlieren dort ihr seitliches
+Polster, jeder Eintrag ist ein 44px-Quadrat in der Mitte. Fluents Body hat
+links 10 und rechts 4px Einzug; mit diesem Versatz saß jedes Icon links in
+seiner Hover-Fläche (Owner-Rückmeldung). Gemessen danach: Eintrag 12px Rand
+links und rechts, Icon darin 12/12. Der Avatar steht als Inhalt im Knopf, nicht
+im Icon-Slot — der ist 20px und schnitt den 32px-Kreis ab. Namen stehen für
+Screenreader im Eintrag (`sr-only`) und sichtbar als Tooltip. Zustand im Cookie
+`bautakt_sidebar_state`.
 
-`NavItem` und `AppItem` rendern ein `<a href>`; den Klick fängt
-`useRouterLink` ab und navigiert clientseitig.
+Unter 768px ist die Leiste ein Overlay; dann öffnet ein Hamburger in der
+Kopfzeile sie.
+
+**Kopfzeile (56px):** Schnellsuche und Glocke. Die Brotkrumen sind entfernt
+(Owner: „unnötig“).
+
+**Schnellsuche** (`QuickSearch.tsx`, Fluent-`Combobox`): Seite oder Aktion
+tippen, wählen, dort. Strg+K bzw. Cmd+K setzt den Fokus. Seiten sind die
+Einträge der Leiste, die sichtbaren Hub-Karten und Einstellungen. Aktionen
+(„Neuer Kunde“, „Zeit nachtragen“, „Auftrag anlegen“ …) springen auf die Liste
+mit `?neu=1`; die Seite öffnet ihr Anlege-Panel über `useCreateFromUrl` und
+nimmt den Parameter wieder heraus. Neue Rechnung und neues Angebot haben eigene
+Routen. Sichtbar ist nur, was die Rechte erlauben (dieselben wie Leiste und
+Anlegen-Knöpfe; Führung, keine Kontrolle).
+
+⚠️ `useCreateFromUrl` hält `open` in einem Ref und öffnet einmal je `?neu=1`.
+Als Effekt-Abhängigkeit löste jede neue Inline-Funktion den Effekt erneut aus,
+bevor der Router den Parameter entfernt hatte: eine Render-Schleife mit
+Dutzenden `open()` je Sekunde, das Panel ging sofort wieder zu.
 
 ## Navigation
 

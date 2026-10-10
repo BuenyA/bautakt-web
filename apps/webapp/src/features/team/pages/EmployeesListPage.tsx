@@ -8,6 +8,7 @@ import { useSearchParams } from 'react-router';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ListFilterChips } from '@/components/common/ListFilterChips';
 import { PageHeader } from '@/components/common/PageHeader';
+import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
@@ -29,6 +30,8 @@ export function EmployeesListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = employeeFilterFromSearch(searchParams.get('status'));
   const [draft, setDraft] = useState<EmployeeDraft | null>(null);
+  // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel.
+  useCreateFromUrl(canManage, () => setDraft(emptyEmployee()));
   const employees = useEmployees();
   const { data, isError, refetch } = employees;
 

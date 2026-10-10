@@ -32,6 +32,13 @@
     "next": "Weiter",
     "actions": "Aktionen"
   },
+  "search": {
+    "label": "Seite oder Aktion suchen",
+    "placeholder": "Suchen oder springen … (Strg+K)",
+    "actions": "Aktionen",
+    "pages": "Seiten",
+    "empty": "Nichts gefunden"
+  },
   "toaster": {
     "label": "Benachrichtigungen (Alt+T)"
   },
@@ -42,7 +49,8 @@
   },
   "nav": {
     "toggleSidebar": "Seitenleiste ein- oder ausblenden",
-    "breadcrumb": "Navigationspfad",
+    "collapseSidebar": "Seitenleiste einklappen",
+    "expandSidebar": "Seitenleiste ausklappen",
     "overview": "Übersicht",
     "finance": "Finanzen",
     "material": "Material",
@@ -63,7 +71,6 @@
     "catalog": "Katalog",
     "costCenters": "Kostenstellen",
     "settings": "Einstellungen",
-    "detail": "Detail",
     "notifications": "Benachrichtigungen",
     "notificationsComingSoon": "Benachrichtigungen folgen in einer späteren Welle.",
     "openMenu": "Menü öffnen",

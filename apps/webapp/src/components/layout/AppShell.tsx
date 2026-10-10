@@ -23,7 +23,12 @@ import {
   tokens,
   Tooltip,
 } from '@fluentui/react-components';
-import { Alert20Regular, SignOut20Regular } from '@fluentui/react-icons';
+import {
+  Alert20Regular,
+  PanelLeftContract20Regular,
+  PanelLeftExpand20Regular,
+  SignOut20Regular,
+} from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router';
@@ -36,8 +41,8 @@ import { useAuth } from '@/features/auth/useAuth';
 import { useMembership } from '@/features/company/useMembership';
 import { HOME_ROUTE } from '@/lib/routes';
 
-import { Breadcrumbs } from './Breadcrumbs';
 import { isNavActive, maySee, navItems, settingsNavItem } from './navItems';
+import { QuickSearch } from './QuickSearch';
 import { SidebarNavItem } from './SidebarNav';
 import { useMediaQuery } from './useMediaQuery';
 
@@ -66,8 +71,39 @@ const useStyles = makeStyles({
     width: '68px',
     minWidth: '68px',
   },
+  // Eingeklappt: kein seitliches Polster, die Einträge stehen als 44-px-Quadrate
+  // mittig. Fluents Body hat links 10 und rechts 4 px Einzug; mit diesem Versatz
+  // saß jedes Icon links in seiner Hover-Fläche.
   railItems: {
-    paddingInline: tokens.spacingHorizontalS,
+    paddingInline: 0,
+    alignItems: 'center',
+  },
+  railItem: {
+    width: '44px',
+    minWidth: '44px',
+    paddingInline: 0,
+    justifyContent: 'center',
+    marginInline: 'auto',
+  },
+  // Kopf der Leiste: Signet und Name links, Einklappen rechts, eine Zeile.
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: tokens.spacingHorizontalXS,
+    paddingInlineStart: '10px',
+    paddingInlineEnd: tokens.spacingHorizontalS,
+    paddingBlock: tokens.spacingVerticalS,
+  },
+  headerRail: {
+    flexDirection: 'column',
+    paddingInline: 0,
+    gap: tokens.spacingVerticalXS,
+  },
+  appItem: {
+    flexGrow: 1,
+    minWidth: 0,
   },
   // Fluents Footer hat kein Polster; dieselben Einzüge wie der Body (10 / 4 px),
   // damit „Einstellungen“ mit den übrigen Einträgen fluchtet, und Luft nach unten.
@@ -85,9 +121,13 @@ const useStyles = makeStyles({
     paddingInline: tokens.spacingHorizontalS,
     minHeight: '48px',
   },
+  // Avatar als Inhalt, nicht als Icon: der Icon-Slot ist 20 px und schnitt den
+  // 32-px-Kreis links und rechts ab.
   railButton: {
     minWidth: 'auto',
-    paddingBlock: tokens.spacingVerticalS,
+    width: '44px',
+    height: '44px',
+    padding: 0,
   },
 });
 
@@ -103,12 +143,9 @@ function UserMenu({ collapsed }: { collapsed: boolean }) {
   const initials = email.slice(0, 2).toUpperCase() || '??';
 
   const trigger = collapsed ? (
-    <Button
-      appearance="subtle"
-      className={styles.railButton}
-      aria-label={email}
-      icon={<Avatar initials={initials} color="brand" size={32} />}
-    />
+    <Button appearance="subtle" className={styles.railButton} aria-label={email}>
+      <Avatar initials={initials} color="brand" size={32} />
+    </Button>
   ) : (
     <Button appearance="subtle" className={styles.personaButton}>
       <Persona
@@ -168,7 +205,15 @@ function UserMenu({ collapsed }: { collapsed: boolean }) {
 }
 
 /** App-Name oben in der Leiste: Fluents `AppItem`, führt zur Übersicht. */
-function AppTitle({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: () => void }) {
+function AppTitle({
+  collapsed,
+  onNavigate,
+  className,
+}: {
+  collapsed: boolean;
+  onNavigate?: () => void;
+  className?: string;
+}) {
   const { t } = useTranslation();
   const link = useRouterLink(HOME_ROUTE);
   const name = t('common:app.name');
@@ -182,6 +227,7 @@ function AppTitle({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: 
       }}
       icon={<BautaktSignet className="size-6" />}
       aria-label={collapsed ? name : undefined}
+      className={className}
     >
       {collapsed ? null : name}
     </AppItem>
@@ -191,11 +237,11 @@ function AppTitle({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: 
 /**
  * Rahmen der angemeldeten App: Seitenleiste, Kopfzeile, Inhalt.
  *
- * Aufbau nach Fluents Muster: der `Hamburger` steht oben in der Leiste, darunter
- * der App-Name (`AppItem`) und die Einträge. Desktop: Drawer inline, per
- * Hamburger auf eine Icon-Leiste einklappbar, Zustand im Cookie. Unter 768 px:
- * Overlay, geöffnet über den Hamburger in der Kopfzeile, schließt nach dem
- * Navigieren.
+ * Kopf der Leiste in einer Zeile: Signet und Name (`AppItem`) links, rechts
+ * das Einklapp-Symbol. Desktop: Drawer inline, einklappbar auf eine
+ * Icon-Leiste, Zustand im Cookie. Unter 768 px: Overlay, geöffnet über den
+ * Hamburger in der Kopfzeile, schließt nach dem Navigieren. Die Kopfzeile
+ * trägt die Schnellsuche und die Glocke.
  */
 export function AppShell() {
   const { t } = useTranslation();
@@ -211,6 +257,7 @@ export function AppShell() {
   const selected = [...visible, settingsNavItem].find((item) => isNavActive(pathname, item))?.to;
   const closeMobile = isMobile ? () => setMobileOpen(false) : undefined;
   const toggleLabel = t('common:nav.toggleSidebar');
+  const collapseLabel = collapsed ? t('common:nav.expandSidebar') : t('common:nav.collapseSidebar');
 
   function toggle() {
     if (isMobile) {
@@ -231,26 +278,41 @@ export function AppShell() {
       selectedValue={selected ?? ''}
       className={mergeClasses(styles.drawer, collapsed && styles.rail)}
     >
-      <NavDrawerHeader>
-        <Tooltip content={toggleLabel} relationship="label" positioning="after">
-          <Hamburger onClick={toggle} aria-expanded={isMobile ? mobileOpen : expanded} />
+      <NavDrawerHeader className={mergeClasses(styles.header, collapsed && styles.headerRail)}>
+        <AppTitle
+          collapsed={collapsed}
+          onNavigate={closeMobile}
+          className={collapsed ? styles.railItem : styles.appItem}
+        />
+        <Tooltip content={collapseLabel} relationship="label" positioning="after">
+          <Button
+            appearance="subtle"
+            icon={collapsed ? <PanelLeftExpand20Regular /> : <PanelLeftContract20Regular />}
+            onClick={toggle}
+            aria-expanded={isMobile ? mobileOpen : expanded}
+          />
         </Tooltip>
       </NavDrawerHeader>
 
       <NavDrawerBody className={collapsed ? styles.railItems : undefined}>
-        <AppTitle collapsed={collapsed} onNavigate={closeMobile} />
         {visible.map((item) => (
           <SidebarNavItem
             key={item.to}
             item={item}
             collapsed={collapsed}
             onNavigate={closeMobile}
+            className={collapsed ? styles.railItem : undefined}
           />
         ))}
       </NavDrawerBody>
 
       <NavDrawerFooter className={mergeClasses(styles.footer, collapsed && styles.railItems)}>
-        <SidebarNavItem item={settingsNavItem} collapsed={collapsed} onNavigate={closeMobile} />
+        <SidebarNavItem
+          item={settingsNavItem}
+          collapsed={collapsed}
+          onNavigate={closeMobile}
+          className={collapsed ? styles.railItem : undefined}
+        />
         <NavDivider />
         <UserMenu collapsed={collapsed} />
       </NavDrawerFooter>
@@ -266,11 +328,11 @@ export function AppShell() {
           {isMobile ? (
             <Hamburger onClick={toggle} aria-label={toggleLabel} aria-expanded={mobileOpen} />
           ) : null}
-          <div className="hidden min-w-0 sm:flex">
-            <Breadcrumbs />
+          <div className="flex min-w-0 flex-1">
+            <QuickSearch />
           </div>
 
-          <div className="ml-auto flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <Tooltip content={t('common:nav.notificationsComingSoon')} relationship="description">
               <Button
                 appearance="subtle"

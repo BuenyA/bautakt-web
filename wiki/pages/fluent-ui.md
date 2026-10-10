@@ -96,6 +96,11 @@ Festgelegt im zweiten Durchgang am 2026-10-10 nach Rückmeldung des Owners
   Flex-Container in Zeilenrichtung; ohne `w-full` blieb das Formular rund 430px
   breit in einem 592px-Panel.
 - Hub-Kacheln sind Fluent-`Card`s mit `CardHeader`; der Titel ist der Link.
+- **Hinweise und Fehlerkästen sind Fluents `MessageBar`** (`intent="warning"`
+  / `"error"`), keine eigenen Kästen aus `bg-warning-bg`.
+- Zahlenspalten in einer Fluent-`Table`: die Kopfzelle über ihren Knopf
+  ausrichten (`button={{ style: { justifyContent: 'flex-end' } }}`);
+  `text-right` an der Zelle erreicht den Flex-Knopf nicht.
 
 ## Bautakt-Bausteine in `packages/ui`
 

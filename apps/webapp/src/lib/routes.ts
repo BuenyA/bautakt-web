@@ -6,6 +6,18 @@
  * eine Umbenennung nie alle Stellen.
  */
 
+/**
+ * Query, der auf einer Listenseite das Anlege-Panel öffnet (`/kunden?neu=1`).
+ * Die Schnellsuche in der Kopfzeile springt so direkt in „Neuer Kunde“. Die
+ * Seite liest ihn über `useCreateFromUrl` und entfernt ihn danach.
+ */
+export const createParam = 'neu';
+
+/** Listenpfad mit geöffnetem Anlege-Panel. */
+export function withCreate(path: string): string {
+  return `${path}?${createParam}=1`;
+}
+
 /** Query auf `/zeiten`, der die Liste auf eine `order_id` filtert. */
 export const timesOrderParam = 'order';
 
