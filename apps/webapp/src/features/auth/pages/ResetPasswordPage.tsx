@@ -1,4 +1,4 @@
-import { Button, Input, Label } from '@bautakt/ui';
+import { Button, Input, Label } from '@fluentui/react-components';
 import { type FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
@@ -57,7 +57,7 @@ export function ResetPasswordPage() {
       <AuthCard
         title={t('auth:resetPassword.title')}
         footer={
-          <Link to={routes.forgotPassword} className="text-primary hover:underline">
+          <Link to={routes.forgotPassword} className="text-brand hover:underline">
             {t('auth:forgotPassword.submit')}
           </Link>
         }
@@ -96,7 +96,7 @@ export function ResetPasswordPage() {
           />
         </div>
 
-        <Button type="submit" disabled={pending}>
+        <Button appearance="primary" type="submit" disabled={pending}>
           {t('auth:resetPassword.submit')}
         </Button>
       </form>

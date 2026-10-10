@@ -1,9 +1,8 @@
-'use client';
-
+import { Input } from '@fluentui/react-components';
 import { type FocusEventHandler, useRef } from 'react';
 
 import { cn } from '../../lib/cn';
-import { Input } from './input';
+import { FieldMessage } from './field-message';
 import { useMaskedField } from './use-masked-field';
 
 const DEFAULT_INVALID = 'Bitte eine Uhrzeit im Format HH:MM eingeben.';
@@ -34,7 +33,7 @@ export type TimeInputProps = {
  * Nachtschicht und mehrtägige Einsätze prüft das Formular, nicht dieses Feld —
  * eine einzelne Uhrzeit hat kein Ende.
  */
-function TimeInput({
+export function TimeInput({
   id,
   value,
   onChange,
@@ -79,17 +78,11 @@ function TimeInput({
         aria-label={ariaLabel}
         aria-invalid={ariaInvalid || field.invalid || undefined}
         aria-describedby={field.describedBy}
-        className="tabular-nums"
+        input={{ className: 'tabular-nums' }}
         onChange={(event) => field.handleChange(event.target.value)}
         onBlur={field.handleBlur}
       />
-      {field.message ? (
-        <p id={field.messageId} role="alert" className="text-destructive text-sm">
-          {field.message}
-        </p>
-      ) : null}
+      <FieldMessage id={field.messageId} message={field.message} />
     </div>
   );
 }
-
-export { TimeInput };

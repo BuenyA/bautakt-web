@@ -8,16 +8,8 @@ import {
   totalOpenMinor,
   totalOverdueMinor,
 } from '@bautakt/finance';
-import {
-  Card,
-  CardContent,
-  cn,
-  DataTable,
-  type DataTableColumn,
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from '@bautakt/ui';
+import { cn, DataTable, type DataTableColumn } from '@bautakt/ui';
+import { Card, Tab, TabList } from '@fluentui/react-components';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
@@ -139,7 +131,7 @@ export function ReceivablesPage() {
           action={
             <button
               type="button"
-              className="text-primary cursor-pointer text-sm font-medium hover:underline"
+              className="text-brand cursor-pointer text-sm font-medium hover:underline"
               onClick={() => {
                 void documents.refetch();
                 void payments.refetch();
@@ -191,17 +183,19 @@ export function ReceivablesPage() {
         labels={labels}
         exportFileName="offene-posten"
         toolbar={
-          <Tabs value={bucket} onValueChange={setBucket}>
-            <TabsList aria-label={t('domain:receivables.bucketsLabel')}>
-              <TabsTrigger value="all">{t('domain:receivables.filterAll')}</TabsTrigger>
-              {AGING_BUCKET_ORDER.map((key) => (
-                <TabsTrigger key={key} value={key}>
-                  {t(`domain:agingBucket.${key}`)}
-                  <span className="text-text-subtle ml-1 tabular-nums">{summary[key].count}</span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+          <TabList
+            selectedValue={bucket}
+            onTabSelect={(_, data) => setBucket(data.value as typeof bucket)}
+            aria-label={t('domain:receivables.bucketsLabel')}
+          >
+            <Tab value="all">{t('domain:receivables.filterAll')}</Tab>
+            {AGING_BUCKET_ORDER.map((key) => (
+              <Tab key={key} value={key}>
+                {t(`domain:agingBucket.${key}`)}
+                <span className="text-text-subtle ml-1 tabular-nums">{summary[key].count}</span>
+              </Tab>
+            ))}
+          </TabList>
         }
         empty={
           <EmptyState
@@ -226,8 +220,8 @@ function SummaryCard({
   tone?: 'destructive';
 }) {
   return (
-    <Card>
-      <CardContent className="flex flex-col gap-1">
+    <Card size="large">
+      <div className="flex flex-col gap-1">
         <span className="text-muted-foreground text-sm">{label}</span>
         <span
           className={cn(
@@ -238,7 +232,7 @@ function SummaryCard({
           {value}
         </span>
         <span className="text-text-subtle text-xs">{note}</span>
-      </CardContent>
+      </div>
     </Card>
   );
 }

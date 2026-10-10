@@ -1,4 +1,27 @@
-import type { UiconName } from '@bautakt/ui';
+import {
+  BoxFilled,
+  BoxRegular,
+  BriefcaseFilled,
+  BriefcaseRegular,
+  bundleIcon,
+  CalendarLtrFilled,
+  CalendarLtrRegular,
+  ClockFilled,
+  ClockRegular,
+  type FluentIcon,
+  HomeFilled,
+  HomeRegular,
+  PeopleFilled,
+  PeopleRegular,
+  PeopleTeamFilled,
+  PeopleTeamRegular,
+  PersonFilled,
+  PersonRegular,
+  SettingsFilled,
+  SettingsRegular,
+  WalletFilled,
+  WalletRegular,
+} from '@fluentui/react-icons';
 
 import {
   hubById,
@@ -10,11 +33,22 @@ import {
 } from '@/features/hubs/hubs';
 import { routes } from '@/lib/routes';
 
+const Home = bundleIcon(HomeFilled, HomeRegular);
+const Briefcase = bundleIcon(BriefcaseFilled, BriefcaseRegular);
+const PeopleTeam = bundleIcon(PeopleTeamFilled, PeopleTeamRegular);
+const Clock = bundleIcon(ClockFilled, ClockRegular);
+const CalendarLtr = bundleIcon(CalendarLtrFilled, CalendarLtrRegular);
+const Wallet = bundleIcon(WalletFilled, WalletRegular);
+const Person = bundleIcon(PersonFilled, PersonRegular);
+const People = bundleIcon(PeopleFilled, PeopleRegular);
+const Box = bundleIcon(BoxFilled, BoxRegular);
+const Settings = bundleIcon(SettingsFilled, SettingsRegular);
+
 export type NavItem = PermissionGate & {
   to: string;
   labelKey: string;
-  /** Name aus der Icon-Schrift — identisch zu dem, was die Handy-App zeigt. */
-  icon: UiconName;
+  /** Fluent-Icon, gefüllt im aktiven Zustand (`bundleIcon`). */
+  icon: FluentIcon;
   /**
    * Hub-Punkt. Sichtbar, sobald mindestens eine seiner Karten sichtbar ist.
    * Fehlt jede Karte, verschwindet der Punkt — eine leere „Finanzen"-Zeile
@@ -35,33 +69,33 @@ export type NavItem = PermissionGate & {
  * RLS-Policies in der Datenbank.
  */
 export const navItems: NavItem[] = [
-  { to: routes.overview, labelKey: 'common:nav.overview', icon: 'home' },
-  { to: routes.orders, labelKey: 'common:nav.orders', icon: 'briefcase' },
-  { to: routes.assignments, labelKey: 'common:nav.assignments', icon: 'users' },
-  { to: routes.times, labelKey: 'common:nav.times', icon: 'clock' },
-  { to: routes.calendar, labelKey: 'common:nav.calendar', icon: 'calendar' },
+  { to: routes.overview, labelKey: 'common:nav.overview', icon: Home },
+  { to: routes.orders, labelKey: 'common:nav.orders', icon: Briefcase },
+  { to: routes.assignments, labelKey: 'common:nav.assignments', icon: PeopleTeam },
+  { to: routes.times, labelKey: 'common:nav.times', icon: Clock },
+  { to: routes.calendar, labelKey: 'common:nav.calendar', icon: CalendarLtr },
   {
     to: routes.financeHub,
     labelKey: 'common:nav.finance',
-    icon: 'wallet',
+    icon: Wallet,
     hubId: 'finance',
   },
   {
     to: routes.personalHub,
     labelKey: 'common:nav.employees',
-    icon: 'user',
+    icon: Person,
     hubId: 'personal',
   },
   {
     to: routes.customers,
     labelKey: 'common:nav.customers',
-    icon: 'users',
+    icon: People,
     permission: 'canManageCustomers',
   },
   {
     to: routes.materialHub,
     labelKey: 'common:nav.material',
-    icon: 'boxes',
+    icon: Box,
     hubId: 'material',
   },
 ];
@@ -70,7 +104,7 @@ export const navItems: NavItem[] = [
 export const settingsNavItem: NavItem = {
   to: routes.settings,
   labelKey: 'common:nav.settings',
-  icon: 'settings',
+  icon: Settings,
 };
 
 export function maySee(item: NavItem, permissions: Parameters<typeof passesGate>[1]): boolean {

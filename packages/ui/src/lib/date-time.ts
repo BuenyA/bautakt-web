@@ -146,3 +146,31 @@ export function isEndBeforeStart(startIso: string, endIso: string): boolean {
   if (!start || !end) return false;
   return end < start;
 }
+
+/**
+ * Monats- und Tagesnamen kommen aus `Intl` mit `de-DE`, nicht aus der
+ * Browsersprache: jedes Datum in der App ist deutsch (wiki/pages/datumseingabe.md).
+ * Der 4. Januar 2026 ist ein Sonntag; ab dort zählen die Wochentage, weil
+ * Fluent `days` mit Sonntag beginnend erwartet.
+ */
+export function germanCalendarNames(): {
+  months: string[];
+  shortMonths: string[];
+  days: string[];
+  shortDays: string[];
+} {
+  const month = (style: 'long' | 'short') =>
+    Array.from({ length: 12 }, (_, index) =>
+      new Intl.DateTimeFormat('de-DE', { month: style }).format(new Date(2026, index, 1)),
+    );
+  const day = (style: 'long' | 'short') =>
+    Array.from({ length: 7 }, (_, index) =>
+      new Intl.DateTimeFormat('de-DE', { weekday: style }).format(new Date(2026, 0, 4 + index)),
+    );
+  return {
+    months: month('long'),
+    shortMonths: month('short'),
+    days: day('long'),
+    shortDays: day('short').map((name) => name.replace('.', '').slice(0, 2)),
+  };
+}

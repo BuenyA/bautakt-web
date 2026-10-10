@@ -1,21 +1,11 @@
 import {
-  Button,
-  Input,
-  Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
+  FormDrawer,
+  FormDrawerDescription,
+  FormDrawerFooter,
+  FormDrawerTitle,
   toast,
 } from '@bautakt/ui';
+import { Button, DrawerBody, DrawerHeader, Input, Label, Select } from '@fluentui/react-components';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -109,11 +99,9 @@ export function EmployeeSheet({
   onOpenChange: (open: boolean) => void;
 }) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="p-0">
-        {open && draft ? <EmployeeForm initial={draft} onDone={() => onOpenChange(false)} /> : null}
-      </SheetContent>
-    </Sheet>
+    <FormDrawer open={open} onOpenChange={onOpenChange}>
+      {open && draft ? <EmployeeForm initial={draft} onDone={() => onOpenChange(false)} /> : null}
+    </FormDrawer>
   );
 }
 
@@ -153,15 +141,15 @@ function EmployeeForm({ initial, onDone }: { initial: EmployeeDraft; onDone: () 
   }
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
-      <SheetHeader>
-        <SheetTitle>
+    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full min-h-0 flex-col">
+      <DrawerHeader>
+        <FormDrawerTitle closeLabel={t('common:action.close')}>
           {draft.id ? t('domain:employeeForm.editTitle') : t('domain:employeeForm.newTitle')}
-        </SheetTitle>
-        <SheetDescription>{t('domain:employeeForm.description')}</SheetDescription>
-      </SheetHeader>
+        </FormDrawerTitle>
+        <FormDrawerDescription>{t('domain:employeeForm.description')}</FormDrawerDescription>
+      </DrawerHeader>
 
-      <SheetBody className="flex flex-col gap-4">
+      <DrawerBody className="flex flex-col gap-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="grid gap-2">
             <Label htmlFor={ids.first}>{t('domain:customerForm.firstName')}</Label>
@@ -183,17 +171,19 @@ function EmployeeForm({ initial, onDone }: { initial: EmployeeDraft; onDone: () 
 
         <div className="grid gap-2">
           <Label htmlFor={roleFieldId}>{t('domain:employees.columns.role')}</Label>
-          <Select value={draft.role} onValueChange={(value) => set({ role: value })}>
-            <SelectTrigger id={roleFieldId} className="w-full">
-              <SelectValue placeholder={t('domain:timeForm.choose')} />
-            </SelectTrigger>
-            <SelectContent>
-              {(roles.data ?? []).map((role) => (
-                <SelectItem key={role.id} value={role.name}>
-                  {role.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
+          <Select
+            id={roleFieldId}
+            value={draft.role}
+            onChange={(_, { value }) => set({ role: value })}
+          >
+            <option value="" disabled>
+              {t('domain:timeForm.choose')}
+            </option>
+            {(roles.data ?? []).map((role) => (
+              <option key={role.id} value={role.name}>
+                {role.name}
+              </option>
+            ))}
           </Select>
         </div>
 
@@ -232,16 +222,16 @@ function EmployeeForm({ initial, onDone }: { initial: EmployeeDraft; onDone: () 
         ) : null}
 
         {error ? <p className="text-destructive text-sm">{error}</p> : null}
-      </SheetBody>
+      </DrawerBody>
 
-      <SheetFooter>
-        <Button type="button" variant="outline" onClick={onDone}>
+      <FormDrawerFooter>
+        <Button type="button" onClick={onDone}>
           {t('common:action.cancel')}
         </Button>
-        <Button type="submit" disabled={save.isPending}>
+        <Button appearance="primary" type="submit" disabled={save.isPending}>
           {t('common:action.save')}
         </Button>
-      </SheetFooter>
+      </FormDrawerFooter>
     </form>
   );
 }

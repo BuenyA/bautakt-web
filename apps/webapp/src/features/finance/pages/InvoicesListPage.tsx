@@ -1,10 +1,12 @@
 import { eurosToMinor, formatMoney } from '@bautakt/finance';
-import { Button, DataTable, type DataTableColumn, Uicon } from '@bautakt/ui';
+import { DataTable, type DataTableColumn } from '@bautakt/ui';
+import { AddRegular } from '@fluentui/react-icons';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { ListFilterChips } from '@/components/common/ListFilterChips';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
@@ -80,7 +82,7 @@ export function InvoicesListPage() {
         cell: ({ row }) => (
           <Link
             to={routes.invoice(row.original.id)}
-            className="text-foreground hover:text-primary font-medium whitespace-nowrap hover:underline"
+            className="text-foreground hover:text-brand font-medium whitespace-nowrap hover:underline"
             onClick={(event) => event.stopPropagation()}
           >
             {row.original.document_number || t('domain:invoices.noNumber')}
@@ -148,7 +150,7 @@ export function InvoicesListPage() {
           action={
             <button
               type="button"
-              className="text-primary cursor-pointer text-sm font-medium hover:underline"
+              className="text-brand cursor-pointer text-sm font-medium hover:underline"
               onClick={() => void refetch()}
             >
               {t('common:action.retry')}
@@ -166,12 +168,14 @@ export function InvoicesListPage() {
         description={t('domain:invoices.listDescription')}
         actions={
           access.canWriteSalesDocuments ? (
-            <Button asChild size="sm">
-              <Link to={routes.invoiceNew}>
-                <Uicon name="plus" size={16} />
-                {t('domain:invoices.new')}
-              </Link>
-            </Button>
+            <LinkButton
+              appearance="primary"
+              size="small"
+              to={routes.invoiceNew}
+              icon={<AddRegular />}
+            >
+              {t('domain:invoices.new')}
+            </LinkButton>
           ) : null
         }
       />

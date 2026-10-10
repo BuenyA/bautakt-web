@@ -1,4 +1,4 @@
-import { Button, Input, Label } from '@bautakt/ui';
+import { Button, Input, Label } from '@fluentui/react-components';
 import { type FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -55,7 +55,7 @@ export function LoginPage() {
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">{t('auth:field.password')}</Label>
-            <Link to={routes.forgotPassword} className="text-sm text-primary hover:underline">
+            <Link to={routes.forgotPassword} className="text-sm text-brand hover:underline">
               {t('auth:signIn.forgotPassword')}
             </Link>
           </div>
@@ -69,7 +69,7 @@ export function LoginPage() {
           />
         </div>
 
-        <Button type="submit" disabled={pending}>
+        <Button appearance="primary" type="submit" disabled={pending}>
           {t('auth:signIn.submit')}
         </Button>
       </form>

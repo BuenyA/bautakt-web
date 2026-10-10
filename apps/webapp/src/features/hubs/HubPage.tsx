@@ -1,4 +1,5 @@
-import { cn, Uicon } from '@bautakt/ui';
+import { cn } from '@bautakt/ui';
+import { ChevronRightRegular } from '@fluentui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
@@ -39,7 +40,7 @@ function HubPage({ hub }: { hub: Hub }) {
           action={
             <button
               type="button"
-              className="text-primary cursor-pointer text-sm font-medium hover:underline"
+              className="text-brand cursor-pointer text-sm font-medium hover:underline"
               onClick={() => void membership.refetch()}
             >
               {t('common:action.retry')}
@@ -64,6 +65,7 @@ function HubPage({ hub }: { hub: Hub }) {
 
 function HubCardLink({ card }: { card: HubCard }) {
   const { t } = useTranslation();
+  const CardIcon = card.icon;
 
   return (
     <Link
@@ -72,21 +74,20 @@ function HubCardLink({ card }: { card: HubCard }) {
         'bg-card border-border flex min-h-[120px] flex-col items-start gap-3 rounded-xl border p-5 shadow-sm',
         'transition duration-150',
         'hover:border-border-strong hover:bg-surface hover:shadow-md',
-        'dark:hover:bg-card-raised',
         'focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2',
         'focus-visible:ring-offset-background focus-visible:outline-none',
         'active:opacity-95',
         card.featured && 'ring-primary/30 ring-1 sm:col-span-2',
       )}
     >
-      <span className="bg-accent dark:bg-card-raised flex size-10 shrink-0 items-center justify-center rounded-lg">
-        <Uicon name={card.icon} size={22} className="text-primary" />
+      <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-lg">
+        <CardIcon fontSize={22} className="text-brand" />
       </span>
       <span className="flex min-w-0 flex-col gap-1">
         <span className="text-foreground text-base font-semibold">{t(card.titleKey)}</span>
         <span className="text-muted-foreground line-clamp-2 text-sm">{t(card.descriptionKey)}</span>
       </span>
-      <Uicon name="angle-right" size={16} className="text-muted-foreground" />
+      <ChevronRightRegular fontSize={16} className="text-muted-foreground" />
     </Link>
   );
 }

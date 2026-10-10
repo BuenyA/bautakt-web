@@ -1,4 +1,6 @@
-import { Button, DataTable, type DataTableColumn, Uicon } from '@bautakt/ui';
+import { DataTable, type DataTableColumn } from '@bautakt/ui';
+import { Button } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router';
@@ -67,7 +69,7 @@ export function CustomersListPage() {
         cell: ({ row }) => (
           <Link
             to={routes.customer(row.original.id)}
-            className="text-foreground hover:text-primary font-medium hover:underline"
+            className="text-foreground hover:text-brand font-medium hover:underline"
             onClick={(event) => event.stopPropagation()}
           >
             {customerDisplayName(row.original) || t('domain:customers.unnamed')}
@@ -127,7 +129,7 @@ export function CustomersListPage() {
           action={
             <button
               type="button"
-              className="text-primary cursor-pointer text-sm font-medium hover:underline"
+              className="text-brand cursor-pointer text-sm font-medium hover:underline"
               onClick={() => void refetch()}
             >
               {t('common:action.retry')}
@@ -145,8 +147,12 @@ export function CustomersListPage() {
         description={t('domain:customers.listDescription')}
         actions={
           canManage ? (
-            <Button size="sm" onClick={() => setDraft(emptyCustomer())}>
-              <Uicon name="plus" size={16} />
+            <Button
+              appearance="primary"
+              size="small"
+              onClick={() => setDraft(emptyCustomer())}
+              icon={<AddRegular />}
+            >
               {t('domain:customerForm.newTitle')}
             </Button>
           ) : null

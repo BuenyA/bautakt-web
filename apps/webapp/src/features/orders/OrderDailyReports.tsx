@@ -1,4 +1,6 @@
-import { Button, Skeleton, Uicon } from '@bautakt/ui';
+import { SkeletonBlock } from '@bautakt/ui';
+import { Button } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -83,7 +85,7 @@ export function OrderDailyReports({ orderId }: { orderId: string }) {
         action={
           <button
             type="button"
-            className="text-sm font-medium text-primary hover:underline"
+            className="text-sm font-medium text-brand hover:underline"
             onClick={() => void refetch()}
           >
             {t('common:action.retry')}
@@ -97,8 +99,13 @@ export function OrderDailyReports({ orderId }: { orderId: string }) {
         title={t('domain:orders.dailyReports.emptyTitle')}
         description={t('domain:orders.dailyReports.emptyDescriptionWrite')}
         action={
-          <Button size="sm" onClick={openNew} disabled={staffLoading}>
-            <Uicon name="plus" size={16} />
+          <Button
+            appearance="primary"
+            size="small"
+            onClick={openNew}
+            disabled={staffLoading}
+            icon={<AddRegular />}
+          >
             {t('domain:dailyReportForm.newTitle')}
           </Button>
         }
@@ -129,8 +136,13 @@ export function OrderDailyReports({ orderId }: { orderId: string }) {
         >
           {t('domain:orders.dailyReports.title')}
         </h2>
-        <Button size="sm" onClick={openNew} disabled={staffLoading}>
-          <Uicon name="plus" size={16} />
+        <Button
+          appearance="primary"
+          size="small"
+          onClick={openNew}
+          disabled={staffLoading}
+          icon={<AddRegular />}
+        >
           {t('domain:dailyReportForm.newTitle')}
         </Button>
       </div>
@@ -252,7 +264,7 @@ function ReportListSkeleton({ label }: { label: string }) {
     <div className="flex max-w-3xl flex-col gap-3" role="status">
       <span className="sr-only">{label}</span>
       {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-        <Skeleton key={index} className="h-24 rounded-xl" />
+        <SkeletonBlock key={index} className="h-24 rounded-xl" />
       ))}
     </div>
   );

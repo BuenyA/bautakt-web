@@ -1,10 +1,13 @@
 import { hasPermission } from '@bautakt/core';
-import { Badge, Button, DataTable, type DataTableColumn, Uicon } from '@bautakt/ui';
+import { DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
+import { Button } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { ListFilterChips } from '@/components/common/ListFilterChips';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
@@ -94,13 +97,12 @@ export function TimesListPage() {
     orderId || canCreate ? (
       <div className="flex flex-wrap items-center gap-2">
         {orderId ? (
-          <Button asChild variant="outline" size="sm">
-            <Link to={routes.order(orderId)}>{t('domain:times.openOrder')}</Link>
-          </Button>
+          <LinkButton size="small" to={routes.order(orderId)}>
+            {t('domain:times.openOrder')}
+          </LinkButton>
         ) : null}
         {canCreate ? (
-          <Button size="sm" onClick={openNew}>
-            <Uicon name="plus" size={16} />
+          <Button appearance="primary" size="small" onClick={openNew} icon={<AddRegular />}>
             {t('domain:timeForm.newTitle')}
           </Button>
         ) : null}
@@ -117,7 +119,9 @@ export function TimesListPage() {
             <span className="text-foreground font-medium">
               {row.original.employee_name || t('domain:times.noEmployee')}
             </span>
-            {row.original.billed ? <Badge variant="muted">{t('domain:times.billed')}</Badge> : null}
+            {row.original.billed ? (
+              <StatusBadge tone="neutral">{t('domain:times.billed')}</StatusBadge>
+            ) : null}
           </span>
         ),
       },
@@ -196,9 +200,9 @@ export function TimesListPage() {
           description={description}
           actions={
             orderId ? (
-              <Button asChild variant="outline" size="sm">
-                <Link to={routes.order(orderId)}>{t('domain:times.openOrder')}</Link>
-              </Button>
+              <LinkButton size="small" to={routes.order(orderId)}>
+                {t('domain:times.openOrder')}
+              </LinkButton>
             ) : null
           }
         />
@@ -209,7 +213,7 @@ export function TimesListPage() {
             <div className="flex flex-wrap items-center gap-4">
               <button
                 type="button"
-                className="text-primary cursor-pointer text-sm font-medium hover:underline"
+                className="text-brand cursor-pointer text-sm font-medium hover:underline"
                 onClick={() => void refetch()}
               >
                 {t('common:action.retry')}
@@ -217,7 +221,7 @@ export function TimesListPage() {
               {orderId ? (
                 <button
                   type="button"
-                  className="text-primary cursor-pointer text-sm font-medium hover:underline"
+                  className="text-brand cursor-pointer text-sm font-medium hover:underline"
                   onClick={clearOrderFilter}
                 >
                   {t('domain:times.clearOrderFilter')}
@@ -280,15 +284,19 @@ export function TimesListPage() {
               canCreate || orderId ? (
                 <div className="flex flex-col items-center gap-3">
                   {canCreate ? (
-                    <Button size="sm" onClick={openNew}>
-                      <Uicon name="plus" size={16} />
+                    <Button
+                      appearance="primary"
+                      size="small"
+                      onClick={openNew}
+                      icon={<AddRegular />}
+                    >
                       {t('domain:timeForm.newTitle')}
                     </Button>
                   ) : null}
                   {orderId ? (
                     <button
                       type="button"
-                      className="text-primary cursor-pointer text-sm font-medium hover:underline"
+                      className="text-brand cursor-pointer text-sm font-medium hover:underline"
                       onClick={clearOrderFilter}
                     >
                       {t('domain:times.clearOrderFilter')}

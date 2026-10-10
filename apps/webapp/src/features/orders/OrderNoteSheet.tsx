@@ -1,17 +1,19 @@
 import {
-  Button,
-  Input,
-  Label,
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  Textarea,
+  DangerButton,
+  FormDrawer,
+  FormDrawerDescription,
+  FormDrawerFooter,
+  FormDrawerTitle,
   toast,
 } from '@bautakt/ui';
+import {
+  Button,
+  DrawerBody,
+  DrawerHeader,
+  Input,
+  Label,
+  Textarea,
+} from '@fluentui/react-components';
 import { type FormEvent, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -40,17 +42,15 @@ export function OrderNoteSheet({
 }) {
   const dismiss = useDismissLock(onOpenChange);
   return (
-    <Sheet open={open} onOpenChange={dismiss.handleOpenChange}>
-      <SheetContent className="p-0">
-        {open && draft ? (
-          <OrderNoteForm
-            initial={draft}
-            onBusyChange={dismiss.onBusyChange}
-            onDone={() => onOpenChange(false)}
-          />
-        ) : null}
-      </SheetContent>
-    </Sheet>
+    <FormDrawer open={open} onOpenChange={dismiss.handleOpenChange}>
+      {open && draft ? (
+        <OrderNoteForm
+          initial={draft}
+          onBusyChange={dismiss.onBusyChange}
+          onDone={() => onOpenChange(false)}
+        />
+      ) : null}
+    </FormDrawer>
   );
 }
 
@@ -121,15 +121,15 @@ function OrderNoteForm({
   }
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
-      <SheetHeader>
-        <SheetTitle>
+    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full min-h-0 flex-col">
+      <DrawerHeader>
+        <FormDrawerTitle closeLabel={t('common:action.close')}>
           {draft.id ? t('domain:noteForm.editTitle') : t('domain:noteForm.newTitle')}
-        </SheetTitle>
-        <SheetDescription>{t('domain:noteForm.description')}</SheetDescription>
-      </SheetHeader>
+        </FormDrawerTitle>
+        <FormDrawerDescription>{t('domain:noteForm.description')}</FormDrawerDescription>
+      </DrawerHeader>
 
-      <SheetBody className="flex flex-col gap-4">
+      <DrawerBody className="flex flex-col gap-4">
         <div className="grid gap-2">
           <Label htmlFor={ids.title}>{t('domain:noteForm.title')}</Label>
           <Input
@@ -155,27 +155,26 @@ function OrderNoteForm({
             {error}
           </p>
         ) : null}
-      </SheetBody>
+      </DrawerBody>
 
-      <SheetFooter className="sm:flex-wrap">
+      <FormDrawerFooter className="sm:flex-wrap">
         {draft.id ? (
-          <Button
+          <DangerButton
             type="button"
-            variant="destructive"
             className="sm:mr-auto"
             disabled={busy}
             onClick={() => setConfirmDelete(true)}
           >
             {t('domain:noteForm.delete.action')}
-          </Button>
+          </DangerButton>
         ) : null}
-        <Button type="button" variant="outline" onClick={onDone} disabled={busy}>
+        <Button type="button" onClick={onDone} disabled={busy}>
           {t('common:action.cancel')}
         </Button>
-        <Button type="submit" disabled={busy}>
+        <Button appearance="primary" type="submit" disabled={busy}>
           {t('common:action.save')}
         </Button>
-      </SheetFooter>
+      </FormDrawerFooter>
 
       {draft.id ? (
         <OrderNoteDeleteDialog

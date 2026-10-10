@@ -1,10 +1,11 @@
 import { eurosToMinor, formatMoney } from '@bautakt/finance';
-import { Button, DataTable, type DataTableColumn, Uicon } from '@bautakt/ui';
+import { DataTable, type DataTableColumn } from '@bautakt/ui';
+import { AddRegular } from '@fluentui/react-icons';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
@@ -85,7 +86,7 @@ export function QuotesListPage() {
           action={
             <button
               type="button"
-              className="text-primary cursor-pointer text-sm font-medium hover:underline"
+              className="text-brand cursor-pointer text-sm font-medium hover:underline"
               onClick={() => void refetch()}
             >
               {t('common:action.retry')}
@@ -103,12 +104,14 @@ export function QuotesListPage() {
         description={t('domain:quotes.listDescription')}
         actions={
           access.canWriteSalesDocuments ? (
-            <Button asChild size="sm">
-              <Link to={routes.quoteNew}>
-                <Uicon name="plus" size={16} />
-                {t('domain:quotes.new')}
-              </Link>
-            </Button>
+            <LinkButton
+              appearance="primary"
+              size="small"
+              to={routes.quoteNew}
+              icon={<AddRegular />}
+            >
+              {t('domain:quotes.new')}
+            </LinkButton>
           ) : null
         }
       />

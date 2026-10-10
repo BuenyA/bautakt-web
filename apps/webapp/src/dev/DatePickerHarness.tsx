@@ -1,14 +1,19 @@
+import { DatePicker, DateRangePicker, FormDrawer, FormDrawerTitle } from '@bautakt/ui';
 import {
-  DatePicker,
-  DateRangePicker,
+  Button,
   Dialog,
+  DialogActions,
+  DialogBody,
   DialogContent,
+  DialogSurface,
   DialogTitle,
-  Sheet,
-  SheetContent,
-  SheetTitle,
-} from '@bautakt/ui';
+  DialogTrigger,
+  DrawerBody,
+  DrawerHeader,
+} from '@fluentui/react-components';
 import { useState } from 'react';
+
+import { useTheme } from '@/app/useTheme';
 
 /**
  * Nur `vite dev`. `main.tsx` lädt die Seite ausschließlich bei
@@ -25,6 +30,7 @@ export function DatePickerHarness() {
   const [rangeEnd, setRangeEnd] = useState('2026-10-09');
   const [sheetOpen, setSheetOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { setTheme } = useTheme();
 
   return (
     <div className="bg-background text-foreground flex min-h-screen flex-col gap-16 p-8 pt-28 pl-40">
@@ -33,7 +39,7 @@ export function DatePickerHarness() {
           type="button"
           data-testid="theme-light"
           className="border-border rounded-md border px-3 py-1 text-sm"
-          onClick={() => document.documentElement.classList.remove('dark')}
+          onClick={() => setTheme('light')}
         >
           Hell
         </button>
@@ -41,7 +47,7 @@ export function DatePickerHarness() {
           type="button"
           data-testid="theme-dark"
           className="border-border rounded-md border px-3 py-1 text-sm"
-          onClick={() => document.documentElement.classList.add('dark')}
+          onClick={() => setTheme('dark')}
         >
           Dunkel
         </button>
@@ -82,7 +88,7 @@ export function DatePickerHarness() {
           </p>
           <div className="grid gap-2">
             <span>Kunde</span>
-            <div className="border-border flex h-11 items-center rounded-sm border px-3 text-sm">
+            <div className="border-border flex h-8 items-center rounded-sm border px-3 text-sm">
               Ohne Kunde
             </div>
           </div>
@@ -134,7 +140,9 @@ export function DatePickerHarness() {
           </div>
           <div className="grid gap-2">
             <span>Beginn, Uhrzeit</span>
-            <div className="border-border h-11 rounded-sm border px-3 py-2 text-sm">07:00</div>
+            <div className="border-border flex h-8 items-center rounded-sm border px-3 text-sm">
+              07:00
+            </div>
           </div>
           <div className="grid gap-2">
             <span data-testid="end-date-label">Ende, Datum</span>
@@ -142,7 +150,9 @@ export function DatePickerHarness() {
           </div>
           <div className="grid gap-2">
             <span data-testid="end-time-label">Ende, Uhrzeit</span>
-            <div className="border-border h-11 rounded-sm border px-3 py-2 text-sm">16:00</div>
+            <div className="border-border flex h-8 items-center rounded-sm border px-3 text-sm">
+              16:00
+            </div>
           </div>
           <p role="alert" className="text-destructive text-sm sm:col-span-2">
             Das Ende liegt vor dem Beginn.
@@ -153,22 +163,33 @@ export function DatePickerHarness() {
         </button>
       </section>
 
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent side="right">
-          <SheetTitle>Zeiteintrag</SheetTitle>
+      <FormDrawer open={sheetOpen} onOpenChange={setSheetOpen}>
+        <DrawerHeader>
+          <FormDrawerTitle>Zeiteintrag</FormDrawerTitle>
+        </DrawerHeader>
+        <DrawerBody>
           <div data-testid="picker-sheet" className="mt-16 max-w-sm">
             <DatePicker aria-label="Datum im Sheet" value={inSheet} onChange={setInSheet} />
           </div>
-        </SheetContent>
-      </Sheet>
+        </DrawerBody>
+      </FormDrawer>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogTitle>Beleg</DialogTitle>
-          <div data-testid="picker-dialog" className="max-w-sm">
-            <DatePicker aria-label="Datum im Dialog" value={inDialog} onChange={setInDialog} />
-          </div>
-        </DialogContent>
+      <Dialog open={dialogOpen} onOpenChange={(_, data) => setDialogOpen(data.open)}>
+        <DialogSurface>
+          <DialogBody>
+            <DialogTitle>Beleg</DialogTitle>
+            <DialogContent>
+              <div data-testid="picker-dialog" className="max-w-sm">
+                <DatePicker aria-label="Datum im Dialog" value={inDialog} onChange={setInDialog} />
+              </div>
+            </DialogContent>
+            <DialogActions>
+              <DialogTrigger action="close" disableButtonEnhancement>
+                <Button>Schließen</Button>
+              </DialogTrigger>
+            </DialogActions>
+          </DialogBody>
+        </DialogSurface>
       </Dialog>
     </div>
   );

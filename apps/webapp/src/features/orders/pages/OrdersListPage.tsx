@@ -1,12 +1,6 @@
-import {
-  Button,
-  DataTable,
-  type DataTableColumn,
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  Uicon,
-} from '@bautakt/ui';
+import { DataTable, type DataTableColumn } from '@bautakt/ui';
+import { Button, Tab, TabList } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router';
@@ -62,7 +56,7 @@ export function OrdersListPage() {
         cell: ({ row }) => (
           <Link
             to={routes.order(row.original.id)}
-            className="text-foreground hover:text-primary font-medium hover:underline"
+            className="text-foreground hover:text-brand font-medium hover:underline"
             // Der Zeilenklick navigiert bereits; ohne das hier wuerde er den
             // Link-Klick zusaetzlich ausloesen.
             onClick={(event) => event.stopPropagation()}
@@ -120,7 +114,7 @@ export function OrdersListPage() {
           action={
             <button
               type="button"
-              className="text-primary cursor-pointer text-sm font-medium hover:underline"
+              className="text-brand cursor-pointer text-sm font-medium hover:underline"
               onClick={() => void refetch()}
             >
               {t('common:action.retry')}
@@ -138,8 +132,12 @@ export function OrdersListPage() {
         description={t('domain:orders.listDescription')}
         actions={
           canCreate ? (
-            <Button size="sm" onClick={() => setSheetOpen(true)}>
-              <Uicon name="plus" size={16} />
+            <Button
+              appearance="primary"
+              size="small"
+              onClick={() => setSheetOpen(true)}
+              icon={<AddRegular />}
+            >
               {t('domain:orders.create.action')}
             </Button>
           ) : null
@@ -154,12 +152,14 @@ export function OrdersListPage() {
         exportFileName="auftraege"
         onRowClick={(order) => void navigate(routes.order(order.id))}
         toolbar={
-          <Tabs value={kind} onValueChange={setKind}>
-            <TabsList aria-label={t('domain:orders.filtersLabel')}>
-              <TabsTrigger value="order">{t('domain:orders.kindOrders')}</TabsTrigger>
-              <TabsTrigger value="quote">{t('domain:orders.kindQuotes')}</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <TabList
+            selectedValue={kind}
+            onTabSelect={(_, data) => setKind(data.value as typeof kind)}
+            aria-label={t('domain:orders.filtersLabel')}
+          >
+            <Tab value="order">{t('domain:orders.kindOrders')}</Tab>
+            <Tab value="quote">{t('domain:orders.kindQuotes')}</Tab>
+          </TabList>
         }
         sectionOf={(row) => {
           switch (orderSection(row.status, kind)) {

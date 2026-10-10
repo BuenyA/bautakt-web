@@ -1,26 +1,30 @@
 import { eurosToMinor, formatMoney } from '@bautakt/finance';
+import { StatusBadge, toast } from '@bautakt/ui';
 import {
-  Badge,
   Button,
   Card,
-  CardContent,
   CardHeader,
-  CardTitle,
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
+  TableHeaderCell,
   TableRow,
-  toast,
-  Uicon,
-} from '@bautakt/ui';
+  Text,
+} from '@fluentui/react-components';
+import {
+  CheckmarkCircleRegular,
+  DocumentRegular,
+  EditRegular,
+  WalletRegular,
+} from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 
 import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
@@ -75,15 +79,15 @@ export function InvoiceDetailPage() {
             isError ? (
               <button
                 type="button"
-                className="text-primary cursor-pointer text-sm font-medium hover:underline"
+                className="text-brand cursor-pointer text-sm font-medium hover:underline"
                 onClick={() => void refetch()}
               >
                 {t('common:action.retry')}
               </button>
             ) : (
-              <Button asChild variant="outline" size="sm">
-                <Link to={routes.invoices}>{t('common:action.back')}</Link>
-              </Button>
+              <LinkButton size="small" to={routes.invoices}>
+                {t('common:action.back')}
+              </LinkButton>
             )
           }
         />
@@ -116,42 +120,48 @@ export function InvoiceDetailPage() {
         description={data.customer_label || t('domain:invoices.noCustomer')}
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link to={routes.invoices}>{t('common:action.back')}</Link>
-            </Button>
+            <LinkButton size="small" to={routes.invoices}>
+              {t('common:action.back')}
+            </LinkButton>
 
             {!isDraft ? (
-              <Button asChild variant="outline" size="sm">
-                <Link to={routes.invoicePrint(data.id)} target="_blank" rel="noreferrer">
-                  <Uicon name="file" size={16} />
-                  {t('domain:invoices.print')}
-                </Link>
+              <Button
+                as="a"
+                size="small"
+                href={routes.invoicePrint(data.id)}
+                target="_blank"
+                rel="noreferrer"
+                icon={<DocumentRegular />}
+              >
+                {t('domain:invoices.print')}
               </Button>
             ) : null}
 
             {access.canWriteSalesDocuments && isDraft ? (
-              <Button asChild variant="outline" size="sm">
-                <Link to={routes.invoiceEdit(data.id)}>
-                  <Uicon name="pencil" size={16} />
-                  {t('common:action.edit')}
-                </Link>
-              </Button>
+              <LinkButton size="small" to={routes.invoiceEdit(data.id)} icon={<EditRegular />}>
+                {t('common:action.edit')}
+              </LinkButton>
             ) : null}
 
             {access.canWriteSalesDocuments && isDraft ? (
               <Button
-                size="sm"
+                appearance="primary"
+                size="small"
                 disabled={finalize.isPending || blockers.length > 0}
                 onClick={() => void onFinalize()}
+                icon={<CheckmarkCircleRegular />}
               >
-                <Uicon name="badge-check" size={16} />
                 {t('domain:invoices.finalize')}
               </Button>
             ) : null}
 
             {access.canWriteSalesDocuments && !isDraft && openMinor > 0 ? (
-              <Button size="sm" onClick={() => setPaymentOpen(true)}>
-                <Uicon name="wallet" size={16} />
+              <Button
+                appearance="primary"
+                size="small"
+                onClick={() => setPaymentOpen(true)}
+                icon={<WalletRegular />}
+              >
                 {t('domain:payments.add')}
               </Button>
             ) : null}
@@ -168,7 +178,7 @@ export function InvoiceDetailPage() {
             ))}
           </ul>
           {blockers.includes('sellerTaxId') ? (
-            <Link to={routes.settings} className="text-primary mt-1 font-medium hover:underline">
+            <Link to={routes.settings} className="text-brand mt-1 font-medium hover:underline">
               {t('domain:invoices.toSettings')}
             </Link>
           ) : null}
@@ -185,7 +195,7 @@ export function InvoiceDetailPage() {
       <div className="flex flex-wrap items-center gap-3">
         <DocumentStatusBadge status={data.status} />
         {overpaidMinor > 0 ? (
-          <Badge variant="warning">{t('domain:invoices.overpaid')}</Badge>
+          <StatusBadge tone="warning">{t('domain:invoices.overpaid')}</StatusBadge>
         ) : null}
         <span
           className={
@@ -198,37 +208,39 @@ export function InvoiceDetailPage() {
         </span>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base font-semibold tracking-tight">
-            {t('domain:invoices.lines')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card size="large">
+        <CardHeader
+          header={
+            <Text as="h2" size={400} weight="semibold">
+              {t('domain:invoices.lines')}
+            </Text>
+          }
+        />
+        <div>
           {data.lines.length === 0 ? (
             <p className="text-muted-foreground text-sm">{t('domain:invoices.noLines')}</p>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead>{t('domain:invoices.lineColumns.title')}</TableHead>
-                  <TableHead className="text-right">
+                <TableRow>
+                  <TableHeaderCell>{t('domain:invoices.lineColumns.title')}</TableHeaderCell>
+                  <TableHeaderCell className="text-right">
                     {t('domain:invoices.lineColumns.quantity')}
-                  </TableHead>
-                  <TableHead className="text-right">
+                  </TableHeaderCell>
+                  <TableHeaderCell className="text-right">
                     {t('domain:invoices.lineColumns.unitPrice')}
-                  </TableHead>
-                  <TableHead className="text-right">
+                  </TableHeaderCell>
+                  <TableHeaderCell className="text-right">
                     {t('domain:invoices.lineColumns.tax')}
-                  </TableHead>
-                  <TableHead className="text-right">
+                  </TableHeaderCell>
+                  <TableHeaderCell className="text-right">
                     {t('domain:invoices.lineColumns.net')}
-                  </TableHead>
+                  </TableHeaderCell>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data.lines.map((line) => (
-                  <TableRow key={line.id} className="hover:bg-transparent">
+                  <TableRow key={line.id}>
                     <TableCell>
                       <span className="text-foreground font-medium">{line.title}</span>
                       {line.description ? (
@@ -284,7 +296,7 @@ export function InvoiceDetailPage() {
               </>
             ) : null}
           </dl>
-        </CardContent>
+        </div>
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -313,13 +325,15 @@ export function InvoiceDetailPage() {
           <DetailRow label={t('domain:invoices.notes')} value={data.notes} />
         </DetailCard>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-semibold tracking-tight">
-              {t('domain:payments.title')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Card size="large">
+          <CardHeader
+            header={
+              <Text as="h2" size={400} weight="semibold">
+                {t('domain:payments.title')}
+              </Text>
+            }
+          />
+          <div>
             {data.payments.length === 0 ? (
               <p className="text-muted-foreground text-sm">{t('domain:payments.empty')}</p>
             ) : (
@@ -345,7 +359,7 @@ export function InvoiceDetailPage() {
                 })}
               </p>
             ) : null}
-          </CardContent>
+          </div>
         </Card>
       </div>
 

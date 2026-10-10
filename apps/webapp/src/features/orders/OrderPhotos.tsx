@@ -1,14 +1,14 @@
+import { SkeletonBlock, toast } from '@bautakt/ui';
 import {
   Button,
   Dialog,
+  DialogActions,
+  DialogBody,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
+  DialogSurface,
   DialogTitle,
-  Skeleton,
-  toast,
-  Uicon,
-} from '@bautakt/ui';
+} from '@fluentui/react-components';
+import { ArrowUploadRegular, DeleteRegular } from '@fluentui/react-icons';
 import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -115,7 +115,7 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
         action={
           <button
             type="button"
-            className="text-sm font-medium text-primary hover:underline"
+            className="text-sm font-medium text-brand hover:underline"
             onClick={() => void refetch()}
           >
             {t('common:action.retry')}
@@ -170,12 +170,13 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
         </h2>
         {canTakePhotos ? (
           <Button
+            appearance="primary"
+            size="small"
             type="button"
-            size="sm"
             disabled={progress !== null}
             onClick={() => inputRef.current?.click()}
+            icon={<ArrowUploadRegular />}
           >
-            <Uicon name="upload" size={16} />
             {t('domain:photoForm.upload')}
           </Button>
         ) : null}
@@ -219,44 +220,46 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
 
       <Dialog
         open={openPhoto !== null}
-        onOpenChange={(open) => {
+        onOpenChange={(_, { open }) => {
           if (!open) setOpenId(null);
         }}
       >
-        <DialogContent className="sm:max-w-3xl">
-          <DialogHeader>
+        {/* Breiter als Fluents 600 px: das Foto ist der Inhalt. */}
+        <DialogSurface style={{ maxWidth: 'min(48rem, calc(100vw - 2rem))' }}>
+          <DialogBody>
             <DialogTitle>{t('domain:orders.photos.lightboxTitle')}</DialogTitle>
-            <DialogDescription>
-              {openDate
-                ? t('domain:orders.photos.takenAt', { date: openDate })
-                : t('domain:orders.photos.openLabelUndated')}
-            </DialogDescription>
-          </DialogHeader>
-          {openPhoto ? (
-            <img
-              src={openPhoto.signedUrl}
-              alt={
-                openDate
-                  ? t('domain:orders.photos.openLabel', { date: openDate })
-                  : t('domain:orders.photos.openLabelUndated')
-              }
-              className="max-h-[70vh] w-full rounded-xl bg-surface object-contain"
-            />
-          ) : null}
-          {openPhoto && canDeleteOpen ? (
-            <div className="flex justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => askDelete(openPhoto)}
-              >
-                <Uicon name="trash" size={16} />
-                {t('domain:photoForm.delete.action')}
-              </Button>
-            </div>
-          ) : null}
-        </DialogContent>
+            <DialogContent className="flex flex-col gap-3">
+              <p className="text-muted-foreground text-sm">
+                {openDate
+                  ? t('domain:orders.photos.takenAt', { date: openDate })
+                  : t('domain:orders.photos.openLabelUndated')}
+              </p>
+              {openPhoto ? (
+                <img
+                  src={openPhoto.signedUrl}
+                  alt={
+                    openDate
+                      ? t('domain:orders.photos.openLabel', { date: openDate })
+                      : t('domain:orders.photos.openLabelUndated')
+                  }
+                  className="max-h-[70vh] w-full rounded-xl bg-surface object-contain"
+                />
+              ) : null}
+            </DialogContent>
+            {openPhoto && canDeleteOpen ? (
+              <DialogActions>
+                <Button
+                  size="small"
+                  type="button"
+                  onClick={() => askDelete(openPhoto)}
+                  icon={<DeleteRegular />}
+                >
+                  {t('domain:photoForm.delete.action')}
+                </Button>
+              </DialogActions>
+            ) : null}
+          </DialogBody>
+        </DialogSurface>
       </Dialog>
 
       {deletePhoto ? (
@@ -322,7 +325,7 @@ function PhotoTile({
           }
           onClick={onDelete}
         >
-          <Uicon name="trash" size={16} />
+          <DeleteRegular fontSize={16} />
         </button>
       ) : null}
     </li>
@@ -334,7 +337,7 @@ function PhotoGridSkeleton({ label }: { label: string }) {
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4" role="status">
       <span className="sr-only">{label}</span>
       {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-        <Skeleton key={index} className="aspect-square rounded-xl" />
+        <SkeletonBlock key={index} className="aspect-square rounded-xl" />
       ))}
     </div>
   );

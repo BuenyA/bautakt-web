@@ -11,7 +11,8 @@
     "search": "Suchen …",
     "export": "CSV-Export",
     "columns": "Spalten",
-    "edit": "Bearbeiten"
+    "edit": "Bearbeiten",
+    "close": "Schließen"
   },
   "state": {
     "loading": "Wird geladen …",
@@ -40,6 +41,8 @@
     "action": "Zur Übersicht"
   },
   "nav": {
+    "toggleSidebar": "Seitenleiste ein- oder ausblenden",
+    "breadcrumb": "Navigationspfad",
     "overview": "Übersicht",
     "finance": "Finanzen",
     "material": "Material",

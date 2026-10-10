@@ -1,5 +1,7 @@
 import { hasPermission } from '@bautakt/core';
-import { Badge, Button, Skeleton, Uicon } from '@bautakt/ui';
+import { SkeletonBlock, StatusBadge } from '@bautakt/ui';
+import { Button } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -59,7 +61,7 @@ export function OrderMaterials({ orderId }: { orderId: string }) {
         action={
           <button
             type="button"
-            className="text-sm font-medium text-primary hover:underline"
+            className="text-sm font-medium text-brand hover:underline"
             onClick={() => void refetch()}
           >
             {t('common:action.retry')}
@@ -78,8 +80,7 @@ export function OrderMaterials({ orderId }: { orderId: string }) {
         }
         action={
           canCreate ? (
-            <Button size="sm" onClick={openNew}>
-              <Uicon name="plus" size={16} />
+            <Button appearance="primary" size="small" onClick={openNew} icon={<AddRegular />}>
               {t('domain:materialForm.newTitle')}
             </Button>
           ) : undefined
@@ -113,8 +114,7 @@ export function OrderMaterials({ orderId }: { orderId: string }) {
           {t('domain:orders.materials.title')}
         </h2>
         {canCreate ? (
-          <Button size="sm" onClick={openNew}>
-            <Uicon name="plus" size={16} />
+          <Button appearance="primary" size="small" onClick={openNew} icon={<AddRegular />}>
             {t('domain:materialForm.newTitle')}
           </Button>
         ) : null}
@@ -168,7 +168,9 @@ function MaterialCard({
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <span className="text-foreground flex flex-wrap items-center gap-2 text-sm font-medium">
           {title}
-          {row.billed ? <Badge variant="muted">{t('domain:orders.materials.billed')}</Badge> : null}
+          {row.billed ? (
+            <StatusBadge tone="neutral">{t('domain:orders.materials.billed')}</StatusBadge>
+          ) : null}
         </span>
         <span className="text-muted-foreground text-sm whitespace-nowrap tabular-nums">
           {amount}
@@ -207,7 +209,7 @@ function MaterialListSkeleton({ label }: { label: string }) {
     <div className="flex max-w-3xl flex-col gap-3" role="status">
       <span className="sr-only">{label}</span>
       {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-        <Skeleton key={index} className="h-16 rounded-xl" />
+        <SkeletonBlock key={index} className="h-16 rounded-xl" />
       ))}
     </div>
   );

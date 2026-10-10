@@ -1,8 +1,7 @@
-'use client';
+import { Label } from '@fluentui/react-components';
 
 import { cn } from '../../lib/cn';
 import { DatePicker, type DatePickerProps } from './date-picker';
-import { Label } from './label';
 
 export type DateRangePickerProps = {
   start: string;
@@ -31,7 +30,7 @@ export type DateRangePickerProps = {
 /**
  * Zwei Datumsfelder. Das Ende darf nicht vor dem Beginn liegen; derselbe Tag gilt.
  */
-function DateRangePicker({
+export function DateRangePicker({
   start,
   end,
   onStartChange,
@@ -67,7 +66,9 @@ function DateRangePicker({
   return (
     <div className={cn('grid gap-4 sm:grid-cols-2', className)}>
       <div className="grid gap-2">
-        <Label htmlFor={startId}>{startLabel}</Label>
+        <Label htmlFor={startId} required={startRequired}>
+          {startLabel}
+        </Label>
         <DatePicker
           {...shared}
           id={startId}
@@ -78,7 +79,9 @@ function DateRangePicker({
         />
       </div>
       <div className="grid gap-2">
-        <Label htmlFor={endId}>{endLabel}</Label>
+        <Label htmlFor={endId} required={endRequired}>
+          {endLabel}
+        </Label>
         <DatePicker
           {...shared}
           id={endId}
@@ -93,5 +96,3 @@ function DateRangePicker({
     </div>
   );
 }
-
-export { DateRangePicker };

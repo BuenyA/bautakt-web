@@ -1,4 +1,6 @@
-import { Button, Skeleton, Uicon } from '@bautakt/ui';
+import { SkeletonBlock } from '@bautakt/ui';
+import { Button } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -44,7 +46,7 @@ export function OrderNotes({ orderId }: { orderId: string }) {
         action={
           <button
             type="button"
-            className="text-sm font-medium text-primary hover:underline"
+            className="text-sm font-medium text-brand hover:underline"
             onClick={() => void refetch()}
           >
             {t('common:action.retry')}
@@ -63,8 +65,7 @@ export function OrderNotes({ orderId }: { orderId: string }) {
         }
         action={
           canCreate ? (
-            <Button size="sm" onClick={openNew}>
-              <Uicon name="plus" size={16} />
+            <Button appearance="primary" size="small" onClick={openNew} icon={<AddRegular />}>
               {t('domain:noteForm.newTitle')}
             </Button>
           ) : undefined
@@ -93,8 +94,7 @@ export function OrderNotes({ orderId }: { orderId: string }) {
           {t('domain:orders.notes.title')}
         </h2>
         {canCreate ? (
-          <Button size="sm" onClick={openNew}>
-            <Uicon name="plus" size={16} />
+          <Button appearance="primary" size="small" onClick={openNew} icon={<AddRegular />}>
             {t('domain:noteForm.newTitle')}
           </Button>
         ) : null}
@@ -163,7 +163,7 @@ function NoteListSkeleton({ label }: { label: string }) {
     <div className="flex max-w-3xl flex-col gap-3" role="status">
       <span className="sr-only">{label}</span>
       {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-        <Skeleton key={index} className="h-24 rounded-xl" />
+        <SkeletonBlock key={index} className="h-24 rounded-xl" />
       ))}
     </div>
   );

@@ -14,7 +14,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* shadcn-Basis = --radius-lg. Die Stufen stehen explizit, nicht als calc,
+  /* Basis = --radius-lg. Die Stufen stehen explizit, nicht als calc,
      damit Light und Dark dieselbe Weichheit haben (Meta-Feeling, 2026-10-01). */
   --radius: 1rem;
   --radius-sm: 8px;

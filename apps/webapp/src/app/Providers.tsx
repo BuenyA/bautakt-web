@@ -1,4 +1,4 @@
-import { Toaster } from '@bautakt/ui';
+import { AppToaster } from '@bautakt/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,8 +23,8 @@ export function Providers({ children }: { children: ReactNode }) {
   );
 }
 
-/** Sonner beschriftet seine Region sonst englisch („Notifications alt+T“). */
+/** Die Toast-Region trägt einen deutschen Namen für Screenreader. */
 function LocalizedToaster() {
   const { t } = useTranslation();
-  return <Toaster customAriaLabel={t('common:toaster.label')} />;
+  return <AppToaster label={t('common:toaster.label')} />;
 }

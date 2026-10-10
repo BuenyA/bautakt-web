@@ -1,5 +1,5 @@
 import { eurosToMinor, formatMoney } from '@bautakt/finance';
-import { Badge, DataTable, type DataTableColumn } from '@bautakt/ui';
+import { DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -88,11 +88,11 @@ export function PayrollPage() {
                 row.original.role_name ||
                 t('domain:payroll.companyWide')}
             </span>
-            <Badge variant="muted">
+            <StatusBadge tone="neutral">
               {t(`domain:payroll.scopes.${row.original.scope}`, {
                 defaultValue: row.original.scope,
               })}
-            </Badge>
+            </StatusBadge>
           </span>
         ),
       },

@@ -1,4 +1,4 @@
-import { Uicon } from '@bautakt/ui';
+import { CloudArrowUpRegular, HourglassHalfRegular } from '@fluentui/react-icons';
 import { type DragEvent, type RefObject, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -56,7 +56,7 @@ export function OrderPhotoDropzone({
 
   return (
     <label
-      className="border-border bg-card focus-within:ring-ring data-[dragging=true]:border-primary data-[dragging=true]:bg-primary/10 flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed px-4 py-6 text-center shadow-sm transition-colors hover:border-border-strong focus-within:ring-2 focus-within:outline-none data-[busy=true]:opacity-60"
+      className="border-border bg-card focus-within:ring-ring data-[dragging=true]:border-brand-stroke data-[dragging=true]:bg-primary/10 flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed px-4 py-6 text-center shadow-sm transition-colors hover:border-border-strong focus-within:ring-2 focus-within:outline-none data-[busy=true]:opacity-60"
       data-dragging={dragging ? 'true' : 'false'}
       data-busy={busy ? 'true' : 'false'}
       onDragEnter={onDragEnter}
@@ -76,7 +76,11 @@ export function OrderPhotoDropzone({
           event.target.value = '';
         }}
       />
-      <Uicon name={busy ? 'hourglass' : 'cloud-upload'} size={22} className="text-primary" />
+      {busy ? (
+        <HourglassHalfRegular fontSize={22} className="text-brand" />
+      ) : (
+        <CloudArrowUpRegular fontSize={22} className="text-brand" />
+      )}
       <span className="text-foreground text-sm font-medium">{t('domain:photoForm.dropTitle')}</span>
       <span className="text-muted-foreground text-xs">{t('domain:photoForm.dropHint')}</span>
     </label>

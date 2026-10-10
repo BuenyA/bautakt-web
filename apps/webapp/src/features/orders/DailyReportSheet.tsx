@@ -1,25 +1,23 @@
 import { hasPermission } from '@bautakt/core';
 import {
-  Badge,
+  DangerButton,
+  FormDrawer,
+  FormDrawerDescription,
+  FormDrawerFooter,
+  FormDrawerTitle,
+  StatusBadge,
+  toast,
+} from '@bautakt/ui';
+import {
   Button,
   Checkbox,
+  DrawerBody,
+  DrawerHeader,
   Input,
   Label,
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
   Textarea,
-  toast,
-} from '@bautakt/ui';
+} from '@fluentui/react-components';
 import { type FormEvent, useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -93,23 +91,21 @@ export function DailyReportSheet({
 }) {
   const dismiss = useDismissLock(onOpenChange);
   return (
-    <Sheet open={open} onOpenChange={dismiss.handleOpenChange}>
-      <SheetContent className="p-0">
-        {open && draft ? (
-          <DailyReportForm
-            key={draft.id ?? 'new'}
-            initial={draft}
-            reports={reports}
-            staff={staff}
-            staffError={staffError}
-            staffPending={staffPending}
-            onOpenExisting={onOpenExisting}
-            onBusyChange={dismiss.onBusyChange}
-            onDone={() => onOpenChange(false)}
-          />
-        ) : null}
-      </SheetContent>
-    </Sheet>
+    <FormDrawer open={open} onOpenChange={dismiss.handleOpenChange}>
+      {open && draft ? (
+        <DailyReportForm
+          key={draft.id ?? 'new'}
+          initial={draft}
+          reports={reports}
+          staff={staff}
+          staffError={staffError}
+          staffPending={staffPending}
+          onOpenExisting={onOpenExisting}
+          onBusyChange={dismiss.onBusyChange}
+          onDone={() => onOpenChange(false)}
+        />
+      ) : null}
+    </FormDrawer>
   );
 }
 
@@ -328,15 +324,15 @@ function DailyReportForm({
       : t('domain:dailyReportForm.attendanceHintNone');
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
-      <SheetHeader>
-        <SheetTitle>
+    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full min-h-0 flex-col">
+      <DrawerHeader>
+        <FormDrawerTitle closeLabel={t('common:action.close')}>
           {draft.id ? t('domain:dailyReportForm.editTitle') : t('domain:dailyReportForm.newTitle')}
-        </SheetTitle>
-        <SheetDescription>{t('domain:dailyReportForm.description')}</SheetDescription>
-      </SheetHeader>
+        </FormDrawerTitle>
+        <FormDrawerDescription>{t('domain:dailyReportForm.description')}</FormDrawerDescription>
+      </DrawerHeader>
 
-      <SheetBody className="flex flex-col gap-4">
+      <DrawerBody className="flex flex-col gap-4">
         <div ref={dateRef} className="grid gap-2">
           <Label htmlFor={ids.date}>{t('domain:dailyReportForm.date')}</Label>
           <DatePicker
@@ -402,7 +398,9 @@ function DailyReportForm({
                     <label className="flex items-center gap-2 text-sm">
                       <Checkbox
                         checked={Boolean(row)}
-                        onCheckedChange={(value) => togglePerson(person.id, value === true)}
+                        onChange={(_, { checked: value }) =>
+                          togglePerson(person.id, value === true)
+                        }
                       />
                       <span className="text-foreground">
                         {person.endedAt
@@ -412,7 +410,9 @@ function DailyReportForm({
                           : person.name || t('domain:employees.unnamed')}
                       </span>
                       {row?.billed ? (
-                        <Badge variant="muted">{t('domain:dailyReportForm.billed')}</Badge>
+                        <StatusBadge tone="neutral">
+                          {t('domain:dailyReportForm.billed')}
+                        </StatusBadge>
                       ) : null}
                     </label>
                     {showTime && row?.billed ? (
@@ -424,7 +424,7 @@ function DailyReportForm({
                     {showTime && row && !row.billed ? (
                       <div className="grid grid-cols-2 gap-2 pl-6">
                         <div className="grid gap-1">
-                          <Label htmlFor={`${person.id}-start`} className="text-xs">
+                          <Label htmlFor={`${person.id}-start`} size="small">
                             {t('domain:dailyReportForm.start')}
                           </Label>
                           <TimeInput
@@ -435,7 +435,7 @@ function DailyReportForm({
                           />
                         </div>
                         <div className="grid gap-1">
-                          <Label htmlFor={`${person.id}-end`} className="text-xs">
+                          <Label htmlFor={`${person.id}-end`} size="small">
                             {t('domain:dailyReportForm.end')}
                           </Label>
                           <TimeInput
@@ -478,16 +478,16 @@ function DailyReportForm({
             onChange={(event) => set({ notes: event.target.value })}
           />
         </div>
-      </SheetBody>
+      </DrawerBody>
 
-      <SheetFooter className="sm:flex-col sm:items-stretch">
+      <FormDrawerFooter className="sm:flex-col sm:items-stretch">
         {duplicate ? (
           <div id={ids.duplicate} role="alert" className="flex flex-col items-start gap-1">
             <p className="text-destructive text-sm">{t('domain:dailyReportForm.duplicate')}</p>
             {duplicateId ? (
               <button
                 type="button"
-                className="text-primary text-sm font-medium hover:underline disabled:opacity-50"
+                className="text-brand text-sm font-medium hover:underline disabled:opacity-50"
                 disabled={openingExisting}
                 onClick={() => void openExisting()}
               >
@@ -508,24 +508,27 @@ function DailyReportForm({
         ) : null}
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
           {draft.id && canDelete ? (
-            <Button
+            <DangerButton
               type="button"
-              variant="destructive"
               className="sm:mr-auto"
               disabled={busy}
               onClick={() => setConfirmDelete(true)}
             >
               {t('domain:dailyReportForm.delete.action')}
-            </Button>
+            </DangerButton>
           ) : null}
-          <Button type="button" variant="outline" onClick={onDone} disabled={busy}>
+          <Button type="button" onClick={onDone} disabled={busy}>
             {t('common:action.cancel')}
           </Button>
-          <Button type="submit" disabled={busy || staffPending || staffError || duplicate}>
+          <Button
+            appearance="primary"
+            type="submit"
+            disabled={busy || staffPending || staffError || duplicate}
+          >
             {save.isPending ? t('domain:dailyReportForm.saving') : t('common:action.save')}
           </Button>
         </div>
-      </SheetFooter>
+      </FormDrawerFooter>
 
       {draft.id && canDelete ? (
         <DailyReportDeleteDialog
@@ -567,17 +570,19 @@ function WeatherField({
   return (
     <div className="grid gap-2">
       <Label htmlFor={fieldId}>{label}</Label>
-      <Select value={value || undefined} onValueChange={(next) => next && onChange(next)}>
-        <SelectTrigger id={fieldId} className="w-full">
-          <SelectValue placeholder={t('domain:dailyReportForm.chooseWeather')} />
-        </SelectTrigger>
-        <SelectContent>
-          {choices.map((choice) => (
-            <SelectItem key={choice} value={choice}>
-              {choice}
-            </SelectItem>
-          ))}
-        </SelectContent>
+      <Select
+        id={fieldId}
+        value={value || undefined}
+        onChange={(_, { value: next }) => next && onChange(next)}
+      >
+        <option value="" disabled>
+          {t('domain:dailyReportForm.chooseWeather')}
+        </option>
+        {choices.map((choice) => (
+          <option key={choice} value={choice}>
+            {choice}
+          </option>
+        ))}
       </Select>
     </div>
   );
@@ -600,7 +605,7 @@ function TemperatureField({
       <Input
         id={id}
         inputMode="decimal"
-        className="tabular-nums"
+        input={{ className: 'tabular-nums' }}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />

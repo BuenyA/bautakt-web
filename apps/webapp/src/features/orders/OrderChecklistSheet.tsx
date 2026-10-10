@@ -1,21 +1,12 @@
 import {
-  Button,
-  Input,
-  Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
+  DangerButton,
+  FormDrawer,
+  FormDrawerDescription,
+  FormDrawerFooter,
+  FormDrawerTitle,
   toast,
 } from '@bautakt/ui';
+import { Button, DrawerBody, DrawerHeader, Input, Label, Select } from '@fluentui/react-components';
 import { type FormEvent, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -51,17 +42,15 @@ export function OrderChecklistSheet({
 }) {
   const dismiss = useDismissLock(onOpenChange);
   return (
-    <Sheet open={open} onOpenChange={dismiss.handleOpenChange}>
-      <SheetContent className="p-0">
-        {open && draft ? (
-          <ChecklistItemForm
-            initial={draft}
-            onBusyChange={dismiss.onBusyChange}
-            onDone={() => onOpenChange(false)}
-          />
-        ) : null}
-      </SheetContent>
-    </Sheet>
+    <FormDrawer open={open} onOpenChange={dismiss.handleOpenChange}>
+      {open && draft ? (
+        <ChecklistItemForm
+          initial={draft}
+          onBusyChange={dismiss.onBusyChange}
+          onDone={() => onOpenChange(false)}
+        />
+      ) : null}
+    </FormDrawer>
   );
 }
 
@@ -163,15 +152,15 @@ function ChecklistItemForm({
   const assigneeValue = draft.assignedEmploymentId || CHECKLIST_UNASSIGNED;
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
-      <SheetHeader>
-        <SheetTitle>
+    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full min-h-0 flex-col">
+      <DrawerHeader>
+        <FormDrawerTitle closeLabel={t('common:action.close')}>
           {draft.id ? t('domain:checklistForm.editTitle') : t('domain:checklistForm.newTitle')}
-        </SheetTitle>
-        <SheetDescription>{t('domain:checklistForm.description')}</SheetDescription>
-      </SheetHeader>
+        </FormDrawerTitle>
+        <FormDrawerDescription>{t('domain:checklistForm.description')}</FormDrawerDescription>
+      </DrawerHeader>
 
-      <SheetBody className="flex flex-col gap-4">
+      <DrawerBody className="flex flex-col gap-4">
         <div className="grid gap-2">
           <Label htmlFor={ids.title}>{t('domain:checklistForm.title')}</Label>
           <Input
@@ -207,33 +196,28 @@ function ChecklistItemForm({
         <div className="grid gap-2">
           <Label htmlFor={ids.assignee}>{t('domain:checklistForm.assignee')}</Label>
           <Select
+            id={ids.assignee}
             value={assigneeValue}
-            onValueChange={(value) => {
+            onChange={(_, { value }) => {
               if (!value) return;
               set({
                 assignedEmploymentId: value === CHECKLIST_UNASSIGNED ? '' : value,
               });
             }}
           >
-            <SelectTrigger id={ids.assignee} className="w-full">
-              <SelectValue placeholder={t('domain:checklistForm.nobody')} />
-            </SelectTrigger>
-            {/* Nach oben, mit Abstand zur Fußleiste. Sonst deckt die Liste bei
-                1280×800 den Knopf „Punkt löschen“ ab. */}
-            <SelectContent side="top" align="start" collisionPadding={{ top: 16, bottom: 120 }}>
-              <SelectItem value={CHECKLIST_UNASSIGNED}>
-                {t('domain:checklistForm.nobody')}
-              </SelectItem>
-              {options.map((option) => (
-                <SelectItem key={option.id} value={option.id}>
-                  {option.ended
-                    ? t('domain:checklistForm.assigneeEnded', {
-                        name: option.name || t('domain:employees.unnamed'),
-                      })
-                    : option.name || t('domain:employees.unnamed')}
-                </SelectItem>
-              ))}
-            </SelectContent>
+            <option value="" disabled>
+              {t('domain:checklistForm.nobody')}
+            </option>
+            <option value={CHECKLIST_UNASSIGNED}>{t('domain:checklistForm.nobody')}</option>
+            {options.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.ended
+                  ? t('domain:checklistForm.assigneeEnded', {
+                      name: option.name || t('domain:employees.unnamed'),
+                    })
+                  : option.name || t('domain:employees.unnamed')}
+              </option>
+            ))}
           </Select>
           {employees.isError ? (
             <p className="text-destructive text-sm">{t('domain:checklistForm.employeesError')}</p>
@@ -253,27 +237,26 @@ function ChecklistItemForm({
             {error}
           </p>
         ) : null}
-      </SheetBody>
+      </DrawerBody>
 
-      <SheetFooter className="sm:flex-wrap">
+      <FormDrawerFooter className="sm:flex-wrap">
         {draft.id ? (
-          <Button
+          <DangerButton
             type="button"
-            variant="destructive"
             className="sm:mr-auto"
             disabled={busy}
             onClick={() => setConfirmDelete(true)}
           >
             {t('domain:checklistForm.delete.action')}
-          </Button>
+          </DangerButton>
         ) : null}
-        <Button type="button" variant="outline" onClick={onDone} disabled={busy}>
+        <Button type="button" onClick={onDone} disabled={busy}>
           {t('common:action.cancel')}
         </Button>
-        <Button type="submit" disabled={busy}>
+        <Button appearance="primary" type="submit" disabled={busy}>
           {t('common:action.save')}
         </Button>
-      </SheetFooter>
+      </FormDrawerFooter>
 
       {draft.id ? (
         <OrderChecklistDeleteDialog

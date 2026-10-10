@@ -1,26 +1,22 @@
 import { formatMoney, formatMoneyInput, todayIso } from '@bautakt/finance';
+import { toast } from '@bautakt/ui';
 import {
   Button,
   Card,
-  CardContent,
   CardHeader,
-  CardTitle,
   Input,
   Label,
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Text,
   Textarea,
-  toast,
-  Uicon,
-} from '@bautakt/ui';
+} from '@fluentui/react-components';
+import { AddRegular, DeleteRegular } from '@fluentui/react-icons';
 import { useId, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { DatePicker } from '@/components/form/dateTime';
@@ -132,9 +128,9 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
           title={t('domain:editor.lockedTitle')}
           description={t('domain:editor.lockedDescription')}
           action={
-            <Button asChild variant="outline" size="sm">
-              <Link to={routes.invoice(id)}>{t('domain:editor.toDocument')}</Link>
-            </Button>
+            <LinkButton size="small" to={routes.invoice(id)}>
+              {t('domain:editor.toDocument')}
+            </LinkButton>
           }
         />
       </div>
@@ -196,13 +192,12 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
         description={t('domain:editor.draftHint')}
         actions={
           <div className="flex items-center gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link to={state.type === 'quote' ? routes.quotes : routes.invoices}>
-                {t('common:action.cancel')}
-              </Link>
-            </Button>
+            <LinkButton size="small" to={state.type === 'quote' ? routes.quotes : routes.invoices}>
+              {t('common:action.cancel')}
+            </LinkButton>
             <Button
-              size="sm"
+              appearance="primary"
+              size="small"
               disabled={save.isPending || dueBeforeIssue}
               onClick={() => void onSave()}
             >
@@ -218,11 +213,15 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
         </p>
       ) : null}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{t('domain:editor.head')}</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <Card size="large">
+        <CardHeader
+          header={
+            <Text as="h2" size={400} weight="semibold">
+              {t('domain:editor.head')}
+            </Text>
+          }
+        />
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {/* Ueber den Feldern: der Kalender oeffnet nach unten und wuerde
               die Meldung direkt unter dem Faellig-Feld verdecken. */}
           {dueBeforeIssue ? (
@@ -237,22 +236,18 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
           <div className="grid gap-2">
             <Label htmlFor={customerFieldId}>{t('domain:invoices.columns.customer')}</Label>
             <Select
+              id={customerFieldId}
               value={state.customerId ?? NO_CUSTOMER}
-              onValueChange={(value) =>
+              onChange={(_, { value }) =>
                 update({ customerId: value === NO_CUSTOMER ? null : value })
               }
             >
-              <SelectTrigger id={customerFieldId} className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={NO_CUSTOMER}>{t('domain:invoices.noCustomer')}</SelectItem>
-                {(customers.data ?? []).map((customer) => (
-                  <SelectItem key={customer.id} value={customer.id}>
-                    {customerDisplayName(customer) || t('domain:customers.unnamed')}
-                  </SelectItem>
-                ))}
-              </SelectContent>
+              <option value={NO_CUSTOMER}>{t('domain:invoices.noCustomer')}</option>
+              {(customers.data ?? []).map((customer) => (
+                <option key={customer.id} value={customer.id}>
+                  {customerDisplayName(customer) || t('domain:customers.unnamed')}
+                </option>
+              ))}
             </Select>
           </div>
 
@@ -279,14 +274,18 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
             describedBy={dueBeforeIssue ? dueAlertId : undefined}
             invalid={dueBeforeIssue}
           />
-        </CardContent>
+        </div>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{t('domain:invoices.lines')}</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
+      <Card size="large">
+        <CardHeader
+          header={
+            <Text as="h2" size={400} weight="semibold">
+              {t('domain:invoices.lines')}
+            </Text>
+          }
+        />
+        <div className="flex flex-col gap-3">
           {state.lines.map((line) => (
             <div
               key={line.key}
@@ -300,21 +299,17 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
               <div className="grid gap-2">
                 <Label htmlFor={`line-${line.key}-kind`}>{t('domain:editor.kind')}</Label>
                 <Select
+                  id={`line-${line.key}-kind`}
                   value={line.kind}
-                  onValueChange={(value) =>
+                  onChange={(_, { value }) =>
                     updateLine(line.key, { kind: value as EditorLine['kind'] })
                   }
                 >
-                  <SelectTrigger id={`line-${line.key}-kind`} size="sm" className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {LINE_KINDS.map((kind) => (
-                      <SelectItem key={kind} value={kind}>
-                        {t(`domain:editor.kinds.${kind}`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
+                  {LINE_KINDS.map((kind) => (
+                    <option key={kind} value={kind}>
+                      {t(`domain:editor.kinds.${kind}`)}
+                    </option>
+                  ))}
                 </Select>
               </div>
               <Field
@@ -348,28 +343,24 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
               </div>
               <div className="flex items-end justify-end">
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-9"
+                  appearance="subtle"
                   aria-label={t('domain:editor.removeLine')}
                   disabled={state.lines.length === 1}
                   onClick={() =>
                     update({ lines: state.lines.filter((entry) => entry.key !== line.key) })
                   }
-                >
-                  <Uicon name="trash" size={16} />
-                </Button>
+                  icon={<DeleteRegular />}
+                />
               </div>
             </div>
           ))}
 
           <div className="flex items-center justify-between gap-4">
             <Button
-              variant="outline"
-              size="sm"
+              size="small"
               onClick={() => update({ lines: [...state.lines, emptyLine()] })}
+              icon={<AddRegular />}
             >
-              <Uicon name="plus" size={16} />
               {t('domain:editor.addLine')}
             </Button>
 
@@ -389,14 +380,18 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
               />
             </dl>
           </div>
-        </CardContent>
+        </div>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{t('domain:editor.texts')}</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 lg:grid-cols-2">
+      <Card size="large">
+        <CardHeader
+          header={
+            <Text as="h2" size={400} weight="semibold">
+              {t('domain:editor.texts')}
+            </Text>
+          }
+        />
+        <div className="grid gap-4 lg:grid-cols-2">
           <div className="grid gap-2">
             <Label htmlFor={introFieldId}>{t('domain:editor.intro')}</Label>
             <Textarea
@@ -415,7 +410,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
               onChange={(event) => update({ footerText: event.target.value })}
             />
           </div>
-        </CardContent>
+        </div>
       </Card>
     </div>
   );
@@ -438,7 +433,7 @@ function Field({
       <Label htmlFor={fieldId}>{label}</Label>
       <Input
         id={fieldId}
-        className={numeric ? 'h-9 text-right tabular-nums' : 'h-9'}
+        input={numeric ? { className: 'text-right tabular-nums' } : undefined}
         inputMode={numeric ? 'decimal' : undefined}
         value={value}
         onChange={(event) => onChange(event.target.value)}

@@ -6,24 +6,21 @@ import {
   todayIso,
 } from '@bautakt/finance';
 import {
+  FormDrawer,
+  FormDrawerDescription,
+  FormDrawerFooter,
+  FormDrawerTitle,
+  toast,
+} from '@bautakt/ui';
+import {
   Button,
+  DrawerBody,
+  DrawerHeader,
   Input,
   Label,
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
   Textarea,
-  toast,
-} from '@bautakt/ui';
+} from '@fluentui/react-components';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -104,11 +101,9 @@ export function ExpenseSheet({
   onOpenChange: (open: boolean) => void;
 }) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="p-0">
-        {open ? <ExpenseForm onDone={() => onOpenChange(false)} /> : null}
-      </SheetContent>
-    </Sheet>
+    <FormDrawer open={open} onOpenChange={onOpenChange}>
+      {open ? <ExpenseForm onDone={() => onOpenChange(false)} /> : null}
+    </FormDrawer>
   );
 }
 
@@ -167,13 +162,15 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
-      <SheetHeader>
-        <SheetTitle>{t('domain:expenseForm.title')}</SheetTitle>
-        <SheetDescription>{t('domain:expenseForm.description')}</SheetDescription>
-      </SheetHeader>
+    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full min-h-0 flex-col">
+      <DrawerHeader>
+        <FormDrawerTitle closeLabel={t('common:action.close')}>
+          {t('domain:expenseForm.title')}
+        </FormDrawerTitle>
+        <FormDrawerDescription>{t('domain:expenseForm.description')}</FormDrawerDescription>
+      </DrawerHeader>
 
-      <SheetBody className="flex flex-col gap-4">
+      <DrawerBody className="flex flex-col gap-4">
         <div className="grid gap-2">
           <Label htmlFor={ids.title}>{t('domain:expenses.columns.title')}</Label>
           <Input id={ids.title} value={title} onChange={(event) => setTitle(event.target.value)} />
@@ -190,17 +187,19 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
 
         <div className="grid gap-2">
           <Label htmlFor={categoryFieldId}>{t('domain:expenses.columns.category')}</Label>
-          <Select value={categoryId} onValueChange={setCategoryId}>
-            <SelectTrigger id={categoryFieldId} className="w-full">
-              <SelectValue placeholder={t('domain:timeForm.choose')} />
-            </SelectTrigger>
-            <SelectContent>
-              {(categories.data ?? []).map((category) => (
-                <SelectItem key={category.id} value={category.id}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
+          <Select
+            id={categoryFieldId}
+            value={categoryId}
+            onChange={(_, { value }) => setCategoryId(value)}
+          >
+            <option value="" disabled>
+              {t('domain:timeForm.choose')}
+            </option>
+            {(categories.data ?? []).map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
           </Select>
         </div>
 
@@ -220,7 +219,7 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
             <Input
               id={ids.net}
               inputMode="decimal"
-              className="text-right tabular-nums"
+              input={{ className: 'text-right tabular-nums' }}
               placeholder="0,00"
               value={net}
               onChange={(event) => setNet(event.target.value)}
@@ -228,17 +227,16 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
           </div>
           <div className="grid gap-2">
             <Label htmlFor={vatRateFieldId}>{t('domain:expenseForm.vatRate')}</Label>
-            <Select value={vatRate} onValueChange={setVatRate}>
-              <SelectTrigger id={vatRateFieldId} className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {VAT_RATES.map((rate) => (
-                  <SelectItem key={rate} value={rate}>
-                    {rate} %
-                  </SelectItem>
-                ))}
-              </SelectContent>
+            <Select
+              id={vatRateFieldId}
+              value={vatRate}
+              onChange={(_, { value }) => setVatRate(value)}
+            >
+              {VAT_RATES.map((rate) => (
+                <option key={rate} value={rate}>
+                  {rate} %
+                </option>
+              ))}
             </Select>
           </div>
         </div>
@@ -265,16 +263,16 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
         </div>
 
         {error ? <p className="text-destructive text-sm">{error}</p> : null}
-      </SheetBody>
+      </DrawerBody>
 
-      <SheetFooter>
-        <Button type="button" variant="outline" onClick={onDone}>
+      <FormDrawerFooter>
+        <Button type="button" onClick={onDone}>
           {t('common:action.cancel')}
         </Button>
-        <Button type="submit" disabled={create.isPending}>
+        <Button appearance="primary" type="submit" disabled={create.isPending}>
           {t('common:action.save')}
         </Button>
-      </SheetFooter>
+      </FormDrawerFooter>
     </form>
   );
 }

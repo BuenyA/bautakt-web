@@ -1,25 +1,23 @@
 import { hasPermission } from '@bautakt/core';
 import {
-  Badge,
+  DangerButton,
+  FormDrawer,
+  FormDrawerDescription,
+  FormDrawerFooter,
+  FormDrawerTitle,
+  StatusBadge,
+  toast,
+} from '@bautakt/ui';
+import {
   Button,
   Checkbox,
+  DrawerBody,
+  DrawerHeader,
   Input,
   Label,
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
   Textarea,
-  toast,
-} from '@bautakt/ui';
+} from '@fluentui/react-components';
 import { type FormEvent, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -63,17 +61,15 @@ export function TimeEntrySheet({
 }) {
   const dismiss = useDismissLock(onOpenChange);
   return (
-    <Sheet open={open} onOpenChange={dismiss.handleOpenChange}>
-      <SheetContent className="p-0">
-        {open && draft ? (
-          <TimeEntryForm
-            initial={draft}
-            onBusyChange={dismiss.onBusyChange}
-            onDone={() => onOpenChange(false)}
-          />
-        ) : null}
-      </SheetContent>
-    </Sheet>
+    <FormDrawer open={open} onOpenChange={dismiss.handleOpenChange}>
+      {open && draft ? (
+        <TimeEntryForm
+          initial={draft}
+          onBusyChange={dismiss.onBusyChange}
+          onDone={() => onOpenChange(false)}
+        />
+      ) : null}
+    </FormDrawer>
   );
 }
 
@@ -193,18 +189,20 @@ function TimeEntryForm({
   });
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
-      <SheetHeader>
-        <SheetTitle>
+    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full min-h-0 flex-col">
+      <DrawerHeader>
+        <FormDrawerTitle closeLabel={t('common:action.close')}>
           <span className="inline-flex flex-wrap items-center gap-2">
             {draft.id ? t('domain:timeForm.editTitle') : t('domain:timeForm.newTitle')}
-            {draft.billed ? <Badge variant="muted">{t('domain:times.billed')}</Badge> : null}
+            {draft.billed ? (
+              <StatusBadge tone="neutral">{t('domain:times.billed')}</StatusBadge>
+            ) : null}
           </span>
-        </SheetTitle>
-        <SheetDescription>{t('domain:timeForm.description')}</SheetDescription>
-      </SheetHeader>
+        </FormDrawerTitle>
+        <FormDrawerDescription>{t('domain:timeForm.description')}</FormDrawerDescription>
+      </DrawerHeader>
 
-      <SheetBody className="flex flex-col gap-4">
+      <DrawerBody className="flex flex-col gap-4">
         {locked ? (
           <p role="status" className="text-muted-foreground text-sm">
             {t('domain:timeForm.billedHint')}
@@ -214,29 +212,26 @@ function TimeEntryForm({
         <div className="grid gap-2">
           <Label htmlFor={orderFieldId}>{t('domain:times.columns.order')}</Label>
           <Select
+            id={orderFieldId}
             key={orderSelectKey}
             value={draft.orderId}
-            onValueChange={chooseOrder}
+            onChange={(_, { value }) => chooseOrder(value)}
             disabled={locked || draft.lockOrder}
           >
-            <SelectTrigger id={orderFieldId} className="w-full">
-              <SelectValue
-                placeholder={
-                  draft.orderId && orders.isPending
-                    ? t('common:state.loading')
-                    : t('domain:timeForm.choose')
-                }
-              >
-                {resolvedOrderLabel || undefined}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {orderOptions.map((order) => (
-                <SelectItem key={order.id} value={order.id}>
-                  {order.name.trim() || t('domain:timeForm.unnamedOrder')}
-                </SelectItem>
-              ))}
-            </SelectContent>
+            <option value="" disabled>
+              {draft.orderId && orders.isPending
+                ? t('common:state.loading')
+                : t('domain:timeForm.choose')}
+            </option>
+            {/* Auftrag des Eintrags, der (noch) nicht in der Liste steht: Name aus dem Eintrag. */}
+            {draft.orderId && !orderOptions.some((order) => order.id === draft.orderId) ? (
+              <option value={draft.orderId}>{resolvedOrderLabel}</option>
+            ) : null}
+            {orderOptions.map((order) => (
+              <option key={order.id} value={order.id}>
+                {order.name.trim() || t('domain:timeForm.unnamedOrder')}
+              </option>
+            ))}
           </Select>
           {orders.isError ? (
             <p className="text-destructive text-sm">{t('domain:timeForm.ordersError')}</p>
@@ -266,7 +261,9 @@ function TimeEntryForm({
                       <Checkbox
                         checked={checked}
                         disabled={locked}
-                        onCheckedChange={(value) => toggleEmployee(employee.id, value === true)}
+                        onChange={(_, { checked: value }) =>
+                          toggleEmployee(employee.id, value === true)
+                        }
                       />
                       <span>{employee.name || t('domain:employees.unnamed')}</span>
                     </label>
@@ -279,23 +276,22 @@ function TimeEntryForm({
           <div className="grid gap-2">
             <Label htmlFor={employeeFieldId}>{t('domain:times.columns.employee')}</Label>
             <Select
+              id={employeeFieldId}
               value={draft.employmentIds[0] ?? ''}
-              onValueChange={(value) => {
+              onChange={(_, { value }) => {
                 if (!value) return;
                 set({ employmentIds: [value] });
               }}
               disabled={locked}
             >
-              <SelectTrigger id={employeeFieldId} className="w-full">
-                <SelectValue placeholder={t('domain:timeForm.choose')} />
-              </SelectTrigger>
-              <SelectContent>
-                {selectableEmployees.map((employee) => (
-                  <SelectItem key={employee.id} value={employee.id}>
-                    {employee.name || t('domain:employees.unnamed')}
-                  </SelectItem>
-                ))}
-              </SelectContent>
+              <option value="" disabled>
+                {t('domain:timeForm.choose')}
+              </option>
+              {selectableEmployees.map((employee) => (
+                <option key={employee.id} value={employee.id}>
+                  {employee.name || t('domain:employees.unnamed')}
+                </option>
+              ))}
             </Select>
             <p className="text-muted-foreground text-sm">{t('domain:timeForm.editEmployeeHint')}</p>
           </div>
@@ -351,7 +347,7 @@ function TimeEntryForm({
               id={ids.pause}
               inputMode="numeric"
               disabled={locked}
-              className="text-right tabular-nums"
+              input={{ className: 'text-right tabular-nums' }}
               value={draft.breakMinutes}
               onChange={(event) => set({ breakMinutes: event.target.value })}
             />
@@ -375,29 +371,28 @@ function TimeEntryForm({
             {error}
           </p>
         ) : null}
-      </SheetBody>
+      </DrawerBody>
 
-      <SheetFooter className="sm:flex-wrap">
+      <FormDrawerFooter className="sm:flex-wrap">
         {draft.id && !locked ? (
-          <Button
+          <DangerButton
             type="button"
-            variant="destructive"
             className="sm:mr-auto"
             disabled={busy}
             onClick={() => setConfirmDelete(true)}
           >
             {t('domain:timeForm.delete.action')}
-          </Button>
+          </DangerButton>
         ) : null}
-        <Button type="button" variant="outline" onClick={onDone} disabled={busy}>
+        <Button type="button" onClick={onDone} disabled={busy}>
           {t('common:action.cancel')}
         </Button>
         {locked ? null : (
-          <Button type="submit" disabled={busy}>
+          <Button appearance="primary" type="submit" disabled={busy}>
             {t('common:action.save')}
           </Button>
         )}
-      </SheetFooter>
+      </FormDrawerFooter>
 
       {draft.id ? (
         <TimeEntryDeleteDialog

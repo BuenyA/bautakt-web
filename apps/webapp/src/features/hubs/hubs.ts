@@ -1,5 +1,20 @@
 import { hasPermission, type PermissionKey } from '@bautakt/core';
-import type { UiconName } from '@bautakt/ui';
+import {
+  BeachRegular,
+  BoxMultipleRegular,
+  BoxRegular,
+  DataHistogramRegular,
+  DocumentEditRegular,
+  DocumentTextRegular,
+  type FluentIcon,
+  LayerRegular,
+  MegaphoneRegular,
+  MoneyRegular,
+  PersonAddRegular,
+  PersonRegular,
+  ReceiptRegular,
+  WalletRegular,
+} from '@fluentui/react-icons';
 
 import { routes } from '@/lib/routes';
 
@@ -15,7 +30,7 @@ export type HubCard = PermissionGate & {
   titleKey: string;
   descriptionKey: string;
   to: string;
-  icon: UiconName;
+  icon: FluentIcon;
   /** Erste Zelle, Primary-Ring, zwei Spalten ab `sm`. Nur Rechnungen. */
   featured?: boolean;
   /**
@@ -30,7 +45,7 @@ export type Hub = {
   to: string;
   titleKey: string;
   descriptionKey: string;
-  icon: UiconName;
+  icon: FluentIcon;
   cards: HubCard[];
 };
 
@@ -64,13 +79,13 @@ export const financeHub: Hub = {
   to: routes.financeHub,
   titleKey: 'common:nav.finance',
   descriptionKey: 'common:hub.finance.description',
-  icon: 'wallet',
+  icon: WalletRegular,
   cards: [
     {
       titleKey: 'common:nav.invoices',
       descriptionKey: 'common:hub.finance.invoicesDescription',
       to: routes.invoices,
-      icon: 'file-invoice',
+      icon: DocumentTextRegular,
       anyPermission: ['canUseBillingModule', 'canViewManagementInvoices'],
       featured: true,
     },
@@ -78,35 +93,35 @@ export const financeHub: Hub = {
       titleKey: 'common:nav.quotes',
       descriptionKey: 'common:hub.finance.quotesDescription',
       to: routes.quotes,
-      icon: 'file-edit',
+      icon: DocumentEditRegular,
       anyPermission: ['canUseBillingModule', 'canViewManagementInvoices'],
     },
     {
       titleKey: 'common:nav.receivables',
       descriptionKey: 'common:hub.finance.receivablesDescription',
       to: routes.receivables,
-      icon: 'money-bill-wave',
+      icon: MoneyRegular,
       permission: 'canViewCompanyFinance',
     },
     {
       titleKey: 'common:nav.expenses',
       descriptionKey: 'common:hub.finance.expensesDescription',
       to: routes.expenses,
-      icon: 'receipt',
+      icon: ReceiptRegular,
       anyPermission: ['canViewCompanyFinance', 'canManageOverheadCosts'],
     },
     {
       titleKey: 'common:nav.dunning',
       descriptionKey: 'common:hub.finance.dunningDescription',
       to: routes.dunning,
-      icon: 'megaphone',
+      icon: MegaphoneRegular,
       anyPermission: ['canUseBillingModule', 'canViewCompanyFinance'],
     },
     {
       titleKey: 'common:nav.reports',
       descriptionKey: 'common:hub.finance.reportsDescription',
       to: routes.reports,
-      icon: 'chart-histogram',
+      icon: DataHistogramRegular,
       permission: 'canViewCompanyFinance',
     },
   ],
@@ -117,27 +132,27 @@ export const personalHub: Hub = {
   to: routes.personalHub,
   titleKey: 'common:nav.employees',
   descriptionKey: 'common:hub.personal.description',
-  icon: 'user',
+  icon: PersonRegular,
   cards: [
     {
       titleKey: 'common:hub.personal.directoryTitle',
       descriptionKey: 'common:hub.personal.directoryDescription',
       to: routes.employees,
-      icon: 'user',
+      icon: PersonRegular,
       permission: 'canManageEmployees',
     },
     {
       titleKey: 'common:nav.absences',
       descriptionKey: 'common:hub.personal.absencesDescription',
       to: routes.absences,
-      icon: 'umbrella-beach',
+      icon: BeachRegular,
       permission: 'canManageAbsences',
     },
     {
       titleKey: 'common:nav.payroll',
       descriptionKey: 'common:hub.personal.payrollDescription',
       to: routes.payroll,
-      icon: 'wallet',
+      icon: WalletRegular,
       anyPermission: ['canViewWageCosts', 'canManageRates'],
     },
     {
@@ -146,7 +161,7 @@ export const personalHub: Hub = {
       titleKey: 'common:hub.personal.addTitle',
       descriptionKey: 'common:hub.personal.addDescription',
       to: routes.employees,
-      icon: 'plus',
+      icon: PersonAddRegular,
       permission: 'canManageEmployees',
       duplicate: true,
     },
@@ -158,20 +173,20 @@ export const materialHub: Hub = {
   to: routes.materialHub,
   titleKey: 'common:nav.material',
   descriptionKey: 'common:hub.material.description',
-  icon: 'boxes',
+  icon: BoxMultipleRegular,
   cards: [
     {
       titleKey: 'common:nav.catalog',
       descriptionKey: 'common:hub.material.catalogDescription',
       to: routes.catalog,
-      icon: 'box',
+      icon: BoxRegular,
       permission: 'canManageCatalog',
     },
     {
       titleKey: 'common:nav.costCenters',
       descriptionKey: 'common:hub.material.costCentersDescription',
       to: routes.costCenters,
-      icon: 'layers',
+      icon: LayerRegular,
       permission: 'canManageCostCenters',
     },
   ],

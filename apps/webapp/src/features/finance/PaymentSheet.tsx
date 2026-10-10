@@ -7,24 +7,21 @@ import {
   todayIso,
 } from '@bautakt/finance';
 import {
+  FormDrawer,
+  FormDrawerDescription,
+  FormDrawerFooter,
+  FormDrawerTitle,
+  toast,
+} from '@bautakt/ui';
+import {
   Button,
+  DrawerBody,
+  DrawerHeader,
   Input,
   Label,
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
   Textarea,
-  toast,
-} from '@bautakt/ui';
+} from '@fluentui/react-components';
 import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -75,17 +72,15 @@ export function PaymentSheet({
   openMinor: number;
 }) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="p-0">
-        {open ? (
-          <PaymentForm
-            documentId={documentId}
-            openMinor={openMinor}
-            onDone={() => onOpenChange(false)}
-          />
-        ) : null}
-      </SheetContent>
-    </Sheet>
+    <FormDrawer open={open} onOpenChange={onOpenChange}>
+      {open ? (
+        <PaymentForm
+          documentId={documentId}
+          openMinor={openMinor}
+          onDone={() => onOpenChange(false)}
+        />
+      ) : null}
+    </FormDrawer>
   );
 }
 
@@ -152,15 +147,17 @@ function PaymentForm({
   }
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
-      <SheetHeader>
-        <SheetTitle>{t('domain:payments.add')}</SheetTitle>
-        <SheetDescription>
+    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full min-h-0 flex-col">
+      <DrawerHeader>
+        <FormDrawerTitle closeLabel={t('common:action.close')}>
+          {t('domain:payments.add')}
+        </FormDrawerTitle>
+        <FormDrawerDescription>
           {t('domain:payments.openHint', { amount: formatMoney(openMinor) })}
-        </SheetDescription>
-      </SheetHeader>
+        </FormDrawerDescription>
+      </DrawerHeader>
 
-      <SheetBody className="flex flex-col gap-4">
+      <DrawerBody className="flex flex-col gap-4">
         <div className="grid gap-2">
           <Label htmlFor={amountId}>{t('domain:payments.amount')}</Label>
           <Input
@@ -201,17 +198,12 @@ function PaymentForm({
 
         <div className="grid gap-2">
           <Label htmlFor={methodFieldId}>{t('domain:payments.method')}</Label>
-          <Select value={method} onValueChange={setMethod}>
-            <SelectTrigger id={methodFieldId} className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {METHODS.map((value) => (
-                <SelectItem key={value} value={value}>
-                  {t(`domain:payments.methods.${value}`)}
-                </SelectItem>
-              ))}
-            </SelectContent>
+          <Select id={methodFieldId} value={method} onChange={(_, { value }) => setMethod(value)}>
+            {METHODS.map((value) => (
+              <option key={value} value={value}>
+                {t(`domain:payments.methods.${value}`)}
+              </option>
+            ))}
           </Select>
         </div>
 
@@ -226,16 +218,16 @@ function PaymentForm({
         </div>
 
         {error ? <p className="text-destructive text-sm">{error}</p> : null}
-      </SheetBody>
+      </DrawerBody>
 
-      <SheetFooter>
-        <Button type="button" variant="outline" onClick={onDone}>
+      <FormDrawerFooter>
+        <Button type="button" onClick={onDone}>
           {t('common:action.cancel')}
         </Button>
-        <Button type="submit" disabled={addPayment.isPending}>
+        <Button appearance="primary" type="submit" disabled={addPayment.isPending}>
           {t('common:action.save')}
         </Button>
-      </SheetFooter>
+      </FormDrawerFooter>
     </form>
   );
 }

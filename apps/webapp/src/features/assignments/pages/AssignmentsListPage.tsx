@@ -1,12 +1,6 @@
-import {
-  Button,
-  DataTable,
-  type DataTableColumn,
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  Uicon,
-} from '@bautakt/ui';
+import { DataTable, type DataTableColumn } from '@bautakt/ui';
+import { Button, Tab, TabList } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router';
@@ -59,7 +53,7 @@ export function AssignmentsListPage() {
         cell: ({ row }) => (
           <Link
             to={routes.assignment(row.original.id)}
-            className="text-foreground hover:text-primary font-medium whitespace-nowrap hover:underline"
+            className="text-foreground hover:text-brand font-medium whitespace-nowrap hover:underline"
             onClick={(event) => event.stopPropagation()}
           >
             {formatDateTimeRange(row.original.starts_at, row.original.ends_at)}
@@ -113,7 +107,7 @@ export function AssignmentsListPage() {
           action={
             <button
               type="button"
-              className="text-primary cursor-pointer text-sm font-medium hover:underline"
+              className="text-brand cursor-pointer text-sm font-medium hover:underline"
               onClick={() => void refetch()}
             >
               {t('common:action.retry')}
@@ -131,8 +125,12 @@ export function AssignmentsListPage() {
         description={t('domain:assignments.listDescription')}
         actions={
           canManage ? (
-            <Button size="sm" onClick={() => setSheetOpen(true)}>
-              <Uicon name="plus" size={16} />
+            <Button
+              appearance="primary"
+              size="small"
+              onClick={() => setSheetOpen(true)}
+              icon={<AddRegular />}
+            >
               {t('domain:assignments.create.action')}
             </Button>
           ) : null
@@ -147,12 +145,14 @@ export function AssignmentsListPage() {
         exportFileName="einsaetze"
         onRowClick={(assignment) => void navigate(routes.assignment(assignment.id))}
         toolbar={
-          <Tabs value={filter} onValueChange={setFilter}>
-            <TabsList aria-label={t('domain:assignments.filtersLabel')}>
-              <TabsTrigger value="all">{t('domain:assignments.filterAll')}</TabsTrigger>
-              <TabsTrigger value="week">{t('domain:assignments.filterThisWeek')}</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <TabList
+            selectedValue={filter}
+            onTabSelect={(_, data) => setFilter(data.value as typeof filter)}
+            aria-label={t('domain:assignments.filtersLabel')}
+          >
+            <Tab value="all">{t('domain:assignments.filterAll')}</Tab>
+            <Tab value="week">{t('domain:assignments.filterThisWeek')}</Tab>
+          </TabList>
         }
         empty={
           <EmptyState
@@ -172,15 +172,19 @@ export function AssignmentsListPage() {
               canManage || filter === 'week' ? (
                 <div className="flex flex-col items-center gap-3">
                   {canManage ? (
-                    <Button size="sm" onClick={() => setSheetOpen(true)}>
-                      <Uicon name="plus" size={16} />
+                    <Button
+                      appearance="primary"
+                      size="small"
+                      onClick={() => setSheetOpen(true)}
+                      icon={<AddRegular />}
+                    >
                       {t('domain:assignments.create.action')}
                     </Button>
                   ) : null}
                   {filter === 'week' ? (
                     <button
                       type="button"
-                      className="text-primary cursor-pointer text-sm font-medium hover:underline"
+                      className="text-brand cursor-pointer text-sm font-medium hover:underline"
                       onClick={() => setFilter('all')}
                     >
                       {t('domain:assignments.emptyWeekShowAll')}

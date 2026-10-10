@@ -1,5 +1,14 @@
 import { formatMoney } from '@bautakt/finance';
-import { Card, CardContent, cn, Skeleton, Uicon, type UiconName } from '@bautakt/ui';
+import { cn, SkeletonBlock } from '@bautakt/ui';
+import { Card } from '@fluentui/react-components';
+import {
+  ChevronRightRegular,
+  DataHistogramRegular,
+  DocumentEditRegular,
+  type FluentIcon,
+  MoneyRegular,
+  WarningRegular,
+} from '@fluentui/react-icons';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
@@ -49,7 +58,7 @@ export function OverviewPage() {
         <>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <KpiCard
-              icon="money-bill-wave"
+              icon={MoneyRegular}
               label={t('domain:overview.openReceivables')}
               value={formatMoney(kpis.openReceivablesMinor)}
               note={t('domain:receivables.documentCount', { count: kpis.openReceivablesCount })}
@@ -57,7 +66,7 @@ export function OverviewPage() {
               isLoading={isLoading}
             />
             <KpiCard
-              icon="exclamation"
+              icon={WarningRegular}
               label={t('domain:overview.overdue')}
               value={formatMoney(kpis.overdueMinor)}
               note={t('domain:receivables.documentCount', { count: kpis.overdueCount })}
@@ -66,7 +75,7 @@ export function OverviewPage() {
               isLoading={isLoading}
             />
             <KpiCard
-              icon="chart-histogram"
+              icon={DataHistogramRegular}
               label={t('domain:overview.revenueMonth')}
               value={formatMoney(kpis.revenueMonthMinor)}
               note={
@@ -80,7 +89,7 @@ export function OverviewPage() {
               isLoading={isLoading}
             />
             <KpiCard
-              icon="file-edit"
+              icon={DocumentEditRegular}
               label={t('domain:overview.drafts')}
               value={String(tasks.draftDocuments)}
               note={t('domain:overview.draftsNote')}
@@ -89,14 +98,14 @@ export function OverviewPage() {
             />
           </div>
 
-          <Card>
-            <CardContent className="flex flex-col gap-1">
+          <Card size="large">
+            <div className="flex flex-col gap-1">
               <h2 className="text-foreground mb-2 text-base font-semibold">
                 {t('domain:overview.tasksTitle')}
               </h2>
 
               {isLoading ? (
-                <Skeleton className="h-24 w-full" />
+                <SkeletonBlock className="h-24 w-full" />
               ) : (
                 <ul className="flex flex-col">
                   <TaskRow
@@ -121,7 +130,7 @@ export function OverviewPage() {
                   ) : null}
                 </ul>
               )}
-            </CardContent>
+            </div>
           </Card>
         </>
       )}
@@ -130,7 +139,7 @@ export function OverviewPage() {
 }
 
 function KpiCard({
-  icon,
+  icon: Icon,
   label,
   value,
   note,
@@ -138,7 +147,7 @@ function KpiCard({
   tone,
   isLoading,
 }: {
-  icon: UiconName;
+  icon: FluentIcon;
   label: string;
   value: string;
   note: string;
@@ -147,15 +156,15 @@ function KpiCard({
   isLoading?: boolean;
 }) {
   return (
-    <Card className="hover:border-border-strong transition-colors">
-      <CardContent>
+    <Card size="large" className="hover:border-border-strong transition-colors">
+      <div>
         <Link to={to} className="flex flex-col gap-1">
           <span className="text-muted-foreground flex items-center gap-2 text-sm">
-            <Uicon name={icon} size={16} />
+            <Icon fontSize={16} />
             {label}
           </span>
           {isLoading ? (
-            <Skeleton className="my-1 h-8 w-32" />
+            <SkeletonBlock className="my-1 h-8 w-32" />
           ) : (
             <span
               className={cn(
@@ -168,7 +177,7 @@ function KpiCard({
           )}
           <span className="text-text-subtle text-xs">{note}</span>
         </Link>
-      </CardContent>
+      </div>
     </Card>
   );
 }
@@ -188,9 +197,8 @@ function TaskRow({ count, label, to }: { count: number; label: string; to: strin
       >
         <span className="bg-primary size-1.5 shrink-0 rounded-full" aria-hidden="true" />
         <span className="min-w-0 flex-1">{label}</span>
-        <Uicon
-          name="angle-right"
-          size={14}
+        <ChevronRightRegular
+          fontSize={14}
           className="text-text-subtle group-hover:text-foreground"
         />
       </Link>

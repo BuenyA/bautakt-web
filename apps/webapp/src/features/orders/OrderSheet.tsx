@@ -1,22 +1,19 @@
 import {
+  FormDrawer,
+  FormDrawerDescription,
+  FormDrawerFooter,
+  FormDrawerTitle,
+  toast,
+} from '@bautakt/ui';
+import {
   Button,
+  DrawerBody,
+  DrawerHeader,
   Input,
   Label,
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
   Textarea,
-  toast,
-} from '@bautakt/ui';
+} from '@fluentui/react-components';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, type Ref, useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -97,17 +94,15 @@ export function OrderSheet(
 ) {
   const { open, onOpenChange } = props;
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="p-0">
-        {open ? (
-          props.mode === 'edit' ? (
-            <OrderEditForm order={props.order} onDone={() => onOpenChange(false)} />
-          ) : (
-            <OrderForm onDone={() => onOpenChange(false)} />
-          )
-        ) : null}
-      </SheetContent>
-    </Sheet>
+    <FormDrawer open={open} onOpenChange={onOpenChange}>
+      {open ? (
+        props.mode === 'edit' ? (
+          <OrderEditForm order={props.order} onDone={() => onOpenChange(false)} />
+        ) : (
+          <OrderForm onDone={() => onOpenChange(false)} />
+        )
+      ) : null}
+    </FormDrawer>
   );
 }
 
@@ -157,13 +152,15 @@ function OrderForm({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
-      <SheetHeader>
-        <SheetTitle>{t('domain:orders.create.title')}</SheetTitle>
-        <SheetDescription>{t('domain:orders.create.description')}</SheetDescription>
-      </SheetHeader>
+    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full min-h-0 flex-col">
+      <DrawerHeader>
+        <FormDrawerTitle closeLabel={t('common:action.close')}>
+          {t('domain:orders.create.title')}
+        </FormDrawerTitle>
+        <FormDrawerDescription>{t('domain:orders.create.description')}</FormDrawerDescription>
+      </DrawerHeader>
 
-      <SheetBody className="flex flex-col gap-4">
+      <DrawerBody className="flex flex-col gap-4">
         <TextField
           id={ids.name}
           label={t('domain:orders.columns.name')}
@@ -211,16 +208,16 @@ function OrderForm({ onDone }: { onDone: () => void }) {
         </div>
 
         {error ? <p className="text-destructive text-sm">{error}</p> : null}
-      </SheetBody>
+      </DrawerBody>
 
-      <SheetFooter>
-        <Button type="button" variant="outline" onClick={onDone}>
+      <FormDrawerFooter>
+        <Button type="button" onClick={onDone}>
           {t('common:action.cancel')}
         </Button>
-        <Button type="submit" disabled={create.isPending}>
+        <Button appearance="primary" type="submit" disabled={create.isPending}>
           {t('common:action.save')}
         </Button>
-      </SheetFooter>
+      </FormDrawerFooter>
     </form>
   );
 }
@@ -325,13 +322,15 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
   const countries = orderCountryOptions(draft.country);
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
-      <SheetHeader>
-        <SheetTitle>{t('domain:orders.edit.title')}</SheetTitle>
-        <SheetDescription>{t('domain:orders.edit.description')}</SheetDescription>
-      </SheetHeader>
+    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full min-h-0 flex-col">
+      <DrawerHeader>
+        <FormDrawerTitle closeLabel={t('common:action.close')}>
+          {t('domain:orders.edit.title')}
+        </FormDrawerTitle>
+        <FormDrawerDescription>{t('domain:orders.edit.description')}</FormDrawerDescription>
+      </DrawerHeader>
 
-      <SheetBody className="flex flex-col gap-4">
+      <DrawerBody className="flex flex-col gap-4">
         <TextField
           id={ids.name}
           label={t('domain:orders.columns.name')}
@@ -358,22 +357,24 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
               </p>
             </>
           )}
-          <Select value={draft.customer_id ?? ''} onValueChange={onCustomer}>
-            <SelectTrigger id={ids.customer} className="w-full">
-              <SelectValue placeholder={t('domain:orders.edit.chooseCustomer')} />
-            </SelectTrigger>
-            <SelectContent>
-              {draft.customer_id && !customerKnown ? (
-                <SelectItem value={draft.customer_id}>
-                  {draft.customer_label.trim() || t('domain:customers.unnamed')}
-                </SelectItem>
-              ) : null}
-              {customerRows.map((customer) => (
-                <SelectItem key={customer.id} value={customer.id}>
-                  {customerDisplayName(customer) || t('domain:customers.unnamed')}
-                </SelectItem>
-              ))}
-            </SelectContent>
+          <Select
+            id={ids.customer}
+            value={draft.customer_id ?? ''}
+            onChange={(_, { value }) => onCustomer(value)}
+          >
+            <option value="" disabled>
+              {t('domain:orders.edit.chooseCustomer')}
+            </option>
+            {draft.customer_id && !customerKnown ? (
+              <option value={draft.customer_id}>
+                {draft.customer_label.trim() || t('domain:customers.unnamed')}
+              </option>
+            ) : null}
+            {customerRows.map((customer) => (
+              <option key={customer.id} value={customer.id}>
+                {customerDisplayName(customer) || t('domain:customers.unnamed')}
+              </option>
+            ))}
           </Select>
           {customers.isError ? (
             <p className="text-destructive text-sm">{t('domain:orders.edit.customersError')}</p>
@@ -389,22 +390,24 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
 
         <div className="grid gap-2">
           <Label htmlFor={ids.costCenter}>{t('domain:orders.fields.costCenter')}</Label>
-          <Select value={draft.cost_center_id ?? ''} onValueChange={onCostCenter}>
-            <SelectTrigger id={ids.costCenter} className="w-full">
-              <SelectValue placeholder={t('domain:orders.edit.chooseCostCenter')} />
-            </SelectTrigger>
-            <SelectContent>
-              {draft.cost_center_id && !costCenterKnown ? (
-                <SelectItem value={draft.cost_center_id}>
-                  {draft.cost_center_label.trim() || t('domain:orders.edit.unnamedCostCenter')}
-                </SelectItem>
-              ) : null}
-              {costCenterRows.map((center) => (
-                <SelectItem key={center.id} value={center.id}>
-                  {costCenterOptionLabel(center.code, center.name)}
-                </SelectItem>
-              ))}
-            </SelectContent>
+          <Select
+            id={ids.costCenter}
+            value={draft.cost_center_id ?? ''}
+            onChange={(_, { value }) => onCostCenter(value)}
+          >
+            <option value="" disabled>
+              {t('domain:orders.edit.chooseCostCenter')}
+            </option>
+            {draft.cost_center_id && !costCenterKnown ? (
+              <option value={draft.cost_center_id}>
+                {draft.cost_center_label.trim() || t('domain:orders.edit.unnamedCostCenter')}
+              </option>
+            ) : null}
+            {costCenterRows.map((center) => (
+              <option key={center.id} value={center.id}>
+                {costCenterOptionLabel(center.code, center.name)}
+              </option>
+            ))}
           </Select>
           {costCenters.isError ? (
             <p className="text-destructive text-sm">{t('domain:orders.edit.costCentersError')}</p>
@@ -437,19 +440,15 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
         <div className="grid gap-2">
           <Label htmlFor={ids.country}>{t('domain:orders.fields.country')}</Label>
           <Select
+            id={ids.country}
             value={displayedCountry(draft.country)}
-            onValueChange={(value) => set({ country: value })}
+            onChange={(_, { value }) => set({ country: value })}
           >
-            <SelectTrigger id={ids.country} className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {countries.map((country) => (
-                <SelectItem key={country} value={country}>
-                  {country}
-                </SelectItem>
-              ))}
-            </SelectContent>
+            {countries.map((country) => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
           </Select>
         </div>
 
@@ -482,16 +481,16 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
             {error}
           </p>
         ) : null}
-      </SheetBody>
+      </DrawerBody>
 
-      <SheetFooter>
-        <Button type="button" variant="outline" onClick={onDone}>
+      <FormDrawerFooter>
+        <Button type="button" onClick={onDone}>
           {t('common:action.cancel')}
         </Button>
-        <Button type="submit" disabled={update.isPending}>
+        <Button appearance="primary" type="submit" disabled={update.isPending}>
           {t('common:action.save')}
         </Button>
-      </SheetFooter>
+      </FormDrawerFooter>
     </form>
   );
 }
