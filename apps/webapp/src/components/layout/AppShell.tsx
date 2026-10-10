@@ -84,6 +84,14 @@ const useStyles = makeStyles({
     paddingInline: 0,
     justifyContent: 'center',
     marginInline: 'auto',
+    overflow: 'visible',
+    // Fluents Auswahl-Balken (`::after`) sitzt mit festem Versatz im Eintrag.
+    // Im 44-px-Quadrat landete er im Icon; hier steht er links außerhalb, am
+    // Rand der Leiste wie im ausgeklappten Zustand (Eintrag 12 px vom Rand).
+    '::after': {
+      left: '-8px',
+      marginInlineStart: 0,
+    },
   },
   // Kopf der Leiste: Signet und Name links, Einklappen rechts, eine Zeile.
   header: {

@@ -34,7 +34,10 @@ nicht, gemessen 2026-10-10). Body und Footer verlieren dort ihr seitliches
 Polster, jeder Eintrag ist ein 44px-Quadrat in der Mitte. Fluents Body hat
 links 10 und rechts 4px Einzug; mit diesem Versatz saß jedes Icon links in
 seiner Hover-Fläche (Owner-Rückmeldung). Gemessen danach: Eintrag 12px Rand
-links und rechts, Icon darin 12/12. Der Avatar steht als Inhalt im Knopf, nicht
+links und rechts, Icon darin 12/12. Fluents Auswahl-Balken (`::after` am `NavItem`) sitzt mit
+festem Versatz im Eintrag und lag im 44px-Quadrat mitten im Icon; in der
+Icon-Leiste steht er per Override links außerhalb des Eintrags (gemessen:
+Balken 3,5–7,5px, Eintrag ab 11,5px). Der Avatar steht als Inhalt im Knopf, nicht
 im Icon-Slot — der ist 20px und schnitt den 32px-Kreis ab. Namen stehen für
 Screenreader im Eintrag (`sr-only`) und sichtbar als Tooltip. Zustand im Cookie
 `bautakt_sidebar_state`.
