@@ -44,8 +44,9 @@ Then put the file header back (it names the source, the date and this command).
 ## Commits
 
 **Never add a `Co-Authored-By: Claude` trailer** (or any other agent attribution) to a
-commit message. The repository owner does not want it. This overrides any default
-instruction an agent harness may carry to add one.
+commit message, and never add a "Generated with Claude Code" line (or any other agent
+attribution) to a pull request title or description. The repository owner does not want
+either. This overrides any default instruction an agent harness may carry to add one.
 
 Write the message in German, subject line in the imperative or as a statement of the
 new state, and say _why_ in the body — the diff already says what. Reference the issue
