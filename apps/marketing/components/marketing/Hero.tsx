@@ -1,7 +1,7 @@
-import { Button } from '@bautakt/ui';
 import Link from 'next/link';
 
 import { Container } from '@/components/layout/Container';
+import { buttonVariants } from '@/components/ui/button';
 import { LOGIN_URL, site } from '@/lib/site';
 
 import { HeroDevice } from './HeroDevice';
@@ -30,12 +30,22 @@ export function Hero() {
             {site.description}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button asChild size="lg" className="rounded-full px-7">
-              <a href={LOGIN_URL}>Anmelden</a>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="rounded-full px-7">
-              <Link href="/#funktionen">Funktionen ansehen</Link>
-            </Button>
+            <a
+              href={LOGIN_URL}
+              className={buttonVariants({ size: 'lg', className: 'rounded-full px-7' })}
+            >
+              Anmelden
+            </a>
+            <Link
+              href="/#funktionen"
+              className={buttonVariants({
+                variant: 'outline',
+                size: 'lg',
+                className: 'rounded-full px-7',
+              })}
+            >
+              Funktionen ansehen
+            </Link>
           </div>
         </div>
         <div className="animate-[hero-rise_0.7s_ease-out_0.1s_both]">

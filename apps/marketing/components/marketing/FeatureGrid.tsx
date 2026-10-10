@@ -1,7 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@bautakt/ui';
 import Link from 'next/link';
 
 import { Container } from '@/components/layout/Container';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { features, featuresCopy } from '@/content/features';
 
 import { SectionHeading } from './SectionHeading';
