@@ -140,8 +140,10 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
   if (!state || !totals) return <PageSpinner />;
 
+  // Nur bei Rechnungen: Bei Angeboten ist das Fällig-Feld ausgeblendet, ein
+  // alter Wert darf das Speichern nicht über ein unsichtbares Feld sperren.
   const dueBeforeIssue = Boolean(
-    state.issueDate && state.dueDate && state.dueDate < state.issueDate,
+    state.type === 'invoice' && state.issueDate && state.dueDate && state.dueDate < state.issueDate,
   );
 
   function update(patch: Partial<EditorState>) {
@@ -169,7 +171,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       setError(t('domain:editor.serviceDateRequired'));
       return;
     }
-    if (state.issueDate && state.dueDate && state.dueDate < state.issueDate) {
+    if (dueBeforeIssue) {
       setError(t('domain:editor.dueBeforeIssue'));
       return;
     }
@@ -254,28 +256,33 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
           </div>
 
           <DateField
-            label={t('domain:invoices.columns.issueDate')}
+            label={t(`domain:editor.issueDateLabel.${state.type}`)}
             value={state.issueDate}
             onChange={(value) => update({ issueDate: value })}
             placeholder={t('domain:editor.issueDatePlaceholder')}
             hint={state.issueDate ? undefined : t('domain:editor.issueDateEmptyHint')}
           />
-          <DateField
-            label={
-              state.type === 'invoice'
-                ? t('domain:editor.serviceDateRequiredLabel')
-                : t('domain:invoices.serviceDate')
-            }
-            value={state.serviceDate}
-            onChange={(value) => update({ serviceDate: value })}
-          />
-          <DateField
-            label={t('domain:invoices.columns.dueDate')}
-            value={state.dueDate}
-            onChange={(value) => update({ dueDate: value })}
-            describedBy={dueBeforeIssue ? dueAlertId : undefined}
-            invalid={dueBeforeIssue}
-          />
+          {/* Angebote: kein Leistungsdatum (keine Pflichtangabe, die App zeigt
+              es dort auch nicht) und kein Fällig-Feld. `due_date` druckt der
+              PDF-Renderer immer als „Zahlbar bis“ — als „Gültig bis“
+              beschriftet, stünde die Gültigkeit als Zahlungsziel im Angebot.
+              Ein eigenes Gültigkeitsfeld braucht Schema und Renderer (#86). */}
+          {state.type === 'invoice' ? (
+            <>
+              <DateField
+                label={t('domain:editor.serviceDateRequiredLabel')}
+                value={state.serviceDate}
+                onChange={(value) => update({ serviceDate: value })}
+              />
+              <DateField
+                label={t('domain:editor.dueDateLabel')}
+                value={state.dueDate}
+                onChange={(value) => update({ dueDate: value })}
+                describedBy={dueBeforeIssue ? dueAlertId : undefined}
+                invalid={dueBeforeIssue}
+              />
+            </>
+          ) : null}
         </CardContent>
       </Card>
 
