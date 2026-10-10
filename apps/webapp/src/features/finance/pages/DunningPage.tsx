@@ -156,7 +156,7 @@ export function DunningPage() {
         cell: ({ row }) =>
           access.canWriteSalesDocuments ? (
             <span className="flex justify-end">
-              <Button size="small" onClick={() => openFor(row.original)}>
+              <Button onClick={() => openFor(row.original)}>
                 {t('domain:dunning.createAction', { level: row.original.level + 1 })}
               </Button>
             </span>

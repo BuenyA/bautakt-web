@@ -13,33 +13,34 @@ Zweifel: dichte Tabellen und Tastaturbedienung schlagen große Touch-Ziele.
 
 ## Layout
 
-Stand 2026-10-10. `AppShell.tsx` baut die Leiste aus Fluents `NavDrawer`
-(`NavDrawerHeader`, `NavDrawerBody`, `NavDrawerFooter`, `NavItem`). Desktop:
-Leiste links, 260px, eingeklappt eine 64px-Icon-Leiste; Kopfzeile 56px mit
-`Hamburger`, Brotkrumen (Fluent `Breadcrumb`), Firmenname und Glocke. Unter
-768px wird dieselbe Leiste ein Overlay (`type="overlay"`), das sich nach dem
-Navigieren schließt. Die Breite steuert die CSS-Variable `--fui-Drawer--size`
-am Drawer.
+Stand 2026-10-10 (zweiter Durchgang nach Owner-Rückmeldung). `AppShell.tsx`
+folgt Fluents eigenem Muster für die Navigation: `NavDrawer` mit
+`NavDrawerHeader` (darin der `Hamburger`), `NavDrawerBody` (zuerst der App-Name
+als `AppItem` mit Signet, dann die `NavItem`s) und `NavDrawerFooter`
+(Einstellungen, `NavDivider`, Benutzermenü als Fluent-`Persona` mit Firma und
+E-Mail). Farben, Abstände und die Auswahl (neutrale Fläche plus
+Brand-Indikator) sind Fluents Standard; eigene Regeln gibt es nur für die
+Icon-Leiste und das Polster im Footer.
 
-Einklappen über den `Hamburger` in der Kopfzeile. Der Zustand steht in einem
-Cookie (`bautakt_sidebar_state`), **nicht** im localStorage: so steht er beim
-ersten Render fest und die Leiste springt nach dem Laden nicht von breit auf
-schmal. Das Cookie schreibt die Shell selbst (`writeExpanded`); früher tat es
-shadcns `SidebarProvider`. Die Tastenkombination `Strg`/`Cmd`+`B` und der Kreis
-an der Kante gehörten zu shadcn und sind mit ihm weg.
+Desktop: Leiste links, 260px (Fluents feste Breite). Der Hamburger oben in der
+Leiste klappt sie auf eine 68px-Icon-Leiste ein; die Breite setzt eine eigene
+Klasse, weil Fluent keine schmale Variante kennt und `--fui-Drawer--size` am
+`NavDrawer` nicht greift (gemessen 2026-10-10: Variable gesetzt, Breite blieb
+260px). Eingeklappt bleiben Signet, Icons und Avatar; der Name steht für
+Screenreader im Eintrag (`sr-only`) und sichtbar als Tooltip. Der Zustand
+steht im Cookie `bautakt_sidebar_state` (beim ersten Render bekannt, die Leiste
+springt nicht).
 
-Eingeklappt bleiben die Icons stehen; der Name steht für Screenreader im
-Eintrag (`sr-only`) und sichtbar als Tooltip. Bewusst nicht „ganz ausblenden":
-am Desktop verliert man damit die Anzeige, wo man ist.
+Unter 768px ist dieselbe Leiste ein Overlay; dann steht ein Hamburger in der
+Kopfzeile, weil die Leiste zu ist. Die Kopfzeile (56px) trägt sonst nur
+Brotkrumen und die Glocke.
 
-Die Leiste ist neutral: Fläche `colorNeutralBackground2`, rechts ein Rahmen
-`colorNeutralStroke2` (`useStyles` in `AppShell.tsx`). Der aktive Eintrag ist
-Fluents eigene Auswahl am `NavItem`: neutrale Fläche plus Indikator in
-`colorCompoundBrandStroke`, gesteuert über `selectedValue` am `NavDrawer`.
-Die Icons sind `bundleIcon`s und werden aktiv gefüllt.
+Icons der Leiste sind die 20px-Varianten (`Home20Regular` …) als
+`bundleIcon`, aktiv gefüllt. Ungrößte Icons (`HomeRegular`) erben die
+Schriftgröße und waren mit 14px kaum zu erkennen.
 
-`NavItem` rendert ein `<a href>`. Den Klick fängt `useRouterLink` ab und
-navigiert clientseitig; Strg-/Mittelklick öffnet weiter einen neuen Tab.
+`NavItem` und `AppItem` rendern ein `<a href>`; den Klick fängt
+`useRouterLink` ab und navigiert clientseitig.
 
 ## Navigation
 

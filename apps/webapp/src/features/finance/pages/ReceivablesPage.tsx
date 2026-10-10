@@ -9,7 +9,7 @@ import {
   totalOverdueMinor,
 } from '@bautakt/finance';
 import { cn, DataTable, type DataTableColumn } from '@bautakt/ui';
-import { Card, Tab, TabList } from '@fluentui/react-components';
+import { Card, Link as FluentLink, Tab, TabList } from '@fluentui/react-components';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
@@ -129,16 +129,15 @@ export function ReceivablesPage() {
           title={t('domain:invoices.loadErrorTitle')}
           description={t('domain:invoices.loadErrorDescription')}
           action={
-            <button
-              type="button"
-              className="text-brand cursor-pointer text-sm font-medium hover:underline"
+            <FluentLink
+              as="button"
               onClick={() => {
                 void documents.refetch();
                 void payments.refetch();
               }}
             >
               {t('common:action.retry')}
-            </button>
+            </FluentLink>
           }
         />
       </div>

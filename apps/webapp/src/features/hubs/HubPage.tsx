@@ -1,11 +1,19 @@
-import { cn } from '@bautakt/ui';
-import { ChevronRightRegular } from '@fluentui/react-icons';
+import {
+  Button,
+  Caption1,
+  Card,
+  CardHeader,
+  Link as FluentLink,
+  Text,
+} from '@fluentui/react-components';
+import { ChevronRight20Regular } from '@fluentui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { useNavigate } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { useRouterLink } from '@/components/common/useRouterLink';
 import { useMembership } from '@/features/company/useMembership';
 
 import {
@@ -38,13 +46,7 @@ function HubPage({ hub }: { hub: Hub }) {
           title={t('errors:boundary.title')}
           description={t('errors:generic')}
           action={
-            <button
-              type="button"
-              className="text-brand cursor-pointer text-sm font-medium hover:underline"
-              onClick={() => void membership.refetch()}
-            >
-              {t('common:action.retry')}
-            </button>
+            <Button onClick={() => void membership.refetch()}>{t('common:action.retry')}</Button>
           }
         />
       ) : cards.length === 0 ? (
@@ -63,32 +65,48 @@ function HubPage({ hub }: { hub: Hub }) {
   );
 }
 
+/**
+ * Eine Kachel als Fluent-`Card`. Der Titel ist ein echter Link (Tastatur,
+ * Strg-Klick); ein Klick irgendwo auf die Karte führt zum selben Ziel.
+ */
 function HubCardLink({ card }: { card: HubCard }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const link = useRouterLink(card.to);
   const CardIcon = card.icon;
 
   return (
-    <Link
-      to={card.to}
-      className={cn(
-        'bg-card border-border flex min-h-[120px] flex-col items-start gap-3 rounded-xl border p-5 shadow-sm',
-        'transition duration-150',
-        'hover:border-border-strong hover:bg-surface hover:shadow-md',
-        'focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2',
-        'focus-visible:ring-offset-background focus-visible:outline-none',
-        'active:opacity-95',
-        card.featured && 'ring-primary/30 ring-1 sm:col-span-2',
-      )}
+    <Card
+      size="large"
+      className={card.featured ? 'sm:col-span-2' : undefined}
+      onClick={() => navigate(card.to)}
     >
-      <span className="bg-accent flex size-10 shrink-0 items-center justify-center rounded-lg">
-        <CardIcon fontSize={22} className="text-brand" />
-      </span>
-      <span className="flex min-w-0 flex-col gap-1">
-        <span className="text-foreground text-base font-semibold">{t(card.titleKey)}</span>
-        <span className="text-muted-foreground line-clamp-2 text-sm">{t(card.descriptionKey)}</span>
-      </span>
-      <ChevronRightRegular fontSize={16} className="text-muted-foreground" />
-    </Link>
+      <CardHeader
+        image={
+          <span className="bg-accent flex size-10 items-center justify-center rounded-lg">
+            <CardIcon fontSize={24} className="text-brand" />
+          </span>
+        }
+        header={
+          <FluentLink
+            href={link.href}
+            onClick={(event) => {
+              event.stopPropagation();
+              link.onClick(event);
+            }}
+            appearance="subtle"
+          >
+            <Text weight="semibold" size={400}>
+              {t(card.titleKey)}
+            </Text>
+          </FluentLink>
+        }
+        description={
+          <Caption1 className="text-muted-foreground">{t(card.descriptionKey)}</Caption1>
+        }
+        action={<ChevronRight20Regular className="text-muted-foreground" aria-hidden />}
+      />
+    </Card>
   );
 }
 

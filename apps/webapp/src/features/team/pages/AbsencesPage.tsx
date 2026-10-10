@@ -127,11 +127,7 @@ export function AbsencesPage() {
         cell: ({ row }) =>
           canManage && row.original.status === PENDING_STATUS ? (
             <span className="flex justify-end">
-              <Button
-                size="small"
-                disabled={approve.isPending}
-                onClick={() => void onApprove(row.original)}
-              >
+              <Button disabled={approve.isPending} onClick={() => void onApprove(row.original)}>
                 {t('domain:absences.approve')}
               </Button>
             </span>
@@ -148,12 +144,7 @@ export function AbsencesPage() {
         description={t('domain:absences.description')}
         actions={
           canManage ? (
-            <Button
-              appearance="primary"
-              size="small"
-              onClick={() => setSheetOpen(true)}
-              icon={<AddRegular />}
-            >
+            <Button appearance="primary" onClick={() => setSheetOpen(true)} icon={<AddRegular />}>
               {t('domain:absenceForm.title')}
             </Button>
           ) : null

@@ -152,7 +152,10 @@ function ChecklistItemForm({
   const assigneeValue = draft.assignedEmploymentId || CHECKLIST_UNASSIGNED;
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full min-h-0 flex-col">
+    <form
+      onSubmit={(event) => void onSubmit(event)}
+      className="flex h-full min-h-0 w-full flex-col"
+    >
       <DrawerHeader>
         <FormDrawerTitle closeLabel={t('common:action.close')}>
           {draft.id ? t('domain:checklistForm.editTitle') : t('domain:checklistForm.newTitle')}

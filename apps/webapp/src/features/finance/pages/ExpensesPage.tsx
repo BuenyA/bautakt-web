@@ -126,12 +126,7 @@ export function ExpensesPage() {
         description={t('domain:expenses.description')}
         actions={
           canManage ? (
-            <Button
-              appearance="primary"
-              size="small"
-              onClick={() => setSheetOpen(true)}
-              icon={<AddRegular />}
-            >
+            <Button appearance="primary" onClick={() => setSheetOpen(true)} icon={<AddRegular />}>
               {t('domain:expenseForm.title')}
             </Button>
           ) : null

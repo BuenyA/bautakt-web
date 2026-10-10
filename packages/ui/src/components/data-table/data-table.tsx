@@ -166,14 +166,17 @@ export function DataTable<TData extends RowData>({
 
   return (
     <div className={cn('flex flex-col gap-4', className)}>
+      {/* Filter (TabList) stehen in einer eigenen Zeile über Suche und Aktionen,
+          nicht gequetscht daneben. */}
+      {toolbar ? <div className="flex flex-wrap items-center gap-2">{toolbar}</div> : null}
+
       <div className="flex flex-wrap items-center gap-2">
-        {toolbar}
         {searchable ? (
           <SearchBox
             value={globalFilter}
             onChange={(_, data) => setGlobalFilter(data.value)}
             placeholder={searchPlaceholder ?? labels.search}
-            className="w-full sm:max-w-64"
+            className="w-full sm:w-80"
             aria-label={labels.search}
           />
         ) : null}

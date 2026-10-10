@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   CardHeader,
+  Link as FluentLink,
   Table,
   TableBody,
   TableCell,
@@ -77,17 +78,11 @@ export function InvoiceDetailPage() {
           }
           action={
             isError ? (
-              <button
-                type="button"
-                className="text-brand cursor-pointer text-sm font-medium hover:underline"
-                onClick={() => void refetch()}
-              >
+              <FluentLink as="button" onClick={() => void refetch()}>
                 {t('common:action.retry')}
-              </button>
+              </FluentLink>
             ) : (
-              <LinkButton size="small" to={routes.invoices}>
-                {t('common:action.back')}
-              </LinkButton>
+              <LinkButton to={routes.invoices}>{t('common:action.back')}</LinkButton>
             )
           }
         />
@@ -120,14 +115,11 @@ export function InvoiceDetailPage() {
         description={data.customer_label || t('domain:invoices.noCustomer')}
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            <LinkButton size="small" to={routes.invoices}>
-              {t('common:action.back')}
-            </LinkButton>
+            <LinkButton to={routes.invoices}>{t('common:action.back')}</LinkButton>
 
             {!isDraft ? (
               <Button
                 as="a"
-                size="small"
                 href={routes.invoicePrint(data.id)}
                 target="_blank"
                 rel="noreferrer"
@@ -138,7 +130,7 @@ export function InvoiceDetailPage() {
             ) : null}
 
             {access.canWriteSalesDocuments && isDraft ? (
-              <LinkButton size="small" to={routes.invoiceEdit(data.id)} icon={<EditRegular />}>
+              <LinkButton to={routes.invoiceEdit(data.id)} icon={<EditRegular />}>
                 {t('common:action.edit')}
               </LinkButton>
             ) : null}
@@ -146,7 +138,6 @@ export function InvoiceDetailPage() {
             {access.canWriteSalesDocuments && isDraft ? (
               <Button
                 appearance="primary"
-                size="small"
                 disabled={finalize.isPending || blockers.length > 0}
                 onClick={() => void onFinalize()}
                 icon={<CheckmarkCircleRegular />}
@@ -158,7 +149,6 @@ export function InvoiceDetailPage() {
             {access.canWriteSalesDocuments && !isDraft && openMinor > 0 ? (
               <Button
                 appearance="primary"
-                size="small"
                 onClick={() => setPaymentOpen(true)}
                 icon={<WalletRegular />}
               >

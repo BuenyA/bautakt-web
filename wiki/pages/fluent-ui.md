@@ -74,6 +74,29 @@ beim Öffnen des Kalenders die ganze Seite weiß überdeckt. Die Mindesthöhe
 trägt jetzt ein `div` im Provider. Wo ein Provider Klassen braucht
 (Druckansicht), steht `applyStylesToPortals={false}`.
 
+## Gestaltungsregeln
+
+Festgelegt im zweiten Durchgang am 2026-10-10 nach Rückmeldung des Owners
+(Leiste „katastrophal“, Knöpfe zu klein, Filter uneinheitlich):
+
+- **Knöpfe in Fluents Standardgröße** (`medium`, 32px). `size="small"` (24px)
+  nicht für Seiten- und Abschnittsaktionen.
+- **Ein Primary-Knopf je Bereich.** Im leeren Zustand (`EmptyState`) steht die
+  Aktion als Standard-Knopf, weil der Kopf des Abschnitts schon den Primary
+  trägt.
+- **Alle Listenfilter sind eine Fluent-`TabList`** (`ListFilterChips` rendert
+  sie). Sie stehen in der `DataTable` in einer eigenen Zeile über Suche, CSV
+  und Spalten.
+- **Text-Aktionen** („Erneut versuchen“, „Alle Zeiten“) sind Fluents `Link`,
+  nicht eigene Knöpfe mit `text-brand`.
+- **Formularfelder füllen ihre Spalte.** Fluents `Input`, `Textarea` und
+  `Select` sind von Haus aus nur so breit wie ihr Inhalt; `theme.css` setzt sie
+  in `@layer base` auf `width: 100%`. Ohne das lag die PLZ über dem Ort.
+- **Formulare im `FormDrawer` brauchen `w-full`.** Der Drawer ist ein
+  Flex-Container in Zeilenrichtung; ohne `w-full` blieb das Formular rund 430px
+  breit in einem 592px-Panel.
+- Hub-Kacheln sind Fluent-`Card`s mit `CardHeader`; der Titel ist der Link.
+
 ## Bautakt-Bausteine in `packages/ui`
 
 | Baustein                                                    | Wozu                                                                                    |

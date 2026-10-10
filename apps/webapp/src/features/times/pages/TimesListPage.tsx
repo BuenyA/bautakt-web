@@ -1,6 +1,6 @@
 import { hasPermission } from '@bautakt/core';
 import { DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
-import { Button } from '@fluentui/react-components';
+import { Button, Link as FluentLink } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -97,12 +97,10 @@ export function TimesListPage() {
     orderId || canCreate ? (
       <div className="flex flex-wrap items-center gap-2">
         {orderId ? (
-          <LinkButton size="small" to={routes.order(orderId)}>
-            {t('domain:times.openOrder')}
-          </LinkButton>
+          <LinkButton to={routes.order(orderId)}>{t('domain:times.openOrder')}</LinkButton>
         ) : null}
         {canCreate ? (
-          <Button appearance="primary" size="small" onClick={openNew} icon={<AddRegular />}>
+          <Button appearance="primary" onClick={openNew} icon={<AddRegular />}>
             {t('domain:timeForm.newTitle')}
           </Button>
         ) : null}
@@ -200,9 +198,7 @@ export function TimesListPage() {
           description={description}
           actions={
             orderId ? (
-              <LinkButton size="small" to={routes.order(orderId)}>
-                {t('domain:times.openOrder')}
-              </LinkButton>
+              <LinkButton to={routes.order(orderId)}>{t('domain:times.openOrder')}</LinkButton>
             ) : null
           }
         />
@@ -211,21 +207,13 @@ export function TimesListPage() {
           description={t('domain:times.loadErrorDescription')}
           action={
             <div className="flex flex-wrap items-center gap-4">
-              <button
-                type="button"
-                className="text-brand cursor-pointer text-sm font-medium hover:underline"
-                onClick={() => void refetch()}
-              >
+              <FluentLink as="button" onClick={() => void refetch()}>
                 {t('common:action.retry')}
-              </button>
+              </FluentLink>
               {orderId ? (
-                <button
-                  type="button"
-                  className="text-brand cursor-pointer text-sm font-medium hover:underline"
-                  onClick={clearOrderFilter}
-                >
+                <FluentLink as="button" onClick={clearOrderFilter}>
                   {t('domain:times.clearOrderFilter')}
-                </button>
+                </FluentLink>
               ) : null}
             </div>
           }
@@ -284,23 +272,14 @@ export function TimesListPage() {
               canCreate || orderId ? (
                 <div className="flex flex-col items-center gap-3">
                   {canCreate ? (
-                    <Button
-                      appearance="primary"
-                      size="small"
-                      onClick={openNew}
-                      icon={<AddRegular />}
-                    >
+                    <Button appearance="primary" onClick={openNew} icon={<AddRegular />}>
                       {t('domain:timeForm.newTitle')}
                     </Button>
                   ) : null}
                   {orderId ? (
-                    <button
-                      type="button"
-                      className="text-brand cursor-pointer text-sm font-medium hover:underline"
-                      onClick={clearOrderFilter}
-                    >
+                    <FluentLink as="button" onClick={clearOrderFilter}>
                       {t('domain:times.clearOrderFilter')}
-                    </button>
+                    </FluentLink>
                   ) : null}
                 </div>
               ) : undefined

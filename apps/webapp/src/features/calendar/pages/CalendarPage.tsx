@@ -108,7 +108,6 @@ export function CalendarPage() {
               icon={<ChevronRightRegular />}
             />
             <Button
-              size="small"
               onClick={() => {
                 const now = new Date();
                 setCursor({ year: now.getFullYear(), month: now.getMonth() });

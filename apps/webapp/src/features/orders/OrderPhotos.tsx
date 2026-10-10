@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogSurface,
   DialogTitle,
+  Link as FluentLink,
 } from '@fluentui/react-components';
 import { ArrowUploadRegular, DeleteRegular } from '@fluentui/react-icons';
 import { type ReactNode, useRef, useState } from 'react';
@@ -113,13 +114,9 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
         title={t('domain:orders.photos.loadErrorTitle')}
         description={t('domain:orders.photos.loadErrorDescription')}
         action={
-          <button
-            type="button"
-            className="text-sm font-medium text-brand hover:underline"
-            onClick={() => void refetch()}
-          >
+          <FluentLink as="button" onClick={() => void refetch()}>
             {t('common:action.retry')}
-          </button>
+          </FluentLink>
         }
       />
     );
@@ -171,7 +168,6 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
         {canTakePhotos ? (
           <Button
             appearance="primary"
-            size="small"
             type="button"
             disabled={progress !== null}
             onClick={() => inputRef.current?.click()}
@@ -248,12 +244,7 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
             </DialogContent>
             {openPhoto && canDeleteOpen ? (
               <DialogActions>
-                <Button
-                  size="small"
-                  type="button"
-                  onClick={() => askDelete(openPhoto)}
-                  icon={<DeleteRegular />}
-                >
+                <Button type="button" onClick={() => askDelete(openPhoto)} icon={<DeleteRegular />}>
                   {t('domain:photoForm.delete.action')}
                 </Button>
               </DialogActions>

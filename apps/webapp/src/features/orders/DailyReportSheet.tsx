@@ -15,6 +15,7 @@ import {
   DrawerHeader,
   Input,
   Label,
+  Link as FluentLink,
   Select,
   Textarea,
 } from '@fluentui/react-components';
@@ -324,7 +325,10 @@ function DailyReportForm({
       : t('domain:dailyReportForm.attendanceHintNone');
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full min-h-0 flex-col">
+    <form
+      onSubmit={(event) => void onSubmit(event)}
+      className="flex h-full min-h-0 w-full flex-col"
+    >
       <DrawerHeader>
         <FormDrawerTitle closeLabel={t('common:action.close')}>
           {draft.id ? t('domain:dailyReportForm.editTitle') : t('domain:dailyReportForm.newTitle')}
@@ -485,14 +489,13 @@ function DailyReportForm({
           <div id={ids.duplicate} role="alert" className="flex flex-col items-start gap-1">
             <p className="text-destructive text-sm">{t('domain:dailyReportForm.duplicate')}</p>
             {duplicateId ? (
-              <button
-                type="button"
-                className="text-brand text-sm font-medium hover:underline disabled:opacity-50"
+              <FluentLink
+                as="button"
                 disabled={openingExisting}
                 onClick={() => void openExisting()}
               >
                 {t('domain:dailyReportForm.openExisting')}
-              </button>
+              </FluentLink>
             ) : null}
             {duplicateDenied ? (
               <p className="text-muted-foreground text-sm">

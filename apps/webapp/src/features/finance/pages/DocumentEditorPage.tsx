@@ -127,11 +127,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
         <EmptyState
           title={t('domain:editor.lockedTitle')}
           description={t('domain:editor.lockedDescription')}
-          action={
-            <LinkButton size="small" to={routes.invoice(id)}>
-              {t('domain:editor.toDocument')}
-            </LinkButton>
-          }
+          action={<LinkButton to={routes.invoice(id)}>{t('domain:editor.toDocument')}</LinkButton>}
         />
       </div>
     );
@@ -192,12 +188,11 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
         description={t('domain:editor.draftHint')}
         actions={
           <div className="flex items-center gap-2">
-            <LinkButton size="small" to={state.type === 'quote' ? routes.quotes : routes.invoices}>
+            <LinkButton to={state.type === 'quote' ? routes.quotes : routes.invoices}>
               {t('common:action.cancel')}
             </LinkButton>
             <Button
               appearance="primary"
-              size="small"
               disabled={save.isPending || dueBeforeIssue}
               onClick={() => void onSave()}
             >
@@ -357,7 +352,6 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
           <div className="flex items-center justify-between gap-4">
             <Button
-              size="small"
               onClick={() => update({ lines: [...state.lines, emptyLine()] })}
               icon={<AddRegular />}
             >

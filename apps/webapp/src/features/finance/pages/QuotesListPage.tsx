@@ -1,5 +1,6 @@
 import { eurosToMinor, formatMoney } from '@bautakt/finance';
 import { DataTable, type DataTableColumn } from '@bautakt/ui';
+import { Link as FluentLink } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -84,13 +85,9 @@ export function QuotesListPage() {
           title={t('domain:invoices.loadErrorTitle')}
           description={t('domain:invoices.loadErrorDescription')}
           action={
-            <button
-              type="button"
-              className="text-brand cursor-pointer text-sm font-medium hover:underline"
-              onClick={() => void refetch()}
-            >
+            <FluentLink as="button" onClick={() => void refetch()}>
               {t('common:action.retry')}
-            </button>
+            </FluentLink>
           }
         />
       </div>
@@ -104,12 +101,7 @@ export function QuotesListPage() {
         description={t('domain:quotes.listDescription')}
         actions={
           access.canWriteSalesDocuments ? (
-            <LinkButton
-              appearance="primary"
-              size="small"
-              to={routes.quoteNew}
-              icon={<AddRegular />}
-            >
+            <LinkButton appearance="primary" to={routes.quoteNew} icon={<AddRegular />}>
               {t('domain:quotes.new')}
             </LinkButton>
           ) : null

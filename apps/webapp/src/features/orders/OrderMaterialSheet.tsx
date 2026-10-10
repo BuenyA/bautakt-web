@@ -201,7 +201,10 @@ function OrderMaterialForm({
   const deleteLabel = (draft.mode === 'custom' ? draft.customTitle : selected?.title)?.trim() ?? '';
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full min-h-0 flex-col">
+    <form
+      onSubmit={(event) => void onSubmit(event)}
+      className="flex h-full min-h-0 w-full flex-col"
+    >
       <DrawerHeader>
         <FormDrawerTitle closeLabel={t('common:action.close')}>
           <span className="inline-flex flex-wrap items-center gap-2">
@@ -227,7 +230,6 @@ function OrderMaterialForm({
           aria-label={t('domain:materialForm.mode')}
         >
           <ToggleButton
-            size="small"
             type="button"
             checked={draft.mode === 'article'}
             disabled={locked}
@@ -236,7 +238,6 @@ function OrderMaterialForm({
             {t('domain:materialForm.modeCatalog')}
           </ToggleButton>
           <ToggleButton
-            size="small"
             type="button"
             checked={draft.mode === 'custom'}
             disabled={locked}

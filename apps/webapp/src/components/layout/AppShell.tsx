@@ -1,5 +1,5 @@
-import { cn } from '@bautakt/ui';
 import {
+  AppItem,
   Avatar,
   Button,
   Hamburger,
@@ -13,22 +13,25 @@ import {
   MenuList,
   MenuPopover,
   MenuTrigger,
+  mergeClasses,
+  NavDivider,
   NavDrawer,
   NavDrawerBody,
   NavDrawerFooter,
   NavDrawerHeader,
+  Persona,
   tokens,
   Tooltip,
 } from '@fluentui/react-components';
-import { AlertRegular, SignOutRegular } from '@fluentui/react-icons';
-import { type CSSProperties, useState } from 'react';
+import { Alert20Regular, SignOut20Regular } from '@fluentui/react-icons';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Outlet, useLocation } from 'react-router';
+import { Outlet, useLocation } from 'react-router';
 
 import { type Theme } from '@/app/ThemeContext';
 import { useTheme } from '@/app/useTheme';
-import { BautaktLogo } from '@/components/brand/BautaktLogo';
 import { BautaktSignet } from '@/components/brand/BautaktSignet';
+import { useRouterLink } from '@/components/common/useRouterLink';
 import { useAuth } from '@/features/auth/useAuth';
 import { useMembership } from '@/features/company/useMembership';
 import { HOME_ROUTE } from '@/lib/routes';
@@ -39,8 +42,6 @@ import { SidebarNavItem } from './SidebarNav';
 import { useMediaQuery } from './useMediaQuery';
 
 const COOKIE = 'bautakt_sidebar_state';
-const EXPANDED_WIDTH = '260px';
-const RAIL_WIDTH = '64px';
 
 /** Zustand der Leiste aus dem Cookie, damit sie beim Laden nicht springt. */
 function readExpanded(): boolean {
@@ -53,21 +54,40 @@ function writeExpanded(expanded: boolean) {
 }
 
 /**
- * Seitenleiste neutral (`colorNeutralBackground2`) mit Rahmen, wie in der
- * Owner-Vorgabe. Der aktive Eintrag trägt Fluents eigene Auswahl: neutrale
- * Fläche plus Brand-Indikator.
+ * Fluents `NavDrawer` mit seinen eigenen Farben und Abständen. Eigene Regeln
+ * gibt es nur für die eingeklappte Icon-Leiste: Fluent setzt die Breite des
+ * Drawers fest auf 260 px, eine schmale Variante kennt er nicht.
  */
 const useStyles = makeStyles({
   drawer: {
-    backgroundColor: tokens.colorNeutralBackground2,
-    borderRight: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
     height: '100%',
   },
-  // Fluents Button ist auf 280 px begrenzt und zentriert; hier füllt er die Leiste.
-  userButton: {
+  rail: {
+    width: '68px',
+    minWidth: '68px',
+  },
+  railItems: {
+    paddingInline: tokens.spacingHorizontalS,
+  },
+  // Fluents Footer hat kein Polster; dieselben Einzüge wie der Body (10 / 4 px),
+  // damit „Einstellungen“ mit den übrigen Einträgen fluchtet, und Luft nach unten.
+  footer: {
+    paddingInlineStart: '10px',
+    paddingInlineEnd: '4px',
+    paddingBottom: tokens.spacingVerticalM,
+    gap: tokens.spacingVerticalXS,
+  },
+  personaButton: {
     width: '100%',
     maxWidth: 'none',
     justifyContent: 'flex-start',
+    paddingBlock: tokens.spacingVerticalS,
+    paddingInline: tokens.spacingHorizontalS,
+    minHeight: '48px',
+  },
+  railButton: {
+    minWidth: 'auto',
+    paddingBlock: tokens.spacingVerticalS,
   },
 });
 
@@ -79,25 +99,26 @@ function UserMenu({ collapsed }: { collapsed: boolean }) {
   const { theme, setTheme } = useTheme();
 
   const email = user?.email ?? '';
+  const company = membership?.companyName ?? '';
   const initials = email.slice(0, 2).toUpperCase() || '??';
 
-  const trigger = (
+  const trigger = collapsed ? (
     <Button
       appearance="subtle"
-      className={collapsed ? undefined : styles.userButton}
-      aria-label={collapsed ? email : undefined}
-      icon={<Avatar initials={initials} size={28} color="neutral" />}
-    >
-      {collapsed ? null : (
-        <span className="flex min-w-0 flex-1 flex-col text-left">
-          <span className="truncate text-sm font-medium">{email}</span>
-          {membership?.companyName ? (
-            <span className="text-text-subtle truncate text-xs font-normal">
-              {membership.companyName}
-            </span>
-          ) : null}
-        </span>
-      )}
+      className={styles.railButton}
+      aria-label={email}
+      icon={<Avatar initials={initials} color="brand" size={32} />}
+    />
+  ) : (
+    <Button appearance="subtle" className={styles.personaButton}>
+      <Persona
+        name={company || email}
+        secondaryText={company ? email : undefined}
+        avatar={{ initials, color: 'brand' }}
+        size="medium"
+        textAlignment="center"
+        className="min-w-0 text-left"
+      />
     </Button>
   );
 
@@ -121,7 +142,7 @@ function UserMenu({ collapsed }: { collapsed: boolean }) {
       <MenuPopover>
         <MenuList>
           <MenuGroup>
-            <MenuGroupHeader className="truncate">{email}</MenuGroupHeader>
+            <MenuGroupHeader>{email}</MenuGroupHeader>
           </MenuGroup>
           <MenuDivider />
           <MenuGroup>
@@ -137,7 +158,7 @@ function UserMenu({ collapsed }: { collapsed: boolean }) {
             </MenuItemRadio>
           </MenuGroup>
           <MenuDivider />
-          <MenuItem icon={<SignOutRegular />} onClick={() => void signOut()}>
+          <MenuItem icon={<SignOut20Regular />} onClick={() => void signOut()}>
             {t('common:action.signOut')}
           </MenuItem>
         </MenuList>
@@ -146,12 +167,35 @@ function UserMenu({ collapsed }: { collapsed: boolean }) {
   );
 }
 
+/** App-Name oben in der Leiste: Fluents `AppItem`, führt zur Übersicht. */
+function AppTitle({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: () => void }) {
+  const { t } = useTranslation();
+  const link = useRouterLink(HOME_ROUTE);
+  const name = t('common:app.name');
+  return (
+    <AppItem
+      as="a"
+      href={link.href}
+      onClick={(event) => {
+        link.onClick(event);
+        onNavigate?.();
+      }}
+      icon={<BautaktSignet className="size-6" />}
+      aria-label={collapsed ? name : undefined}
+    >
+      {collapsed ? null : name}
+    </AppItem>
+  );
+}
+
 /**
  * Rahmen der angemeldeten App: Seitenleiste, Kopfzeile, Inhalt.
  *
- * Desktop: Fluent-`NavDrawer` inline, per Hamburger einklappbar auf eine
- * Icon-Leiste; der Zustand steht im Cookie. Unter 768 px: dieselbe Leiste als
- * Overlay, die sich nach dem Navigieren schließt.
+ * Aufbau nach Fluents Muster: der `Hamburger` steht oben in der Leiste, darunter
+ * der App-Name (`AppItem`) und die Einträge. Desktop: Drawer inline, per
+ * Hamburger auf eine Icon-Leiste einklappbar, Zustand im Cookie. Unter 768 px:
+ * Overlay, geöffnet über den Hamburger in der Kopfzeile, schließt nach dem
+ * Navigieren.
  */
 export function AppShell() {
   const { t } = useTranslation();
@@ -166,6 +210,7 @@ export function AppShell() {
   const visible = navItems.filter((item) => maySee(item, membership?.permissions));
   const selected = [...visible, settingsNavItem].find((item) => isNavActive(pathname, item))?.to;
   const closeMobile = isMobile ? () => setMobileOpen(false) : undefined;
+  const toggleLabel = t('common:nav.toggleSidebar');
 
   function toggle() {
     if (isMobile) {
@@ -184,25 +229,16 @@ export function AppShell() {
       open={isMobile ? mobileOpen : true}
       onOpenChange={(_, data) => setMobileOpen(data.open)}
       selectedValue={selected ?? ''}
-      className={styles.drawer}
-      style={
-        {
-          '--fui-Drawer--size': collapsed ? RAIL_WIDTH : EXPANDED_WIDTH,
-        } as CSSProperties
-      }
+      className={mergeClasses(styles.drawer, collapsed && styles.rail)}
     >
-      <NavDrawerHeader className="h-14 justify-center">
-        <Link
-          to={HOME_ROUTE}
-          onClick={closeMobile}
-          className={cn('flex items-center rounded-md', collapsed ? 'justify-center' : 'px-2.5')}
-          aria-label={t('common:app.name')}
-        >
-          {collapsed ? <BautaktSignet className="size-7" /> : <BautaktLogo />}
-        </Link>
+      <NavDrawerHeader>
+        <Tooltip content={toggleLabel} relationship="label" positioning="after">
+          <Hamburger onClick={toggle} aria-expanded={isMobile ? mobileOpen : expanded} />
+        </Tooltip>
       </NavDrawerHeader>
 
-      <NavDrawerBody>
+      <NavDrawerBody className={collapsed ? styles.railItems : undefined}>
+        <AppTitle collapsed={collapsed} onNavigate={closeMobile} />
         {visible.map((item) => (
           <SidebarNavItem
             key={item.to}
@@ -213,8 +249,9 @@ export function AppShell() {
         ))}
       </NavDrawerBody>
 
-      <NavDrawerFooter>
+      <NavDrawerFooter className={mergeClasses(styles.footer, collapsed && styles.railItems)}>
         <SidebarNavItem item={settingsNavItem} collapsed={collapsed} onNavigate={closeMobile} />
+        <NavDivider />
         <UserMenu collapsed={collapsed} />
       </NavDrawerFooter>
     </NavDrawer>
@@ -225,27 +262,23 @@ export function AppShell() {
       {isMobile ? drawer : <div className="sticky top-0 h-svh shrink-0">{drawer}</div>}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="border-border bg-background sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b px-3">
-          <Hamburger
-            onClick={toggle}
-            aria-label={t('common:nav.toggleSidebar')}
-            aria-expanded={isMobile ? mobileOpen : expanded}
-          />
+        <header className="border-border bg-background sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b px-4 sm:px-6">
+          {isMobile ? (
+            <Hamburger onClick={toggle} aria-label={toggleLabel} aria-expanded={mobileOpen} />
+          ) : null}
           <div className="hidden min-w-0 sm:flex">
             <Breadcrumbs />
           </div>
 
-          <span className="text-muted-foreground ml-auto hidden truncate text-sm lg:block">
-            {membership?.companyName}
-          </span>
-
-          <Button
-            appearance="subtle"
-            icon={<AlertRegular />}
-            aria-label={t('common:nav.notifications')}
-            title={t('common:nav.notificationsComingSoon')}
-            className="max-lg:ml-auto"
-          />
+          <div className="ml-auto flex items-center gap-2">
+            <Tooltip content={t('common:nav.notificationsComingSoon')} relationship="description">
+              <Button
+                appearance="subtle"
+                icon={<Alert20Regular />}
+                aria-label={t('common:nav.notifications')}
+              />
+            </Tooltip>
+          </div>
         </header>
 
         <main className="min-w-0 flex-1 p-4 sm:p-6">

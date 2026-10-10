@@ -189,7 +189,10 @@ function TimeEntryForm({
   });
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full min-h-0 flex-col">
+    <form
+      onSubmit={(event) => void onSubmit(event)}
+      className="flex h-full min-h-0 w-full flex-col"
+    >
       <DrawerHeader>
         <FormDrawerTitle closeLabel={t('common:action.close')}>
           <span className="inline-flex flex-wrap items-center gap-2">

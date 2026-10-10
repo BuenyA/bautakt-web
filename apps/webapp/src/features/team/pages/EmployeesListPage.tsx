@@ -1,5 +1,5 @@
 import { DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
-import { Button } from '@fluentui/react-components';
+import { Button, Link as FluentLink } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -132,13 +132,9 @@ export function EmployeesListPage() {
           title={t('domain:employees.loadErrorTitle')}
           description={t('domain:employees.loadErrorDescription')}
           action={
-            <button
-              type="button"
-              className="text-brand cursor-pointer text-sm font-medium hover:underline"
-              onClick={() => void refetch()}
-            >
+            <FluentLink as="button" onClick={() => void refetch()}>
               {t('common:action.retry')}
-            </button>
+            </FluentLink>
           }
         />
       </div>
@@ -154,7 +150,6 @@ export function EmployeesListPage() {
           canManage ? (
             <Button
               appearance="primary"
-              size="small"
               onClick={() => setDraft(emptyEmployee())}
               icon={<AddRegular />}
             >

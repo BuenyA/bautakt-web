@@ -1,5 +1,5 @@
 import { DataTable, type DataTableColumn } from '@bautakt/ui';
-import { Button, Tab, TabList } from '@fluentui/react-components';
+import { Button, Link as FluentLink, Tab, TabList } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -105,13 +105,9 @@ export function AssignmentsListPage() {
           title={t('domain:assignments.loadErrorTitle')}
           description={t('domain:assignments.loadErrorDescription')}
           action={
-            <button
-              type="button"
-              className="text-brand cursor-pointer text-sm font-medium hover:underline"
-              onClick={() => void refetch()}
-            >
+            <FluentLink as="button" onClick={() => void refetch()}>
               {t('common:action.retry')}
-            </button>
+            </FluentLink>
           }
         />
       </div>
@@ -125,12 +121,7 @@ export function AssignmentsListPage() {
         description={t('domain:assignments.listDescription')}
         actions={
           canManage ? (
-            <Button
-              appearance="primary"
-              size="small"
-              onClick={() => setSheetOpen(true)}
-              icon={<AddRegular />}
-            >
+            <Button appearance="primary" onClick={() => setSheetOpen(true)} icon={<AddRegular />}>
               {t('domain:assignments.create.action')}
             </Button>
           ) : null
@@ -174,7 +165,6 @@ export function AssignmentsListPage() {
                   {canManage ? (
                     <Button
                       appearance="primary"
-                      size="small"
                       onClick={() => setSheetOpen(true)}
                       icon={<AddRegular />}
                     >
@@ -182,13 +172,9 @@ export function AssignmentsListPage() {
                     </Button>
                   ) : null}
                   {filter === 'week' ? (
-                    <button
-                      type="button"
-                      className="text-brand cursor-pointer text-sm font-medium hover:underline"
-                      onClick={() => setFilter('all')}
-                    >
+                    <FluentLink as="button" onClick={() => setFilter('all')}>
                       {t('domain:assignments.emptyWeekShowAll')}
-                    </button>
+                    </FluentLink>
                   ) : null}
                 </div>
               ) : undefined

@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogSurface,
   DialogTitle,
+  Link as FluentLink,
 } from '@fluentui/react-components';
 import { AddRegular, DeleteRegular } from '@fluentui/react-icons';
 import { useCallback, useMemo, useState } from 'react';
@@ -143,12 +144,7 @@ export function CostCentersPage() {
         title={t('domain:costCenters.title')}
         description={t('domain:costCenters.description')}
         actions={
-          <Button
-            appearance="primary"
-            size="small"
-            onClick={() => setSheetOpen(true)}
-            icon={<AddRegular />}
-          >
+          <Button appearance="primary" onClick={() => setSheetOpen(true)} icon={<AddRegular />}>
             {t('domain:costCenters.form.action')}
           </Button>
         }
@@ -159,13 +155,9 @@ export function CostCentersPage() {
           title={t('domain:costCenters.loadErrorTitle')}
           description={t('domain:costCenters.loadErrorDescription')}
           action={
-            <button
-              type="button"
-              className="text-brand cursor-pointer text-sm font-medium hover:underline"
-              onClick={() => void refetch()}
-            >
+            <FluentLink as="button" onClick={() => void refetch()}>
               {t('common:action.retry')}
-            </button>
+            </FluentLink>
           }
         />
       ) : (

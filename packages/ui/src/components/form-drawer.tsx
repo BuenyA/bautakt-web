@@ -74,7 +74,7 @@ export function FormDrawerTitle({
 }
 
 export function FormDrawerDescription({ children }: { children: React.ReactNode }) {
-  return <p className="text-muted-foreground text-sm">{children}</p>;
+  return <p className="text-muted-foreground mt-1 mb-2 text-sm">{children}</p>;
 }
 
 export function FormDrawerFooter({

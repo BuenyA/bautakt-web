@@ -1,4 +1,4 @@
-import { Button } from '@fluentui/react-components';
+import { Button, Link as FluentLink } from '@fluentui/react-components';
 import { DeleteRegular } from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,13 +43,9 @@ export function AssignmentDetailPage() {
           title={t('domain:assignments.loadErrorTitle')}
           description={t('domain:assignments.loadErrorDescription')}
           action={
-            <button
-              type="button"
-              className="text-sm font-medium text-brand hover:underline"
-              onClick={() => void refetch()}
-            >
+            <FluentLink as="button" onClick={() => void refetch()}>
               {t('common:action.retry')}
-            </button>
+            </FluentLink>
           }
         />
       </div>
@@ -63,11 +59,7 @@ export function AssignmentDetailPage() {
         <EmptyState
           title={t('domain:assignments.notFoundTitle')}
           description={t('domain:assignments.notFoundDescription')}
-          action={
-            <LinkButton size="small" to={routes.assignments}>
-              {t('common:action.back')}
-            </LinkButton>
-          }
+          action={<LinkButton to={routes.assignments}>{t('common:action.back')}</LinkButton>}
         />
       </div>
     );
@@ -85,11 +77,9 @@ export function AssignmentDetailPage() {
         description={t('domain:assignments.detailDescription')}
         actions={
           <div className="flex items-center gap-2">
-            <LinkButton size="small" to={routes.assignments}>
-              {t('common:action.back')}
-            </LinkButton>
+            <LinkButton to={routes.assignments}>{t('common:action.back')}</LinkButton>
             {canManage ? (
-              <Button size="small" onClick={() => setDeleteOpen(true)} icon={<DeleteRegular />}>
+              <Button onClick={() => setDeleteOpen(true)} icon={<DeleteRegular />}>
                 {t('domain:assignments.delete.action')}
               </Button>
             ) : null}

@@ -108,6 +108,17 @@
   * {
     @apply border-border;
   }
+
+  /* Fluents Eingabefelder sind `inline-flex` ohne Breite und nehmen damit die
+     Breite ihres Inhalts (rund 20 Zeichen) statt der ihrer Spalte. In einem
+     Formular-Raster schieben sie sich dann über das Nachbarfeld. In `base`,
+     damit eine Utility wie `sm:w-80` (Suchfeld) weiter gewinnt. */
+  .fui-Input,
+  .fui-Textarea,
+  .fui-Select {
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 /**

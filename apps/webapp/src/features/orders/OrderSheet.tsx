@@ -152,7 +152,10 @@ function OrderForm({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full min-h-0 flex-col">
+    <form
+      onSubmit={(event) => void onSubmit(event)}
+      className="flex h-full min-h-0 w-full flex-col"
+    >
       <DrawerHeader>
         <FormDrawerTitle closeLabel={t('common:action.close')}>
           {t('domain:orders.create.title')}
@@ -322,7 +325,10 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
   const countries = orderCountryOptions(draft.country);
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full min-h-0 flex-col">
+    <form
+      onSubmit={(event) => void onSubmit(event)}
+      className="flex h-full min-h-0 w-full flex-col"
+    >
       <DrawerHeader>
         <FormDrawerTitle closeLabel={t('common:action.close')}>
           {t('domain:orders.edit.title')}

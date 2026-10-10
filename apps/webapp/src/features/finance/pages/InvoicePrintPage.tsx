@@ -1,6 +1,6 @@
 import { eurosToMinor, formatMoney, vatByRateGroups } from '@bautakt/finance';
 import { lightTheme } from '@bautakt/ui';
-import { FluentProvider } from '@fluentui/react-components';
+import { FluentProvider, Link as FluentLink } from '@fluentui/react-components';
 import { useQuery } from '@tanstack/react-query';
 import { type ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -86,17 +86,11 @@ export function InvoicePrintPage() {
         action={
           <div className="flex flex-wrap items-center justify-center gap-4">
             {isError ? (
-              <button
-                type="button"
-                className="text-brand cursor-pointer text-sm font-medium hover:underline"
-                onClick={() => void refetch()}
-              >
+              <FluentLink as="button" onClick={() => void refetch()}>
                 {t('common:action.retry')}
-              </button>
+              </FluentLink>
             ) : null}
-            <LinkButton size="small" to={routes.invoices}>
-              {t('common:action.back')}
-            </LinkButton>
+            <LinkButton to={routes.invoices}>{t('common:action.back')}</LinkButton>
           </div>
         }
       />

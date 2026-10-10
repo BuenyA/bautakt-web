@@ -1,4 +1,4 @@
-import { Button } from '@fluentui/react-components';
+import { Button, Link as FluentLink } from '@fluentui/react-components';
 import { EditRegular } from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -57,13 +57,9 @@ export function CustomerDetailPage() {
           title={t('domain:customers.loadErrorTitle')}
           description={t('domain:customers.loadErrorDescription')}
           action={
-            <button
-              type="button"
-              className="text-sm font-medium text-brand hover:underline"
-              onClick={() => void refetch()}
-            >
+            <FluentLink as="button" onClick={() => void refetch()}>
               {t('common:action.retry')}
-            </button>
+            </FluentLink>
           }
         />
       </div>
@@ -77,11 +73,7 @@ export function CustomerDetailPage() {
         <EmptyState
           title={t('domain:customers.notFoundTitle')}
           description={t('domain:customers.notFoundDescription')}
-          action={
-            <LinkButton size="small" to={routes.customers}>
-              {t('common:action.back')}
-            </LinkButton>
-          }
+          action={<LinkButton to={routes.customers}>{t('common:action.back')}</LinkButton>}
         />
       </div>
     );
@@ -103,13 +95,10 @@ export function CustomerDetailPage() {
         description={t('domain:customers.detailDescription')}
         actions={
           <div className="flex items-center gap-2">
-            <LinkButton size="small" to={routes.customers}>
-              {t('common:action.back')}
-            </LinkButton>
+            <LinkButton to={routes.customers}>{t('common:action.back')}</LinkButton>
             {canManage ? (
               <Button
                 appearance="primary"
-                size="small"
                 onClick={() => setDraft(draftFromCustomer(data))}
                 icon={<EditRegular />}
               >

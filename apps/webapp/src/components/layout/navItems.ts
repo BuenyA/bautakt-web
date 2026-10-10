@@ -1,26 +1,26 @@
 import {
-  BoxFilled,
-  BoxRegular,
-  BriefcaseFilled,
-  BriefcaseRegular,
+  Box20Filled,
+  Box20Regular,
+  Briefcase20Filled,
+  Briefcase20Regular,
   bundleIcon,
-  CalendarLtrFilled,
-  CalendarLtrRegular,
-  ClockFilled,
-  ClockRegular,
+  CalendarLtr20Filled,
+  CalendarLtr20Regular,
+  Clock20Filled,
+  Clock20Regular,
   type FluentIcon,
-  HomeFilled,
-  HomeRegular,
-  PeopleFilled,
-  PeopleRegular,
-  PeopleTeamFilled,
-  PeopleTeamRegular,
-  PersonFilled,
-  PersonRegular,
-  SettingsFilled,
-  SettingsRegular,
-  WalletFilled,
-  WalletRegular,
+  Home20Filled,
+  Home20Regular,
+  People20Filled,
+  People20Regular,
+  PeopleTeam20Filled,
+  PeopleTeam20Regular,
+  Person20Filled,
+  Person20Regular,
+  Settings20Filled,
+  Settings20Regular,
+  Wallet20Filled,
+  Wallet20Regular,
 } from '@fluentui/react-icons';
 
 import {
@@ -33,21 +33,24 @@ import {
 } from '@/features/hubs/hubs';
 import { routes } from '@/lib/routes';
 
-const Home = bundleIcon(HomeFilled, HomeRegular);
-const Briefcase = bundleIcon(BriefcaseFilled, BriefcaseRegular);
-const PeopleTeam = bundleIcon(PeopleTeamFilled, PeopleTeamRegular);
-const Clock = bundleIcon(ClockFilled, ClockRegular);
-const CalendarLtr = bundleIcon(CalendarLtrFilled, CalendarLtrRegular);
-const Wallet = bundleIcon(WalletFilled, WalletRegular);
-const Person = bundleIcon(PersonFilled, PersonRegular);
-const People = bundleIcon(PeopleFilled, PeopleRegular);
-const Box = bundleIcon(BoxFilled, BoxRegular);
-const Settings = bundleIcon(SettingsFilled, SettingsRegular);
+const Home = bundleIcon(Home20Filled, Home20Regular);
+const Briefcase = bundleIcon(Briefcase20Filled, Briefcase20Regular);
+const PeopleTeam = bundleIcon(PeopleTeam20Filled, PeopleTeam20Regular);
+const Clock = bundleIcon(Clock20Filled, Clock20Regular);
+const CalendarLtr = bundleIcon(CalendarLtr20Filled, CalendarLtr20Regular);
+const Wallet = bundleIcon(Wallet20Filled, Wallet20Regular);
+const Person = bundleIcon(Person20Filled, Person20Regular);
+const People = bundleIcon(People20Filled, People20Regular);
+const Box = bundleIcon(Box20Filled, Box20Regular);
+const Settings = bundleIcon(Settings20Filled, Settings20Regular);
 
 export type NavItem = PermissionGate & {
   to: string;
   labelKey: string;
-  /** Fluent-Icon, gefüllt im aktiven Zustand (`bundleIcon`). */
+  /**
+   * Fluent-Icon in 20px (Fluents Größe für die Navigation), gefüllt im aktiven
+   * Zustand (`bundleIcon`). Ungrößte Icons (`HomeRegular`) erben 14px Schrift.
+   */
   icon: FluentIcon;
   /**
    * Hub-Punkt. Sichtbar, sobald mindestens eine seiner Karten sichtbar ist.

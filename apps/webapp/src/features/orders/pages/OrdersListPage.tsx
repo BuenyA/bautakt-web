@@ -1,5 +1,5 @@
 import { DataTable, type DataTableColumn } from '@bautakt/ui';
-import { Button, Tab, TabList } from '@fluentui/react-components';
+import { Button, Link as FluentLink, Tab, TabList } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -112,13 +112,9 @@ export function OrdersListPage() {
           title={t('domain:orders.loadErrorTitle')}
           description={t('domain:orders.loadErrorDescription')}
           action={
-            <button
-              type="button"
-              className="text-brand cursor-pointer text-sm font-medium hover:underline"
-              onClick={() => void refetch()}
-            >
+            <FluentLink as="button" onClick={() => void refetch()}>
               {t('common:action.retry')}
-            </button>
+            </FluentLink>
           }
         />
       </div>
@@ -132,12 +128,7 @@ export function OrdersListPage() {
         description={t('domain:orders.listDescription')}
         actions={
           canCreate ? (
-            <Button
-              appearance="primary"
-              size="small"
-              onClick={() => setSheetOpen(true)}
-              icon={<AddRegular />}
-            >
+            <Button appearance="primary" onClick={() => setSheetOpen(true)} icon={<AddRegular />}>
               {t('domain:orders.create.action')}
             </Button>
           ) : null

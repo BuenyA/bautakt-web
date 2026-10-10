@@ -38,11 +38,7 @@ export function RequirePermission({
     <EmptyState
       title={t('common:forbidden.title')}
       description={t('common:forbidden.description')}
-      action={
-        <LinkButton size="small" to={HOME_ROUTE}>
-          {t('common:forbidden.action')}
-        </LinkButton>
-      }
+      action={<LinkButton to={HOME_ROUTE}>{t('common:forbidden.action')}</LinkButton>}
     />
   );
 }

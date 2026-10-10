@@ -1,5 +1,5 @@
 import { SkeletonBlock, toast } from '@bautakt/ui';
-import { Button, Checkbox } from '@fluentui/react-components';
+import { Button, Checkbox, Link as FluentLink } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -71,13 +71,9 @@ export function OrderChecklist({ orderId }: { orderId: string }) {
         title={t('domain:orders.checklist.loadErrorTitle')}
         description={t('domain:orders.checklist.loadErrorDescription')}
         action={
-          <button
-            type="button"
-            className="text-sm font-medium text-brand hover:underline"
-            onClick={() => void refetch()}
-          >
+          <FluentLink as="button" onClick={() => void refetch()}>
             {t('common:action.retry')}
-          </button>
+          </FluentLink>
         }
       />
     );
@@ -92,7 +88,7 @@ export function OrderChecklist({ orderId }: { orderId: string }) {
         }
         action={
           canEdit ? (
-            <Button appearance="primary" size="small" onClick={openNew} icon={<AddRegular />}>
+            <Button onClick={openNew} icon={<AddRegular />}>
               {t('domain:checklistForm.newTitle')}
             </Button>
           ) : undefined
@@ -101,7 +97,7 @@ export function OrderChecklist({ orderId }: { orderId: string }) {
     );
   } else {
     body = (
-      <ul className="flex max-w-3xl flex-col gap-3">
+      <ul className="flex flex-col gap-3">
         {items.map((item) => (
           <ChecklistRow
             key={item.id}
@@ -117,7 +113,7 @@ export function OrderChecklist({ orderId }: { orderId: string }) {
 
   return (
     <section className="flex flex-col gap-4" aria-labelledby="order-checklist-title">
-      <div className="flex max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-2">
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <div className="flex flex-col gap-1">
           <h2
             id="order-checklist-title"
@@ -132,7 +128,7 @@ export function OrderChecklist({ orderId }: { orderId: string }) {
           ) : null}
         </div>
         {canEdit ? (
-          <Button appearance="primary" size="small" onClick={openNew} icon={<AddRegular />}>
+          <Button appearance="primary" onClick={openNew} icon={<AddRegular />}>
             {t('domain:checklistForm.newTitle')}
           </Button>
         ) : null}
@@ -233,7 +229,7 @@ function ChecklistRow({
 
 function ChecklistSkeleton({ label }: { label: string }) {
   return (
-    <div className="flex max-w-3xl flex-col gap-3" role="status">
+    <div className="flex flex-col gap-3" role="status">
       <span className="sr-only">{label}</span>
       {Array.from({ length: SKELETON_COUNT }, (_, index) => (
         <SkeletonBlock key={index} className="h-16 rounded-xl" />
