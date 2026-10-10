@@ -2,13 +2,14 @@ import { Button, Link as FluentLink } from '@fluentui/react-components';
 import { DeleteRegular } from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { LinkButton } from '@/components/common/LinkButton';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { RouterLink } from '@/components/common/RouterLink';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate, formatDateTimeRange } from '@/lib/format';
@@ -89,12 +90,9 @@ export function AssignmentDetailPage() {
 
       {data.order_name ? (
         <div className="flex flex-wrap items-center gap-3">
-          <Link
-            to={routes.order(data.order_id)}
-            className="text-sm font-medium text-brand hover:underline"
-          >
-            {data.order_name}
-          </Link>
+          <RouterLink to={routes.order(data.order_id)}>
+            <span className="font-medium">{data.order_name}</span>
+          </RouterLink>
         </div>
       ) : null}
 

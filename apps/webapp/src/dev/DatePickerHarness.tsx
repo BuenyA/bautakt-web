@@ -35,44 +35,30 @@ export function DatePickerHarness() {
   return (
     <div className="bg-background text-foreground flex min-h-screen flex-col gap-16 p-8 pt-28 pl-40">
       <div className="flex gap-2">
-        <button
-          type="button"
-          data-testid="theme-light"
-          className="border-border rounded-md border px-3 py-1 text-sm"
-          onClick={() => setTheme('light')}
-        >
+        <Button data-testid="theme-light" onClick={() => setTheme('light')}>
           Hell
-        </button>
-        <button
-          type="button"
-          data-testid="theme-dark"
-          className="border-border rounded-md border px-3 py-1 text-sm"
-          onClick={() => setTheme('dark')}
-        >
+        </Button>
+        <Button data-testid="theme-dark" onClick={() => setTheme('dark')}>
           Dunkel
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
           data-testid="open-sheet"
-          className="border-border rounded-md border px-3 py-1 text-sm"
           onClick={() => {
             setDialogOpen(false);
             setSheetOpen(true);
           }}
         >
           Sheet
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
           data-testid="open-dialog"
-          className="border-border rounded-md border px-3 py-1 text-sm"
           onClick={() => {
             setSheetOpen(false);
             setDialogOpen(true);
           }}
         >
           Dialog
-        </button>
+        </Button>
       </div>
 
       {/* Wie der Belegeditor: die Fällig-Meldung steht über den Feldern,
@@ -158,9 +144,9 @@ export function DatePickerHarness() {
             Das Ende liegt vor dem Beginn.
           </p>
         </div>
-        <button type="button" disabled className="mt-4">
+        <Button disabled className="mt-4">
           Speichern
-        </button>
+        </Button>
       </section>
 
       <FormDrawer open={sheetOpen} onOpenChange={setSheetOpen}>

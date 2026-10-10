@@ -1,6 +1,7 @@
-import { SkeletonBlock, toast } from '@bautakt/ui';
+import { ActionCard, SkeletonBlock, toast } from '@bautakt/ui';
 import {
   Button,
+  CardPreview,
   Dialog,
   DialogActions,
   DialogBody,
@@ -286,38 +287,30 @@ function PhotoTile({
 
   return (
     <li className="relative">
-      <button
-        type="button"
-        className="focus-visible:ring-ring flex w-full cursor-pointer flex-col overflow-hidden rounded-xl border border-border bg-card text-left shadow-sm transition-colors hover:border-border-strong hover:shadow-md focus-visible:ring-2 focus-visible:outline-none"
-        aria-label={label}
-        onClick={onOpen}
-      >
-        <img
-          src={photo.signedUrl}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="aspect-square w-full bg-surface object-cover"
-        />
-        {takenAt ? (
-          <span className="truncate bg-card px-2.5 py-2 text-xs text-muted-foreground">
-            {takenAt}
-          </span>
-        ) : null}
-      </button>
+      <ActionCard className="w-full text-left" aria-label={label} onAction={onOpen}>
+        <CardPreview>
+          <img
+            src={photo.signedUrl}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="bg-surface aspect-square w-full object-cover"
+          />
+        </CardPreview>
+        {takenAt ? <span className="text-muted-foreground truncate text-xs">{takenAt}</span> : null}
+      </ActionCard>
       {deletable ? (
-        <button
-          type="button"
-          className="focus-visible:ring-ring absolute top-2 right-2 z-10 flex size-8 items-center justify-center rounded-full border border-border bg-card text-destructive shadow-sm hover:bg-accent focus-visible:ring-2 focus-visible:outline-none"
+        <Button
+          shape="circular"
+          icon={<DeleteRegular />}
+          className="absolute! top-2 right-2 z-10"
           aria-label={
             takenAt
               ? t('domain:photoForm.delete.label', { date: takenAt })
               : t('domain:photoForm.delete.labelUndated')
           }
           onClick={onDelete}
-        >
-          <DeleteRegular fontSize={16} />
-        </button>
+        />
       ) : null}
     </li>
   );

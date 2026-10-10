@@ -3,10 +3,11 @@ import { Button, Link as FluentLink, Tab, TabList } from '@fluentui/react-compon
 import { AddRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useSearchParams } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
+import { RouterLink } from '@/components/common/RouterLink';
 import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
@@ -54,13 +55,11 @@ export function AssignmentsListPage() {
         accessorKey: 'starts_at',
         header: t('domain:assignments.columns.period'),
         cell: ({ row }) => (
-          <Link
-            to={routes.assignment(row.original.id)}
-            className="text-foreground hover:text-brand font-medium whitespace-nowrap hover:underline"
-            onClick={(event) => event.stopPropagation()}
-          >
-            {formatDateTimeRange(row.original.starts_at, row.original.ends_at)}
-          </Link>
+          <RouterLink appearance="subtle" to={routes.assignment(row.original.id)} stopPropagation>
+            <span className="font-medium whitespace-nowrap">
+              {formatDateTimeRange(row.original.starts_at, row.original.ends_at)}
+            </span>
+          </RouterLink>
         ),
       },
       {

@@ -24,13 +24,14 @@ import {
 } from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { LinkButton } from '@/components/common/LinkButton';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { RouterLink } from '@/components/common/RouterLink';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
@@ -178,12 +179,9 @@ export function InvoiceDetailPage() {
               ))}
             </ul>
             {blockers.includes('sellerTaxId') ? (
-              <Link
-                to={routes.settings}
-                className="text-brand mt-1 inline-block font-medium hover:underline"
-              >
-                {t('domain:invoices.toSettings')}
-              </Link>
+              <RouterLink to={routes.settings} className="mt-1 inline-block">
+                <span className="font-medium">{t('domain:invoices.toSettings')}</span>
+              </RouterLink>
             ) : null}
           </MessageBarBody>
         </MessageBar>

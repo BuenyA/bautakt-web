@@ -1,5 +1,5 @@
 import { SkeletonBlock, toast } from '@bautakt/ui';
-import { Button, Checkbox, Link as FluentLink } from '@fluentui/react-components';
+import { Button, Card, Checkbox, Link as FluentLink } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -174,8 +174,6 @@ function ChecklistRow({
       ? t('domain:checklistForm.assigneeEnded', { name: item.assignee })
       : item.assignee
     : '';
-  const className =
-    'flex w-full items-start gap-3 rounded-xl border border-border bg-card px-4 py-3 shadow-sm';
 
   const text = (
     <>
@@ -201,28 +199,34 @@ function ChecklistRow({
   );
 
   return (
-    <li className={editable ? `${className} hover:border-border-strong` : className}>
-      <Checkbox
-        className="mt-0.5"
-        checked={item.isDone}
-        disabled={!editable}
-        aria-label={t('domain:orders.checklist.toggle', { title })}
-        onChange={(_, { checked: value }) => {
-          if (value === 'mixed') return;
-          onToggle(value);
-        }}
-      />
-      {editable ? (
-        <button
-          type="button"
-          className="flex min-w-0 flex-1 flex-col gap-1 text-left"
-          onClick={onEdit}
-        >
-          {text}
-        </button>
-      ) : (
-        <div className="flex min-w-0 flex-1 flex-col gap-1">{text}</div>
-      )}
+    <li>
+      {/* Fluent-`Card` als Fläche. Der Text daneben ist ein ungestylter Knopf: er
+          öffnet die Bearbeitung, ohne dass der Klick auf die Checkbox es tut. */}
+      <Card>
+        <div className="flex items-start gap-3">
+          <Checkbox
+            className="mt-0.5"
+            checked={item.isDone}
+            disabled={!editable}
+            aria-label={t('domain:orders.checklist.toggle', { title })}
+            onChange={(_, { checked: value }) => {
+              if (value === 'mixed') return;
+              onToggle(value);
+            }}
+          />
+          {editable ? (
+            <button
+              type="button"
+              className="flex min-w-0 flex-1 cursor-pointer flex-col gap-1 text-left"
+              onClick={onEdit}
+            >
+              {text}
+            </button>
+          ) : (
+            <div className="flex min-w-0 flex-1 flex-col gap-1">{text}</div>
+          )}
+        </div>
+      </Card>
     </li>
   );
 }

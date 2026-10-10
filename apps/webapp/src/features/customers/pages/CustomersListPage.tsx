@@ -3,11 +3,12 @@ import { Button, Link as FluentLink } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useSearchParams } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { ListFilterChips } from '@/components/common/ListFilterChips';
 import { PageHeader } from '@/components/common/PageHeader';
+import { RouterLink } from '@/components/common/RouterLink';
 import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
@@ -70,13 +71,11 @@ export function CustomersListPage() {
         accessorFn: (row) => customerDisplayName(row),
         header: t('domain:customers.columns.name'),
         cell: ({ row }) => (
-          <Link
-            to={routes.customer(row.original.id)}
-            className="text-foreground hover:text-brand font-medium hover:underline"
-            onClick={(event) => event.stopPropagation()}
-          >
-            {customerDisplayName(row.original) || t('domain:customers.unnamed')}
-          </Link>
+          <RouterLink appearance="subtle" to={routes.customer(row.original.id)} stopPropagation>
+            <span className="font-medium">
+              {customerDisplayName(row.original) || t('domain:customers.unnamed')}
+            </span>
+          </RouterLink>
         ),
       },
       {

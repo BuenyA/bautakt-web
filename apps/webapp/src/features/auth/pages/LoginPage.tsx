@@ -1,8 +1,8 @@
 import { Button, Input, Label } from '@fluentui/react-components';
 import { type FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 
+import { RouterLink } from '@/components/common/RouterLink';
 import { routes } from '@/lib/routes';
 
 import { signInSchema } from '../schema';
@@ -55,9 +55,7 @@ export function LoginPage() {
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">{t('auth:field.password')}</Label>
-            <Link to={routes.forgotPassword} className="text-sm text-brand hover:underline">
-              {t('auth:signIn.forgotPassword')}
-            </Link>
+            <RouterLink to={routes.forgotPassword}>{t('auth:signIn.forgotPassword')}</RouterLink>
           </div>
           <Input
             id="password"

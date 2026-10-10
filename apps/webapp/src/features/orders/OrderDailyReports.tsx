@@ -1,5 +1,5 @@
-import { SkeletonBlock } from '@bautakt/ui';
-import { Button, Link as FluentLink } from '@fluentui/react-components';
+import { ActionCard, SkeletonBlock } from '@bautakt/ui';
+import { Button, Card, Link as FluentLink } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -195,8 +195,9 @@ function ReportCard({
   const { t } = useTranslation();
   const dateLabel = formatReportDate(report.date);
   const weather = weatherLine(report, t);
-  const className =
-    'flex w-full flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3 text-left shadow-sm transition-colors';
+  // Fluent-`Card`; als `button`, wenn die Zeile bearbeitet werden darf.
+  const className = 'w-full text-left';
+  const bodyClassName = 'flex flex-col gap-1';
 
   const content = (
     <>
@@ -231,16 +232,17 @@ function ReportCard({
   return (
     <li>
       {editable ? (
-        <button
-          type="button"
-          className={`${className} cursor-pointer hover:border-border-strong`}
+        <ActionCard
+          className={className}
           aria-label={t('domain:orders.dailyReports.openLabel', { date: dateLabel })}
-          onClick={onEdit}
+          onAction={onEdit}
         >
-          {content}
-        </button>
+          <div className={bodyClassName}>{content}</div>
+        </ActionCard>
       ) : (
-        <div className={className}>{content}</div>
+        <Card className={className}>
+          <div className={bodyClassName}>{content}</div>
+        </Card>
       )}
     </li>
   );

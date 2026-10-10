@@ -20,10 +20,10 @@ import {
 } from '@fluentui/react-components';
 import { type FormEvent, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
+import { RouterLink } from '@/components/common/RouterLink';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { readableDbError } from '@/lib/dbErrors';
@@ -102,12 +102,11 @@ export function DunningPage() {
         accessorFn: (row) => row.document.document_number ?? '',
         header: t('domain:receivables.columns.number'),
         cell: ({ row }) => (
-          <Link
-            to={routes.invoice(row.original.document.id)}
-            className="text-foreground hover:text-brand font-medium whitespace-nowrap hover:underline"
-          >
-            {row.original.document.document_number || t('domain:invoices.noNumber')}
-          </Link>
+          <RouterLink appearance="subtle" to={routes.invoice(row.original.document.id)}>
+            <span className="font-medium whitespace-nowrap">
+              {row.original.document.document_number || t('domain:invoices.noNumber')}
+            </span>
+          </RouterLink>
         ),
       },
       {

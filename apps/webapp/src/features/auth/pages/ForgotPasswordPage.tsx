@@ -1,8 +1,8 @@
 import { Button, Input, Label } from '@fluentui/react-components';
 import { type FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 
+import { RouterLink } from '@/components/common/RouterLink';
 import { routes } from '@/lib/routes';
 
 import { forgotPasswordSchema } from '../schema';
@@ -38,11 +38,7 @@ export function ForgotPasswordPage() {
     else setSent(true);
   }
 
-  const footer = (
-    <Link to={routes.login} className="text-brand hover:underline">
-      {t('auth:forgotPassword.backToSignIn')}
-    </Link>
-  );
+  const footer = <RouterLink to={routes.login}>{t('auth:forgotPassword.backToSignIn')}</RouterLink>;
 
   if (sent) {
     return (

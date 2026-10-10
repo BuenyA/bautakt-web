@@ -1,9 +1,9 @@
 import { Button, Input, Label } from '@fluentui/react-components';
 import { type FormEvent, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 
 import { LinkButton } from '@/components/common/LinkButton';
+import { RouterLink } from '@/components/common/RouterLink';
 import { routes } from '@/lib/routes';
 
 import { signUpSchema } from '../schema';
@@ -50,7 +50,7 @@ export function RegisterPage() {
   const footer = (
     <Trans
       i18nKey="auth:signUp.hasAccount"
-      components={{ signin: <Link to={routes.login} className="text-brand hover:underline" /> }}
+      components={{ signin: <RouterLink to={routes.login} /> }}
     />
   );
 

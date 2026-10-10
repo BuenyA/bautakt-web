@@ -104,18 +104,19 @@ Festgelegt im zweiten Durchgang am 2026-10-10 nach Rückmeldung des Owners
 
 ## Bautakt-Bausteine in `packages/ui`
 
-| Baustein                                                    | Wozu                                                                                    |
-| ----------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `lightTheme`, `darkTheme`                                   | Die Themes oben.                                                                        |
-| `DataTable`                                                 | TanStack-Logik, Fluent-`Table`. Siehe [webapp-shell.md](webapp-shell.md#listen).        |
-| `DatePicker`, `DateRangePicker`, `TimeInput`                | Deutsche Maske, Fluent-Optik. Siehe [datumseingabe.md](datumseingabe.md).               |
-| `FormDrawer` + `FormDrawerTitle`, `-Description`, `-Footer` | `OverlayDrawer` von rechts für die kurzen Formulare; Titel mit Schließen-Knopf.         |
-| `DangerButton`                                              | Primary-Button auf den Status-Danger-Tokens. Fluent hat keine Danger-Variante.          |
-| `StatusBadge`                                               | Fluent-`Badge` mit Tönen `neutral`, `brand`, `success`, `warning`, `danger`, `outline`. |
-| `SkeletonBlock`                                             | Fluent-`Skeleton`, Größe per Tailwind am Rahmen.                                        |
-| `toast`, `AppToaster`                                       | `toast.success(text, { description })` an Fluents `Toaster`.                            |
+| Baustein                                                    | Wozu                                                                                                                 |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `lightTheme`, `darkTheme`                                   | Die Themes oben.                                                                                                     |
+| `DataTable`                                                 | TanStack-Logik, Fluent-`Table`. Siehe [webapp-shell.md](webapp-shell.md#listen).                                     |
+| `DatePicker`, `DateRangePicker`, `TimeInput`                | Deutsche Maske, Fluent-Optik. Siehe [datumseingabe.md](datumseingabe.md).                                            |
+| `FormDrawer` + `FormDrawerTitle`, `-Description`, `-Footer` | `OverlayDrawer` von rechts für die kurzen Formulare; Titel mit Schließen-Knopf.                                      |
+| `DangerButton`                                              | Primary-Button auf den Status-Danger-Tokens. Fluent hat keine Danger-Variante.                                       |
+| `StatusBadge`                                               | Fluent-`Badge` mit Tönen `neutral`, `brand`, `success`, `warning`, `danger`, `outline`.                              |
+| `ActionCard`                                                | Fluent-`Card`, die eine Aktion auslöst: `role="button"`, Tab, Enter/Leertaste. Fluents `Card` rendert nur als `div`. |
+| `SkeletonBlock`                                             | Fluent-`Skeleton`, Größe per Tailwind am Rahmen.                                                                     |
+| `toast`, `AppToaster`                                       | `toast.success(text, { description })` an Fluents `Toaster`.                                                         |
 
-In `apps/webapp/src/components/common/`: `LinkButton` (Fluent-`Button` als
+In `apps/webapp/src/components/common/`: `RouterLink` (Fluent-`Link` auf eine Route, mit `stopPropagation` für Links in klickbaren Tabellenzeilen), `LinkButton` (Fluent-`Button` als
 `<a>` auf eine Route) und `useRouterLink` (`href` und Klick-Handler für jedes
 Fluent-Bauteil, das als Link rendert: `NavItem`, `BreadcrumbButton`, `Button
 as="a"`). Fluent kennt keine Router-Links; ein nackter `href` lädt die Seite
@@ -148,6 +149,18 @@ bleibt.
 eine gesperrte erste Option mit `value=""`. Steht im Entwurf ein Wert, der
 (noch) nicht in der Liste ist, braucht er eine eigene Option, sonst zeigt das
 Feld die erste — so beim Auftrag im Zeiteintrag (`TimeEntrySheet`).
+
+## Bewusst native Elemente
+
+Stand 2026-10-11 nach einer Durchsicht aller Bedienelemente: Es gibt genau
+zwei native Elemente ohne Fluent-Gegenstück, beide ohne eigene Optik.
+
+- Das versteckte `<input type="file">` der Foto-Ablage (`OrderPhotoDropzone`).
+  Fluent hat keinen Datei-Upload; die sichtbare Fläche ist das `<label>`.
+- Der ungestylte `<button>` für den Text einer Checklisten-Zeile
+  (`OrderChecklist`). Er liegt in einer Fluent-`Card` neben der Fluent-
+  `Checkbox` und öffnet die Bearbeitung, ohne dass ein Klick auf die Checkbox
+  es tut.
 
 ## Bekanntes
 

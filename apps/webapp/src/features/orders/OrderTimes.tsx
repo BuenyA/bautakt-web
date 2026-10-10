@@ -1,12 +1,12 @@
 import { hasPermission } from '@bautakt/core';
-import { SkeletonBlock, StatusBadge } from '@bautakt/ui';
-import { Button, Link as FluentLink } from '@fluentui/react-components';
+import { ActionCard, SkeletonBlock, StatusBadge } from '@bautakt/ui';
+import { Button, Card, Link as FluentLink } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { RouterLink } from '@/components/common/RouterLink';
 import { useAuth } from '@/features/auth/useAuth';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { useMembership } from '@/features/company/useMembership';
@@ -116,12 +116,9 @@ export function OrderTimes({ orderId, orderName }: { orderId: string; orderName:
               {t('domain:timeForm.newTitle')}
             </Button>
           ) : null}
-          <Link
-            to={routes.timesForOrder(orderId)}
-            className="text-brand text-sm font-medium hover:underline"
-          >
-            {t('domain:orders.times.all')}
-          </Link>
+          <RouterLink to={routes.timesForOrder(orderId)}>
+            <span className="font-medium">{t('domain:orders.times.all')}</span>
+          </RouterLink>
         </div>
       </div>
       {body}
@@ -150,8 +147,9 @@ function TimeCard({
     t('domain:times.noEnd');
   const pause = formatBreakLabel(entry.break_minutes, t);
   const note = entry.note.trim();
-  const className =
-    'flex w-full flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3 text-left shadow-sm transition-colors';
+  // Fluent-`Card`; als `button`, wenn die Zeile bearbeitet werden darf.
+  const className = 'w-full text-left';
+  const bodyClassName = 'flex flex-col gap-1';
 
   const content = (
     <>
@@ -179,15 +177,13 @@ function TimeCard({
   return (
     <li>
       {editable ? (
-        <button
-          type="button"
-          className={`${className} cursor-pointer hover:border-border-strong`}
-          onClick={onEdit}
-        >
-          {content}
-        </button>
+        <ActionCard className={className} onAction={onEdit}>
+          <div className={bodyClassName}>{content}</div>
+        </ActionCard>
       ) : (
-        <div className={className}>{content}</div>
+        <Card className={className}>
+          <div className={bodyClassName}>{content}</div>
+        </Card>
       )}
     </li>
   );

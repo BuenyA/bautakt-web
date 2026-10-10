@@ -1,6 +1,6 @@
 import { hasPermission } from '@bautakt/core';
-import { SkeletonBlock, StatusBadge } from '@bautakt/ui';
-import { Button, Link as FluentLink } from '@fluentui/react-components';
+import { ActionCard, SkeletonBlock, StatusBadge } from '@bautakt/ui';
+import { Button, Card, Link as FluentLink } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -156,8 +156,9 @@ function MaterialCard({
       ? t('domain:orders.materials.price', { price: formatCurrency(row.unitPrice) })
       : '',
   ].filter(Boolean);
-  const className =
-    'flex w-full flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3 text-left shadow-sm transition-colors';
+  // Fluent-`Card`; als `button`, wenn die Zeile bearbeitet werden darf.
+  const className = 'w-full text-left';
+  const bodyClassName = 'flex flex-col gap-1';
 
   const content = (
     <>
@@ -186,15 +187,13 @@ function MaterialCard({
   return (
     <li>
       {editable ? (
-        <button
-          type="button"
-          className={`${className} cursor-pointer hover:border-border-strong`}
-          onClick={onEdit}
-        >
-          {content}
-        </button>
+        <ActionCard className={className} onAction={onEdit}>
+          <div className={bodyClassName}>{content}</div>
+        </ActionCard>
       ) : (
-        <div className={className}>{content}</div>
+        <Card className={className}>
+          <div className={bodyClassName}>{content}</div>
+        </Card>
       )}
     </li>
   );
