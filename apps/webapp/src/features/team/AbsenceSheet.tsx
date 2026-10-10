@@ -1,22 +1,19 @@
 import { todayIso } from '@bautakt/finance';
 import {
-  Button,
-  Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  Textarea,
+  FormDrawer,
+  FormDrawerDescription,
+  FormDrawerFooter,
+  FormDrawerTitle,
   toast,
 } from '@bautakt/ui';
+import {
+  Button,
+  DrawerBody,
+  DrawerHeader,
+  Label,
+  Select,
+  Textarea,
+} from '@fluentui/react-components';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -79,15 +76,15 @@ export function AbsenceSheet({
   onOpenChange: (open: boolean) => void;
 }) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="p-0">
-        {open ? <AbsenceForm onDone={() => onOpenChange(false)} /> : null}
-      </SheetContent>
-    </Sheet>
+    <FormDrawer open={open} onOpenChange={onOpenChange}>
+      {open ? <AbsenceForm onDone={() => onOpenChange(false)} /> : null}
+    </FormDrawer>
   );
 }
 
 function AbsenceForm({ onDone }: { onDone: () => void }) {
+  const typeFieldId = useId();
+  const employeeFieldId = useId();
   const { t } = useTranslation();
   const create = useCreateAbsence();
   const employees = useEmployees();
@@ -124,42 +121,44 @@ function AbsenceForm({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
-      <SheetHeader>
-        <SheetTitle>{t('domain:absenceForm.title')}</SheetTitle>
-        <SheetDescription>{t('domain:absenceForm.description')}</SheetDescription>
-      </SheetHeader>
+    <form
+      onSubmit={(event) => void onSubmit(event)}
+      className="flex h-full min-h-0 w-full flex-col"
+    >
+      <DrawerHeader>
+        <FormDrawerTitle closeLabel={t('common:action.close')}>
+          {t('domain:absenceForm.title')}
+        </FormDrawerTitle>
+        <FormDrawerDescription>{t('domain:absenceForm.description')}</FormDrawerDescription>
+      </DrawerHeader>
 
-      <SheetBody className="flex flex-col gap-4">
+      <DrawerBody className="flex flex-col gap-4">
         <div className="grid gap-2">
-          <Label>{t('domain:absences.columns.employee')}</Label>
-          <Select value={employmentId} onValueChange={setEmploymentId}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder={t('domain:timeForm.choose')} />
-            </SelectTrigger>
-            <SelectContent>
-              {selectable.map((employee) => (
-                <SelectItem key={employee.id} value={employee.id}>
-                  {employee.name || t('domain:employees.unnamed')}
-                </SelectItem>
-              ))}
-            </SelectContent>
+          <Label htmlFor={employeeFieldId}>{t('domain:absences.columns.employee')}</Label>
+          <Select
+            id={employeeFieldId}
+            value={employmentId}
+            onChange={(_, { value }) => setEmploymentId(value)}
+          >
+            <option value="" disabled>
+              {t('domain:timeForm.choose')}
+            </option>
+            {selectable.map((employee) => (
+              <option key={employee.id} value={employee.id}>
+                {employee.name || t('domain:employees.unnamed')}
+              </option>
+            ))}
           </Select>
         </div>
 
         <div className="grid gap-2">
-          <Label>{t('domain:absences.columns.type')}</Label>
-          <Select value={type} onValueChange={setType}>
-            <SelectTrigger className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {ABSENCE_TYPES.map((value) => (
-                <SelectItem key={value} value={value}>
-                  {t(`domain:absences.types.${value}`)}
-                </SelectItem>
-              ))}
-            </SelectContent>
+          <Label htmlFor={typeFieldId}>{t('domain:absences.columns.type')}</Label>
+          <Select id={typeFieldId} value={type} onChange={(_, { value }) => setType(value)}>
+            {ABSENCE_TYPES.map((value) => (
+              <option key={value} value={value}>
+                {t(`domain:absences.types.${value}`)}
+              </option>
+            ))}
           </Select>
         </div>
 
@@ -192,16 +191,16 @@ function AbsenceForm({ onDone }: { onDone: () => void }) {
             {error}
           </p>
         ) : null}
-      </SheetBody>
+      </DrawerBody>
 
-      <SheetFooter>
-        <Button type="button" variant="outline" onClick={onDone}>
+      <FormDrawerFooter>
+        <Button type="button" onClick={onDone}>
           {t('common:action.cancel')}
         </Button>
-        <Button type="submit" disabled={create.isPending}>
+        <Button appearance="primary" type="submit" disabled={create.isPending}>
           {t('common:action.save')}
         </Button>
-      </SheetFooter>
+      </FormDrawerFooter>
     </form>
   );
 }

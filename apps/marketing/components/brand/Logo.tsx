@@ -1,6 +1,6 @@
-import { cn } from '@bautakt/ui';
 import Link from 'next/link';
 
+import { cn } from '@/lib/cn';
 import { site } from '@/lib/site';
 
 type LogoProps = {

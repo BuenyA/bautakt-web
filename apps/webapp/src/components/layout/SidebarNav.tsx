@@ -1,45 +1,54 @@
-import {
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  Uicon,
-} from '@bautakt/ui';
+import { NavItem, Tooltip } from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';
-import { NavLink, useLocation } from 'react-router';
 
-import { useMembership } from '@/features/company/useMembership';
+import { useRouterLink } from '@/components/common/useRouterLink';
 
-import { isNavActive, maySee, navItems } from './navItems';
+import type { NavItem as NavItemConfig } from './navItems';
 
-export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+/**
+ * Ein Eintrag der Seitenleiste als Fluent-`NavItem`, der clientseitig
+ * navigiert.
+ *
+ * Eingeklappt (Icon-Leiste) bleibt der Text für Screenreader im Eintrag und
+ * erscheint sichtbar als Tooltip. Der aktive Eintrag bekommt Fluents neutrale
+ * Fläche und den Brand-Indikator; das steuert `selectedValue` am `NavDrawer`.
+ */
+export function SidebarNavItem({
+  item,
+  collapsed,
+  onNavigate,
+  className,
+}: {
+  item: NavItemConfig;
+  collapsed: boolean;
+  onNavigate?: () => void;
+  className?: string;
+}) {
   const { t } = useTranslation();
-  const { data: membership } = useMembership();
-  const { pathname } = useLocation();
+  const link = useRouterLink(item.to);
+  const Icon = item.icon;
+  const label = t(item.labelKey);
 
-  const visible = navItems.filter((item) => maySee(item, membership?.permissions));
+  const entry = (
+    <NavItem
+      value={item.to}
+      href={link.href}
+      icon={<Icon />}
+      className={className}
+      onClick={(event) => {
+        link.onClick(event);
+        onNavigate?.();
+      }}
+    >
+      {collapsed ? <span className="sr-only">{label}</span> : label}
+    </NavItem>
+  );
+
+  if (!collapsed) return entry;
 
   return (
-    <SidebarGroup>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {visible.map((item) => (
-            <SidebarMenuItem key={item.to}>
-              <SidebarMenuButton
-                asChild
-                tooltip={t(item.labelKey)}
-                isActive={isNavActive(pathname, item)}
-              >
-                <NavLink to={item.to} onClick={onNavigate}>
-                  <Uicon name={item.icon} size={18} />
-                  <span>{t(item.labelKey)}</span>
-                </NavLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
+    <Tooltip content={label} relationship="description" positioning="after">
+      {entry}
+    </Tooltip>
   );
 }

@@ -1,7 +1,7 @@
-import { Button } from '@bautakt/ui';
 import Link from 'next/link';
 
 import { Container } from '@/components/layout/Container';
+import { buttonVariants } from '@/components/ui/button';
 import { LOGIN_URL } from '@/lib/site';
 
 export function CtaSection() {
@@ -18,12 +18,22 @@ export function CtaSection() {
             Aufträge, Zeiten und Rechnungen an einer Stelle. Auch ohne Empfang.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Button asChild size="lg" className="rounded-full px-7">
-              <a href={LOGIN_URL}>Anmelden</a>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="rounded-full px-7">
-              <Link href="#funktionen">Mehr erfahren</Link>
-            </Button>
+            <a
+              href={LOGIN_URL}
+              className={buttonVariants({ size: 'lg', className: 'rounded-full px-7' })}
+            >
+              Anmelden
+            </a>
+            <Link
+              href="#funktionen"
+              className={buttonVariants({
+                variant: 'outline',
+                size: 'lg',
+                className: 'rounded-full px-7',
+              })}
+            >
+              Mehr erfahren
+            </Link>
           </div>
         </div>
       </Container>

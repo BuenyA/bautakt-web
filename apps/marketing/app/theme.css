@@ -1,0 +1,234 @@
+/**
+ * Design-Tokens der Marketing-Seite.
+ *
+ * Seit der Umstellung der Web-App auf Fluent UI (2026-10) teilt Marketing keine
+ * Tokens mehr mit packages/ui. Dies ist der Stand von packages/ui/src/styles/theme.css
+ * vor der Umstellung, ohne die Sidebar-Tokens. Die WCAG-Kontrastnotizen sind
+ * mitgenommen; sie gelten gegen die jeweils genannte Fläche.
+ *
+ * Die Marketing-Overrides (#3B86E0 / #E8F2FC) stehen in globals.css.
+ */
+
+@import 'tailwindcss';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Basis = --radius-lg. Die Stufen stehen explizit, nicht als calc,
+     damit Light und Dark dieselbe Weichheit haben (Meta-Feeling, 2026-10-01). */
+  --radius: 1rem;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+
+  /* Weiche Schatten. Dark überschreibt dieselben Namen. */
+  --shadow-sm: 0 1px 2px rgba(15, 17, 21, 0.06);
+  --shadow-md: 0 8px 24px rgba(15, 17, 21, 0.08);
+  --shadow-lg: 0 16px 40px rgba(15, 17, 21, 0.1);
+
+  /* --- Flächen / Elevation --- */
+  --background: #ffffff;
+  --background-second: #f7f8fa;
+  --background-third: #eceff3;
+  --card: #ffffff;
+  --card-raised: #ffffff; /* Light hat keine Extra-Stufe; Alias existiert in beiden Modi */
+  --popover: #ffffff;
+  --surface: #f4f6f8; /* minimal kühler, harmoniert mit dem blauen Primary */
+  --input: #f1f3f6; /* hebt sich bewusst von surface ab */
+  --border: #e4e7ec;
+  --border-strong: #cfd4dc;
+
+  /* --- Text --- */
+  --foreground: #111827; /* 17.74:1 auf background — AAA */
+  --card-foreground: #111827;
+  --popover-foreground: #111827;
+  --text-secondary: #374151; /* 10.31:1 — AAA */
+  --muted-foreground: #4b5563; /* 7.56:1 */
+  --text-subtle: #646d7a; /* war #9ca3af (2.54:1, FAIL) — jetzt 5.24:1 */
+  /* Bewusst schwach: ein Platzhalter darf sich nicht wie eingegebener Inhalt
+     lesen. 1.97:1 auf input. Siehe Hinweis am Dateiende. */
+  --text-placeholder: #a9b0ba;
+
+  /* Schleier hinter Dialog, AlertDialog und Sheet.
+     Light bleibt die Vordergrundfarbe bei 40 % — bisher `bg-foreground/40`
+     (#111827). Dark darf dieselbe Klasse nicht erben: --foreground ist dort
+     #fafafa, und 40 % Weiß über der Fläche wirkt hellgrau. */
+  --overlay: color-mix(in oklab, var(--foreground) 40%, transparent);
+
+  /* --- Primary --- */
+  /* Light = Electric #0064E0 (Owner-Override 2026-10-01; Spec hielt #3B86E0).
+     Gemessen (WCAG 2.1): #0064E0 auf #ffffff 5.39:1 — AA für normalen Text.
+     Weiss auf dem Primary ebenfalls 5.39:1. Accent #E6F0FC ist 10 % Electric
+     auf Weiss; Primary darauf 4.68:1 (AA). Der vorige Wash #E8F2FC war auf
+     #3B86E0 gemischt (Primary darauf nur 3.27:1). */
+  --primary: #0064e0; /* 5.39:1 auf background */
+  --primary-foreground: #ffffff; /* 5.39:1 */
+  --accent: #e6f0fc; /* primary darauf: 4.68:1 */
+  --accent-foreground: #0064e0;
+  --ring: #0064e0;
+
+  /* --- Sekundär / Muted --- */
+  --secondary: #f4f6f8;
+  --secondary-foreground: #374151;
+  --muted: #f4f6f8;
+
+  /* --- Danger --- */
+  --destructive: #d82121; /* war #EF4444 (3.76:1, FAIL) — jetzt 5.05:1 auf card */
+  --destructive-foreground: #ffffff;
+  --destructive-solid: #dc2626; /* weißer Text darauf 4.83:1 */
+  --destructive-bg: #fff5f5; /* destructive darauf 4.72:1 */
+
+  /* --- Success --- */
+  --success: #15803d; /* war #16a34a (3.05:1, FAIL) — jetzt 5.02:1 */
+  --success-foreground: #ffffff;
+  --success-bg: #f0fdf4; /* success darauf: 4.79:1 */
+
+  /* --- Warnung --- */
+  --warning: #ff5c00;
+  --warning-bg: rgba(255, 92, 0, 0.08);
+  --warning-border: rgba(255, 92, 0, 0.2);
+}
+
+.dark {
+  /* Meta-Feeling (2026-10-01): neutrales Charcoal, Tiefe über Flächenstufen.
+     background, Sidebar (second), surface, third, card, card-raised.
+     Kein Blau-Cast mehr (Dark Mode v2 war #0F1115 / #1E2430). */
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
+
+  /* --- Flächen / Elevation --- */
+  --background: #111112;
+  --background-second: #161618; /* Sidebar */
+  --background-third: #1c1c1f;
+  --card: #1f1f22; /* eine Stufe über surface */
+  --card-raised: #28292c; /* innere Panels; nicht die Card-Fläche */
+  --popover: #1f1f22;
+  --surface: #1a1a1d;
+  --input: #1a1a1d; /* == surface, bewusst (wie im Light-Mode) */
+  --border: #2e2e32;
+  --border-strong: #3f3f46;
+
+  /* --- Text --- */
+  --foreground: #fafafa; /* 18.08:1 auf background, AAA */
+  --card-foreground: #fafafa;
+  --popover-foreground: #fafafa;
+  --text-secondary: #a1a1aa; /* 7.36:1 auf background — AAA */
+  --muted-foreground: #8b8b96; /* 5.60:1 auf background, 4.88:1 auf card */
+  --text-subtle: #71717a; /* 3.90:1 auf background, 3.40:1 auf card — unter AA 4.5:1 */
+  --text-placeholder: #52525b; /* 2.25:1 auf input, eingegebener Text 16.64:1 */
+
+  /* Schwarz bei 65 %. Siehe --overlay im Light. */
+  --overlay: color-mix(in oklab, black 65%, transparent);
+
+  /* --- Primary --- */
+  /* Electric #0064E0, gleich dem Light. Weiß darauf 5.39:1 (AA). Als Text
+     auf Canvas 3.50:1, auf Card 3.05:1 — über 3:1 für UI, unter AA 4.5:1
+     für Fließtext. */
+  --primary: #0064e0;
+  --primary-foreground: #ffffff; /* 5.39:1 auf primary */
+  --accent: #0a1628; /* primary darauf: 3.37:1 */
+  --accent-foreground: #0064e0;
+  --ring: #0064e0;
+
+  /* --- Sekundär / Muted --- */
+  --secondary: #1a1a1d;
+  --secondary-foreground: #a1a1aa;
+  --muted: #1a1a1d;
+
+  /* --- Danger --- */
+  --destructive: #f87171; /* 6.82:1 auf background, 5.94:1 auf card */
+  --destructive-foreground: #0f1115; /* 6.83:1 auf destructive; Weiß darauf nur 2.77:1 */
+  --destructive-solid: #dc2626;
+  --destructive-bg: #2a1518;
+
+  /* --- Success --- */
+  --success: #4ade80;
+  --success-foreground: #0f1115; /* 10.84:1 auf success */
+  --success-bg: #10231a;
+
+  /* --- Warnung --- */
+  --warning: #ff5c00;
+  --warning-bg: rgba(255, 92, 0, 0.14);
+  --warning-border: rgba(255, 92, 0, 0.28);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-background-second: var(--background-second);
+  --color-background-third: var(--background-third);
+  --color-foreground: var(--foreground);
+  --color-overlay: var(--overlay);
+  --color-card: var(--card);
+  --color-card-raised: var(--card-raised);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-surface: var(--surface);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-solid: var(--destructive-solid);
+  --color-destructive-bg: var(--destructive-bg);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-bg: var(--success-bg);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-border: var(--warning-border);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-subtle: var(--text-subtle);
+  --color-text-placeholder: var(--text-placeholder);
+
+  /* inline, damit die Utilities `var(--shadow-*)` lesen und .dark die
+     Schatten umschaltet. Die Literale stehen unlayered in :root / .dark
+     und gewinnen gegen die Selbstreferenz in @layer theme. */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-pill: var(--radius-pill);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/**
+ * Bewusste Abweichung von WCAG AA
+ *
+ * --text-placeholder liegt in beiden Modi bei etwa 2:1 (Light 1.97:1 auf
+ * input, Dark 2.25:1 auf input) und damit unter der AA-Schwelle von 4.5:1.
+ * Das ist eine bewusste Entscheidung: ein Platzhalter,
+ * der wie ein bereits eingegebener Wert aussieht, ist selbst ein
+ * Usability-Fehler. Abgemildert dadurch, dass jedes Feld ein sichtbares Label
+ * trägt — der Platzhalter ist Hinweis, nicht Beschriftung.
+ *
+ * Deshalb ausschließlich für Placeholder verwenden. Für echten Sekundärtext
+ * gehören --muted-foreground / --text-subtle her.
+ *
+ * --border / --border-strong liegen absichtlich unter AA: sie sind dekorative
+ * Trenner und nicht das alleinige Erkennungsmerkmal einer Komponente.
+ */

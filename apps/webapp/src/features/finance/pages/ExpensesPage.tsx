@@ -1,21 +1,14 @@
 import { daysBetween, eurosToMinor, formatMoney, todayIso } from '@bautakt/finance';
-import {
-  Badge,
-  Button,
-  DataTable,
-  type DataTableColumn,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-  Uicon,
-} from '@bautakt/ui';
-import { useMemo, useState } from 'react';
+import { DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
+import { Button, Tab, TabList } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
+import { useId, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
+import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
@@ -40,9 +33,13 @@ export function ExpensesPage() {
   const labels = useDataTableLabels();
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = searchParams.get('bereich') === 'sonstige' ? 'expenses' : 'incoming';
+  const panelId = useId();
+  const tabIds = { incoming: useId(), expenses: useId() };
 
   const canManage = usePermission('canManageOverheadCosts');
   const [sheetOpen, setSheetOpen] = useState(false);
+  // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel.
+  useCreateFromUrl(canManage, () => setSheetOpen(true));
   const incoming = useIncomingInvoiceList();
   const expenses = useExpenses();
 
@@ -96,7 +93,7 @@ export function ExpensesPage() {
           <span className="flex items-center gap-2">
             <span className="text-foreground font-medium">{row.original.title}</span>
             {row.original.is_calculatory ? (
-              <Badge variant="muted">{t('domain:expenses.calculatory')}</Badge>
+              <StatusBadge tone="neutral">{t('domain:expenses.calculatory')}</StatusBadge>
             ) : null}
           </span>
         ),
@@ -132,57 +129,60 @@ export function ExpensesPage() {
         description={t('domain:expenses.description')}
         actions={
           canManage ? (
-            <Button size="sm" onClick={() => setSheetOpen(true)}>
-              <Uicon name="plus" size={16} />
+            <Button appearance="primary" onClick={() => setSheetOpen(true)} icon={<AddRegular />}>
               {t('domain:expenseForm.title')}
             </Button>
           ) : null
         }
       />
 
-      <Tabs
-        value={tab}
-        onValueChange={(next) =>
-          setSearchParams(next === 'expenses' ? { bereich: 'sonstige' } : {}, { replace: true })
-        }
-      >
-        <TabsList>
-          <TabsTrigger value="incoming">{t('domain:expenses.tabIncoming')}</TabsTrigger>
-          <TabsTrigger value="expenses">{t('domain:expenses.tabExpenses')}</TabsTrigger>
-        </TabsList>
+      <div className="flex flex-col gap-4">
+        <TabList
+          selectedValue={tab}
+          onTabSelect={(_, { value }) =>
+            setSearchParams(value === 'expenses' ? { bereich: 'sonstige' } : {}, { replace: true })
+          }
+        >
+          <Tab value="incoming" id={tabIds.incoming} aria-controls={panelId}>
+            {t('domain:expenses.tabIncoming')}
+          </Tab>
+          <Tab value="expenses" id={tabIds.expenses} aria-controls={panelId}>
+            {t('domain:expenses.tabExpenses')}
+          </Tab>
+        </TabList>
 
-        <TabsContent value="incoming">
-          <DataTable
-            columns={incomingColumns}
-            data={incoming.data ?? []}
-            isLoading={isLoading}
-            labels={labels}
-            exportFileName="eingangsrechnungen"
-            empty={
-              <EmptyState
-                title={t('domain:expenses.emptyIncomingTitle')}
-                description={t('domain:expenses.emptyIncomingDescription')}
-              />
-            }
-          />
-        </TabsContent>
-
-        <TabsContent value="expenses">
-          <DataTable
-            columns={expenseColumns}
-            data={expenses.data ?? []}
-            isLoading={isLoading}
-            labels={labels}
-            exportFileName="ausgaben"
-            empty={
-              <EmptyState
-                title={t('domain:expenses.emptyExpensesTitle')}
-                description={t('domain:expenses.emptyExpensesDescription')}
-              />
-            }
-          />
-        </TabsContent>
-      </Tabs>
+        <div role="tabpanel" id={panelId} aria-labelledby={tabIds[tab]}>
+          {tab === 'incoming' ? (
+            <DataTable
+              columns={incomingColumns}
+              data={incoming.data ?? []}
+              isLoading={isLoading}
+              labels={labels}
+              exportFileName="eingangsrechnungen"
+              empty={
+                <EmptyState
+                  title={t('domain:expenses.emptyIncomingTitle')}
+                  description={t('domain:expenses.emptyIncomingDescription')}
+                />
+              }
+            />
+          ) : (
+            <DataTable
+              columns={expenseColumns}
+              data={expenses.data ?? []}
+              isLoading={isLoading}
+              labels={labels}
+              exportFileName="ausgaben"
+              empty={
+                <EmptyState
+                  title={t('domain:expenses.emptyExpensesTitle')}
+                  description={t('domain:expenses.emptyExpensesDescription')}
+                />
+              }
+            />
+          )}
+        </div>
+      </div>
 
       <ExpenseSheet open={sheetOpen} onOpenChange={setSheetOpen} />
     </div>

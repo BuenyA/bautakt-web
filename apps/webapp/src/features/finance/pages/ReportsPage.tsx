@@ -6,19 +6,8 @@ import {
   monthRange,
   todayIso,
 } from '@bautakt/finance';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  DataTable,
-  type DataTableColumn,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@bautakt/ui';
+import { DataTable, type DataTableColumn } from '@bautakt/ui';
+import { Card, CardHeader, Select, Text } from '@fluentui/react-components';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -126,44 +115,51 @@ export function ReportsPage() {
         title={t('domain:reports.title')}
         description={t('domain:reports.description')}
         actions={
-          <Select value={String(months)} onValueChange={(value) => setMonths(Number(value))}>
-            <SelectTrigger size="sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {RANGES.map((value) => (
-                <SelectItem key={value} value={String(value)}>
-                  {t('domain:reports.lastMonths', { count: value })}
-                </SelectItem>
-              ))}
-            </SelectContent>
+          <Select value={String(months)} onChange={(_, { value }) => setMonths(Number(value))}>
+            {RANGES.map((value) => (
+              <option key={value} value={String(value)}>
+                {t('domain:reports.lastMonths', { count: value })}
+              </option>
+            ))}
           </Select>
         }
       />
 
       <div className="grid gap-4 xl:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">{t('domain:reports.revenueTitle')}</CardTitle>
-            <span className="text-foreground text-2xl font-semibold tabular-nums">
-              {formatMoney(revenueTotal)}
-            </span>
-          </CardHeader>
-          <CardContent>
+        <Card size="large">
+          <CardHeader
+            header={
+              <Text as="h2" size={400} weight="semibold">
+                {t('domain:reports.revenueTitle')}
+              </Text>
+            }
+            description={
+              <span className="text-foreground text-2xl font-semibold tabular-nums">
+                {formatMoney(revenueTotal)}
+              </span>
+            }
+          />
+          <div>
             <MonthlyBarChart points={revenuePoints} emptyLabel={t('domain:reports.noData')} />
-          </CardContent>
+          </div>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">{t('domain:reports.expenseTitle')}</CardTitle>
-            <span className="text-foreground text-2xl font-semibold tabular-nums">
-              {formatMoney(expenseTotal)}
-            </span>
-          </CardHeader>
-          <CardContent>
+        <Card size="large">
+          <CardHeader
+            header={
+              <Text as="h2" size={400} weight="semibold">
+                {t('domain:reports.expenseTitle')}
+              </Text>
+            }
+            description={
+              <span className="text-foreground text-2xl font-semibold tabular-nums">
+                {formatMoney(expenseTotal)}
+              </span>
+            }
+          />
+          <div>
             <MonthlyBarChart points={expensePoints} emptyLabel={t('domain:reports.noData')} />
-          </CardContent>
+          </div>
         </Card>
       </div>
 

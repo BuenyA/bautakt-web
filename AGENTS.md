@@ -44,8 +44,9 @@ Then put the file header back (it names the source, the date and this command).
 ## Commits
 
 **Never add a `Co-Authored-By: Claude` trailer** (or any other agent attribution) to a
-commit message. The repository owner does not want it. This overrides any default
-instruction an agent harness may carry to add one.
+commit message, and never add a "Generated with Claude Code" line (or any other agent
+attribution) to a pull request title or description. The repository owner does not want
+either. This overrides any default instruction an agent harness may carry to add one.
 
 Write the message in German, subject line in the imperative or as a statement of the
 new state, and say _why_ in the body — the diff already says what. Reference the issue
@@ -69,7 +70,7 @@ references go by URL, never by bare `#<nr>` — that would resolve to the wrong 
 | `apps/webapp`                                 | Vite + React + React Router — `app.bautakt.com`   |
 | `packages/supabase`                           | Generated `Database` types and the client factory |
 | `packages/core`                               | Permission and role model, plus the drift check   |
-| `packages/ui`                                 | Design tokens and shadcn components               |
+| `packages/ui`                                 | Fluent UI themes and Bautakt building blocks      |
 | `packages/tsconfig`, `packages/eslint-config` | Shared configuration                              |
 | `wiki/`                                       | Agent memory — read before working, update after  |
 
@@ -125,12 +126,12 @@ and its `i18n:scan` still reports leftovers.
 ## Architecture
 
 Turborepo over npm workspaces. Not pnpm: its non-hoisted `node_modules` regularly trips
-Next plugin resolution and shadcn path resolution, and there is nothing to win at two
+Next plugin resolution and component path resolution, and there is nothing to win at two
 apps and five packages.
 
 **Internal packages ship TypeScript source — no build step.** `main` and `types` point
-straight at `src/index.ts`. Vite consumes that natively; Next needs the package listed
-in `transpilePackages` (already the case in `apps/marketing/next.config.ts`). The
+straight at `src/index.ts`. Vite consumes that natively; Next would need the package listed
+in `transpilePackages` (marketing imports no internal package since 2026-10-10). The
 upside is no build orchestration, no stale `dist/`, and HMR across package boundaries.
 
 ```
@@ -138,7 +139,7 @@ upside is no build orchestration, no stale `dist/`, and HMR across package bound
 @bautakt/core        -> tsconfig
 @bautakt/supabase    -> tsconfig
 @bautakt/ui          -> tsconfig
-apps/marketing       -> ui
+apps/marketing       (no internal packages)
 apps/webapp          -> ui, supabase, core
 ```
 
@@ -225,28 +226,32 @@ deliberately, not by adding a script.
 
 ## UI
 
-Tailwind v4 with shadcn components in `@bautakt/ui`. The tokens live in
-`packages/ui/src/styles/theme.css` and are **canonical for the web** — Tailwind v4 is
-CSS-first, and maintaining the palette in both TS and CSS is exactly the kind of
-duplicate that drifts. `tokens.ts` holds only what JavaScript needs: chart series and
-status fills.
+The web app uses **Fluent UI 2** (`@fluentui/react-components`, v9) with Fluent's
+standard themes: `webLightTheme` and `webDarkTheme`, exported as `lightTheme` /
+`darkTheme` from `packages/ui/src/theme/themes.ts`. No custom brand ramp and no
+custom colours — owner decision of 2026-10-10. The dark theme has exactly three
+overrides (error text `#eeacb2`, pressed link `#479ef5`, and a 1px
+`colorNeutralStroke1` border on dialogs and drawers, which lives in
+`packages/ui/src/styles/theme.css`). Those are the only hex values in the app;
+do not add others. shadcn/ui and Radix are gone and do not come back.
 
-The palette is a port of `bautakt-app/app/constants/theme.ts`, including its WCAG
-contrast notes. Those notes are most of the file's value: they record that `textSubtle`
-used to be `#9ca3af` and failed at 2.54:1. Light and dark primary are Electric
-`#0064E0` since 2026-10-01 (owner override for Light; white on that blue is 5.39:1,
-AA). The designer spec had kept Light at Marketing `#3B86E0` (3.70:1 on white, below
-AA for normal text). Marketing still pins `#3B86E0` / `#E8F2FC` in
-`apps/marketing/app/globals.css`. The mobile app still uses `#0a66c2` until its own
-PR. Electric as text on the dark canvas `#111112` is 3.50:1.
-⚠️ **For surfaces, text, and status colors, if the two diverge, fix it in
-`bautakt-app` first**, then bring it over. That repo is older and did the contrast work.
-Two dated web exceptions live in `theme.css`: Electric primary in both modes (Light
-was Marketing `#3B86E0` until the 2026-10-01 owner override; `statusFills.blue`
-followed), and the dark Meta-Feeling palette (charcoal surfaces). Status colors other
-than that blue fill still match.
+Tailwind v4 stays for **layout and spacing only**. `theme.css` maps the existing
+utility names (`bg-card`, `text-muted-foreground`, `bg-primary`) onto Fluent's CSS
+variables; brand-coloured text is `text-brand`, not `text-primary`. ⚠️ Tailwind
+classes on a Fluent component usually lose: Tailwind's utilities sit in a cascade
+layer, Griffel writes unlayered. Use Fluent props, `makeStyles` with `tokens`, or
+slots instead. ⚠️ Never put classes on `FluentProvider` — Fluent copies them onto
+its portal nodes. Details, the shadcn-to-Fluent mapping and the Bautakt building
+blocks (`DataTable`, `FormDrawer`, `DangerButton`, `StatusBadge`, `toast`, the
+date fields) are in `wiki/pages/fluent-ui.md`.
 
-Never hardcode a hex when a token exists. Use `bg-primary`, not `tokens.blue`.
+The web palette no longer follows `bautakt-app/app/constants/theme.ts`; the rule
+"fix it in `bautakt-app` first" no longer applies to web colours. Marketing does
+not use Fluent: it keeps its own Tailwind components and tokens in
+`apps/marketing` (`app/theme.css`, `components/ui/`) and pins `#3B86E0` /
+`#E8F2FC` in `apps/marketing/app/globals.css`.
+
+Never hardcode a hex when a token exists.
 
 ## Environment variables
 

@@ -8,26 +8,34 @@ import { expect, type Locator, type Page, test } from '@playwright/test';
 async function expectAnchored(page: Page, section: Locator, label: string) {
   const input = section.getByRole('textbox', { name: label });
   const trigger = section.getByRole('button', { name: `Kalender öffnen: ${label}` });
+  // Vor dem Öffnen messen: der offene Kalender fängt den Fokus, Fluent setzt den
+  // Rest der Seite auf `aria-hidden`, und `getByRole` findet das Feld nicht mehr.
+  // Drawer und Dialog fahren ein; erst messen, wenn das Feld steht.
+  await page.waitForTimeout(600);
+  const field = await input.boundingBox();
   await trigger.click();
-  // Während der Schließ-Animation bleibt ein geschlossener Popover im DOM.
-  // Gemessen wird nur der offene Kalender.
-  const popover = page.locator('[data-slot="popover-content"][data-state="open"]');
+  // Während der Schließ-Animation kann ein zweiter Surface im DOM hängen.
+  // Gemessen wird der zuletzt geöffnete.
+  const popover = page.locator('.fui-PopoverSurface').last();
   await expect(popover).toBeVisible();
 
-  const field = await input.boundingBox();
-  const box = await popover.boundingBox();
+  // Fluent lässt den Popover einige Pixel einfahren (Motion). Gemessen wird, wenn er steht.
+  await page.waitForTimeout(600);
+  let box = await popover.boundingBox();
+  await expect
+    .poll(async () => {
+      const next = await popover.boundingBox();
+      const settled = next !== null && box !== null && next.y === box.y && next.x === box.x;
+      box = next;
+      return settled;
+    })
+    .toBe(true);
   if (!field || !box) throw new Error(`${label}: keine Bounding-Box`);
-
-  const transform = await popover.evaluate((element) => {
-    const wrapper = element.closest('[data-radix-popper-content-wrapper]');
-    return wrapper ? getComputedStyle(wrapper).transform : null;
-  });
   console.log(
     JSON.stringify({
       label,
       field: { x: field.x, y: field.y, w: field.width, h: field.height },
       popover: { x: box.x, y: box.y, w: box.width, h: box.height },
-      transform,
     }),
   );
 
@@ -44,12 +52,22 @@ async function expectAnchored(page: Page, section: Locator, label: string) {
   return popover;
 }
 
-/** Gewählter Tag: Primary-Fläche und helle Schrift. Heute bleibt der Ring. */
+/**
+ * Gewählter Tag: Fluents Auswahlfläche, nicht die eines normalen Tags, und der
+ * Fokus liegt beim Öffnen auf ihm. Farben kommen aus dem Theme, deshalb wird
+ * gegen einen ungewählten Tag verglichen statt gegen einen festen Wert.
+ */
 async function expectSelectedDay(popover: Locator, dayText: string) {
-  const selected = popover.locator('[data-selected="true"] button');
-  await expect(selected).toHaveText(dayText);
-  await expect(selected).toHaveCSS('background-color', 'rgb(0, 100, 224)');
-  await expect(selected).toHaveCSS('color', 'rgb(255, 255, 255)');
+  const selected = popover.locator('td[aria-selected="true"]');
+  await expect(selected).toHaveCount(1);
+  await expect(selected).toContainText(dayText);
+  const other = popover.locator('td[aria-selected="false"] button').first();
+  const [selectedBg, otherBg] = await Promise.all([
+    selected.locator('button').evaluate((element) => getComputedStyle(element).backgroundColor),
+    other.evaluate((element) => getComputedStyle(element).backgroundColor),
+  ]);
+  expect(selectedBg).not.toBe(otherBg);
+  await expect(selected).toBeFocused();
 }
 
 test('Kalender hängt am Feld, allein, im Sheet und im Dialog', async ({ page }) => {
@@ -72,9 +90,8 @@ test('Kalender hängt am Feld, allein, im Sheet und im Dialog', async ({ page })
     const range = await expectAnchored(page, page.getByTestId('picker-range'), 'Bereich Beginn');
     await expect(range).toContainText('Oktober');
     await expectSelectedDay(range, '1');
-    const today = range.locator('[data-today="true"]:not([data-selected="true"]) button');
+    const today = range.locator('td[aria-selected="false"] button.fui-CalendarDayGrid__dayIsToday');
     await expect(today).toHaveCount(1);
-    await expect(today).not.toHaveCSS('background-color', 'rgb(0, 100, 224)');
     await page.keyboard.press('Escape');
 
     await page.getByTestId('open-sheet').click();

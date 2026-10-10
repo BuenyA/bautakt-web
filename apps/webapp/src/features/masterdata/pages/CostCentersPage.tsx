@@ -1,17 +1,16 @@
 import { eurosToMinor, formatMoney } from '@bautakt/finance';
+import { DangerButton, DataTable, type DataTableColumn, toast } from '@bautakt/ui';
 import {
   Button,
-  DataTable,
-  type DataTableColumn,
   Dialog,
+  DialogActions,
+  DialogBody,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
+  DialogSurface,
   DialogTitle,
-  toast,
-  Uicon,
-} from '@bautakt/ui';
+  Link as FluentLink,
+} from '@fluentui/react-components';
+import { AddRegular, DeleteRegular } from '@fluentui/react-icons';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -121,18 +120,15 @@ export function CostCentersPage() {
         cell: ({ row }) => (
           <span className="flex justify-end">
             <Button
+              appearance="subtle"
               type="button"
-              variant="ghost"
-              size="icon"
-              className="size-9"
               aria-label={t('domain:costCenters.delete.actionLabel', {
                 code: row.original.code,
                 name: row.original.name,
               })}
               onClick={() => askDelete(row.original)}
-            >
-              <Uicon name="trash" size={16} />
-            </Button>
+              icon={<DeleteRegular />}
+            />
           </span>
         ),
       },
@@ -148,8 +144,7 @@ export function CostCentersPage() {
         title={t('domain:costCenters.title')}
         description={t('domain:costCenters.description')}
         actions={
-          <Button size="sm" onClick={() => setSheetOpen(true)}>
-            <Uicon name="plus" size={16} />
+          <Button appearance="primary" onClick={() => setSheetOpen(true)} icon={<AddRegular />}>
             {t('domain:costCenters.form.action')}
           </Button>
         }
@@ -160,13 +155,9 @@ export function CostCentersPage() {
           title={t('domain:costCenters.loadErrorTitle')}
           description={t('domain:costCenters.loadErrorDescription')}
           action={
-            <button
-              type="button"
-              className="text-primary cursor-pointer text-sm font-medium hover:underline"
-              onClick={() => void refetch()}
-            >
+            <FluentLink as="button" onClick={() => void refetch()}>
               {t('common:action.retry')}
-            </button>
+            </FluentLink>
           }
         />
       ) : (
@@ -187,47 +178,41 @@ export function CostCentersPage() {
 
       <CostCenterSheet open={sheetOpen} onOpenChange={setSheetOpen} />
 
-      <Dialog open={pending !== null} onOpenChange={(open) => !open && closeDelete()}>
-        <DialogContent>
-          <DialogHeader>
+      <Dialog open={pending !== null} onOpenChange={(_, { open }) => !open && closeDelete()}>
+        <DialogSurface>
+          <DialogBody>
             <DialogTitle>
               {blocked
                 ? t('domain:costCenters.delete.blockedTitle')
                 : t('domain:costCenters.delete.confirmTitle')}
             </DialogTitle>
-            <DialogDescription>
-              {blocked
-                ? t('domain:costCenters.delete.blockedDescription', { count: blockedCount })
-                : t('domain:costCenters.delete.confirmDescription', {
-                    code: pending?.code ?? '',
-                    name: pending?.name ?? '',
-                  })}
-            </DialogDescription>
-          </DialogHeader>
-
-          {deleteError ? <p className="text-destructive text-sm">{deleteError}</p> : null}
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={closeDelete}
-              disabled={remove.isPending}
-            >
-              {t('common:action.cancel')}
-            </Button>
-            {blocked ? null : (
-              <Button
-                type="button"
-                variant="destructive"
-                disabled={remove.isPending}
-                onClick={() => void confirmDelete()}
-              >
-                {t('domain:costCenters.delete.confirmAction')}
+            <DialogContent className="flex flex-col gap-3">
+              <p>
+                {blocked
+                  ? t('domain:costCenters.delete.blockedDescription', { count: blockedCount })
+                  : t('domain:costCenters.delete.confirmDescription', {
+                      code: pending?.code ?? '',
+                      name: pending?.name ?? '',
+                    })}
+              </p>
+              {deleteError ? <p className="text-destructive text-sm">{deleteError}</p> : null}
+            </DialogContent>
+            <DialogActions>
+              <Button type="button" onClick={closeDelete} disabled={remove.isPending}>
+                {t('common:action.cancel')}
               </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
+              {blocked ? null : (
+                <DangerButton
+                  type="button"
+                  disabled={remove.isPending}
+                  onClick={() => void confirmDelete()}
+                >
+                  {t('domain:costCenters.delete.confirmAction')}
+                </DangerButton>
+              )}
+            </DialogActions>
+          </DialogBody>
+        </DialogSurface>
       </Dialog>
     </div>
   );

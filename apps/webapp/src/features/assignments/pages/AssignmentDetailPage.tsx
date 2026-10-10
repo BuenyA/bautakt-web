@@ -1,12 +1,15 @@
-import { Button, Uicon } from '@bautakt/ui';
+import { Button, Link as FluentLink } from '@fluentui/react-components';
+import { DeleteRegular } from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { RouterLink } from '@/components/common/RouterLink';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate, formatDateTimeRange } from '@/lib/format';
@@ -41,13 +44,9 @@ export function AssignmentDetailPage() {
           title={t('domain:assignments.loadErrorTitle')}
           description={t('domain:assignments.loadErrorDescription')}
           action={
-            <button
-              type="button"
-              className="text-sm font-medium text-primary hover:underline"
-              onClick={() => void refetch()}
-            >
+            <FluentLink as="button" onClick={() => void refetch()}>
               {t('common:action.retry')}
-            </button>
+            </FluentLink>
           }
         />
       </div>
@@ -61,11 +60,7 @@ export function AssignmentDetailPage() {
         <EmptyState
           title={t('domain:assignments.notFoundTitle')}
           description={t('domain:assignments.notFoundDescription')}
-          action={
-            <Button asChild variant="outline" size="sm">
-              <Link to={routes.assignments}>{t('common:action.back')}</Link>
-            </Button>
-          }
+          action={<LinkButton to={routes.assignments}>{t('common:action.back')}</LinkButton>}
         />
       </div>
     );
@@ -83,17 +78,9 @@ export function AssignmentDetailPage() {
         description={t('domain:assignments.detailDescription')}
         actions={
           <div className="flex items-center gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link to={routes.assignments}>{t('common:action.back')}</Link>
-            </Button>
+            <LinkButton to={routes.assignments}>{t('common:action.back')}</LinkButton>
             {canManage ? (
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                onClick={() => setDeleteOpen(true)}
-              >
-                <Uicon name="trash" size={16} />
+              <Button onClick={() => setDeleteOpen(true)} icon={<DeleteRegular />}>
                 {t('domain:assignments.delete.action')}
               </Button>
             ) : null}
@@ -103,12 +90,9 @@ export function AssignmentDetailPage() {
 
       {data.order_name ? (
         <div className="flex flex-wrap items-center gap-3">
-          <Link
-            to={routes.order(data.order_id)}
-            className="text-sm font-medium text-primary hover:underline"
-          >
-            {data.order_name}
-          </Link>
+          <RouterLink to={routes.order(data.order_id)}>
+            <span className="font-medium">{data.order_name}</span>
+          </RouterLink>
         </div>
       ) : null}
 

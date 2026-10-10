@@ -1,10 +1,12 @@
 import { hasPermission } from '@bautakt/core';
-import { Badge, Button, Skeleton, Uicon } from '@bautakt/ui';
+import { ActionCard, SkeletonBlock, StatusBadge } from '@bautakt/ui';
+import { Button, Card, Link as FluentLink } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { RouterLink } from '@/components/common/RouterLink';
 import { useAuth } from '@/features/auth/useAuth';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { useMembership } from '@/features/company/useMembership';
@@ -67,13 +69,9 @@ export function OrderTimes({ orderId, orderName }: { orderId: string; orderName:
         title={t('domain:orders.times.loadErrorTitle')}
         description={t('domain:orders.times.loadErrorDescription')}
         action={
-          <button
-            type="button"
-            className="text-sm font-medium text-primary hover:underline"
-            onClick={() => void refetch()}
-          >
+          <FluentLink as="button" onClick={() => void refetch()}>
             {t('common:action.retry')}
-          </button>
+          </FluentLink>
         }
       />
     );
@@ -84,8 +82,7 @@ export function OrderTimes({ orderId, orderName }: { orderId: string; orderName:
         description={t('domain:orders.times.emptyDescription')}
         action={
           canCreate ? (
-            <Button size="sm" onClick={openNew}>
-              <Uicon name="plus" size={16} />
+            <Button onClick={openNew} icon={<AddRegular />}>
               {t('domain:timeForm.newTitle')}
             </Button>
           ) : undefined
@@ -94,7 +91,7 @@ export function OrderTimes({ orderId, orderName }: { orderId: string; orderName:
     );
   } else {
     body = (
-      <ul className="flex max-w-3xl flex-col gap-3">
+      <ul className="flex flex-col gap-3">
         {data.map((entry) => (
           <TimeCard
             key={entry.id}
@@ -109,23 +106,19 @@ export function OrderTimes({ orderId, orderName }: { orderId: string; orderName:
 
   return (
     <section className="flex flex-col gap-4" aria-labelledby="order-times-title">
-      <div className="flex max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-2">
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <h2 id="order-times-title" className="text-foreground text-lg font-semibold tracking-tight">
           {t('domain:orders.times.title')}
         </h2>
         <div className="flex flex-wrap items-center gap-3">
           {canCreate ? (
-            <Button size="sm" onClick={openNew}>
-              <Uicon name="plus" size={16} />
+            <Button appearance="primary" onClick={openNew} icon={<AddRegular />}>
               {t('domain:timeForm.newTitle')}
             </Button>
           ) : null}
-          <Link
-            to={routes.timesForOrder(orderId)}
-            className="text-primary text-sm font-medium hover:underline"
-          >
-            {t('domain:orders.times.all')}
-          </Link>
+          <RouterLink to={routes.timesForOrder(orderId)}>
+            <span className="font-medium">{t('domain:orders.times.all')}</span>
+          </RouterLink>
         </div>
       </div>
       {body}
@@ -154,15 +147,18 @@ function TimeCard({
     t('domain:times.noEnd');
   const pause = formatBreakLabel(entry.break_minutes, t);
   const note = entry.note.trim();
-  const className =
-    'flex w-full flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3 text-left shadow-sm transition-colors';
+  // Fluent-`Card`; als `button`, wenn die Zeile bearbeitet werden darf.
+  const className = 'w-full text-left';
+  const bodyClassName = 'flex flex-col gap-1';
 
   const content = (
     <>
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <span className="text-foreground flex flex-wrap items-center gap-2 text-sm font-medium">
           {entry.employee_name || t('domain:times.noEmployee')}
-          {entry.billed ? <Badge variant="muted">{t('domain:times.billed')}</Badge> : null}
+          {entry.billed ? (
+            <StatusBadge tone="neutral">{t('domain:times.billed')}</StatusBadge>
+          ) : null}
         </span>
         <span className="text-muted-foreground text-sm whitespace-nowrap">{duration}</span>
       </div>
@@ -181,15 +177,13 @@ function TimeCard({
   return (
     <li>
       {editable ? (
-        <button
-          type="button"
-          className={`${className} cursor-pointer hover:border-border-strong`}
-          onClick={onEdit}
-        >
-          {content}
-        </button>
+        <ActionCard className={className} onAction={onEdit}>
+          <div className={bodyClassName}>{content}</div>
+        </ActionCard>
       ) : (
-        <div className={className}>{content}</div>
+        <Card className={className}>
+          <div className={bodyClassName}>{content}</div>
+        </Card>
       )}
     </li>
   );
@@ -197,10 +191,10 @@ function TimeCard({
 
 function TimeListSkeleton({ label }: { label: string }) {
   return (
-    <div className="flex max-w-3xl flex-col gap-3" role="status">
+    <div className="flex flex-col gap-3" role="status">
       <span className="sr-only">{label}</span>
       {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-        <Skeleton key={index} className="h-16 rounded-xl" />
+        <SkeletonBlock key={index} className="h-16 rounded-xl" />
       ))}
     </div>
   );

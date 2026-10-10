@@ -1,13 +1,13 @@
+import { DangerButton, toast } from '@bautakt/ui';
 import {
   Button,
   Dialog,
+  DialogActions,
+  DialogBody,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
+  DialogSurface,
   DialogTitle,
-  toast,
-} from '@bautakt/ui';
+} from '@fluentui/react-components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -81,44 +81,43 @@ export function AssignmentDeleteDialog({
   return (
     <Dialog
       open={open}
-      onOpenChange={(next) => {
+      onOpenChange={(_, { open: next }) => {
         if (!next) setError(null);
         onOpenChange(next);
       }}
     >
-      <DialogContent>
-        <DialogHeader>
+      <DialogSurface>
+        <DialogBody>
           <DialogTitle>{t('domain:assignments.delete.title')}</DialogTitle>
-          <DialogDescription>
-            {t('domain:assignments.delete.description', {
-              period: period || t('domain:assignments.detailTitle'),
-              orderSuffix: orderName
-                ? t('domain:assignments.delete.orderSuffix', { order: orderName })
-                : '',
-            })}
-          </DialogDescription>
-        </DialogHeader>
-
-        {error ? (
-          <p role="alert" className="text-destructive text-sm">
-            {error}
-          </p>
-        ) : null}
-
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={close}>
-            {t('common:action.cancel')}
-          </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            disabled={remove.isPending}
-            onClick={() => void onConfirm()}
-          >
-            {t('domain:assignments.delete.confirm')}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
+          <DialogContent className="flex flex-col gap-3">
+            <p>
+              {t('domain:assignments.delete.description', {
+                period: period || t('domain:assignments.detailTitle'),
+                orderSuffix: orderName
+                  ? t('domain:assignments.delete.orderSuffix', { order: orderName })
+                  : '',
+              })}
+            </p>
+            {error ? (
+              <p role="alert" className="text-destructive text-sm">
+                {error}
+              </p>
+            ) : null}
+          </DialogContent>
+          <DialogActions>
+            <Button type="button" onClick={close}>
+              {t('common:action.cancel')}
+            </Button>
+            <DangerButton
+              type="button"
+              disabled={remove.isPending}
+              onClick={() => void onConfirm()}
+            >
+              {t('domain:assignments.delete.confirm')}
+            </DangerButton>
+          </DialogActions>
+        </DialogBody>
+      </DialogSurface>
     </Dialog>
   );
 }

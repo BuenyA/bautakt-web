@@ -1,16 +1,11 @@
 import {
-  Button,
-  Input,
-  Label,
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
+  FormDrawer,
+  FormDrawerDescription,
+  FormDrawerFooter,
+  FormDrawerTitle,
   toast,
 } from '@bautakt/ui';
+import { Button, DrawerBody, DrawerHeader, Input, Label } from '@fluentui/react-components';
 import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -33,11 +28,9 @@ export function CostCenterSheet({
   onOpenChange: (open: boolean) => void;
 }) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="p-0">
-        {open ? <CostCenterForm onDone={() => onOpenChange(false)} /> : null}
-      </SheetContent>
-    </Sheet>
+    <FormDrawer open={open} onOpenChange={onOpenChange}>
+      {open ? <CostCenterForm onDone={() => onOpenChange(false)} /> : null}
+    </FormDrawer>
   );
 }
 
@@ -80,13 +73,18 @@ function CostCenterForm({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
-      <SheetHeader>
-        <SheetTitle>{t('domain:costCenters.form.title')}</SheetTitle>
-        <SheetDescription>{t('domain:costCenters.form.description')}</SheetDescription>
-      </SheetHeader>
+    <form
+      onSubmit={(event) => void onSubmit(event)}
+      className="flex h-full min-h-0 w-full flex-col"
+    >
+      <DrawerHeader>
+        <FormDrawerTitle closeLabel={t('common:action.close')}>
+          {t('domain:costCenters.form.title')}
+        </FormDrawerTitle>
+        <FormDrawerDescription>{t('domain:costCenters.form.description')}</FormDrawerDescription>
+      </DrawerHeader>
 
-      <SheetBody className="flex flex-col gap-4">
+      <DrawerBody className="flex flex-col gap-4">
         <div className="grid gap-2">
           <Label htmlFor={ids.code}>{t('domain:costCenters.columns.code')}</Label>
           <Input
@@ -102,16 +100,16 @@ function CostCenterForm({ onDone }: { onDone: () => void }) {
         </div>
 
         {error ? <p className="text-destructive text-sm">{error}</p> : null}
-      </SheetBody>
+      </DrawerBody>
 
-      <SheetFooter>
-        <Button type="button" variant="outline" onClick={onDone}>
+      <FormDrawerFooter>
+        <Button type="button" onClick={onDone}>
           {t('common:action.cancel')}
         </Button>
-        <Button type="submit" disabled={create.isPending}>
+        <Button appearance="primary" type="submit" disabled={create.isPending}>
           {t('common:action.save')}
         </Button>
-      </SheetFooter>
+      </FormDrawerFooter>
     </form>
   );
 }

@@ -1,28 +1,37 @@
 import { eurosToMinor, formatMoney } from '@bautakt/finance';
+import { StatusBadge, toast } from '@bautakt/ui';
 import {
-  Badge,
   Button,
   Card,
-  CardContent,
   CardHeader,
-  CardTitle,
+  Link as FluentLink,
+  MessageBar,
+  MessageBarBody,
+  MessageBarTitle,
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
+  TableHeaderCell,
   TableRow,
-  toast,
-  Uicon,
-} from '@bautakt/ui';
+  Text,
+} from '@fluentui/react-components';
+import {
+  CheckmarkCircleRegular,
+  DocumentRegular,
+  EditRegular,
+  WalletRegular,
+} from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { RouterLink } from '@/components/common/RouterLink';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
@@ -39,6 +48,12 @@ import {
   useFinalizeDocument,
   useSalesDocument,
 } from '../useSalesDocument';
+
+/**
+ * Zahlenspalten: Fluents Kopfzelle legt den Text in einen Flex-Knopf, `text-right`
+ * an der Zelle wirkt darauf nicht. Ausgerichtet wird der Knopf selbst.
+ */
+const END_ALIGNED = { style: { justifyContent: 'flex-end' } } as const;
 
 export function InvoiceDetailPage() {
   const { t } = useTranslation();
@@ -73,17 +88,11 @@ export function InvoiceDetailPage() {
           }
           action={
             isError ? (
-              <button
-                type="button"
-                className="text-primary cursor-pointer text-sm font-medium hover:underline"
-                onClick={() => void refetch()}
-              >
+              <FluentLink as="button" onClick={() => void refetch()}>
                 {t('common:action.retry')}
-              </button>
+              </FluentLink>
             ) : (
-              <Button asChild variant="outline" size="sm">
-                <Link to={routes.invoices}>{t('common:action.back')}</Link>
-              </Button>
+              <LinkButton to={routes.invoices}>{t('common:action.back')}</LinkButton>
             )
           }
         />
@@ -116,42 +125,43 @@ export function InvoiceDetailPage() {
         description={data.customer_label || t('domain:invoices.noCustomer')}
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link to={routes.invoices}>{t('common:action.back')}</Link>
-            </Button>
+            <LinkButton to={routes.invoices}>{t('common:action.back')}</LinkButton>
 
             {!isDraft ? (
-              <Button asChild variant="outline" size="sm">
-                <Link to={routes.invoicePrint(data.id)} target="_blank" rel="noreferrer">
-                  <Uicon name="file" size={16} />
-                  {t('domain:invoices.print')}
-                </Link>
+              <Button
+                as="a"
+                href={routes.invoicePrint(data.id)}
+                target="_blank"
+                rel="noreferrer"
+                icon={<DocumentRegular />}
+              >
+                {t('domain:invoices.print')}
               </Button>
             ) : null}
 
             {access.canWriteSalesDocuments && isDraft ? (
-              <Button asChild variant="outline" size="sm">
-                <Link to={routes.invoiceEdit(data.id)}>
-                  <Uicon name="pencil" size={16} />
-                  {t('common:action.edit')}
-                </Link>
-              </Button>
+              <LinkButton to={routes.invoiceEdit(data.id)} icon={<EditRegular />}>
+                {t('common:action.edit')}
+              </LinkButton>
             ) : null}
 
             {access.canWriteSalesDocuments && isDraft ? (
               <Button
-                size="sm"
+                appearance="primary"
                 disabled={finalize.isPending || blockers.length > 0}
                 onClick={() => void onFinalize()}
+                icon={<CheckmarkCircleRegular />}
               >
-                <Uicon name="badge-check" size={16} />
                 {t('domain:invoices.finalize')}
               </Button>
             ) : null}
 
             {access.canWriteSalesDocuments && !isDraft && openMinor > 0 ? (
-              <Button size="sm" onClick={() => setPaymentOpen(true)}>
-                <Uicon name="wallet" size={16} />
+              <Button
+                appearance="primary"
+                onClick={() => setPaymentOpen(true)}
+                icon={<WalletRegular />}
+              >
                 {t('domain:payments.add')}
               </Button>
             ) : null}
@@ -160,32 +170,36 @@ export function InvoiceDetailPage() {
       />
 
       {isDraft && blockers.length > 0 ? (
-        <div className="border-warning-border bg-warning-bg text-text-secondary flex flex-col gap-1 rounded-xl border p-4 text-sm">
-          <span className="text-foreground font-medium">{t('domain:invoices.blockersTitle')}</span>
-          <ul className="list-inside list-disc">
-            {blockers.map((blocker) => (
-              <li key={blocker}>{t(`domain:invoices.blockers.${blocker}`)}</li>
-            ))}
-          </ul>
-          {blockers.includes('sellerTaxId') ? (
-            <Link to={routes.settings} className="text-primary mt-1 font-medium hover:underline">
-              {t('domain:invoices.toSettings')}
-            </Link>
-          ) : null}
-        </div>
+        <MessageBar intent="warning" layout="multiline">
+          <MessageBarBody>
+            <MessageBarTitle>{t('domain:invoices.blockersTitle')}</MessageBarTitle>
+            <ul className="mt-1 list-inside list-disc">
+              {blockers.map((blocker) => (
+                <li key={blocker}>{t(`domain:invoices.blockers.${blocker}`)}</li>
+              ))}
+            </ul>
+            {blockers.includes('sellerTaxId') ? (
+              <RouterLink to={routes.settings} className="mt-1 inline-block">
+                <span className="font-medium">{t('domain:invoices.toSettings')}</span>
+              </RouterLink>
+            ) : null}
+          </MessageBarBody>
+        </MessageBar>
       ) : null}
 
       {overpaidMinor > 0 ? (
-        <div className="border-warning-border bg-warning-bg text-text-secondary flex flex-col gap-1 rounded-xl border p-4 text-sm">
-          <span className="text-foreground font-medium">{t('domain:invoices.overpaid')}</span>
-          <p>{t('domain:invoices.overpaidWarning', { amount: formatMoney(overpaidMinor) })}</p>
-        </div>
+        <MessageBar intent="warning" layout="multiline">
+          <MessageBarBody>
+            <MessageBarTitle>{t('domain:invoices.overpaid')}</MessageBarTitle>
+            {t('domain:invoices.overpaidWarning', { amount: formatMoney(overpaidMinor) })}
+          </MessageBarBody>
+        </MessageBar>
       ) : null}
 
       <div className="flex flex-wrap items-center gap-3">
         <DocumentStatusBadge status={data.status} />
         {overpaidMinor > 0 ? (
-          <Badge variant="warning">{t('domain:invoices.overpaid')}</Badge>
+          <StatusBadge tone="warning">{t('domain:invoices.overpaid')}</StatusBadge>
         ) : null}
         <span
           className={
@@ -198,37 +212,39 @@ export function InvoiceDetailPage() {
         </span>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base font-semibold tracking-tight">
-            {t('domain:invoices.lines')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <Card size="large">
+        <CardHeader
+          header={
+            <Text as="h2" size={400} weight="semibold">
+              {t('domain:invoices.lines')}
+            </Text>
+          }
+        />
+        <div>
           {data.lines.length === 0 ? (
             <p className="text-muted-foreground text-sm">{t('domain:invoices.noLines')}</p>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead>{t('domain:invoices.lineColumns.title')}</TableHead>
-                  <TableHead className="text-right">
+                <TableRow>
+                  <TableHeaderCell>{t('domain:invoices.lineColumns.title')}</TableHeaderCell>
+                  <TableHeaderCell button={END_ALIGNED}>
                     {t('domain:invoices.lineColumns.quantity')}
-                  </TableHead>
-                  <TableHead className="text-right">
+                  </TableHeaderCell>
+                  <TableHeaderCell button={END_ALIGNED}>
                     {t('domain:invoices.lineColumns.unitPrice')}
-                  </TableHead>
-                  <TableHead className="text-right">
+                  </TableHeaderCell>
+                  <TableHeaderCell button={END_ALIGNED}>
                     {t('domain:invoices.lineColumns.tax')}
-                  </TableHead>
-                  <TableHead className="text-right">
+                  </TableHeaderCell>
+                  <TableHeaderCell button={END_ALIGNED}>
                     {t('domain:invoices.lineColumns.net')}
-                  </TableHead>
+                  </TableHeaderCell>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data.lines.map((line) => (
-                  <TableRow key={line.id} className="hover:bg-transparent">
+                  <TableRow key={line.id}>
                     <TableCell>
                       <span className="text-foreground font-medium">{line.title}</span>
                       {line.description ? (
@@ -284,7 +300,7 @@ export function InvoiceDetailPage() {
               </>
             ) : null}
           </dl>
-        </CardContent>
+        </div>
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -313,13 +329,15 @@ export function InvoiceDetailPage() {
           <DetailRow label={t('domain:invoices.notes')} value={data.notes} />
         </DetailCard>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-semibold tracking-tight">
-              {t('domain:payments.title')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Card size="large">
+          <CardHeader
+            header={
+              <Text as="h2" size={400} weight="semibold">
+                {t('domain:payments.title')}
+              </Text>
+            }
+          />
+          <div>
             {data.payments.length === 0 ? (
               <p className="text-muted-foreground text-sm">{t('domain:payments.empty')}</p>
             ) : (
@@ -345,7 +363,7 @@ export function InvoiceDetailPage() {
                 })}
               </p>
             ) : null}
-          </CardContent>
+          </div>
         </Card>
       </div>
 

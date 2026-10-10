@@ -1,5 +1,6 @@
-import { cn } from '@bautakt/ui';
 import type * as React from 'react';
+
+import { cn } from '@/lib/cn';
 
 export function Container({ className, ...props }: React.ComponentProps<'div'>) {
   return (

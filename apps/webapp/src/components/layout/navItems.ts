@@ -1,8 +1,30 @@
-import type { UiconName } from '@bautakt/ui';
+import {
+  Box20Filled,
+  Box20Regular,
+  Briefcase20Filled,
+  Briefcase20Regular,
+  bundleIcon,
+  CalendarLtr20Filled,
+  CalendarLtr20Regular,
+  Clock20Filled,
+  Clock20Regular,
+  type FluentIcon,
+  Home20Filled,
+  Home20Regular,
+  People20Filled,
+  People20Regular,
+  PeopleTeam20Filled,
+  PeopleTeam20Regular,
+  Person20Filled,
+  Person20Regular,
+  Settings20Filled,
+  Settings20Regular,
+  Wallet20Filled,
+  Wallet20Regular,
+} from '@fluentui/react-icons';
 
 import {
   hubById,
-  hubDestinationForPath,
   type HubId,
   passesGate,
   pathMatches,
@@ -10,11 +32,25 @@ import {
 } from '@/features/hubs/hubs';
 import { routes } from '@/lib/routes';
 
+const Home = bundleIcon(Home20Filled, Home20Regular);
+const Briefcase = bundleIcon(Briefcase20Filled, Briefcase20Regular);
+const PeopleTeam = bundleIcon(PeopleTeam20Filled, PeopleTeam20Regular);
+const Clock = bundleIcon(Clock20Filled, Clock20Regular);
+const CalendarLtr = bundleIcon(CalendarLtr20Filled, CalendarLtr20Regular);
+const Wallet = bundleIcon(Wallet20Filled, Wallet20Regular);
+const Person = bundleIcon(Person20Filled, Person20Regular);
+const People = bundleIcon(People20Filled, People20Regular);
+const Box = bundleIcon(Box20Filled, Box20Regular);
+const Settings = bundleIcon(Settings20Filled, Settings20Regular);
+
 export type NavItem = PermissionGate & {
   to: string;
   labelKey: string;
-  /** Name aus der Icon-Schrift — identisch zu dem, was die Handy-App zeigt. */
-  icon: UiconName;
+  /**
+   * Fluent-Icon in 20px (Fluents Größe für die Navigation), gefüllt im aktiven
+   * Zustand (`bundleIcon`). Ungrößte Icons (`HomeRegular`) erben 14px Schrift.
+   */
+  icon: FluentIcon;
   /**
    * Hub-Punkt. Sichtbar, sobald mindestens eine seiner Karten sichtbar ist.
    * Fehlt jede Karte, verschwindet der Punkt — eine leere „Finanzen"-Zeile
@@ -35,33 +71,33 @@ export type NavItem = PermissionGate & {
  * RLS-Policies in der Datenbank.
  */
 export const navItems: NavItem[] = [
-  { to: routes.overview, labelKey: 'common:nav.overview', icon: 'home' },
-  { to: routes.orders, labelKey: 'common:nav.orders', icon: 'briefcase' },
-  { to: routes.assignments, labelKey: 'common:nav.assignments', icon: 'users' },
-  { to: routes.times, labelKey: 'common:nav.times', icon: 'clock' },
-  { to: routes.calendar, labelKey: 'common:nav.calendar', icon: 'calendar' },
+  { to: routes.overview, labelKey: 'common:nav.overview', icon: Home },
+  { to: routes.orders, labelKey: 'common:nav.orders', icon: Briefcase },
+  { to: routes.assignments, labelKey: 'common:nav.assignments', icon: PeopleTeam },
+  { to: routes.times, labelKey: 'common:nav.times', icon: Clock },
+  { to: routes.calendar, labelKey: 'common:nav.calendar', icon: CalendarLtr },
   {
     to: routes.financeHub,
     labelKey: 'common:nav.finance',
-    icon: 'wallet',
+    icon: Wallet,
     hubId: 'finance',
   },
   {
     to: routes.personalHub,
     labelKey: 'common:nav.employees',
-    icon: 'user',
+    icon: Person,
     hubId: 'personal',
   },
   {
     to: routes.customers,
     labelKey: 'common:nav.customers',
-    icon: 'users',
+    icon: People,
     permission: 'canManageCustomers',
   },
   {
     to: routes.materialHub,
     labelKey: 'common:nav.material',
-    icon: 'boxes',
+    icon: Box,
     hubId: 'material',
   },
 ];
@@ -70,7 +106,7 @@ export const navItems: NavItem[] = [
 export const settingsNavItem: NavItem = {
   to: routes.settings,
   labelKey: 'common:nav.settings',
-  icon: 'settings',
+  icon: Settings,
 };
 
 export function maySee(item: NavItem, permissions: Parameters<typeof passesGate>[1]): boolean {
@@ -85,33 +121,4 @@ export function isNavActive(pathname: string, item: NavItem): boolean {
   if (pathMatches(pathname, item.to)) return true;
   if (!item.hubId) return false;
   return hubById(item.hubId).cards.some((card) => pathMatches(pathname, card.to));
-}
-
-export type BreadcrumbCrumb = { to: string; labelKey: string };
-
-/**
- * Brotkrume aus der Nav. Hub-Ziele (`/rechnungen`) haengen nicht am Hub-Pfad,
- * deshalb steht davor der Hub-Name.
- */
-export function breadcrumbModel(
-  pathname: string,
-): { crumbs: BreadcrumbCrumb[]; detail: boolean } | null {
-  const top = [...navItems, settingsNavItem].find((item) => pathMatches(pathname, item.to));
-  if (top) {
-    return {
-      crumbs: [{ to: top.to, labelKey: top.labelKey }],
-      detail: pathname !== top.to,
-    };
-  }
-
-  const destination = hubDestinationForPath(pathname);
-  if (!destination) return null;
-
-  return {
-    crumbs: [
-      { to: destination.hub.to, labelKey: destination.hub.titleKey },
-      { to: destination.card.to, labelKey: destination.card.titleKey },
-    ],
-    detail: pathname !== destination.card.to,
-  };
 }

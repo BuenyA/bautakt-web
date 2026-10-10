@@ -13,7 +13,8 @@ zum Problem wird oder die Paketzahl deutlich steigt.
 ## Pakete ohne Build-Schritt
 
 `main` und `types` zeigen direkt auf `src/index.ts`. Vite verarbeitet das nativ; Next
-braucht dafür `transpilePackages`.
+bräuchte dafür `transpilePackages`. Marketing importiert seit 2026-10-10 kein
+internes Paket mehr ([Fluent-Umstellung](../logs/2026-10-10-fluent-ui.md)).
 
 Der Gewinn: keine Build-Orchestrierung, kein veraltetes `dist/`, HMR über Paketgrenzen.
 Der Preis — die Apps typechecken den Paketquelltext mit — ist in Wahrheit ein Vorteil.
@@ -23,7 +24,7 @@ Der Preis — die Apps typechecken den Paketquelltext mit — ist in Wahrheit ei
 @bautakt/core        -> tsconfig
 @bautakt/supabase    -> tsconfig
 @bautakt/ui          -> tsconfig
-apps/marketing       -> ui
+apps/marketing       (keine internen Pakete)
 apps/webapp          -> ui, supabase, core
 ```
 

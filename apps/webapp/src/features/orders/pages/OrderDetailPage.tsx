@@ -1,10 +1,12 @@
-import { Button, Uicon } from '@bautakt/ui';
+import { Button, Link as FluentLink } from '@fluentui/react-components';
+import { EditRegular } from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
@@ -48,13 +50,9 @@ export function OrderDetailPage() {
           title={t('domain:orders.loadErrorTitle')}
           description={t('domain:orders.loadErrorDescription')}
           action={
-            <button
-              type="button"
-              className="text-sm font-medium text-primary hover:underline"
-              onClick={() => void refetch()}
-            >
+            <FluentLink as="button" onClick={() => void refetch()}>
               {t('common:action.retry')}
-            </button>
+            </FluentLink>
           }
         />
       </div>
@@ -68,11 +66,7 @@ export function OrderDetailPage() {
         <EmptyState
           title={t('domain:orders.notFoundTitle')}
           description={t('domain:orders.notFoundDescription')}
-          action={
-            <Button asChild variant="outline" size="sm">
-              <Link to={routes.orders}>{t('common:action.back')}</Link>
-            </Button>
-          }
+          action={<LinkButton to={routes.orders}>{t('common:action.back')}</LinkButton>}
         />
       </div>
     );
@@ -89,12 +83,9 @@ export function OrderDetailPage() {
         description={t('domain:orders.detailDescription')}
         actions={
           <div className="flex items-center gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link to={routes.orders}>{t('common:action.back')}</Link>
-            </Button>
+            <LinkButton to={routes.orders}>{t('common:action.back')}</LinkButton>
             {canManage ? (
-              <Button size="sm" onClick={() => setEditing(true)}>
-                <Uicon name="pencil" size={16} />
+              <Button appearance="primary" onClick={() => setEditing(true)} icon={<EditRegular />}>
                 {t('common:action.edit')}
               </Button>
             ) : null}

@@ -1,6 +1,7 @@
-import { Toaster } from '@bautakt/ui';
+import { AppToaster } from '@bautakt/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { AuthProvider } from '@/features/auth/AuthProvider';
 
@@ -16,8 +17,14 @@ export function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>{children}</AuthProvider>
-        <Toaster />
+        <LocalizedToaster />
       </ThemeProvider>
     </QueryClientProvider>
   );
+}
+
+/** Die Toast-Region trägt einen deutschen Namen für Screenreader. */
+function LocalizedToaster() {
+  const { t } = useTranslation();
+  return <AppToaster label={t('common:toaster.label')} />;
 }

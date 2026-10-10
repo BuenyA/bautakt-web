@@ -1,9 +1,9 @@
-import { de } from 'date-fns/locale';
 import { describe, expect, it } from 'vitest';
 
 import {
   dateToIso,
   formatGermanDate,
+  germanCalendarNames,
   isEndBeforeStart,
   isoToLocalDate,
   maskGermanDate,
@@ -122,8 +122,13 @@ describe('isEndBeforeStart', () => {
   });
 });
 
-describe('date-fns locale de', () => {
-  it('beginnt die Woche am Montag', () => {
-    expect(de.options?.weekStartsOn).toBe(1);
+describe('germanCalendarNames', () => {
+  it('liefert deutsche Namen, Wochentage ab Sonntag wie Fluent sie erwartet', () => {
+    const names = germanCalendarNames();
+    expect(names.months[0]).toBe('Januar');
+    expect(names.months[2]).toBe('März');
+    expect(names.days[0]).toBe('Sonntag');
+    expect(names.days[1]).toBe('Montag');
+    expect(names.shortDays).toEqual(['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']);
   });
 });

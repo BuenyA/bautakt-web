@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@bautakt/ui';
+import { Card, CardHeader, Text } from '@fluentui/react-components';
 import type { ReactNode } from 'react';
 
 /**
@@ -17,15 +17,17 @@ export function DetailCard({
   className?: string;
 }) {
   return (
-    <Card className={className}>
+    <Card size="large" className={className}>
       {title ? (
-        <CardHeader>
-          <CardTitle className="text-base font-semibold tracking-tight">{title}</CardTitle>
-        </CardHeader>
+        <CardHeader
+          header={
+            <Text as="h2" size={400} weight="semibold">
+              {title}
+            </Text>
+          }
+        />
       ) : null}
-      <CardContent>
-        <dl className="flex flex-col gap-4">{children}</dl>
-      </CardContent>
+      <dl className="flex flex-col gap-4">{children}</dl>
     </Card>
   );
 }

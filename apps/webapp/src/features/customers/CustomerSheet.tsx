@@ -1,22 +1,20 @@
 import {
-  Button,
-  Input,
-  Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  Textarea,
+  FormDrawer,
+  FormDrawerDescription,
+  FormDrawerFooter,
+  FormDrawerTitle,
   toast,
 } from '@bautakt/ui';
+import {
+  Button,
+  DrawerBody,
+  DrawerHeader,
+  Input,
+  type InputProps,
+  Label,
+  Select,
+  Textarea,
+} from '@fluentui/react-components';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -87,15 +85,14 @@ export function CustomerSheet({
   onOpenChange: (open: boolean) => void;
 }) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="p-0">
-        {open && draft ? <CustomerForm initial={draft} onDone={() => onOpenChange(false)} /> : null}
-      </SheetContent>
-    </Sheet>
+    <FormDrawer open={open} onOpenChange={onOpenChange}>
+      {open && draft ? <CustomerForm initial={draft} onDone={() => onOpenChange(false)} /> : null}
+    </FormDrawer>
   );
 }
 
 function CustomerForm({ initial, onDone }: { initial: CustomerDraft; onDone: () => void }) {
+  const typeFieldId = useId();
   const { t } = useTranslation();
   const save = useSaveCustomer();
   const [draft, setDraft] = useState<CustomerDraft>(initial);
@@ -141,28 +138,27 @@ function CustomerForm({ initial, onDone }: { initial: CustomerDraft; onDone: () 
   }
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
-      <SheetHeader>
-        <SheetTitle>
+    <form
+      onSubmit={(event) => void onSubmit(event)}
+      className="flex h-full min-h-0 w-full flex-col"
+    >
+      <DrawerHeader>
+        <FormDrawerTitle closeLabel={t('common:action.close')}>
           {draft.id ? t('domain:customerForm.editTitle') : t('domain:customerForm.newTitle')}
-        </SheetTitle>
-        <SheetDescription>{t('domain:customerForm.description')}</SheetDescription>
-      </SheetHeader>
+        </FormDrawerTitle>
+        <FormDrawerDescription>{t('domain:customerForm.description')}</FormDrawerDescription>
+      </DrawerHeader>
 
-      <SheetBody className="flex flex-col gap-4">
+      <DrawerBody className="flex flex-col gap-4">
         <div className="grid gap-2">
-          <Label>{t('domain:customerForm.type')}</Label>
+          <Label htmlFor={typeFieldId}>{t('domain:customerForm.type')}</Label>
           <Select
+            id={typeFieldId}
             value={draft.customer_type}
-            onValueChange={(value) => set({ customer_type: value as 'b2b' | 'b2c' })}
+            onChange={(_, { value }) => set({ customer_type: value as 'b2b' | 'b2c' })}
           >
-            <SelectTrigger className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="b2b">{t('domain:customerForm.types.b2b')}</SelectItem>
-              <SelectItem value="b2c">{t('domain:customerForm.types.b2c')}</SelectItem>
-            </SelectContent>
+            <option value="b2b">{t('domain:customerForm.types.b2b')}</option>
+            <option value="b2c">{t('domain:customerForm.types.b2c')}</option>
           </Select>
         </div>
 
@@ -247,16 +243,16 @@ function CustomerForm({ initial, onDone }: { initial: CustomerDraft; onDone: () 
         </div>
 
         {error ? <p className="text-destructive text-sm">{error}</p> : null}
-      </SheetBody>
+      </DrawerBody>
 
-      <SheetFooter>
-        <Button type="button" variant="outline" onClick={onDone}>
+      <FormDrawerFooter>
+        <Button type="button" onClick={onDone}>
           {t('common:action.cancel')}
         </Button>
-        <Button type="submit" disabled={save.isPending}>
+        <Button appearance="primary" type="submit" disabled={save.isPending}>
           {t('common:action.save')}
         </Button>
-      </SheetFooter>
+      </FormDrawerFooter>
     </form>
   );
 }
@@ -272,7 +268,7 @@ function TextField({
   label: string;
   value: string;
   onChange: (value: string) => void;
-  type?: string;
+  type?: InputProps['type'];
 }) {
   return (
     <div className="grid gap-2">
