@@ -25,6 +25,7 @@ verlinkt, nie kopiert.
 | [berechtigungen-im-web.md](pages/berechtigungen-im-web.md) | Die 33 Rechte, drei Durchsetzungsebenen, Drift-Check.         |
 | [deployment-vercel.md](pages/deployment-vercel.md)         | Zwei Projekte aus einem Repo, der SPA-Rewrite, Env-Präfixe.   |
 | [webapp-shell.md](pages/webapp-shell.md)                   | Shell-Layout, kanonische Top-Nav IA, Listen-Muster.           |
+| [fluent-ui.md](pages/fluent-ui.md)                         | Fluent UI 2: Themes, Provider, Tailwind-Regel, Bausteine.     |
 | [auftragsfotos.md](pages/auftragsfotos.md)                 | Fotos am Auftrag anzeigen, hochladen und löschen.             |
 | [auftragsnotizen.md](pages/auftragsnotizen.md)             | Notizen am Auftrag lesen, anlegen, bearbeiten, löschen.       |
 | [auftragszeiten.md](pages/auftragszeiten.md)               | Zeiten am Auftrag und auf `/zeiten` anlegen, ändern, löschen. |
@@ -94,6 +95,7 @@ verlinkt, nie kopiert.
 | 2026-10-09 | [Pause nur anzeigen, wenn sie größer als 0 ist](logs/2026-10-09-pause-anzeige.md)                 |
 | 2026-10-09 | [Marketing ohne Preise und Registrierung](logs/2026-10-09-marketing-nicht-kommerziell.md)         |
 | 2026-10-09 | [Login ohne Registrierungslink](logs/2026-10-09-login-ohne-registrierung.md)                      |
+| 2026-10-10 | [Web-App auf Fluent UI 2](logs/2026-10-10-fluent-ui.md)                                           |
 
 ## Die drei wichtigsten Sätze
 

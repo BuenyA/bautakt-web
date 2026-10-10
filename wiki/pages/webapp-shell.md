@@ -1,8 +1,9 @@
 # Webapp-Shell und Navigation
 
 Wie die angemeldete Oberfläche in `apps/webapp` aufgebaut ist und welche
-Informationsarchitektur gilt. Stand 2026-09-23: Neuaufbau mit shadcn/ui für
-Geschäftsführung und Buchhaltung.
+Informationsarchitektur gilt. Neuaufbau 2026-09-23 für Geschäftsführung und
+Buchhaltung; seit 2026-10-10 auf Fluent UI 2 statt shadcn/ui
+([fluent-ui.md](fluent-ui.md)).
 
 ## Zielgruppe
 
@@ -12,21 +13,33 @@ Zweifel: dichte Tabellen und Tastaturbedienung schlagen große Touch-Ziele.
 
 ## Layout
 
-`SidebarProvider` / `Sidebar` / `SidebarInset` aus `@bautakt/ui` (shadcn).
-Desktop: Sidebar links (240px, eingeklappt 64px Icon-Spalte), Topbar (56px)
-mit Trigger, Brotkrumen, Firmenname und Glocke. Unter 1024px wird die Leiste ein
-Overlay-Drawer. Innen 12px horizontal, 8px unter dem Logo, 2px zwischen den
-Einträgen, Mindesthöhe 40px. Icons 18px, Abstand zum Label 10px.
+Stand 2026-10-10. `AppShell.tsx` baut die Leiste aus Fluents `NavDrawer`
+(`NavDrawerHeader`, `NavDrawerBody`, `NavDrawerFooter`, `NavItem`). Desktop:
+Leiste links, 260px, eingeklappt eine 64px-Icon-Leiste; Kopfzeile 56px mit
+`Hamburger`, Brotkrumen (Fluent `Breadcrumb`), Firmenname und Glocke. Unter
+768px wird dieselbe Leiste ein Overlay (`type="overlay"`), das sich nach dem
+Navigieren schließt. Die Breite steuert die CSS-Variable `--fui-Drawer--size`
+am Drawer.
 
-Einklappen über den Trigger in der Topbar, den Kreis an der rechten Kante
-(Hit-Fläche 32px, sichtbarer Kreis 28px, halb über der Border, Chevron) oder
-`Strg`/`Cmd`+`B`. Der Zustand steht in einem Cookie (`bautakt_sidebar_state`),
-**nicht** im localStorage: so steht er beim ersten Render fest und die Leiste
-springt nach dem Laden nicht von breit auf schmal.
+Einklappen über den `Hamburger` in der Kopfzeile. Der Zustand steht in einem
+Cookie (`bautakt_sidebar_state`), **nicht** im localStorage: so steht er beim
+ersten Render fest und die Leiste springt nach dem Laden nicht von breit auf
+schmal. Das Cookie schreibt die Shell selbst (`writeExpanded`); früher tat es
+shadcns `SidebarProvider`. Die Tastenkombination `Strg`/`Cmd`+`B` und der Kreis
+an der Kante gehörten zu shadcn und sind mit ihm weg.
 
-Eingeklappt bleiben die Icons stehen und zeigen den Namen als Tooltip. Die
-Active-Pill wird dabei ein 40px-Quadrat mit Radius 8px um das Icon. Bewusst
-nicht „ganz ausblenden": am Desktop verliert man damit die Anzeige, wo man ist.
+Eingeklappt bleiben die Icons stehen; der Name steht für Screenreader im
+Eintrag (`sr-only`) und sichtbar als Tooltip. Bewusst nicht „ganz ausblenden":
+am Desktop verliert man damit die Anzeige, wo man ist.
+
+Die Leiste ist neutral: Fläche `colorNeutralBackground2`, rechts ein Rahmen
+`colorNeutralStroke2` (`useStyles` in `AppShell.tsx`). Der aktive Eintrag ist
+Fluents eigene Auswahl am `NavItem`: neutrale Fläche plus Indikator in
+`colorCompoundBrandStroke`, gesteuert über `selectedValue` am `NavDrawer`.
+Die Icons sind `bundleIcon`s und werden aktiv gefüllt.
+
+`NavItem` rendert ein `<a href>`. Den Klick fängt `useRouterLink` ab und
+navigiert clientseitig; Strg-/Mittelklick öffnet weiter einen neuen Tab.
 
 ## Navigation
 
@@ -63,7 +76,7 @@ der Redirect auf Rechnungen ist weg.
 Einstellungen bleibt im Fuß, abgesetzt, und zählt als zehnter Punkt.
 Benachrichtigungen sind die Topbar-Glocke, kein Nav-Eintrag.
 
-Die graue Active-Pill gilt auch für den Hub, solange eine seiner Zielrouten
+Die Auswahl in der Leiste gilt auch für den Hub, solange eine seiner Zielrouten
 offen ist: `/rechnungen` hält „Finanzen“ markiert, `/mitarbeiter` hält
 „Mitarbeiter“.
 
@@ -140,18 +153,17 @@ alles in eine Spalte legt und Umlaute zerlegt.
 Beträge stehen rechtsbündig mit `tabular-nums`, damit die Stellen untereinander
 liegen.
 
-Die Listen-Shell (Stand 2026-10-01) ist eine weiche Card:
-`rounded-xl border border-border bg-card shadow-sm overflow-hidden`. Der Kopf
-bleibt `bg-surface` mit `text-muted-foreground`. Zellen sind `px-4 py-3`, der
-Kopf `h-11` und `px-4` (`table.tsx`). Der Zeilenhover ist `hover:bg-surface/40`.
-Außenabstand der `DataTable` ist `gap-4`; die Toolbar-Zeile (Tabs, Suche, CSV,
-Spalten) bleibt `gap-2`. Die Suche erbt `h-9` und `sm:max-w-64`. Sortieren,
-Suche und Export sind davon unberührt.
+Stand 2026-10-10 rendert `DataTable` mit Fluents `Table`, `TableHeaderCell`
+(`sortable`, `sortDirection`, dazu `aria-sort`), `SearchBox`, `Menu` mit
+`MenuItemCheckbox` für die Spalten und Fluent-`Button` für CSV und Blättern.
+Die Logik (TanStack, `features.ts`, `csv.ts`) ist unverändert. Der Rahmen um
+die Tabelle ist `rounded-xl border bg-card overflow-x-auto`; schmale Fenster
+scrollen die Tabelle seitlich statt sie abzuschneiden.
 
-Die Leer-Zelle ist `p-2` (`data-table.tsx`). `EmptyState` trägt seit Slice 1
-eine eigene Border (`rounded-xl border bg-card/50`). Mit `p-0` läge diese
-Border bündig an der Shell — die Ecken schneidet `overflow-hidden` ab. Die
-`8px` halten die Karte von der Shell-Kante.
+Zeilen mit Klickziel sind fokussierbar, Enter und Leertaste lösen sie aus
+(nur auf der Zeile selbst), eine Spalte mit `header: ''` ist eine
+Aktionsspalte mit der Screenreader-Überschrift „Aktionen“
+([#108](https://github.com/BuenyA/bautakt-web/issues/108)).
 
 ## Mitarbeiterverzeichnis
 
@@ -204,9 +216,9 @@ weiter mit, ohne Chip-Oberfläche. Die Typ-Chips lassen den Param stehen.
 
 ## Auftragsliste
 
-Stand 2026-10-05. `/auftraege` schaltet die Art mit dem grauen `Tabs`-Pill
-(Pattern B: Track `bg-surface`, aktiv `bg-card` und `text-foreground`). Das
-ist nicht `ListFilterChips`. Werte `order` · `quote`, Labels Aufträge ·
+Stand 2026-10-10. `/auftraege` schaltet die Art mit Fluents `TabList`
+(bis 2026-10-10 ein grauer shadcn-`Tabs`-Pill). Das ist nicht
+`ListFilterChips`. Werte `order` · `quote`, Labels Aufträge ·
 Angebote. Default ist **Aufträge**. Ohne Query oder bei unbekanntem
 `status` gilt `order`. `?status=quote` ist Angebote — derselbe Param wie
 der bisherige Angebote-Tab.
@@ -239,38 +251,19 @@ Auftrags-Deep-Link `?order=` bleibt und wird vom Zeitraum nicht gelöscht.
 
 ## Optik der Shared Primitives
 
-Stand 2026-10-01. Nur Klassen, keine neuen Komponenten und keine Feature-Diffs.
-Die Tokens (`#0064E0`, Status-Hex, Sidebar-Grau) bleiben die aus
-[Meta-Feeling](../logs/2026-10-01-meta-feeling-tokens.md) und
-[Light-Primary Electric](../logs/2026-10-01-light-primary-electric.md).
-
-| Primitive  | Look                                                                                                                                                                                                                                                                                                                                             |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Button     | Pill (`rounded-full`), auch `sm` / `lg` / `icon`. Default bleibt `bg-primary text-primary-foreground` mit `shadow-sm`. Höhen unverändert (`h-11` / `h-9` / `h-12` / `size-11`). Gesperrt: im Hellen `disabled:opacity-50`, im Dunkeln `dark:disabled:opacity-30`, für jede Variante. 50 % Electric auf Anthrazit bleibt ein satter blauer Knopf. |
-| Badge      | `rounded-full`. Farbvarianten unverändert.                                                                                                                                                                                                                                                                                                       |
-| EmptyState | Zentrierte weiche Card: `rounded-xl border border-border bg-card/50`, ohne gestrichelten Rand. Titel `font-semibold`.                                                                                                                                                                                                                            |
-| PageHeader | Keine harte Unterstreichung (`pb-2` statt `border-b`). Titel `text-2xl font-semibold tracking-tight text-foreground`. Beschreibung `mt-1.5`.                                                                                                                                                                                                     |
-| Tabs       | Liste und Trigger `rounded-full`. Aktiv bleibt `data-[state=active]:bg-card` — graue Pill, kein Primary-Fill.                                                                                                                                                                                                                                    |
-| AuthCard   | Canvas `bg-background`. Karte zusätzlich `shadow-md` (Radius weiter von `Card`, `rounded-xl`). Wortmarke `text-foreground`.                                                                                                                                                                                                                      |
-| Input      | `rounded-sm` (`--radius-sm`, 8px), ohne `shadow-xs`. Höhe weiter `h-11`, Fokusring `ring-[3px]` / `ring-ring/50`.                                                                                                                                                                                                                                |
-| Textarea   | Wie Input: `rounded-sm`, kein `shadow-xs`.                                                                                                                                                                                                                                                                                                       |
-| Select     | Trigger wie Input (`rounded-sm`, kein Schatten, Höhe unverändert). Content `rounded-xl`. Item bleibt `rounded-sm`.                                                                                                                                                                                                                               |
-| Sheet      | Titel `text-base font-semibold tracking-tight text-foreground`. Header `border-b border-border/60`, Footer `border-t border-border/60`. Schließen `rounded-full`. Inhalt weiter `bg-card shadow-lg`; Breite, Seite und Animation unverändert.                                                                                                    |
-
-Die graue Sidebar-Active-Pill (`rounded-sm`, `#F3F4F6` / Dark `#1F1F22`) ist
-nicht diese Button-Pill und bleibt grau.
-
-Der Schleier hinter `Dialog`, `AlertDialog` und `Sheet` ist `--overlay`
-(`bg-overlay` in `packages/ui`). Light: Vordergrundfarbe bei 40 %, wie zuvor
-`bg-foreground/40`. Dark: Schwarz bei 65 %. `--foreground` ist im Dark
-`#fafafa`; dieselbe Klasse würde dort einen hellgrauen Schleier legen.
-Dialog und AlertDialog bleiben auf `z-[60]` mit `duration-150`, das Sheet
-auf `z-50`.
+Stand 2026-10-10. Die Bauteile sind Fluent UI 2 mit den Standard-Themes; Radien,
+Höhen, Schrift und Farben sind Fluents eigene. Welche Komponente was ersetzt
+und welche Bautakt-Bausteine es in `packages/ui` gibt, steht in
+[fluent-ui.md](fluent-ui.md).
 
 Eine destruktive Aktion im Auftrags-Panel sitzt links in der Fußleiste
-(`sm:mr-auto`), Abbrechen und Speichern rechts. Unter `sm` stapelt die
-Leiste, Löschen bleibt der erste Knopf. Ab `sm` darf die Zeile umbrechen.
-Das gilt für Notiz, Zeit, Material, Checkliste und Bautagebuch.
+(`DangerButton` mit `sm:mr-auto`), Abbrechen und Speichern rechts. Ab `sm`
+darf die Zeile umbrechen. Das gilt für Notiz, Zeit, Material, Checkliste und
+Bautagebuch.
+
+Bis 2026-10-10 galt hier der „Meta-Feeling“-Look aus shadcn-Klassen (Pill-Knöpfe
+`rounded-full`, `h-11`, Electric `#0064E0`). Die Protokolle dazu bleiben unter
+`logs/2026-10-01-meta-*`; die Werte gelten nicht mehr.
 
 ## Detailflächen
 
@@ -291,11 +284,11 @@ dieselbe Fläche und bei Schreibrecht ein Knopf. Siehe
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Section                         | `flex flex-col gap-4`                                                                                                                                                                                                                         |
 | Section-Titel `h2`              | `text-lg font-semibold tracking-tight text-foreground`                                                                                                                                                                                        |
-| Nebenlink (z. B. „Alle Zeiten“) | `text-primary text-sm font-medium`, auf der Baseline des Titels                                                                                                                                                                               |
+| Nebenlink (z. B. „Alle Zeiten“) | `text-brand text-sm font-medium`, auf der Baseline des Titels                                                                                                                                                                                 |
 | Notiz-, Zeit- und Berichtskarte | `rounded-xl border border-border bg-card shadow-sm`. Hover `border-border-strong`. Skelett `rounded-xl`.                                                                                                                                      |
 | Foto-Kachel                     | Dieselbe Card-Fläche, `overflow-hidden`. Hover zusätzlich `shadow-md`. Bildunterschrift `bg-card px-2.5 py-2`. Lightbox-Bild `rounded-xl`.                                                                                                    |
 | Foto-Raster                     | Weiter `grid-cols-2 sm:grid-cols-3 xl:grid-cols-4`.                                                                                                                                                                                           |
-| Foto-Ablegefläche               | `rounded-xl border border-dashed border-border bg-card`. Beim Ziehen `border-primary` und `bg-primary/10`. Löschen auf der Kachel: `bg-card`, Icon `text-destructive`.                                                                        |
+| Foto-Ablegefläche               | `rounded-xl border border-dashed border-border bg-card`. Beim Ziehen `border-brand-stroke` und `bg-primary/10`. Löschen auf der Kachel: `bg-card`, Icon `text-destructive`.                                                                   |
 | Seitenwurzel                    | `gap-8` auf Auftrag, Rechnung, Kunde (`/kunden/:id`) und Einsatz (`/einsaetze/:id`), auch in Laden, Fehler und Nicht-gefunden. Auftragsbeschreibung und Einsatz-Notiz darüber: `max-w-3xl text-sm text-muted-foreground whitespace-pre-wrap`. |
 | `DetailCard`                    | Titel `text-base font-semibold tracking-tight`. Label-Spalte `sm:grid-cols-[10rem_1fr]`. `dt` ist `text-muted-foreground`, `dd` `text-foreground whitespace-pre-wrap`.                                                                        |
 | Rechnungs-Blocker               | `rounded-xl`, Padding `p-4`. Positions- und Zahlungstitel wie der `DetailCard`-Titel.                                                                                                                                                         |
@@ -306,55 +299,24 @@ Label-Spalte, derselbe Titel und `whitespace-pre-wrap` auf dem Wert (`dd`)
 gelten deshalb auch auf Kunde, Einsatz und Einstellungen. Adresse und Notiz
 brechen dadurch mehrzeilig, ohne eine eigene Klasse an der Zeile. Die
 Einsatz-Notiz steht einmal als Lead über der Karte und einmal als
-`DetailRow`; der Auftrags-Link bleibt `text-sm font-medium text-primary`.
+`DetailRow`; der Auftrags-Link bleibt `text-sm font-medium text-brand`.
 Einstellungen behält `gap-6`. Listen, Sidebar und Login bleiben bei den Soft
 Primitives oben.
 
 ## Icons und Theme
 
-Icons sind die Flaticon-Uicons der Handy-App: die drei TTFs und die generierte
-Glyph-Tabelle liegen in `packages/ui/src/icons/`. **Die Mobile-App ist
-kanonisch**, der Generator bleibt drüben; neue Icons werden dort erzeugt und
-hierher kopiert. Radix-interne Glyphen (Haken, Chevron) bleiben `lucide-react` —
-das sind Bauteile der Primitives, keine Bautakt-Symbole.
+Stand 2026-10-10. Icons sind `@fluentui/react-icons` (SVG, Tree-Shaking).
+`Regular` im Normalfall, in der Leiste `bundleIcon(Filled, Regular)`. Die
+Flaticon-Uicons der Handy-App (drei TTFs, rund 2,8 MB) und `lucide-react` sind
+aus dem Web entfernt; Web und Handy zeigen damit bewusst unterschiedliche
+Symbole.
 
-Hell/Dunkel über `ThemeProvider` (Klasse `dark` am `<html>`, Wahl im
-localStorage, Standard: Systemeinstellung). Die Farbwerte sind die Tokens aus
-`packages/ui/src/styles/theme.css`.
-
-Die `--sidebar-*`-Tokens sind seit 2026-09-24 eigene Werte (Expo-Docs-Optik),
-keine Aliase auf `--accent` oder `--background-second`. Die Light-Sidebar ist
-`#FFFFFF`. Der aktive Eintrag ist eine graue Pill (`#F3F4F6`, Dark `#1F1F22`,
-Radius 8px über `rounded-sm`, Schrift 600) — nie ein Primary-Fill. Idle-Text ist
-`--text-secondary` (`#374151` / Dark `#A1A1AA`). Hover im Light ist dieselbe
-Fläche wie Active; im Dark die Surface `#1A1A1D` (`--sidebar-accent-hover`).
-Primary (`--sidebar-primary` / `--sidebar-ring`, Light und Dark `#0064E0`)
-bleibt dem Fokus-Ring (2px, Offset 2px) und Badge-Zahlen vorbehalten. Die
-Pill-Klasse ist `rounded-sm`, weil `--radius-md` seit 2026-10-01 12px ist.
-
-⚠️ `--sidebar-accent` nicht wieder auf `--accent` legen. Das war der
-Wave-1-Stand und färbt den aktiven Eintrag blau (damals `#E8F2FC` mit
-Vordergrund `#3B86E0`; die Accent-Fläche ist seit 2026-10-01 `#E6F0FC` mit
-Vordergrund `#0064E0`).
-
-Sektionsüberschriften rendert die Web-Nav seit 2026-10-01 nicht mehr. Das
-Primitive `SidebarGroupLabel` bleibt (12px / 600, `--text-subtle`, Title Case,
-kein Uppercase), falls eine spätere Leiste sie wieder braucht. Sie waren nur
-Beschriftung, keine Routen.
-
-Dark (Stand 2026-10-01, Meta-Feeling) ist neutrales Charcoal:
-Hintergrund `#111112`, Sidebar `#161618`, Surface `#1A1A1D`, Card `#1F1F22`,
-angehoben `#28292C` (`--card-raised`, unbenutzt bis ein inneres Panel es
-zieht). Primary im Dark ist Electric `#0064E0`, Vordergrund `#FFFFFF`.
-Light-Primary ist seit dem Owner-Override am selben Tag dasselbe `#0064E0`.
-Das ersetzt Dark Mode v2 (`#0F1115` / `#4FA3E3`).
-
-Die Sidebar scrollt in `SidebarContent` (`data-sidebar="content"`,
-`overflow-y-auto`). Nur dieses Element bekommt den schmalen Scrollbar (6px,
-Thumb `--border-strong`, Track transparent). Der Wrapper trägt
-`overflow-hidden`; die übrige Seite behält den Browser-Scrollbar. Die
-Collapse-Kontrolle (`SidebarRail`) wird deshalb aus dem Wrapper gehoben,
-sonst schneidet `overflow-hidden` den Kreis auf der Border ab.
+Hell/Dunkel über `ThemeProvider` (`apps/webapp/src/app/ThemeProvider.tsx`):
+`FluentProvider` mit `lightTheme` oder `darkTheme` aus `@bautakt/ui`, Wahl im
+localStorage (`bautakt-theme`), Standard: Systemeinstellung. Umgeschaltet wird
+im Benutzermenü unten in der Leiste (Fluent `Menu`, Gruppe „Darstellung“ mit
+`MenuItemRadio` Hell / Dunkel / Wie das System). Details und die drei
+Dunkel-Abweichungen: [fluent-ui.md](fluent-ui.md).
 
 ## Datenabfragen
 
