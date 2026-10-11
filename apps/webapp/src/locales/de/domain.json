@@ -710,7 +710,34 @@
     "approved": "Abwesenheit genehmigt.",
     "approveError": "Genehmigung nicht möglich",
     "emptyTitle": "Keine Abwesenheiten",
-    "emptyDescription": "Es liegt nichts vor."
+    "emptyDescription": "Es liegt nichts vor.",
+    "actions": {
+      "summary": "{{name}} · {{type}} · {{period}}",
+      "notUpdated": "Nichts geändert: Das Recht fehlt, oder die Abwesenheit wurde inzwischen geändert.",
+      "reject": {
+        "title": "Antrag ablehnen?",
+        "hint": "Der Mitarbeiter wird benachrichtigt.",
+        "reason": "Grund (freiwillig)",
+        "reasonPlaceholder": "z. B. Baustelle braucht dich in dieser Woche",
+        "confirm": "Ablehnen",
+        "done": "Antrag abgelehnt.",
+        "error": "Ablehnen nicht möglich."
+      },
+      "cancel": {
+        "title": "Abwesenheit stornieren?",
+        "hint": "Sie bleibt als „Storniert“ in der Liste, zählt aber nicht mehr.",
+        "confirm": "Stornieren",
+        "done": "Abwesenheit storniert.",
+        "error": "Stornieren nicht möglich."
+      },
+      "delete": {
+        "title": "Endgültig löschen?",
+        "hint": "Die Abwesenheit verschwindet ganz, auch aus dem Urlaubskonto. Das lässt sich nicht rückgängig machen.",
+        "confirm": "Endgültig löschen",
+        "done": "Abwesenheit gelöscht.",
+        "error": "Löschen nicht möglich."
+      }
+    }
   },
   "payroll": {
     "title": "Lohn",
