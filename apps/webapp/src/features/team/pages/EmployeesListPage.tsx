@@ -3,7 +3,7 @@ import { Button, Link as FluentLink } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { ListFilterChips } from '@/components/common/ListFilterChips';
@@ -13,8 +13,9 @@ import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
+import { routes } from '@/lib/routes';
 
-import { draftFromEmployee, type EmployeeDraft, emptyEmployee } from '../employeeDraft';
+import { type EmployeeDraft, emptyEmployee } from '../employeeDraft';
 import { EmployeeSheet } from '../EmployeeSheet';
 import {
   employeeFilterFromSearch,
@@ -27,6 +28,7 @@ export function EmployeesListPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
   const canManage = usePermission('canManageEmployees');
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = employeeFilterFromSearch(searchParams.get('status'));
   const [draft, setDraft] = useState<EmployeeDraft | null>(null);
@@ -168,7 +170,7 @@ export function EmployeesListPage() {
         isLoading={isLoading}
         labels={labels}
         exportFileName="mitarbeiter"
-        onRowClick={canManage ? (employee) => setDraft(draftFromEmployee(employee)) : undefined}
+        onRowClick={(employee) => void navigate(routes.employee(employee.id))}
         toolbar={
           <ListFilterChips
             nowrap

@@ -33,9 +33,10 @@ import { OrdersListPage } from '@/features/orders/pages/OrdersListPage';
 import { OverviewPage } from '@/features/overview/pages/OverviewPage';
 import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 import { AbsencesPage } from '@/features/team/pages/AbsencesPage';
+import { EmployeeDetailPage } from '@/features/team/pages/EmployeeDetailPage';
 import { EmployeesListPage } from '@/features/team/pages/EmployeesListPage';
 import { PayrollPage } from '@/features/team/pages/PayrollPage';
-import { TimesListPage } from '@/features/times/pages/TimesListPage';
+import { LegacyTimesRedirect } from '@/features/times/LegacyTimesRedirect';
 import { HOME_ROUTE, routes } from '@/lib/routes';
 
 /**
@@ -94,7 +95,6 @@ export const router = createBrowserRouter([
               { path: routes.assignments, element: <AssignmentsListPage /> },
               { path: `${routes.assignments}/:id`, element: <AssignmentDetailPage /> },
               { path: routes.calendar, element: <CalendarPage /> },
-              { path: routes.times, element: <TimesListPage /> },
 
               // --- Finanzen: Hub ist kanonisch, Listen bleiben ---
               { path: routes.financeHub, element: <FinanceHubPage /> },
@@ -190,6 +190,14 @@ export const router = createBrowserRouter([
                 ),
               },
               {
+                path: `${routes.employees}/:id`,
+                element: (
+                  <RequirePermission anyOf={['canManageEmployees']}>
+                    <EmployeeDetailPage />
+                  </RequirePermission>
+                ),
+              },
+              {
                 path: routes.absences,
                 element: (
                   <RequirePermission anyOf={['canManageAbsences']}>
@@ -237,6 +245,7 @@ export const router = createBrowserRouter([
                 element: <Navigate to={routes.assignments} replace />,
               },
               { path: `${routes.legacyAssignments}/:id`, element: <LegacyAssignmentRedirect /> },
+              { path: routes.legacyTimes, element: <LegacyTimesRedirect /> },
             ],
           },
         ],

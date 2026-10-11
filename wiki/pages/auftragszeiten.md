@@ -1,21 +1,28 @@
 # Auftragszeiten
 
 Die Auftragsdetailseite zeigt die Zeiteinträge zu diesem Auftrag und legt sie
-dort an, ändert sie und löscht sie. Dieselbe Schreibstelle liegt auf `/zeiten`.
-Beide öffnen `TimeEntrySheet`. Die Zeile liegt in `time_entries`, derselben
+dort an, ändert sie und löscht sie. Dieselbe Schreibstelle liegt auf der
+Mitarbeiterseite `/mitarbeiter/:id` ([mitarbeiterseite.md](mitarbeiterseite.md)).
+Beide öffnen `TimeEntrySheet`. Einen eigenen Bereich „Zeiten“ gibt es seit
+2026-10-11 nicht mehr (Owner-Vorgabe); `/zeiten` leitet um, mit `?order=` auf
+den Auftrag. Die Zeile liegt in `time_entries`, derselben
 Tabelle, die die Handy-App liest und per Sync schreibt.
 
 ## Was die Seite zeigt
 
 `OrderTimes` steht unter der Stammdatenkarte auf `OrderDetailPage`, direkt
 unter den Notizen. Vier Zustände: Skelett beim Laden, Fehler mit „Erneut
-versuchen", leerer Hinweis („Noch keine Zeiten"), Liste der Einträge. Jede
+versuchen", leerer Hinweis („Noch keine Zeiten"), Liste der Einträge. Über
+der Liste steht „Stunden je Mitarbeiter“ (`TimeTotalsCard`): Nettostunden und
+Anzahl Einträge je Person, die meisten zuerst, darunter „Gesamt“. Gerechnet
+in `features/times/timeTotals.ts` (rein, mit `node --test`); laufende
+Einträge ohne Ende zählen als Eintrag mit 0 Minuten. Jede
 Karte zeigt Mitarbeiter, Zeitraum, Nettodauer (ohne Ende: „Offen") und die
 Notiz, soweit sie nicht leer ist, und ist eine weiche Card (`rounded-xl`,
 `bg-card`, `shadow-sm`). Die Pause steht in derselben Meta-Zeile wie der
 Zeitraum, nur wenn sie größer als 0 ist: „Pause 30 Min.“, „Pause 1 Std.“
 oder „Pause 1 Std. 15 Min.“ (`formatBreakLabel`). Eine Pause von 0 bleibt
-weg. Die Spalte Pause auf `/zeiten` nutzt dieselbe Dauer ohne das Wort
+weg. Die Spalte Pause der Zeitentabelle (Mitarbeiterseite) nutzt dieselbe Dauer ohne das Wort
 Pause, weil die Spaltenüberschrift es schon sagt; 0 bleibt eine leere
 Zelle. Die Nettodauer bleibt „8:00 Std.“. Der CSV-Export schreibt weiter
 die Rohzahl `break_minutes`, nicht den Anzeigetext. Ein abgerechneter Eintrag trägt zusätzlich „Abgerechnet“.
@@ -26,13 +33,10 @@ lesen darf, sieht dieselbe Karte ohne Knopf. „Zeit nachtragen“ steht in der
 Überschrift und im leeren Zustand, sobald das Konto eigene Zeit oder Team-Zeit
 erfassen darf.
 
-„Alle Zeiten“ führt auf `/zeiten?order=<id>`. Dieselbe Abfrage filtert die
-Liste: `useTimeEntries(orderId)` setzt `order_id` nur, wenn die Route den
-Parameter trägt (`timesOrderParam`, der Wert ist `order`). Ohne Parameter bleibt
-die Betriebsliste. Leer und Fehler auf der gefilterten Liste bieten „Alle
-Aufträge“; „Zum Auftrag“ führt zurück auf die Detailseite. Die Liste öffnet
-eine Zeile ins selbe Panel, wenn das Konto sie ändern darf, und kennzeichnet
-abgerechnete Zeilen.
+`useTimeEntries` nimmt genau einen Filter: `{ orderId }` (Auftrag) oder
+`{ employmentId }` (Mitarbeiterseite). Eine Liste aller Zeiten des Betriebs
+gibt es nicht mehr. Der queryKey ist `['timeEntries', companyId, scope]`;
+Speichern und Löschen invalidieren über den Präfix beide Ansichten.
 
 Die Abfrage steckt in `useTimeEntries`: `time_entries`, gefiltert auf die
 `company_id` der Mitgliedschaft und — auf der Detailseite — die `order_id`,
@@ -73,7 +77,7 @@ Beim Bearbeiten gehen `order_id`, `employment_id`, `user_id`, `started_at`,
 `ended_at`, `break_minutes`, `note` und `modified_at` mit. Ungeschrieben
 bleiben `group_id`, `work_assignment_id`, `daily_report_id`, `cost_rate`,
 `billing_rate`, `is_billable` und `billed_document_id`. Vom Auftragsdetail aus
-ist der Auftrag gesperrt, auf `/zeiten` nicht. Eine Einsatz-Verknüpfung legt
+ist der Auftrag gesperrt, auf der Mitarbeiterseite nicht. Eine Einsatz-Verknüpfung legt
 dieses Formular nicht an.
 
 ## Sätze

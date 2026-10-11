@@ -6,8 +6,6 @@ import {
   bundleIcon,
   CalendarLtr20Filled,
   CalendarLtr20Regular,
-  Clock20Filled,
-  Clock20Regular,
   type FluentIcon,
   Home20Filled,
   Home20Regular,
@@ -35,7 +33,6 @@ import { routes } from '@/lib/routes';
 const Home = bundleIcon(Home20Filled, Home20Regular);
 const Briefcase = bundleIcon(Briefcase20Filled, Briefcase20Regular);
 const PeopleTeam = bundleIcon(PeopleTeam20Filled, PeopleTeam20Regular);
-const Clock = bundleIcon(Clock20Filled, Clock20Regular);
 const CalendarLtr = bundleIcon(CalendarLtr20Filled, CalendarLtr20Regular);
 const Wallet = bundleIcon(Wallet20Filled, Wallet20Regular);
 const Person = bundleIcon(Person20Filled, Person20Regular);
@@ -74,7 +71,6 @@ export const navItems: NavItem[] = [
   { to: routes.overview, labelKey: 'common:nav.overview', icon: Home },
   { to: routes.orders, labelKey: 'common:nav.orders', icon: Briefcase },
   { to: routes.assignments, labelKey: 'common:nav.assignments', icon: PeopleTeam },
-  { to: routes.times, labelKey: 'common:nav.times', icon: Clock },
   { to: routes.calendar, labelKey: 'common:nav.calendar', icon: CalendarLtr },
   {
     to: routes.financeHub,
