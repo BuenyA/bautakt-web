@@ -83,6 +83,10 @@ function matches(label: string, query: string): boolean {
  * Fluents `Combobox` mit eigener Filterung, Aktionen oben (sie öffnen das
  * Anlege-Panel über `?neu=1`), Seiten darunter. Strg+K (Cmd+K) setzt den
  * Fokus hinein. Das Feld leert sich nach jeder Wahl.
+ *
+ * Die Liste ist `fixed` positioniert: als `absolute` ragte sie 1px über den
+ * Fensterrand, die Seite wurde höher und Chrome blendete die Scrollbar ein,
+ * was alles nach links schob.
  */
 export function QuickSearch() {
   const { t } = useTranslation();
@@ -126,6 +130,7 @@ export function QuickSearch() {
       aria-label={t('common:search.label')}
       placeholder={t('common:search.placeholder')}
       expandIcon={<Search20Regular />}
+      positioning={{ strategy: 'fixed', autoSize: 'height' }}
       value={query}
       selectedOptions={[]}
       onChange={(event) => setQuery(event.target.value)}
