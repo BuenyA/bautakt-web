@@ -6,7 +6,6 @@ import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
-import { RouterLink } from '@/components/common/RouterLink';
 import { useAuth } from '@/features/auth/useAuth';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { useMembership } from '@/features/company/useMembership';
@@ -20,18 +19,21 @@ import {
   type TimeEntryDraft,
 } from '@/features/times/timeEntryDraft';
 import { TimeEntrySheet } from '@/features/times/TimeEntrySheet';
+import { TimeTotalsCard } from '@/features/times/TimeTotalsCard';
 import { type TimeEntryListRow, useTimeEntries } from '@/features/times/useTimeEntries';
 import { formatDateTimeRange, formatNetDuration } from '@/lib/format';
-import { routes } from '@/lib/routes';
 
 const SKELETON_COUNT = 2;
 
 /**
  * Zeiten unter den Stammdaten eines Auftrags, unter den Notizen.
  *
- * Anlegen, Bearbeiten und Löschen laufen über dasselbe Panel wie `/zeiten`.
- * Der Auftrag ist vorbelegt und bleibt dieser. Wer weder eigene Zeit noch
- * Team-Zeit erfassen darf, sieht die Liste nur.
+ * Oben die Summe je Mitarbeiter (wer hat wie viel gearbeitet), darunter die
+ * einzelnen Einträge. Einen eigenen Bereich „Zeiten“ gibt es seit 2026-10-11
+ * nicht mehr; Zeiten stehen hier und auf der Mitarbeiterseite.
+ * Anlegen, Bearbeiten und Löschen laufen über `TimeEntrySheet`. Der Auftrag
+ * ist vorbelegt und bleibt dieser. Wer weder eigene Zeit noch Team-Zeit
+ * erfassen darf, sieht die Liste nur.
  */
 export function OrderTimes({ orderId, orderName }: { orderId: string; orderName: string }) {
   const { t } = useTranslation();
@@ -45,7 +47,7 @@ export function OrderTimes({ orderId, orderName }: { orderId: string; orderName:
   useOrders({ enabled: canCreate });
   useEmployees({ enabled: canCreate });
   const [draft, setDraft] = useState<TimeEntryDraft | null>(null);
-  const entries = useTimeEntries(orderId);
+  const entries = useTimeEntries({ orderId });
   const { data, isError, refetch } = entries;
   const isLoading = useCompanyListLoading(entries);
 
@@ -91,16 +93,19 @@ export function OrderTimes({ orderId, orderName }: { orderId: string; orderName:
     );
   } else {
     body = (
-      <ul className="flex flex-col gap-3">
-        {data.map((entry) => (
-          <TimeCard
-            key={entry.id}
-            entry={entry}
-            editable={canEditTimeEntry(membership?.permissions, user?.id, entry)}
-            onEdit={() => setDraft(draftFromTimeEntry(entry, { lockOrder: true }))}
-          />
-        ))}
-      </ul>
+      <div className="flex flex-col gap-4">
+        <TimeTotalsCard rows={data} />
+        <ul className="flex flex-col gap-3">
+          {data.map((entry) => (
+            <TimeCard
+              key={entry.id}
+              entry={entry}
+              editable={canEditTimeEntry(membership?.permissions, user?.id, entry)}
+              onEdit={() => setDraft(draftFromTimeEntry(entry, { lockOrder: true }))}
+            />
+          ))}
+        </ul>
+      </div>
     );
   }
 
@@ -110,16 +115,11 @@ export function OrderTimes({ orderId, orderName }: { orderId: string; orderName:
         <h2 id="order-times-title" className="text-foreground text-lg font-semibold tracking-tight">
           {t('domain:orders.times.title')}
         </h2>
-        <div className="flex flex-wrap items-center gap-3">
-          {canCreate ? (
-            <Button appearance="primary" onClick={openNew} icon={<AddRegular />}>
-              {t('domain:timeForm.newTitle')}
-            </Button>
-          ) : null}
-          <RouterLink to={routes.timesForOrder(orderId)}>
-            <span className="font-medium">{t('domain:orders.times.all')}</span>
-          </RouterLink>
-        </div>
+        {canCreate ? (
+          <Button appearance="primary" onClick={openNew} icon={<AddRegular />}>
+            {t('domain:timeForm.newTitle')}
+          </Button>
+        ) : null}
       </div>
       {body}
       <TimeEntrySheet

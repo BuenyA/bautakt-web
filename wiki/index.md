@@ -30,7 +30,8 @@ verlinkt, nie kopiert.
 | [auftragsfotos.md](pages/auftragsfotos.md)                 | Fotos am Auftrag anzeigen, hochladen und löschen.                         |
 | [auftragsnotizen.md](pages/auftragsnotizen.md)             | Notizen am Auftrag lesen, anlegen, bearbeiten, löschen.                   |
 | [kalender.md](pages/kalender.md)                           | Kalender mit Terminen, Einsätzen, Abwesenheiten; Termine anlegen, Serien. |
-| [auftragszeiten.md](pages/auftragszeiten.md)               | Zeiten am Auftrag und auf `/zeiten` anlegen, ändern, löschen.             |
+| [auftragszeiten.md](pages/auftragszeiten.md)               | Zeiten am Auftrag anlegen, ändern, löschen; Stunden je Mitarbeiter.       |
+| [mitarbeiterseite.md](pages/mitarbeiterseite.md)           | Seite je Mitarbeiter mit Stammdaten und Zeiten (`/mitarbeiter/:id`).      |
 | [auftragsmaterial.md](pages/auftragsmaterial.md)           | Material am Auftrag lesen, anlegen, ändern, löschen.                      |
 | [bautagebuch.md](pages/bautagebuch.md)                     | Bautagebuch am Auftrag lesen, anlegen, ändern, löschen.                   |
 | [auftragscheckliste.md](pages/auftragscheckliste.md)       | Checkliste am Auftrag lesen, abhaken, zuweisen.                           |
@@ -100,6 +101,7 @@ verlinkt, nie kopiert.
 | 2026-10-10 | [Web-App auf Fluent UI 2](logs/2026-10-10-fluent-ui.md)                                           |
 | 2026-10-11 | [Neue Übersicht](logs/2026-10-11-uebersicht.md)                                                   |
 | 2026-10-11 | [Ein Logo überall: der orangene Bauhelm](logs/2026-10-11-logo.md)                                 |
+| 2026-10-11 | [Zeiten ohne eigenen Bereich, Mitarbeiterseite](logs/2026-10-11-zeiten-ohne-bereich.md)           |
 | 2026-10-11 | [Kalender: Termine wie in der App](logs/2026-10-11-kalender-termine.md)                           |
 
 ## Die drei wichtigsten Sätze

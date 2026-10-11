@@ -85,7 +85,10 @@
     },
     "times": {
       "title": "Zeiten",
-      "all": "Alle Zeiten",
+      "totalsTitle": "Stunden je Mitarbeiter",
+      "totalAll": "Gesamt",
+      "entries_one": "{{count}} Eintrag",
+      "entries_other": "{{count}} Einträge",
       "emptyTitle": "Noch keine Zeiten",
       "emptyDescription": "Erfasste Zeiten zu diesem Auftrag erscheinen hier.",
       "loadErrorTitle": "Zeiten konnten nicht geladen werden",
@@ -282,8 +285,6 @@
     }
   },
   "times": {
-    "listTitle": "Zeiten",
-    "listDescription": "Erfasste Arbeitszeiten Ihres Betriebs.",
     "filtersLabel": "Zeitraum",
     "periodToday": "Heute",
     "periodWeek": "Woche",
@@ -308,14 +309,6 @@
     "breakHours": "{{hours}} Std.",
     "breakHoursMinutes": "{{hours}} Std. {{minutes}} Min.",
     "breakLabel": "Pause {{duration}}",
-    "emptyTitle": "Noch keine Zeiten",
-    "emptyDescription": "Sobald Zeiten erfasst sind, erscheinen sie hier.",
-    "emptyForOrderTitle": "Keine Zeiten für diesen Auftrag",
-    "emptyForOrderDescription": "Für diesen Auftrag sind noch keine Zeiten erfasst.",
-    "clearOrderFilter": "Alle Aufträge",
-    "filteredDescription": "Nur die Zeiten dieses Auftrags.",
-    "filteredOnOrder": "Nur die Zeiten für {{order}}.",
-    "openOrder": "Zum Auftrag",
     "loadErrorTitle": "Zeiten konnten nicht geladen werden",
     "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
   },
@@ -648,7 +641,18 @@
     "emptyResultsTitle": "Keine Ergebnisse",
     "emptyResultsDescription": "Für diesen Filter oder diese Suche gibt es keine Treffer.",
     "loadErrorTitle": "Mitarbeiter konnten nicht geladen werden",
-    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
+    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+    "detail": {
+      "title": "Mitarbeiter",
+      "description": "Stammdaten und Arbeitszeiten.",
+      "until": "Bis",
+      "notFoundTitle": "Mitarbeiter nicht gefunden",
+      "notFoundDescription": "Diesen Mitarbeiter gibt es nicht oder nicht in diesem Betrieb.",
+      "timesTitle": "Zeiten",
+      "periodTotal": "Summe: {{hours}}",
+      "timesEmptyTitle": "Noch keine Zeiten",
+      "timesEmptyDescription": "Erfasste Zeiten dieses Mitarbeiters erscheinen hier."
+    }
   },
   "absences": {
     "title": "Abwesenheiten",

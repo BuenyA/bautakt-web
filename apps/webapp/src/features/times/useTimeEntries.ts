@@ -62,20 +62,24 @@ function mapTimeEntryRow(row: TimeEntryQueryRow): TimeEntryListRow {
 }
 
 /**
- * Zeiteintraege des aktiven Betriebs, optional auf einen Auftrag.
+ * Zeiteintraege des aktiven Betriebs — eines Auftrags oder eines Mitarbeiters.
  *
- * queryKey beginnt mit companyId (Mandant). Das dritte Segment ist die
- * `order_id` oder `'all'`, damit die Auftragsliste und die Betriebsliste
- * nicht denselben Cache teilen. RLS filtert auf eigene bzw. team-/finanzsichtbare
- * Zeilen. Neueste zuerst — das trifft den Index
- * `time_entries_order_id_started_at_idx` `(order_id, started_at desc)`.
+ * Eine Liste aller Zeiten des Betriebs gibt es seit 2026-10-11 nicht mehr
+ * (kein Bereich „Zeiten“): Zeiten stehen im Auftrag und auf der
+ * Mitarbeiterseite. queryKey beginnt mit companyId (Mandant), danach der
+ * Filter, damit beide Ansichten nicht denselben Cache teilen; invalidiert wird
+ * über den Präfix `['timeEntries', companyId]`. RLS filtert auf eigene bzw.
+ * team-/finanzsichtbare Zeilen. Neueste zuerst — beim Auftrag trifft das den
+ * Index `time_entries_order_id_started_at_idx` `(order_id, started_at desc)`.
  */
-export function useTimeEntries(orderId?: string) {
+export function useTimeEntries(filter: { orderId: string } | { employmentId: string }) {
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
+  const scope =
+    'orderId' in filter ? `order:${filter.orderId}` : `employment:${filter.employmentId}`;
 
   return useQuery({
-    queryKey: ['timeEntries', companyId, orderId ?? 'all'],
+    queryKey: ['timeEntries', companyId, scope],
     enabled: Boolean(companyId),
     queryFn: async (): Promise<TimeEntryListRow[]> => {
       let query = supabase
@@ -102,9 +106,10 @@ export function useTimeEntries(orderId?: string) {
         )
         .eq('company_id', companyId!);
 
-      if (orderId) {
-        query = query.eq('order_id', orderId);
-      }
+      query =
+        'orderId' in filter
+          ? query.eq('order_id', filter.orderId)
+          : query.eq('employment_id', filter.employmentId);
 
       const { data, error } = await query.order('started_at', { ascending: false });
 

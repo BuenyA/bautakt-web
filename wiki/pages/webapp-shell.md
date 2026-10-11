@@ -79,7 +79,6 @@ erste Karte im Finanzen-Hub.
 | 1   | Übersicht      | `/uebersicht`                                  | Direkt (HOME)          |
 | 2   | Aufträge       | `/auftraege`                                   | Direkt                 |
 | 3   | Einsatzplanung | `/einsatzplanung` (alt `/einsaetze` leitet um) | Direkt                 |
-| 4   | Zeiten         | `/zeiten`                                      | Direkt                 |
 | 5   | Kalender       | `/kalender`                                    | Direkt                 |
 | 6   | Finanzen       | `/finanzen`                                    | Hub                    |
 | 7   | Mitarbeiter    | `/personal`                                    | Hub                    |
@@ -260,7 +259,9 @@ kommen. `useOrders` hat keinen Filter-Parameter mehr.
 
 ## Zeitenliste
 
-Stand 2026-10-05. `/zeiten` filtert clientseitig mit denselben
+Seit 2026-10-11 ohne eigenen Bereich: die Tabelle steht auf der
+Mitarbeiterseite (`EmployeeTimes`), Spalten aus `useTimeColumns`. Sie filtert
+clientseitig mit denselben
 `ListFilterChips`, `flex-wrap`. Default ist **Woche**. Ohne `period`
 oder bei unbekanntem Wert gilt `week`. `?period=today|month` schaltet
 um; `day` liest denselben Chip wie `today`. Woche löscht den Param.
