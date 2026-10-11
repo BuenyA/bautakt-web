@@ -26,6 +26,13 @@ eine Meldung; sie landen nicht im Formularzustand. Ein leeres Pflichtfeld
 blockiert das Absenden mit der deutschen Meldung, nicht mit dem
 Browser-Tooltip in der OS-Sprache.
 
+Für eine volle Stunde reicht die Zahl: `9` wird beim Verlassen des Feldes zu
+`09:00` (Owner-Vorgabe 2026-10-11, vorher kam „Bitte eine Uhrzeit im Format
+HH:MM eingeben.“). Punkt und Komma gelten als Doppelpunkt (`9.30`), und drei
+Ziffern ohne Trenner werden `9:30`, wenn die ersten zwei keine Stunde sind
+(`930`, aber `1030` → `10:30`). Geregelt in `parseTimeValue`/`maskTimeInput`
+(`packages/ui/src/lib/date-time.ts`, mit Test) — also für jedes `TimeInput`.
+
 Acht Ziffern ohne Punkte sind `TTMMJJJJ`. Die Punkte setzt die Maske beim
 Tippen, überzählige Ziffern eines Feldes rutschen ins nächste. Aus
 `15082026` wird `15.08.2026`, das Jahr wird nicht abgeschnitten. Mehr als

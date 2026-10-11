@@ -10,6 +10,8 @@
 const ISO_DAY = /^(\d{4})-(\d{2})-(\d{2})$/;
 const GERMAN_DAY = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/;
 const CLOCK = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/;
+/** Nur die Stunde, optional mit Doppelpunkt: `9`, `09`, `9:`. */
+const HOUR_ONLY = /^(\d{1,2}):?$/;
 
 /** Echter Kalendertag als `YYYY-MM-DD`, sonst `null`. `2026-02-31` ist keiner. */
 export function parseIsoDay(iso: string | null | undefined): string | null {
@@ -109,10 +111,14 @@ export function maskGermanDate(raw: string): string {
 /**
  * Uhrzeit als `HH:MM` (00–23, 00–59).
  *
- * `7:00` wird zu `07:00`. Sekunden (`07:00:00`) fallen weg. `25:00` ist `null`.
+ * `7:00` wird zu `07:00`. Eine nackte Stunde reicht: `9`, `09` und `9:` sind
+ * `09:00` — niemand soll für „9 Uhr“ Doppelpunkt und Minuten tippen müssen.
+ * Sekunden (`07:00:00`) fallen weg. `25:00` und `25` sind `null`.
  */
 export function parseTimeValue(input: string): string | null {
-  const match = CLOCK.exec(input.trim());
+  const trimmed = input.trim();
+  const hourOnly = HOUR_ONLY.exec(trimmed);
+  const match = hourOnly ? [trimmed, hourOnly[1], '00'] : CLOCK.exec(trimmed);
   if (!match) return null;
   const hour = Number(match[1]);
   const minute = Number(match[2]);
@@ -121,9 +127,15 @@ export function parseTimeValue(input: string): string | null {
   return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 }
 
-/** Tippen auf `HH:MM` zuschneiden. Ungültige Stunden bleiben stehen, damit die Meldung sie zeigen kann. */
+/**
+ * Tippen auf `HH:MM` zuschneiden. Ungültige Stunden bleiben stehen, damit die Meldung sie zeigen kann.
+ *
+ * Punkt und Komma gelten als Doppelpunkt (`9.30`). Ohne Trenner gehört die
+ * erste Ziffer bei drei Ziffern allein zur Stunde, wenn zwei keine Stunde
+ * ergäben: `930` ist `9:30`, `1030` ist `10:30`.
+ */
 export function maskTimeInput(raw: string): string {
-  const cleaned = raw.replace(/[^\d:]/g, '');
+  const cleaned = raw.replace(/[.,]/g, ':').replace(/[^\d:]/g, '');
   if (cleaned.includes(':')) {
     const parts = cleaned.split(':');
     const hour = (parts[0] ?? '').slice(0, 2);
@@ -133,6 +145,9 @@ export function maskTimeInput(raw: string): string {
   }
   const digits = cleaned.slice(0, 4);
   if (digits.length <= 2) return digits;
+  if (digits.length === 3 && Number(digits.slice(0, 2)) > 23) {
+    return `${digits[0]}:${digits.slice(1)}`;
+  }
   return `${digits.slice(0, 2)}:${digits.slice(2)}`;
 }
 

@@ -4,7 +4,7 @@
   "passwordMin": "Das Passwort muss mindestens {{count}} Zeichen haben.",
   "passwordMismatch": "Die Passwörter stimmen nicht überein.",
   "date": "Bitte ein gültiges Datum im Format TT.MM.JJJJ eingeben.",
-  "time": "Bitte eine Uhrzeit im Format HH:MM eingeben.",
+  "time": "Bitte eine Uhrzeit eingeben, zum Beispiel 9 oder 9:30.",
   "datePlaceholder": "TT.MM.JJJJ",
   "timePlaceholder": "HH:MM",
   "openCalendar": "Kalender öffnen",

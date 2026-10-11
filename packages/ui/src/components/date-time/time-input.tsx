@@ -5,7 +5,7 @@ import { cn } from '../../lib/cn';
 import { FieldMessage } from './field-message';
 import { useMaskedField } from './use-masked-field';
 
-const DEFAULT_INVALID = 'Bitte eine Uhrzeit im Format HH:MM eingeben.';
+const DEFAULT_INVALID = 'Bitte eine Uhrzeit eingeben, zum Beispiel 9 oder 9:30.';
 const DEFAULT_REQUIRED = 'Dieses Feld wird benötigt.';
 const DEFAULT_PLACEHOLDER = 'HH:MM';
 

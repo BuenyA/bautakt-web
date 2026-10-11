@@ -1,4 +1,4 @@
-import { DatePicker, DateRangePicker, FormDrawer, FormDrawerTitle } from '@bautakt/ui';
+import { DatePicker, DateRangePicker, FormDrawer, FormDrawerTitle, TimeInput } from '@bautakt/ui';
 import {
   Button,
   Dialog,
@@ -23,6 +23,7 @@ import { useTheme } from '@/app/useTheme';
  * allein, im Sheet und im Dialog gemessen werden.
  */
 export function DatePickerHarness() {
+  const [time, setTime] = useState('');
   const [alone, setAlone] = useState('2026-08-15');
   const [inSheet, setInSheet] = useState('2026-08-15');
   const [inDialog, setInDialog] = useState('2026-08-15');
@@ -103,6 +104,11 @@ export function DatePickerHarness() {
 
       <section data-testid="picker-standalone" className="max-w-sm">
         <DatePicker aria-label="Datum allein" value={alone} onChange={setAlone} />
+      </section>
+
+      <section data-testid="time-input" className="grid max-w-sm gap-1">
+        <TimeInput aria-label="Uhrzeit" value={time} onChange={setTime} />
+        <output data-testid="time-value">{time || '—'}</output>
       </section>
 
       <section data-testid="picker-range" className="max-w-xl">

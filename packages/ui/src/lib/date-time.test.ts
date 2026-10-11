@@ -92,6 +92,15 @@ describe('parseTimeValue / maskTimeInput', () => {
     expect(parseTimeValue('07:00:00')).toBe('07:00');
   });
 
+  it('nimmt eine nackte Stunde als volle Stunde', () => {
+    expect(parseTimeValue('9')).toBe('09:00');
+    expect(parseTimeValue('09')).toBe('09:00');
+    expect(parseTimeValue('9:')).toBe('09:00');
+    expect(parseTimeValue('0')).toBe('00:00');
+    expect(parseTimeValue('23')).toBe('23:00');
+    expect(parseTimeValue('24')).toBeNull();
+  });
+
   it('lehnt Uhrzeiten ab, die es nicht gibt', () => {
     expect(parseTimeValue('25:00')).toBeNull();
     expect(parseTimeValue('24:00')).toBeNull();
@@ -106,6 +115,15 @@ describe('parseTimeValue / maskTimeInput', () => {
     expect(maskTimeInput('25:00')).toBe('25:00');
     expect(maskTimeInput('07:')).toBe('07:');
     expect(maskTimeInput('abc')).toBe('');
+  });
+
+  it('versteht Punkt, Komma und Zeiten ohne Trenner', () => {
+    expect(maskTimeInput('9.30')).toBe('9:30');
+    expect(maskTimeInput('9,30')).toBe('9:30');
+    expect(maskTimeInput('930')).toBe('9:30');
+    expect(maskTimeInput('1030')).toBe('10:30');
+    expect(maskTimeInput('9 Uhr')).toBe('9');
+    expect(maskTimeInput('2500')).toBe('25:00');
   });
 });
 
