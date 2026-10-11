@@ -18,8 +18,8 @@ export function withCreate(path: string): string {
   return `${path}?${createParam}=1`;
 }
 
-/** Query auf `/zeiten`, der die Liste auf eine `order_id` filtert. */
-export const timesOrderParam = 'order';
+/** Query der alten Zeitenliste `/zeiten?order=…`; die Umleitung liest ihn noch. */
+export const legacyTimesOrderParam = 'order';
 
 export const routes = {
   // Oeffentlich
@@ -38,12 +38,6 @@ export const routes = {
   assignments: '/einsatzplanung',
   assignment: (id: string) => `/einsatzplanung/${id}`,
   calendar: '/kalender',
-  times: '/zeiten',
-  /**
-   * Zeitenliste, eingeschraenkt auf einen Auftrag.
-   * Parametername steht in `timesOrderParam` — die Liste liest denselben Namen.
-   */
-  timesForOrder: (orderId: string) => `/zeiten?${timesOrderParam}=${encodeURIComponent(orderId)}`,
 
   // Finanzen — `/finanzen` ist der Hub, die Listen bleiben wo sie sind.
   financeHub: '/finanzen',
@@ -82,6 +76,11 @@ export const routes = {
   legacyNotifications: '/benachrichtigungen',
   /** Bis 2026-10-11 hieß die Einsatzplanung „Einsätze“. */
   legacyAssignments: '/einsaetze',
+  /**
+   * Bis 2026-10-11 gab es den Bereich „Zeiten“. Zeiten stehen jetzt im Auftrag
+   * und auf der Mitarbeiterseite; `?order=` führt auf den Auftrag.
+   */
+  legacyTimes: '/zeiten',
 } as const;
 
 /** Startseite nach dem Anmelden. */

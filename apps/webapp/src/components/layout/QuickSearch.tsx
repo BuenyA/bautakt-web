@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router';
 
 import { useMembership } from '@/features/company/useMembership';
 import { hubs, visibleHubCards } from '@/features/hubs/hubs';
-import { canCreateTimeEntry } from '@/features/times/timeEntryAccess';
 import { routes, withCreate } from '@/lib/routes';
 
 import { maySee, navItems, settingsNavItem } from './navItems';
@@ -43,10 +42,6 @@ function useEntries(): { pages: Entry[]; actions: Entry[] } {
     can('canManageWorkAssignments') && {
       to: withCreate(routes.assignments),
       key: 'domain:assignments.create.action',
-    },
-    canCreateTimeEntry(permissions) && {
-      to: withCreate(routes.times),
-      key: 'domain:timeForm.newTitle',
     },
     can('canManageCustomers') && {
       to: withCreate(routes.customers),
