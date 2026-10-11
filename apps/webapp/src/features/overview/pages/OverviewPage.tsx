@@ -1,213 +1,99 @@
-import { formatMoney } from '@bautakt/finance';
-import { cn, SkeletonBlock } from '@bautakt/ui';
-import { Card } from '@fluentui/react-components';
-import {
-  ChevronRightRegular,
-  DataHistogramRegular,
-  DocumentEditRegular,
-  type FluentIcon,
-  MoneyRegular,
-  WarningRegular,
-} from '@fluentui/react-icons';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { useMemo } from 'react';
 
-import { EmptyState } from '@/components/common/EmptyState';
-import { PageHeader } from '@/components/common/PageHeader';
-import { useFinanceAccess } from '@/features/finance/useFinanceAccess';
-import { routes } from '@/lib/routes';
+import { useProfileImageUrls } from '@/features/team/useProfileImageUrls';
 
+import { CrewPlanSection } from '../components/CrewPlanSection';
+import { OverviewGreeting } from '../components/OverviewGreeting';
+import { TodayPlanCard } from '../components/TodayPlanCard';
+import { TodoPanel } from '../components/TodoPanel';
+import { useNow } from '../components/useNow';
+import { YearKpiRow } from '../components/YearKpiRow';
 import { useOverviewData } from '../useOverviewData';
+import { useMyFirstName } from '../useTodayData';
 
 /**
- * Die Startseite der Geschaeftsfuehrung.
+ * Die Startseite: der ganze Betrieb auf einen Blick.
  *
- * Vier Kacheln und eine Liste dessen, was zu tun ist — mehr nicht. Wer morgens
- * die Anwendung oeffnet, will wissen, wer ihm Geld schuldet und was liegen
- * geblieben ist; Jahresverlaeufe gehoeren in die Auswertungen.
+ * Oben in einer Reihe: Einsatzplan (eine Kachel je Einsatz), was jemand
+ * anfassen muss, und schmal der Tag als Zeitleiste mit Abwesenden und Terminen.
+ * Darunter die Zahlen des Jahres.
+ * „Heute zuerst“, weil sich das über den Tag ändert; die Jahreszahlen nicht.
  *
- * ⚠️ Ohne Finanzrecht erscheinen die Geldkacheln gar nicht — nicht mit einer
- * Null darin. Eine Null saehe aus wie „keine Forderungen" und waere eine
- * Falschaussage.
+ * ⚠️ Ohne Finanzrecht entfällt die Zahlenzeile ganz — nicht mit Nullen darin.
+ * Eine Null sähe aus wie „keine Forderungen“ und wäre eine Falschaussage.
+ * Dasselbe gilt für jeden Abschnitt in „Zu erledigen“.
  */
 export function OverviewPage() {
-  const { t } = useTranslation();
-  const access = useFinanceAccess();
-  const { kpis, tasks, isLoading, isError } = useOverviewData(access.canViewCompanyFinance);
+  const data = useOverviewData();
+  const firstName = useMyFirstName();
+  const now = useNow();
+  const { today, todo, finance, access } = data;
 
-  const revenueDelta = deltaPercent(kpis.revenueMonthMinor, kpis.revenuePreviousMonthMinor);
+  const imagePaths = useMemo(
+    () => [
+      ...today.assignments.flatMap((assignment) =>
+        assignment.crew.map((member) => member.imagePath),
+      ),
+      ...today.absences.map((absence) => absence.member.imagePath),
+      ...todo.pendingAbsences.map((absence) => absence.member.imagePath),
+    ],
+    [today.assignments, today.absences, todo.pendingAbsences],
+  );
+  const urls = useProfileImageUrls(imagePaths).data ?? {};
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader
-        title={t('domain:overview.title')}
-        description={t('domain:overview.description')}
-      />
+      <OverviewGreeting firstName={firstName.data ?? ''} />
 
-      {!access.canViewCompanyFinance ? (
-        <EmptyState
-          title={t('domain:overview.noFinanceTitle')}
-          description={t('domain:overview.noFinanceDescription')}
+      {/*
+        Eine Reihe auf breiten Bildschirmen: links der Einsatzplan (wer ist wo —
+        die erste Frage am Morgen), in der Mitte, gleich breit, was zu tun ist,
+        rechts schmal der Kalender — er zeigt ohnehin nur den heutigen Tag.
+      */}
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-[5fr_5fr_3fr]">
+        <div className="min-w-0">
+          <CrewPlanSection
+            assignments={today.assignments}
+            urls={urls}
+            canPlan={access.canPlan}
+            isLoading={today.isLoading}
+            now={now}
+          />
+        </div>
+        <div className="min-w-0">
+          <TodoPanel
+            pendingAbsences={todo.pendingAbsences}
+            newIncoming={todo.newIncoming}
+            deadlines={todo.deadlines}
+            overdue={todo.overdue}
+            tasks={todo.tasks}
+            urls={urls}
+            isLoading={todo.isLoading}
+          />
+        </div>
+        <div className="min-w-0 lg:col-span-2 xl:col-span-1">
+          <TodayPlanCard
+            assignments={today.assignments}
+            events={today.events}
+            absences={today.absences}
+            urls={urls}
+            isLoading={today.isLoading}
+            isError={today.isError}
+          />
+        </div>
+      </div>
+
+      {finance ? (
+        <YearKpiRow
+          result={finance.result}
+          kpis={finance.kpis}
+          revenueByMonth={finance.revenueByMonth}
+          expensesByMonth={finance.expensesByMonth}
+          laborIncluded={finance.laborIncluded}
+          isLoading={finance.isLoading}
+          isError={finance.isError}
         />
-      ) : isError ? (
-        <EmptyState
-          title={t('domain:invoices.loadErrorTitle')}
-          description={t('domain:invoices.loadErrorDescription')}
-        />
-      ) : (
-        <>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <KpiCard
-              icon={MoneyRegular}
-              label={t('domain:overview.openReceivables')}
-              value={formatMoney(kpis.openReceivablesMinor)}
-              note={t('domain:receivables.documentCount', { count: kpis.openReceivablesCount })}
-              to={routes.receivables}
-              isLoading={isLoading}
-            />
-            <KpiCard
-              icon={WarningRegular}
-              label={t('domain:overview.overdue')}
-              value={formatMoney(kpis.overdueMinor)}
-              note={t('domain:receivables.documentCount', { count: kpis.overdueCount })}
-              to={`${routes.receivables}?klasse=1_30`}
-              tone={kpis.overdueMinor > 0 ? 'destructive' : undefined}
-              isLoading={isLoading}
-            />
-            <KpiCard
-              icon={DataHistogramRegular}
-              label={t('domain:overview.revenueMonth')}
-              value={formatMoney(kpis.revenueMonthMinor)}
-              note={
-                revenueDelta === null
-                  ? t('domain:overview.noPreviousMonth')
-                  : t('domain:overview.versusPreviousMonth', {
-                      value: `${revenueDelta > 0 ? '+' : ''}${revenueDelta} %`,
-                    })
-              }
-              to={routes.invoices}
-              isLoading={isLoading}
-            />
-            <KpiCard
-              icon={DocumentEditRegular}
-              label={t('domain:overview.drafts')}
-              value={String(tasks.draftDocuments)}
-              note={t('domain:overview.draftsNote')}
-              to={`${routes.invoices}?status=entwurf`}
-              isLoading={isLoading}
-            />
-          </div>
-
-          <Card size="large">
-            <div className="flex flex-col gap-1">
-              <h2 className="text-foreground mb-2 text-base font-semibold">
-                {t('domain:overview.tasksTitle')}
-              </h2>
-
-              {isLoading ? (
-                <SkeletonBlock className="h-24 w-full" />
-              ) : (
-                <ul className="flex flex-col">
-                  <TaskRow
-                    count={tasks.dunnable}
-                    label={t('domain:overview.taskDunnable', { count: tasks.dunnable })}
-                    to={routes.dunning}
-                  />
-                  <TaskRow
-                    count={tasks.draftDocuments}
-                    label={t('domain:overview.taskDrafts', { count: tasks.draftDocuments })}
-                    to={`${routes.invoices}?status=entwurf`}
-                  />
-                  <TaskRow
-                    count={tasks.incomingDueSoon}
-                    label={t('domain:overview.taskIncoming', { count: tasks.incomingDueSoon })}
-                    to={routes.expenses}
-                  />
-                  {tasks.dunnable + tasks.draftDocuments + tasks.incomingDueSoon === 0 ? (
-                    <li className="text-muted-foreground py-3 text-sm">
-                      {t('domain:overview.tasksEmpty')}
-                    </li>
-                  ) : null}
-                </ul>
-              )}
-            </div>
-          </Card>
-        </>
-      )}
+      ) : null}
     </div>
   );
-}
-
-function KpiCard({
-  icon: Icon,
-  label,
-  value,
-  note,
-  to,
-  tone,
-  isLoading,
-}: {
-  icon: FluentIcon;
-  label: string;
-  value: string;
-  note: string;
-  to: string;
-  tone?: 'destructive';
-  isLoading?: boolean;
-}) {
-  return (
-    <Card size="large" className="hover:border-border-strong transition-colors">
-      <div>
-        <Link to={to} className="flex flex-col gap-1">
-          <span className="text-muted-foreground flex items-center gap-2 text-sm">
-            <Icon fontSize={16} />
-            {label}
-          </span>
-          {isLoading ? (
-            <SkeletonBlock className="my-1 h-8 w-32" />
-          ) : (
-            <span
-              className={cn(
-                'text-2xl font-semibold tabular-nums',
-                tone === 'destructive' ? 'text-destructive' : 'text-foreground',
-              )}
-            >
-              {value}
-            </span>
-          )}
-          <span className="text-text-subtle text-xs">{note}</span>
-        </Link>
-      </div>
-    </Card>
-  );
-}
-
-/**
- * Eine Zeile der Aufgabenliste. Zeigt sich nur, wenn es etwas zu tun gibt —
- * „0 Belege mahnfaehig" ist keine Aufgabe, sondern Rauschen.
- */
-function TaskRow({ count, label, to }: { count: number; label: string; to: string }) {
-  if (count === 0) return null;
-
-  return (
-    <li className="border-border border-b last:border-b-0">
-      <Link
-        to={to}
-        className="group hover:text-foreground text-text-secondary flex items-center gap-3 py-3 text-sm transition-colors"
-      >
-        <span className="bg-primary size-1.5 shrink-0 rounded-full" aria-hidden="true" />
-        <span className="min-w-0 flex-1">{label}</span>
-        <ChevronRightRegular
-          fontSize={14}
-          className="text-text-subtle group-hover:text-foreground"
-        />
-      </Link>
-    </li>
-  );
-}
-
-/** Veraenderung zum Vormonat in ganzen Prozent; null, wenn es keinen Vergleich gibt. */
-function deltaPercent(current: number, previous: number): number | null {
-  if (previous <= 0) return null;
-  return Math.round(((current - previous) / previous) * 100);
 }

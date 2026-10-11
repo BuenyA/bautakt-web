@@ -26,6 +26,7 @@ verlinkt, nie kopiert.
 | [deployment-vercel.md](pages/deployment-vercel.md)         | Zwei Projekte aus einem Repo, der SPA-Rewrite, Env-Präfixe.   |
 | [webapp-shell.md](pages/webapp-shell.md)                   | Shell-Layout, kanonische Top-Nav IA, Listen-Muster.           |
 | [fluent-ui.md](pages/fluent-ui.md)                         | Fluent UI 2: Themes, Provider, Tailwind-Regel, Bausteine.     |
+| [uebersicht.md](pages/uebersicht.md)                       | Startseite: Tagesplan, Zu erledigen, Jahresergebnis.          |
 | [auftragsfotos.md](pages/auftragsfotos.md)                 | Fotos am Auftrag anzeigen, hochladen und löschen.             |
 | [auftragsnotizen.md](pages/auftragsnotizen.md)             | Notizen am Auftrag lesen, anlegen, bearbeiten, löschen.       |
 | [auftragszeiten.md](pages/auftragszeiten.md)               | Zeiten am Auftrag und auf `/zeiten` anlegen, ändern, löschen. |
@@ -96,6 +97,7 @@ verlinkt, nie kopiert.
 | 2026-10-09 | [Marketing ohne Preise und Registrierung](logs/2026-10-09-marketing-nicht-kommerziell.md)         |
 | 2026-10-09 | [Login ohne Registrierungslink](logs/2026-10-09-login-ohne-registrierung.md)                      |
 | 2026-10-10 | [Web-App auf Fluent UI 2](logs/2026-10-10-fluent-ui.md)                                           |
+| 2026-10-11 | [Neue Übersicht](logs/2026-10-11-uebersicht.md)                                                   |
 | 2026-10-11 | [Ein Logo überall: der orangene Bauhelm](logs/2026-10-11-logo.md)                                 |
 
 ## Die drei wichtigsten Sätze

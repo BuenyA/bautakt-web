@@ -26,6 +26,8 @@ export type IncomingInvoiceListRow = {
   net_total: number;
   vat_total: number;
   gross_total: number;
+  /** Wann sie im System ankam — die Übersicht zeigt, was neu ist. */
+  created_at: string;
 };
 
 /**
@@ -77,7 +79,7 @@ export function useIncomingInvoiceList() {
       const { data, error } = await supabase
         .from('incoming_invoices')
         .select(
-          'id, invoice_number, vendor_name, invoice_date, due_date, status, net_total, vat_total, gross_total',
+          'id, invoice_number, vendor_name, invoice_date, due_date, status, net_total, vat_total, gross_total, created_at',
         )
         .eq('company_id', companyId!)
         .order('due_date', { ascending: true, nullsFirst: false });
