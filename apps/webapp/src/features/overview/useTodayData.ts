@@ -1,19 +1,17 @@
 import type { LaborRateRow, LaborTimeEntry } from '@bautakt/finance';
 import { useQuery } from '@tanstack/react-query';
 
+import {
+  type CrewMember,
+  crewMember,
+  EMPLOYMENT_SELECT,
+  type EmploymentJoin,
+} from '@/features/assignments/crew';
 import { useAuth } from '@/features/auth/useAuth';
 import { useMembership } from '@/features/company/useMembership';
-import { employmentDisplayName } from '@/lib/employeeName';
 import { supabase } from '@/lib/supabase';
 
 import { localDayBounds, localIsoDate, recurrenceCoversDate } from './today';
-
-export type CrewMember = {
-  employmentId: string;
-  name: string;
-  /** Pfad im Bucket `profile-images` oder schon eine URL. */
-  imagePath: string | null;
-};
 
 export type TodayAssignment = {
   id: string;
@@ -26,16 +24,6 @@ export type TodayAssignment = {
   crew: CrewMember[];
 };
 
-type EmploymentJoin = {
-  display_first_name: string | null;
-  display_last_name: string | null;
-  profiles: {
-    first_name: string | null;
-    last_name: string | null;
-    profile_image_url: string | null;
-  } | null;
-} | null;
-
 type AssignmentQueryRow = {
   id: string;
   order_id: string;
@@ -45,17 +33,6 @@ type AssignmentQueryRow = {
   orders: { name: string; street_address: string; postal_code: string; city: string } | null;
   work_assignment_employees: { employment_id: string; employments: EmploymentJoin }[] | null;
 };
-
-const EMPLOYMENT_SELECT =
-  'display_first_name, display_last_name, profiles ( first_name, last_name, profile_image_url )';
-
-export function crewMember(employmentId: string, employment: EmploymentJoin): CrewMember {
-  return {
-    employmentId,
-    name: employment ? employmentDisplayName(employment) : '',
-    imagePath: employment?.profiles?.profile_image_url ?? null,
-  };
-}
 
 /** Vorname der angemeldeten Person für den Gruß; leer, wenn keiner gepflegt ist. */
 export function useMyFirstName() {

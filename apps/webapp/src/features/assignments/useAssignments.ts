@@ -1,11 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { useMembership } from '@/features/company/useMembership';
-import { employmentDisplayName } from '@/lib/employeeName';
-import { getLocalWeekBounds } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
 
-export type AssignmentListFilter = 'all' | 'week';
+import {
+  type CrewMember,
+  crewMember,
+  EMPLOYMENT_SELECT,
+  type EmploymentJoin,
+  sortCrew,
+} from './crew';
 
 export type AssignmentListRow = {
   id: string;
@@ -14,7 +18,7 @@ export type AssignmentListRow = {
   note: string;
   order_id: string;
   order_name: string;
-  employee_names: string[];
+  crew: CrewMember[];
   created_at: string;
 };
 
@@ -26,24 +30,10 @@ type AssignmentQueryRow = {
   order_id: string;
   created_at: string;
   orders: { name: string } | null;
-  work_assignment_employees:
-    | {
-        employment_id: string;
-        employments: {
-          display_first_name: string | null;
-          display_last_name: string | null;
-          profiles: { first_name: string | null; last_name: string | null } | null;
-        } | null;
-      }[]
-    | null;
+  work_assignment_employees: { employment_id: string; employments: EmploymentJoin }[] | null;
 };
 
 function mapAssignmentRow(row: AssignmentQueryRow): AssignmentListRow {
-  const names =
-    row.work_assignment_employees
-      ?.map((link) => (link.employments ? employmentDisplayName(link.employments) : ''))
-      .filter(Boolean) ?? [];
-
   return {
     id: row.id,
     starts_at: row.starts_at,
@@ -51,55 +41,47 @@ function mapAssignmentRow(row: AssignmentQueryRow): AssignmentListRow {
     note: row.note,
     order_id: row.order_id,
     order_name: row.orders?.name ?? '',
-    employee_names: names,
+    crew: sortCrew(
+      (row.work_assignment_employees ?? []).map((link) =>
+        crewMember(link.employment_id, link.employments),
+      ),
+    ),
     created_at: row.created_at,
   };
 }
 
 /**
- * Einsaetze des aktiven Betriebs. queryKey beginnt mit companyId (Mandant).
+ * Einsätze des aktiven Betriebs, die den Zeitraum [`from`, `to`] berühren —
+ * auch solche, die vorher beginnen oder danach enden (Nacht, mehrere Tage).
+ *
+ * queryKey beginnt mit companyId (Mandant). Speichern invalidiert
+ * `['assignments', companyId]` und trifft damit Woche, Kalender und Übersicht.
  * RLS zeigt nur eigene/zugewiesene oder verwaltbare Zeilen.
  */
-export function useAssignments(filter: AssignmentListFilter = 'all') {
+export function useAssignments(from: Date, to: Date) {
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
+  const fromIso = from.toISOString();
+  const toIso = to.toISOString();
 
   return useQuery({
-    queryKey: ['assignments', companyId, filter],
+    queryKey: ['assignments', companyId, 'range', fromIso, toIso],
     enabled: Boolean(companyId),
     queryFn: async (): Promise<AssignmentListRow[]> => {
-      let query = supabase
+      const { data, error } = await supabase
         .from('work_assignments')
         .select(
-          `
-          id,
-          starts_at,
-          ends_at,
-          note,
-          order_id,
-          created_at,
-          orders ( name ),
-          work_assignment_employees (
-            employment_id,
-            employments (
-              display_first_name,
-              display_last_name,
-              profiles ( first_name, last_name )
-            )
-          )
-        `,
+          `id, starts_at, ends_at, note, order_id, created_at,
+           orders ( name ),
+           work_assignment_employees ( employment_id, employments ( ${EMPLOYMENT_SELECT} ) )`,
         )
         .eq('company_id', companyId!)
-        .order('starts_at', { ascending: false });
+        .lte('starts_at', toIso)
+        .gte('ends_at', fromIso)
+        .order('starts_at', { ascending: true });
 
-      if (filter === 'week') {
-        const { start, end } = getLocalWeekBounds();
-        query = query.gte('starts_at', start.toISOString()).lte('starts_at', end.toISOString());
-      }
-
-      const { data, error } = await query;
       if (error) throw error;
-      return ((data as AssignmentQueryRow[] | null) ?? []).map(mapAssignmentRow);
+      return ((data ?? []) as unknown as AssignmentQueryRow[]).map(mapAssignmentRow);
     },
   });
 }

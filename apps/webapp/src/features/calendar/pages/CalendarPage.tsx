@@ -118,7 +118,7 @@ export function CalendarPage() {
 
   const { days, from, to } = useMemo(() => rangeOf(view, dayIso), [view, dayIso]);
   const events = useCalendarEvents(from, to);
-  const assignments = useAssignments('all');
+  const assignments = useAssignments(from, to);
   const absences = useAbsences();
 
   function go(nextView: View, nextDay: string) {
