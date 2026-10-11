@@ -9,6 +9,7 @@ import {
   MenuGroup,
   MenuGroupHeader,
   MenuItem,
+  MenuItemLink,
   MenuItemRadio,
   MenuList,
   MenuPopover,
@@ -24,7 +25,7 @@ import {
   Tooltip,
 } from '@fluentui/react-components';
 import {
-  Alert20Regular,
+  Document20Regular,
   PanelLeftContract20Regular,
   PanelLeftExpand20Regular,
   SignOut20Regular,
@@ -39,9 +40,11 @@ import { BautaktSignet } from '@/components/brand/BautaktSignet';
 import { useRouterLink } from '@/components/common/useRouterLink';
 import { useAuth } from '@/features/auth/useAuth';
 import { useMembership } from '@/features/company/useMembership';
+import { LEGAL_PAGES, legalUrl } from '@/lib/legal';
 import { HOME_ROUTE } from '@/lib/routes';
 
 import { isNavActive, maySee, navItems, settingsNavItem } from './navItems';
+import { NotificationsBell } from './NotificationsBell';
 import { QuickSearch } from './QuickSearch';
 import { SidebarNavItem } from './SidebarNav';
 import { useMediaQuery } from './useMediaQuery';
@@ -203,6 +206,28 @@ function UserMenu({ collapsed }: { collapsed: boolean }) {
             </MenuItemRadio>
           </MenuGroup>
           <MenuDivider />
+          {/* Rechtstexte leben auf der Marketing-Seite (#81), neuer Tab. */}
+          <Menu>
+            <MenuTrigger disableButtonEnhancement>
+              <MenuItem icon={<Document20Regular />}>{t('common:legal.label')}</MenuItem>
+            </MenuTrigger>
+            <MenuPopover>
+              <MenuList>
+                {LEGAL_PAGES.map((page) => (
+                  <MenuItemLink
+                    key={page}
+                    href={legalUrl(page)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t(`common:legal.${page}`)}
+                    <span className="sr-only"> {t('common:legal.newTab')}</span>
+                  </MenuItemLink>
+                ))}
+              </MenuList>
+            </MenuPopover>
+          </Menu>
+          <MenuDivider />
           <MenuItem icon={<SignOut20Regular />} onClick={() => void signOut()}>
             {t('common:action.signOut')}
           </MenuItem>
@@ -341,13 +366,7 @@ export function AppShell() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Tooltip content={t('common:nav.notificationsComingSoon')} relationship="description">
-              <Button
-                appearance="subtle"
-                icon={<Alert20Regular />}
-                aria-label={t('common:nav.notifications')}
-              />
-            </Tooltip>
+            <NotificationsBell />
           </div>
         </header>
 

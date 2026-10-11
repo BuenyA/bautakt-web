@@ -1,6 +1,8 @@
 import { Card, CardHeader, Text } from '@fluentui/react-components';
 import type { ReactNode } from 'react';
 
+import { LegalLinks } from '@/components/common/LegalLinks';
+
 export function AuthCard({
   title,
   subtitle,
@@ -28,6 +30,7 @@ export function AuthCard({
           <div className="flex flex-col gap-4">{children}</div>
         </Card>
         {footer ? <div className="text-center text-sm text-muted-foreground">{footer}</div> : null}
+        <LegalLinks />
       </div>
     </main>
   );

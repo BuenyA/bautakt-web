@@ -17,6 +17,7 @@
   "state": {
     "loading": "Wird geladen …",
     "empty": "Nichts vorhanden",
+    "emptyValue": "—",
     "comingSoon": "Dieser Bereich wird gerade gebaut."
   },
   "theme": {
@@ -71,11 +72,14 @@
     "catalog": "Katalog",
     "costCenters": "Kostenstellen",
     "settings": "Einstellungen",
-    "notifications": "Benachrichtigungen",
-    "notificationsComingSoon": "Benachrichtigungen folgen in einer späteren Welle.",
     "openMenu": "Menü öffnen",
     "closeMenu": "Menü schließen",
     "main": "Hauptnavigation"
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "emptyTitle": "Keine neuen Benachrichtigungen",
+    "emptyDescription": "Neue Hinweise erscheinen hier."
   },
   "hub": {
     "emptyTitle": "Keine Bereiche freigeschaltet",
@@ -103,6 +107,13 @@
       "catalogDescription": "Artikel & Leistungen",
       "costCentersDescription": "Kostenstellen"
     }
+  },
+  "legal": {
+    "label": "Rechtliches",
+    "imprint": "Impressum",
+    "privacy": "Datenschutz",
+    "terms": "AGB",
+    "newTab": "(öffnet in neuem Tab)"
   },
   "notFound": {
     "title": "Seite nicht gefunden",

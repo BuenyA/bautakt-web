@@ -53,7 +53,7 @@
       "created": "Angelegt"
     },
     "noCustomer": "Kein Kunde",
-    "noDate": "Offen",
+    "noDate": "Kein Datum",
     "emptyTitle": "Noch keine Aufträge",
     "emptyDescription": "Sobald Aufträge angelegt sind, erscheinen sie hier.",
     "emptyQuotesTitle": "Noch keine Angebote",
@@ -416,6 +416,7 @@
       "issueDate": "Datum",
       "gross": "Brutto"
     },
+    "issueDate": "Angebotsdatum",
     "emptyTitle": "Noch keine Angebote",
     "emptyDescription": "Sobald Angebote geschrieben sind, erscheinen sie hier.",
     "new": "Neues Angebot"
@@ -751,6 +752,11 @@
     "serviceDateRequired": "Bitte das Leistungsdatum angeben — ohne es lässt sich die Rechnung später nicht festschreiben.",
     "serviceDateRequiredLabel": "Leistungsdatum *",
     "dueBeforeIssue": "Das Fälligkeitsdatum liegt vor dem Rechnungsdatum.",
+    "issueDateLabel": {
+      "invoice": "Rechnungsdatum",
+      "quote": "Angebotsdatum"
+    },
+    "dueDateLabel": "Fällig am",
     "issueDatePlaceholder": "Wird beim Ausstellen gesetzt",
     "issueDateEmptyHint": "Noch nicht ausgestellt"
   },
