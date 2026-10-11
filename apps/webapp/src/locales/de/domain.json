@@ -269,8 +269,6 @@
       "previous": "Vorherige Woche",
       "next": "Nächste Woche",
       "thisWeek": "Diese Woche",
-      "empty": "In dieser Woche ist nichts geplant.",
-      "emptyManage": "In dieser Woche ist nichts geplant. Klicken Sie in eine Stunde, um dort einen Einsatz anzulegen.",
       "noCrew": "Niemand eingeteilt",
       "createAt": "Einsatz am {{date}} um {{hour}}:00 anlegen",
       "openAssignment": "{{order}}, {{time}}, {{crew}}",
@@ -278,8 +276,6 @@
     },
     "detail": {
       "heading": "Einsatz vom {{date}}",
-      "toOrder": "Zum Auftrag",
-      "backToWeek": "Zur Einsatzplanung",
       "crewTitle": "Mitarbeiter",
       "noCrew": "Noch niemand eingeteilt.",
       "assignCrew": "Mitarbeiter einteilen",

@@ -1,7 +1,6 @@
 import { DangerButton } from '@bautakt/ui';
 import { Button, Card, CardHeader, Link as FluentLink, Text } from '@fluentui/react-components';
 import {
-  ArrowRightRegular,
   CalendarRegular,
   ClockRegular,
   DeleteRegular,
@@ -159,18 +158,18 @@ function AssignmentView({
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 flex-col gap-1.5">
-          <p className="text-muted-foreground text-sm font-medium">
+          {/* Auftrag klein darüber, Datum und Uhrzeit groß: auf dieser Seite geht
+              es um den Termin, der Auftrag ist der Kontext (Owner-Vorgabe). */}
+          <Link
+            to={routes.order(assignment.order_id)}
+            className="text-muted-foreground hover:text-foreground w-fit text-sm font-medium break-words underline-offset-4 hover:underline"
+          >
+            {orderName}
+          </Link>
+          <h1 className="text-foreground text-2xl font-semibold tracking-tight break-words sm:text-3xl">
             {t('domain:assignments.detail.heading', { date })}
             <span aria-hidden> · </span>
             <span className="tabular-nums">{time}</span>
-          </p>
-          <h1 className="text-foreground text-2xl font-semibold tracking-tight break-words sm:text-3xl">
-            <Link
-              to={routes.order(assignment.order_id)}
-              className="decoration-2 underline-offset-4 hover:underline"
-            >
-              {orderName}
-            </Link>
           </h1>
           {assignment.order_location ? (
             <p className="text-muted-foreground flex items-center gap-1.5 text-sm">
@@ -181,11 +180,9 @@ function AssignmentView({
         </div>
 
         <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {/* Zurück in die Woche des Einsatzes, nicht in die aktuelle. */}
           <LinkButton to={`${routes.assignments}?woche=${weekOf}`}>
-            {t('domain:assignments.detail.backToWeek')}
-          </LinkButton>
-          <LinkButton to={routes.order(assignment.order_id)} icon={<ArrowRightRegular />}>
-            {t('domain:assignments.detail.toOrder')}
+            {t('common:action.back')}
           </LinkButton>
           {canManage ? (
             <>

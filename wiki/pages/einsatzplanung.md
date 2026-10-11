@@ -25,6 +25,7 @@ Notizen. Einsätze lassen sich dort bearbeiten. Anlegen und Löschen:
 - Klick in eine leere Stunde legt dort einen Einsatz an (eine Stunde lang),
   nur mit `canManageWorkAssignments`. Danach bleibt man im Wochenplan. Der
   Knopf „Einsatz anlegen“ oben führt nach dem Speichern weiter zum Einsatz.
+- Eine leere Woche zeigt nur das leere Raster, ohne Hinweistext.
 - Unter `sm` wären sieben Spalten zu schmal: dort eine Liste je Tag.
 
 Abfrage: `useAssignments(from, to)` holt alles, was die Woche berührt
@@ -34,15 +35,17 @@ denselben Hook für seinen sichtbaren Zeitraum.
 
 ## Einsatzseite
 
-- Oben klein „Einsatz vom Di., 6. Oktober 2026 · 06:30–17:00“, darunter groß
-  der Auftragsname (führt zum Auftrag) und die Adresse.
+- Oben klein der Auftragsname (führt zum Auftrag), darunter groß „Einsatz vom
+  Di., 6. Oktober 2026 · 06:30–17:00“ und die Adresse. Auf dieser Seite geht es
+  um den Termin, der Auftrag ist Kontext (Owner-Vorgabe 2026-10-11). Einen
+  eigenen Knopf „Zum Auftrag“ gibt es deshalb nicht.
 - Karte „Mitarbeiter (N)“: Kacheln mit 56-px-Bild und Namen. Mit
   `canManageEmployees` führt eine Kachel zur Mitarbeiterseite.
 - Karte „Notizen“, Zeilenumbrüche bleiben.
 - „Auf einen Blick“: Datum, Uhrzeit mit Dauer, angelegt am … von ….
   Den Namen liefert der Join `creator:profiles!created_by_user_id`. Kollegen
   derselben Firma dürfen das Profil lesen (gemessen 2026-10-11).
-- „Zur Einsatzplanung“ öffnet die Woche des Einsatzes.
+- „Zurück“ öffnet die Woche des Einsatzes, nicht die aktuelle.
 
 ## Bearbeiten
 

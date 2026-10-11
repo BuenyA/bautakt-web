@@ -145,24 +145,15 @@ export function AssignmentsListPage() {
       {isLoading ? (
         <PageSpinner />
       ) : (
-        <>
-          {data && data.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              {canManage
-                ? t('domain:assignments.week.emptyManage')
-                : t('domain:assignments.week.empty')}
-            </p>
-          ) : null}
-          <AssignmentWeekView
-            key={monday}
-            days={days}
-            todayIso={todayIso}
-            now={now}
-            assignments={data ?? []}
-            urls={urls}
-            onCreate={canManage ? (dayIso, hour) => setSheet({ dayIso, hour }) : undefined}
-          />
-        </>
+        <AssignmentWeekView
+          key={monday}
+          days={days}
+          todayIso={todayIso}
+          now={now}
+          assignments={data ?? []}
+          urls={urls}
+          onCreate={canManage ? (dayIso, hour) => setSheet({ dayIso, hour }) : undefined}
+        />
       )}
 
       <AssignmentSheet
