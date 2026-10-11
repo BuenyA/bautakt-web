@@ -1,6 +1,7 @@
 import { Card, CardHeader, Text } from '@fluentui/react-components';
 import type { ReactNode } from 'react';
 
+import { BautaktLogo } from '@/components/brand/BautaktLogo';
 import { LegalLinks } from '@/components/common/LegalLinks';
 
 export function AuthCard({
@@ -17,7 +18,7 @@ export function AuthCard({
   return (
     <main className="bg-background flex min-h-svh items-center justify-center p-6">
       <div className="flex w-full max-w-sm flex-col gap-6">
-        <p className="text-foreground text-center text-lg font-semibold tracking-tight">Bautakt</p>
+        <BautaktLogo className="self-center" />
         <Card size="large">
           <CardHeader
             header={

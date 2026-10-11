@@ -10,21 +10,24 @@ type LogoProps = {
 };
 
 /**
- * Kanonisches Lockup v4.4 aus `/public/bautakt-logo.svg`.
- * Anthrazit #1C1F26. Blau bleibt den CTAs vorbehalten.
- * Im Dunkelmodus wird das Lockup invertiert, sonst verschwindet Anthrazit
- * auf der dunklen Fläche.
+ * Lockup: der orangene Bauhelm aus `/public/bautakt-logo.png` und der
+ * Schriftzug „Bautakt“. Quelle ist `bautakt_logo.png` im Projektordner,
+ * dasselbe Bild wie in Web-App und Handy-App.
+ * Der Schriftzug ist Text in Anthrazit #1C1F26, im Dunkelmodus hell. Das Bild
+ * wird nie invertiert — sonst würde der Helm blau.
  */
 export function Logo({ className, linked = true }: LogoProps) {
   const mark = (
-    // eslint-disable-next-line @next/next/no-img-element -- kanonisches SVG-Lockup, kein Raster
-    <img
-      src="/bautakt-logo.svg"
-      alt={site.name}
-      width={220}
-      height={40}
-      className={cn('h-8 w-auto dark:brightness-0 dark:invert', className)}
-    />
+    <span
+      className={cn(
+        'inline-flex items-center gap-2 text-[#1C1F26] dark:text-foreground',
+        className,
+      )}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element -- kleines Logo, kein next/image nötig */}
+      <img src="/bautakt-logo.png" alt="" width={480} height={293} className="h-8 w-auto" />
+      <span className="text-xl font-semibold tracking-tight">{site.name}</span>
+    </span>
   );
 
   if (!linked) return mark;

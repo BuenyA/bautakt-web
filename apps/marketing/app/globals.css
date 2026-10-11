@@ -1,6 +1,6 @@
 /* Design-Tokens und Tailwind der Marketing-Seite, unabhängig von der Web-App
    (die seit 2026-10 Fluent UI nutzt). Diese :root-Werte pinnen das Spec-Blau
-   #3B86E0. Blau ist für CTAs vorgesehen; Logo bleibt Anthrazit. */
+   #3B86E0. Blau ist für CTAs vorgesehen; das Logo ist der orangene Bauhelm. */
 @import './theme.css';
 
 :root {
