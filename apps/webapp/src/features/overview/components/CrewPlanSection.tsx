@@ -22,18 +22,12 @@ import { RouterLink } from '@/components/common/RouterLink';
 import { formatTime } from '@/lib/format';
 import { routes, withCreate } from '@/lib/routes';
 
-import { type AssignmentPhase, assignmentPhase, mapsSearchUrl } from '../today';
+import { mapsSearchUrl } from '../today';
 import type { TodayAssignment } from '../useTodayData';
 import { CrewAvatars } from './CrewAvatars';
 import { COLUMN_SCROLL } from './layout';
 
 const useStyles = makeStyles({
-  // Vergangene Einsätze treten zurück. Laufende bekommen bewusst keine
-  // Hervorhebung: Farbe zog den Blick auf den Einsatzplan, obwohl er nicht der
-  // wichtigste Bereich ist.
-  done: {
-    opacity: 0.7,
-  },
   timePill: {
     backgroundColor: tokens.colorNeutralBackground3,
     color: tokens.colorNeutralForeground1,
@@ -54,13 +48,11 @@ export function CrewPlanSection({
   urls,
   canPlan,
   isLoading,
-  now,
 }: {
   assignments: readonly TodayAssignment[];
   urls: Record<string, string>;
   canPlan: boolean;
   isLoading: boolean;
-  now: Date;
 }) {
   const { t } = useTranslation();
 
@@ -108,11 +100,7 @@ export function CrewPlanSection({
           <ul className="flex flex-col gap-3">
             {assignments.map((assignment) => (
               <li key={assignment.id}>
-                <AssignmentTile
-                  assignment={assignment}
-                  urls={urls}
-                  phase={assignmentPhase(assignment.startsAt, assignment.endsAt, now)}
-                />
+                <AssignmentTile assignment={assignment} urls={urls} />
               </li>
             ))}
           </ul>
@@ -125,11 +113,9 @@ export function CrewPlanSection({
 function AssignmentTile({
   assignment,
   urls,
-  phase,
 }: {
   assignment: TodayAssignment;
   urls: Record<string, string>;
-  phase: AssignmentPhase;
 }) {
   const { t } = useTranslation();
   const styles = useStyles();
@@ -140,11 +126,9 @@ function AssignmentTile({
       : t('domain:overview.today.crewCount', { count: assignment.crew.length });
 
   return (
-    <Card
-      size="medium"
-      appearance="outline"
-      className={mergeClasses(phase === 'done' && styles.done)}
-    >
+    // Alle Einsätze sehen gleich aus: weder laufende hervorgehoben (Farbe zog
+    // den Blick zu stark) noch vergangene gedämpft (Owner-Vorgabe).
+    <Card size="medium" appearance="outline">
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-0.5">
           <Text weight="bold" size={300} truncate wrap={false}>

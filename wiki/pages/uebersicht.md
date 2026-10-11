@@ -13,8 +13,9 @@ Ziel: der ganze Betrieb auf einen Blick.
      `WorkAssignmentCard` der App — Auftrag, Baustelle, Uhrzeit als Pill, Team mit
      Avatar-Stapel (`CrewAvatars`, Fluent `AvatarGroup`), Notiz, Knöpfe „Auftrag“,
      „Maps“ (Google-Maps-Suche, neuer Tab, `mapsSearchUrl`) und „Zum Einsatz“.
-     Keine farbige Hervorhebung laufender Einsätze (Farbe zog den Blick zu stark);
-     vergangene sind gedämpft. „Zum Einsatz“ steht rechtsbündig.
+     Alle Kacheln sehen gleich aus: laufende nicht farbig hervorgehoben (Farbe zog
+     den Blick zu stark), vergangene nicht gedämpft (Owner-Vorgabe). „Zum Einsatz“
+     steht rechtsbündig.
    - **Zu erledigen** (Mitte, `TodoPanel`, so breit wie der Einsatzplan): Anträge (mit
      „Genehmigen“ über `approve_absence`), neu eingegangene Eingangsrechnungen, Fristen
      (7 Tage + Überfälliges), überfällige Rechnungen, mahnfähige Belege und Entwürfe.

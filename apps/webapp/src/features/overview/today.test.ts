@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
-  assignmentPhase,
   collectDeadlines,
   layoutLanes,
   mapsSearchUrl,
@@ -126,15 +125,5 @@ describe('mapsSearchUrl', () => {
       mapsSearchUrl(' Hauptstr. 4, 70173 Stuttgart '),
       'https://www.google.com/maps/search/?api=1&query=Hauptstr.%204%2C%2070173%20Stuttgart',
     );
-  });
-});
-
-describe('assignmentPhase', () => {
-  const start = '2026-10-12T07:00:00';
-  const end = '2026-10-12T15:30:00';
-  it('unterscheidet bevorstehend, laufend und vorbei', () => {
-    assert.equal(assignmentPhase(start, end, new Date('2026-10-12T06:59:00')), 'upcoming');
-    assert.equal(assignmentPhase(start, end, new Date('2026-10-12T07:00:00')), 'running');
-    assert.equal(assignmentPhase(start, end, new Date('2026-10-12T15:30:00')), 'done');
   });
 });

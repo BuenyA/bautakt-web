@@ -214,13 +214,3 @@ export function collectDeadlines(
 export function mapsSearchUrl(address: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address.trim())}`;
 }
-
-export type AssignmentPhase = 'upcoming' | 'running' | 'done';
-
-/** Steht ein Einsatz noch bevor, läuft er gerade oder ist er vorbei? */
-export function assignmentPhase(startIso: string, endIso: string, now: Date): AssignmentPhase {
-  const time = now.getTime();
-  if (time < new Date(startIso).getTime()) return 'upcoming';
-  if (time >= new Date(endIso).getTime()) return 'done';
-  return 'running';
-}

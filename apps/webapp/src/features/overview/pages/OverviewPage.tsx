@@ -6,7 +6,6 @@ import { CrewPlanSection } from '../components/CrewPlanSection';
 import { OverviewGreeting } from '../components/OverviewGreeting';
 import { TodayPlanCard } from '../components/TodayPlanCard';
 import { TodoPanel } from '../components/TodoPanel';
-import { useNow } from '../components/useNow';
 import { YearKpiRow } from '../components/YearKpiRow';
 import { useOverviewData } from '../useOverviewData';
 import { useMyFirstName } from '../useTodayData';
@@ -26,7 +25,6 @@ import { useMyFirstName } from '../useTodayData';
 export function OverviewPage() {
   const data = useOverviewData();
   const firstName = useMyFirstName();
-  const now = useNow();
   const { today, todo, finance, access } = data;
 
   const imagePaths = useMemo(
@@ -57,7 +55,6 @@ export function OverviewPage() {
             urls={urls}
             canPlan={access.canPlan}
             isLoading={today.isLoading}
-            now={now}
           />
         </div>
         <div className="min-w-0">
