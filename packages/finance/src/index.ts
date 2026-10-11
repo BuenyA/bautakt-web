@@ -15,6 +15,14 @@ export {
   previousMonth,
 } from './kpis';
 export {
+  DEFAULT_COST_RATE,
+  entryMinutes,
+  laborCostMinor,
+  type LaborRateRow,
+  type LaborTimeEntry,
+  resolveCostRate,
+} from './laborCost';
+export {
   addMoney,
   type CurrencyCode,
   currencyForCountry,
@@ -60,3 +68,10 @@ export {
   totalOpenMinor,
   totalOverdueMinor,
 } from './receivables';
+export {
+  computeYearResult,
+  type ResultExpenseRow,
+  type ResultIncomingRow,
+  type YearResult,
+  type YearResultInput,
+} from './result';
