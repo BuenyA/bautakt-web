@@ -7,28 +7,30 @@ Ziel: der ganze Betrieb auf einen Blick.
    Fluent-`InteractionTag`-Chips mit Zählern (offene Anträge, abwesend, neue
    Eingangsrechnungen, Fristen heute/vorbei, überfällige Rechnungen). Ein Chip
    erscheint nur mit Zähler > 0 und springt zum Abschnitt.
-2. **Eine Reihe aus drei Spalten** (ab 1280 px; 1024–1279 px: Einsatzplan und Heute
-   nebeneinander, Zu erledigen darunter; schmaler: untereinander). Jede Spalte ist eine
-   Fluent-`Card`, gleich hoch, Inhalt scrollt ab 640 px selbst (`COLUMN_SCROLL`).
-   - **Einsatzplan heute** (links, `CrewPlanSection`, breiteste Spalte): eine Kachel je
-     Einsatz wie `WorkAssignmentCard` der App — Auftrag, Baustelle, Uhrzeit als Pill,
-     Team mit Avatar-Stapel (`CrewAvatars`, Fluent `AvatarGroup`), Notiz, Knöpfe
-     „Auftrag“, „Maps“ (Google-Maps-Suche, neuer Tab, `mapsSearchUrl`) und „Zum
-     Einsatz“. Laufende Einsätze mit Brand-Rahmen und „läuft“, vergangene gedämpft.
-   - **Heute** (Mitte, `TodayPlanCard`): Abwesende mit Profilbild, ganztägige Termine,
-     darunter die flache Zeitleiste (`DayTimeline`, 32 px je Stunde, 7–18 Uhr, wächst bei
-     Bedarf, rote Jetzt-Linie). Überlappendes steht nebeneinander; in schmalen Spalten
-     nur der Name, Zeit im Tooltip. Unter 768 px eine Liste.
-   - **Zu erledigen** (rechts, `TodoPanel`): Anträge (mit „Genehmigen“ über
-     `approve_absence`), neu eingegangene Eingangsrechnungen, Fristen (7 Tage +
-     Überfälliges), überfällige Rechnungen, mahnfähige Belege und Entwürfe.
+2. **Eine Reihe aus drei Spalten** (ab 1280 px im Verhältnis 5 : 5 : 3; 1024–1279 px:
+   Einsatzplan und Zu erledigen nebeneinander, Heute darunter; schmaler: untereinander).
+   Jede Spalte ist eine Fluent-`Card`, gleich hoch, Inhalt scrollt ab 640 px selbst
+   (`COLUMN_SCROLL`).
+   - **Einsatzplan heute** (links, `CrewPlanSection`): eine Kachel je Einsatz wie
+     `WorkAssignmentCard` der App — Auftrag, Baustelle, Uhrzeit als Pill, Team mit
+     Avatar-Stapel (`CrewAvatars`, Fluent `AvatarGroup`), Notiz, Knöpfe „Auftrag“,
+     „Maps“ (Google-Maps-Suche, neuer Tab, `mapsSearchUrl`) und „Zum Einsatz“.
+     Laufende Einsätze mit Brand-Rahmen und „läuft“, vergangene gedämpft.
+   - **Zu erledigen** (Mitte, `TodoPanel`, so breit wie der Einsatzplan): Anträge (mit
+     „Genehmigen“ über `approve_absence`), neu eingegangene Eingangsrechnungen, Fristen
+     (7 Tage + Überfälliges), überfällige Rechnungen, mahnfähige Belege und Entwürfe.
+   - **Heute** (rechts, `TodayPlanCard`, schmalste Spalte): Abwesende mit Profilbild,
+     ganztägige Termine, darunter die flache Zeitleiste (`DayTimeline`, 32 px je Stunde,
+     7–19 Uhr, wächst, wenn ein Eintrag früher oder später liegt, rote Jetzt-Linie).
+     Überlappendes steht nebeneinander, dann nur der Name, Zeit im Tooltip. Ein leerer
+     Tag zeigt die leere Zeitleiste, keinen Hinweis — das Planen gehört in den
+     Einsatzplan. Am Handy eine Liste, solange es Einträge gibt.
 3. **Zahlen des Jahres** (`YearKpiRow`): Umsatz, Aufwände, Ergebnis, offene
    Forderungen — netto, 01.01. bis heute.
 
-**Warum diese Reihenfolge:** gelesen wird links → rechts, und die erste Frage am Morgen
-ist „wer ist wo“ — die Kacheln brauchen die meiste Breite. Die Zeitleiste in der Mitte
-verbindet beide Seiten. Aufgaben stehen rechts als Aktionsleiste, wie man es aus
-Outlook/Teams kennt.
+**Warum diese Reihenfolge** (vom Owner festgelegt): links „wer ist wo“, in der Mitte
+gleich breit „was ist zu tun“, rechts schmal der Kalender — er zeigt ohnehin nur den
+heutigen Tag.
 
 ## Regeln
 

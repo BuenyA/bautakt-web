@@ -12,7 +12,7 @@ import type { TodayAssignment, TodayEvent } from '../useTodayData';
 /** Bewusst flach: die Einzelheiten zu jedem Einsatz stehen im Einsatzplan darunter. */
 const HOUR_PX = 32;
 const DEFAULT_FROM = 7;
-const DEFAULT_TO = 18;
+const DEFAULT_TO = 19;
 /** Kurze Termine bleiben so als Zeile lesbar. */
 const MIN_EVENT_MINUTES = 30;
 /** Ab dieser Blockhöhe passt die Adresse als zweite Zeile. */
@@ -59,7 +59,7 @@ function minutesToday(iso: string, dayStart: Date): number {
 /**
  * Der heutige Tag als Zeitleiste: Einsätze als Brand-Blöcke mit Team,
  * Termine neutral, rote Linie für jetzt. Überlappendes steht nebeneinander.
- * Der sichtbare Bereich ist 7–18 Uhr und wächst, wenn etwas früher oder
+ * Der sichtbare Bereich ist 7–19 Uhr und wächst, wenn etwas früher oder
  * später liegt. Die Team-Bilder stehen im Einsatzplan, nicht hier.
  */
 export function DayTimeline({
@@ -96,15 +96,17 @@ export function DayTimeline({
 
   const fromHour = Math.min(DEFAULT_FROM, ...blocks.map((block) => Math.floor(block.start / 60)));
   const toHour = Math.max(DEFAULT_TO, ...blocks.map((block) => Math.ceil(block.end / 60)));
-  const hours = Array.from({ length: toHour - fromHour }, (_, index) => fromHour + index);
+  const span = toHour - fromHour;
+  // Eine Linie mehr als Stunden: die Abschlusslinie trägt das Ende (z. B. 19:00).
+  const hours = Array.from({ length: span + 1 }, (_, index) => fromHour + index);
   const top = (minutes: number) => ((minutes - fromHour * 60) / 60) * HOUR_PX;
   const nowMinutes = minutesToday(now.toISOString(), dayStart);
   // Bei langen Tagen nur jede zweite Stunde beschriften, sonst kleben die Zahlen.
-  const labelEvery = hours.length > 12 ? 2 : 1;
+  const labelEvery = span > 12 ? 2 : 1;
   const showNow = nowMinutes >= fromHour * 60 && nowMinutes <= toHour * 60;
 
   return (
-    <div className="relative" style={{ height: hours.length * HOUR_PX }}>
+    <div className="relative my-2" style={{ height: span * HOUR_PX }}>
       {hours.map((hour) => (
         <div
           key={hour}
@@ -112,7 +114,7 @@ export function DayTimeline({
           style={{ top: top(hour * 60) }}
           aria-hidden
         >
-          {(hour - fromHour) % labelEvery === 0 ? (
+          {(hour - fromHour) % labelEvery === 0 || hour === toHour ? (
             <span className="text-text-subtle absolute -top-2 left-0 text-[11px] tabular-nums">
               {String(hour).padStart(2, '0')}:00
             </span>

@@ -14,8 +14,8 @@ import { useMyFirstName } from '../useTodayData';
 /**
  * Die Startseite: der ganze Betrieb auf einen Blick.
  *
- * Oben in einer Reihe: Einsatzplan (eine Kachel je Einsatz), der Tag als
- * Zeitleiste mit Abwesenden und Terminen, und was jemand anfassen muss.
+ * Oben in einer Reihe: Einsatzplan (eine Kachel je Einsatz), was jemand
+ * anfassen muss, und schmal der Tag als Zeitleiste mit Abwesenden und Terminen.
  * Darunter die Zahlen des Jahres.
  * „Heute zuerst“, weil sich das über den Tag ändert; die Jahreszahlen nicht.
  *
@@ -59,10 +59,10 @@ export function OverviewPage() {
 
       {/*
         Eine Reihe auf breiten Bildschirmen: links der Einsatzplan (wer ist wo —
-        die erste Frage am Morgen, braucht die meiste Breite), in der Mitte der
-        Tag auf der Zeitachse, rechts die Aufgaben als Aktionsleiste.
+        die erste Frage am Morgen), in der Mitte, gleich breit, was zu tun ist,
+        rechts schmal der Kalender — er zeigt ohnehin nur den heutigen Tag.
       */}
-      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-[5fr_4fr_4fr]">
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-[5fr_5fr_3fr]">
         <div className="min-w-0">
           <CrewPlanSection
             assignments={today.assignments}
@@ -73,17 +73,6 @@ export function OverviewPage() {
           />
         </div>
         <div className="min-w-0">
-          <TodayPlanCard
-            assignments={today.assignments}
-            events={today.events}
-            absences={today.absences}
-            urls={urls}
-            canPlan={access.canPlan}
-            isLoading={today.isLoading}
-            isError={today.isError}
-          />
-        </div>
-        <div className="min-w-0 lg:col-span-2 xl:col-span-1">
           <TodoPanel
             pendingAbsences={todo.pendingAbsences}
             newIncoming={todo.newIncoming}
@@ -92,6 +81,16 @@ export function OverviewPage() {
             tasks={todo.tasks}
             urls={urls}
             isLoading={todo.isLoading}
+          />
+        </div>
+        <div className="min-w-0 lg:col-span-2 xl:col-span-1">
+          <TodayPlanCard
+            assignments={today.assignments}
+            events={today.events}
+            absences={today.absences}
+            urls={urls}
+            isLoading={today.isLoading}
+            isError={today.isError}
           />
         </div>
       </div>

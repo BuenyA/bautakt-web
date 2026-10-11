@@ -1,14 +1,13 @@
 import { SkeletonBlock } from '@bautakt/ui';
 import { Badge, Card, CardHeader, Divider, MessageBar, Text } from '@fluentui/react-components';
-import { AddRegular, CalendarRegular, WeatherSunnyRegular } from '@fluentui/react-icons';
+import { CalendarRegular } from '@fluentui/react-icons';
 import { useTranslation } from 'react-i18next';
 
-import { LinkButton } from '@/components/common/LinkButton';
 import { RouterLink } from '@/components/common/RouterLink';
 import { useRouterLink } from '@/components/common/useRouterLink';
 import { useMediaQuery } from '@/components/layout/useMediaQuery';
 import { formatDate, formatTime } from '@/lib/format';
-import { routes, withCreate } from '@/lib/routes';
+import { routes } from '@/lib/routes';
 
 import type { OverviewAbsence, TodayAssignment, TodayEvent } from '../useTodayData';
 import { CrewAvatars, MemberAvatar } from './CrewAvatars';
@@ -25,7 +24,6 @@ export function TodayPlanCard({
   events,
   absences,
   urls,
-  canPlan,
   isLoading,
   isError,
 }: {
@@ -33,7 +31,6 @@ export function TodayPlanCard({
   events: readonly TodayEvent[];
   absences: readonly OverviewAbsence[];
   urls: Record<string, string>;
-  canPlan: boolean;
   isLoading: boolean;
   isError: boolean;
 }) {
@@ -43,6 +40,8 @@ export function TodayPlanCard({
 
   const allDay = events.filter((event) => event.allDay);
   const timed = events.filter((event) => !event.allDay);
+  // Ein leerer Tag zeigt die leere Zeitleiste, keinen Hinweis: das hier ist
+  // nur der Kalender, das Planen gehört in den Einsatzplan.
   const isEmpty = assignments.length === 0 && timed.length === 0;
 
   return (
@@ -119,27 +118,7 @@ export function TodayPlanCard({
           <MessageBar intent="error">{t('domain:overview.today.loadError')}</MessageBar>
         ) : isLoading ? (
           <SkeletonBlock className="h-72 w-full" />
-        ) : isEmpty ? (
-          <div className="flex flex-col items-center gap-2 py-10 text-center">
-            <span className="bg-muted text-muted-foreground flex size-12 items-center justify-center rounded-full">
-              <WeatherSunnyRegular fontSize={24} aria-hidden />
-            </span>
-            <Text weight="semibold">{t('domain:overview.today.emptyTitle')}</Text>
-            <Text size={200} className="text-muted-foreground">
-              {t('domain:overview.today.emptyDescription')}
-            </Text>
-            {canPlan ? (
-              <LinkButton
-                to={withCreate(routes.assignments)}
-                appearance="primary"
-                icon={<AddRegular />}
-                className="mt-2"
-              >
-                {t('domain:overview.today.plan')}
-              </LinkButton>
-            ) : null}
-          </div>
-        ) : isMobile ? (
+        ) : isMobile && !isEmpty ? (
           <TodayList assignments={assignments} events={timed} urls={urls} />
         ) : (
           <DayTimeline assignments={assignments} events={timed} now={now} />

@@ -478,8 +478,6 @@
       "crewCount_one": "{{count}} Mitarbeiter",
       "crewCount_other": "{{count}} Mitarbeiter",
       "noCrew": "Noch niemand eingeteilt",
-      "emptyTitle": "Heute ist nichts geplant",
-      "emptyDescription": "Keine Einsätze und keine Termine für heute.",
       "plan": "Einsatz planen",
       "loadError": "Der Tagesplan konnte nicht geladen werden.",
       "untilDate": "bis {{date}}",
