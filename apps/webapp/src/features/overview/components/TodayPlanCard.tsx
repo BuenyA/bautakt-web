@@ -12,7 +12,6 @@ import { routes } from '@/lib/routes';
 import type { OverviewAbsence, TodayAssignment, TodayEvent } from '../useTodayData';
 import { CrewAvatars, MemberAvatar } from './CrewAvatars';
 import { DayTimeline } from './DayTimeline';
-import { COLUMN_SCROLL } from './layout';
 import { useNow } from './useNow';
 
 /**
@@ -58,7 +57,7 @@ export function TodayPlanCard({
         }
       />
 
-      <div className={COLUMN_SCROLL}>
+      <div className="flex min-h-0 flex-col gap-3">
         {absences.length > 0 || allDay.length > 0 ? (
           <div className="flex flex-col gap-2">
             {absences.length > 0 ? (

@@ -20,8 +20,9 @@ Ziel: der ganze Betrieb auf einen Blick.
      „Genehmigen“ über `approve_absence`), neu eingegangene Eingangsrechnungen, Fristen
      (7 Tage + Überfälliges), überfällige Rechnungen, mahnfähige Belege und Entwürfe.
    - **Heute** (rechts, `TodayPlanCard`, schmalste Spalte): Abwesende mit Profilbild,
-     ganztägige Termine, darunter die flache Zeitleiste (`DayTimeline`, 32 px je Stunde,
-     7–19 Uhr, wächst, wenn ein Eintrag früher oder später liegt, rote Jetzt-Linie).
+     ganztägige Termine, darunter die Zeitleiste (`DayTimeline`, 32 px je Stunde) für den
+     ganzen Tag 0–24 Uhr in einem Fenster von zwölf Stunden, in dem die Uhrzeit scrollt.
+     Beim Öffnen steht es auf 7 Uhr oder auf dem ersten früheren Eintrag; rote Jetzt-Linie.
      Überlappendes steht nebeneinander, dann nur der Name, Zeit im Tooltip. Ein leerer
      Tag zeigt die leere Zeitleiste, keinen Hinweis — das Planen gehört in den
      Einsatzplan. Am Handy eine Liste, solange es Einträge gibt.
@@ -63,6 +64,10 @@ Abwesenheiten ohne Mitarbeiter-ID (keine Bilder). Für eine Startseite, die imme
 alles zeigen soll, passt das nicht.
 
 ## Fallstricke
+
+- Scrollende Spalten setzen `overflow-x-hidden` ausdrücklich: Mit nur `overflow-y: auto`
+  scrollt CSS auch seitlich, sobald etwas einen Pixel übersteht (so geschehen durch
+  `-mx-2` an den Zeilen in „Zu erledigen“).
 
 - Angebote haben im Schema keine Gültigkeit (`valid_until` fehlt) — darum keine
   Angebotsfristen.

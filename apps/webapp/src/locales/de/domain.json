@@ -481,7 +481,8 @@
       "plan": "Einsatz planen",
       "loadError": "Der Tagesplan konnte nicht geladen werden.",
       "untilDate": "bis {{date}}",
-      "pendingSick": "unbestätigt"
+      "pendingSick": "unbestätigt",
+      "timelineA11y": "Tagesablauf von 0 bis 24 Uhr"
     },
     "todo": {
       "title": "Zu erledigen",

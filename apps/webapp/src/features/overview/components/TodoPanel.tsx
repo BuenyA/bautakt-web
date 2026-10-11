@@ -244,7 +244,7 @@ function Row({
       <a
         href={link.href}
         onClick={link.onClick}
-        className="group hover:bg-muted -mx-2 flex items-center gap-3 rounded-md px-2 py-2 transition-colors"
+        className="group hover:bg-muted flex items-center gap-3 rounded-md px-1 py-2 transition-colors"
       >
         <span className="flex min-w-0 flex-1 flex-col">
           <Text size={300} truncate wrap={false}>

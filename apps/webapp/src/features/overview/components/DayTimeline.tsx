@@ -1,5 +1,6 @@
 import { makeStyles, mergeClasses, Text, tokens, Tooltip } from '@fluentui/react-components';
 import { CalendarRegular } from '@fluentui/react-icons';
+import { useLayoutEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useRouterLink } from '@/components/common/useRouterLink';
@@ -9,10 +10,13 @@ import { routes } from '@/lib/routes';
 import { layoutLanes, localDayBounds } from '../today';
 import type { TodayAssignment, TodayEvent } from '../useTodayData';
 
-/** Bewusst flach: die Einzelheiten zu jedem Einsatz stehen im Einsatzplan darunter. */
+/** Bewusst flach: die Einzelheiten zu jedem Einsatz stehen im Einsatzplan. */
 const HOUR_PX = 32;
-const DEFAULT_FROM = 7;
-const DEFAULT_TO = 19;
+/** Sichtbar ist ein Arbeitstag (7–19 Uhr); der Rest des Tages ist per Scrollen erreichbar. */
+const VISIBLE_FROM = 7;
+const VISIBLE_HOURS = 12;
+/** Platz über 0:00 und unter 24:00, damit die Randbeschriftungen nicht abgeschnitten werden. */
+const EDGE_PX = 8;
 /** Kurze Termine bleiben so als Zeile lesbar. */
 const MIN_EVENT_MINUTES = 30;
 /** Ab dieser Blockhöhe passt die Adresse als zweite Zeile. */
@@ -59,8 +63,10 @@ function minutesToday(iso: string, dayStart: Date): number {
 /**
  * Der heutige Tag als Zeitleiste: Einsätze als Brand-Blöcke mit Team,
  * Termine neutral, rote Linie für jetzt. Überlappendes steht nebeneinander.
- * Der sichtbare Bereich ist 7–19 Uhr und wächst, wenn etwas früher oder
- * später liegt. Die Team-Bilder stehen im Einsatzplan, nicht hier.
+ * Gezeichnet wird der ganze Tag von 0 bis 24 Uhr; sichtbar ist ein Fenster
+ * von zwölf Stunden, in dem die Uhrzeit scrollt. Beim Öffnen steht es auf
+ * 7 Uhr — oder auf dem ersten Eintrag, wenn der früher liegt. Die Team-Bilder
+ * stehen im Einsatzplan, nicht hier.
  */
 export function DayTimeline({
   assignments,
@@ -72,6 +78,7 @@ export function DayTimeline({
   now: Date;
 }) {
   const styles = useStyles();
+  const { t } = useTranslation();
   const { start: dayStart } = localDayBounds(now);
 
   const blocks: Block[] = [
@@ -94,76 +101,87 @@ export function DayTimeline({
     }),
   ];
 
-  const fromHour = Math.min(DEFAULT_FROM, ...blocks.map((block) => Math.floor(block.start / 60)));
-  const toHour = Math.max(DEFAULT_TO, ...blocks.map((block) => Math.ceil(block.end / 60)));
-  const span = toHour - fromHour;
-  // Eine Linie mehr als Stunden: die Abschlusslinie trägt das Ende (z. B. 19:00).
-  const hours = Array.from({ length: span + 1 }, (_, index) => fromHour + index);
-  const top = (minutes: number) => ((minutes - fromHour * 60) / 60) * HOUR_PX;
+  // 25 Linien für 24 Stunden: die letzte trägt 24:00.
+  const hours = Array.from({ length: 25 }, (_, index) => index);
+  const top = (minutes: number) => (minutes / 60) * HOUR_PX;
   const nowMinutes = minutesToday(now.toISOString(), dayStart);
-  // Bei langen Tagen nur jede zweite Stunde beschriften, sonst kleben die Zahlen.
-  const labelEvery = span > 12 ? 2 : 1;
-  const showNow = nowMinutes >= fromHour * 60 && nowMinutes <= toHour * 60;
+
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const firstStartHour = Math.min(
+    VISIBLE_FROM,
+    ...blocks.map((block) => Math.floor(block.start / 60)),
+  );
+  // Nur beim ersten Zeichnen ausrichten — danach gehört die Scrollposition der Person.
+  useLayoutEffect(() => {
+    if (viewportRef.current) viewportRef.current.scrollTop = firstStartHour * HOUR_PX;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <div className="relative my-2" style={{ height: span * HOUR_PX }}>
-      {hours.map((hour) => (
-        <div
-          key={hour}
-          className={mergeClasses('absolute right-0 left-0', styles.hourLine)}
-          style={{ top: top(hour * 60) }}
-          aria-hidden
-        >
-          {(hour - fromHour) % labelEvery === 0 || hour === toHour ? (
+    <div
+      ref={viewportRef}
+      className="overflow-x-hidden overflow-y-auto overscroll-contain"
+      style={{ height: VISIBLE_HOURS * HOUR_PX + 2 * EDGE_PX }}
+      role="region"
+      aria-label={t('domain:overview.today.timelineA11y')}
+    >
+      <div className="relative" style={{ height: 24 * HOUR_PX, margin: `${EDGE_PX}px 0` }}>
+        {hours.map((hour) => (
+          <div
+            key={hour}
+            className={mergeClasses('absolute right-0 left-0', styles.hourLine)}
+            style={{ top: top(hour * 60) }}
+            aria-hidden
+          >
             <span className="text-text-subtle absolute -top-2 left-0 text-[11px] tabular-nums">
               {String(hour).padStart(2, '0')}:00
             </span>
-          ) : null}
-        </div>
-      ))}
-
-      <div className="absolute top-0 right-0 bottom-0" style={{ left: LABEL_WIDTH }}>
-        {layoutLanes(blocks).map((block) => (
-          <div
-            key={`${block.kind}-${block.id}`}
-            className="absolute px-0.5"
-            style={{
-              top: top(block.start),
-              height: Math.max(top(block.end) - top(block.start), MIN_BLOCK_PX),
-              left: `${(block.lane / block.lanes) * 100}%`,
-              width: `${100 / block.lanes}%`,
-            }}
-          >
-            {block.kind === 'assignment' ? (
-              <AssignmentBlock
-                item={block.item}
-                showAddress={top(block.end) - top(block.start) >= ADDRESS_MIN_PX}
-                narrow={block.lanes > 1}
-                className={styles.assignment}
-              />
-            ) : (
-              <EventBlock
-                item={block.item}
-                narrow={block.lanes > 1}
-                className={mergeClasses(
-                  styles.event,
-                  block.item.eventType === 'all' && styles.companyEvent,
-                )}
-              />
-            )}
           </div>
         ))}
 
-        {showNow ? (
-          <div
-            className="pointer-events-none absolute right-0 -left-1 flex items-center"
-            style={{ top: top(nowMinutes) }}
-            aria-hidden
-          >
-            <span className={mergeClasses('size-2 rounded-full', styles.nowDot)} />
-            <span className={mergeClasses('h-0.5 flex-1', styles.nowLine)} />
-          </div>
-        ) : null}
+        <div className="absolute top-0 right-0 bottom-0" style={{ left: LABEL_WIDTH }}>
+          {layoutLanes(blocks).map((block) => (
+            <div
+              key={`${block.kind}-${block.id}`}
+              className="absolute px-0.5"
+              style={{
+                top: top(block.start),
+                height: Math.max(top(block.end) - top(block.start), MIN_BLOCK_PX),
+                left: `${(block.lane / block.lanes) * 100}%`,
+                width: `${100 / block.lanes}%`,
+              }}
+            >
+              {block.kind === 'assignment' ? (
+                <AssignmentBlock
+                  item={block.item}
+                  showAddress={top(block.end) - top(block.start) >= ADDRESS_MIN_PX}
+                  narrow={block.lanes > 1}
+                  className={styles.assignment}
+                />
+              ) : (
+                <EventBlock
+                  item={block.item}
+                  narrow={block.lanes > 1}
+                  className={mergeClasses(
+                    styles.event,
+                    block.item.eventType === 'all' && styles.companyEvent,
+                  )}
+                />
+              )}
+            </div>
+          ))}
+
+          {nowMinutes > 0 && nowMinutes < 24 * 60 ? (
+            <div
+              className="pointer-events-none absolute right-0 left-0 flex items-center"
+              style={{ top: top(nowMinutes) }}
+              aria-hidden
+            >
+              <span className={mergeClasses('size-2 rounded-full', styles.nowDot)} />
+              <span className={mergeClasses('h-0.5 flex-1', styles.nowLine)} />
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );
