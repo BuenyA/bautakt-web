@@ -2,7 +2,14 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { collectDeadlines, layoutLanes, newSince, recurrenceCoversDate } from './today.ts';
+import {
+  assignmentPhase,
+  collectDeadlines,
+  layoutLanes,
+  mapsSearchUrl,
+  newSince,
+  recurrenceCoversDate,
+} from './today.ts';
 
 describe('recurrenceCoversDate', () => {
   it('kennt die vier Frequenzen der App', () => {
@@ -110,5 +117,24 @@ describe('collectDeadlines', () => {
       list.map((item) => item.id),
       ['bald'],
     );
+  });
+});
+
+describe('mapsSearchUrl', () => {
+  it('kodiert die Adresse für die Google-Maps-Suche', () => {
+    assert.equal(
+      mapsSearchUrl(' Hauptstr. 4, 70173 Stuttgart '),
+      'https://www.google.com/maps/search/?api=1&query=Hauptstr.%204%2C%2070173%20Stuttgart',
+    );
+  });
+});
+
+describe('assignmentPhase', () => {
+  const start = '2026-10-12T07:00:00';
+  const end = '2026-10-12T15:30:00';
+  it('unterscheidet bevorstehend, laufend und vorbei', () => {
+    assert.equal(assignmentPhase(start, end, new Date('2026-10-12T06:59:00')), 'upcoming');
+    assert.equal(assignmentPhase(start, end, new Date('2026-10-12T07:00:00')), 'running');
+    assert.equal(assignmentPhase(start, end, new Date('2026-10-12T15:30:00')), 'done');
   });
 });

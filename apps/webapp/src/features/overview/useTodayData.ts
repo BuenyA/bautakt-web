@@ -22,6 +22,7 @@ export type TodayAssignment = {
   location: string;
   startsAt: string;
   endsAt: string;
+  note: string;
   crew: CrewMember[];
 };
 
@@ -40,6 +41,7 @@ type AssignmentQueryRow = {
   order_id: string;
   starts_at: string;
   ends_at: string;
+  note: string | null;
   orders: { name: string; street_address: string; postal_code: string; city: string } | null;
   work_assignment_employees: { employment_id: string; employments: EmploymentJoin }[] | null;
 };
@@ -92,7 +94,7 @@ export function useTodayAssignments() {
       const { data, error } = await supabase
         .from('work_assignments')
         .select(
-          `id, order_id, starts_at, ends_at,
+          `id, order_id, starts_at, ends_at, note,
            orders ( name, street_address, postal_code, city ),
            work_assignment_employees ( employment_id, employments ( ${EMPLOYMENT_SELECT} ) )`,
         )
@@ -114,6 +116,7 @@ export function useTodayAssignments() {
           .join(', '),
         startsAt: row.starts_at,
         endsAt: row.ends_at,
+        note: row.note?.trim() ?? '',
         crew: (row.work_assignment_employees ?? []).map((link) =>
           crewMember(link.employment_id, link.employments),
         ),

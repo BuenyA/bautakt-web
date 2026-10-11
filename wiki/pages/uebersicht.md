@@ -8,14 +8,18 @@ Ziel: der ganze Betrieb auf einen Blick. Aufbau „Heute zuerst“:
    Eingangsrechnungen, Fristen heute/vorbei, überfällige Rechnungen). Ein Chip
    erscheint nur mit Zähler > 0 und springt zum Abschnitt.
 2. **Heute** (`TodayPlanCard`, 2/3 Breite): Abwesende mit Profilbild, ganztägige
-   Termine, darunter die Zeitleiste (`DayTimeline`, 6–20 Uhr, wächst bei Bedarf,
-   rote Jetzt-Linie, Überlappendes nebeneinander). Einsätze als Brand-Blöcke mit
-   Auftrag, Ort, Uhrzeit und Avatar-Stapel (`CrewAvatars`, Fluent `AvatarGroup`).
-   Unter 768px eine Liste statt der Zeitleiste.
+   Termine, darunter die flache Zeitleiste (`DayTimeline`, 32 px je Stunde, 7–18 Uhr,
+   wächst bei Bedarf, rote Jetzt-Linie, Überlappendes nebeneinander). Einsätze als
+   schmale Brand-Blöcke mit Auftrag und Uhrzeit, ohne Bilder. Unter 768px eine Liste.
 3. **Zu erledigen** (`TodoPanel`, 1/3): Anträge (mit „Genehmigen“ über
    `approve_absence`), neu eingegangene Eingangsrechnungen, Fristen (7 Tage +
    Überfälliges), überfällige Rechnungen, mahnfähige Belege und Entwürfe.
-4. **Zahlen des Jahres** (`YearKpiRow`): Umsatz, Aufwände, Ergebnis, offene
+4. **Einsatzplan heute** (`CrewPlanSection`, volle Breite): eine Kachel je Einsatz wie
+   `WorkAssignmentCard` der App — Auftrag, Baustelle, Uhrzeit als Pill, Team mit
+   Avatar-Stapel (`CrewAvatars`, Fluent `AvatarGroup`), Notiz, Knöpfe „Auftrag“,
+   „Maps“ (Google-Maps-Suche, neuer Tab, `mapsSearchUrl`) und „Zum Einsatz“.
+   Laufende Einsätze mit Brand-Rahmen und „läuft“, vergangene gedämpft.
+5. **Zahlen des Jahres** (`YearKpiRow`): Umsatz, Aufwände, Ergebnis, offene
    Forderungen — netto, 01.01. bis heute.
 
 ## Regeln

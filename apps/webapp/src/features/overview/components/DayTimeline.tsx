@@ -8,13 +8,16 @@ import { routes } from '@/lib/routes';
 
 import { layoutLanes, localDayBounds } from '../today';
 import type { TodayAssignment, TodayEvent } from '../useTodayData';
-import { CrewAvatars } from './CrewAvatars';
 
-const HOUR_PX = 56;
-const DEFAULT_FROM = 6;
-const DEFAULT_TO = 20;
-/** Termine haben im Briefing oft kein sinnvolles Ende; so bleiben sie lesbar. */
+/** Bewusst flach: die Einzelheiten zu jedem Einsatz stehen im Einsatzplan darunter. */
+const HOUR_PX = 32;
+const DEFAULT_FROM = 7;
+const DEFAULT_TO = 18;
+/** Kurze Termine bleiben so als Zeile lesbar. */
 const MIN_EVENT_MINUTES = 30;
+/** Ab dieser Blockhöhe passt die Adresse als zweite Zeile. */
+const ADDRESS_MIN_PX = 2 * HOUR_PX;
+const MIN_BLOCK_PX = 20;
 const LABEL_WIDTH = 48;
 
 const useStyles = makeStyles({
@@ -56,18 +59,16 @@ function minutesToday(iso: string, dayStart: Date): number {
 /**
  * Der heutige Tag als Zeitleiste: Einsätze als Brand-Blöcke mit Team,
  * Termine neutral, rote Linie für jetzt. Überlappendes steht nebeneinander.
- * Der sichtbare Bereich ist 6–20 Uhr und wächst, wenn etwas früher oder
- * später liegt.
+ * Der sichtbare Bereich ist 7–18 Uhr und wächst, wenn etwas früher oder
+ * später liegt. Die Team-Bilder stehen im Einsatzplan, nicht hier.
  */
 export function DayTimeline({
   assignments,
   events,
-  urls,
   now,
 }: {
   assignments: readonly TodayAssignment[];
   events: readonly TodayEvent[];
-  urls: Record<string, string>;
   now: Date;
 }) {
   const styles = useStyles();
@@ -98,6 +99,8 @@ export function DayTimeline({
   const hours = Array.from({ length: toHour - fromHour }, (_, index) => fromHour + index);
   const top = (minutes: number) => ((minutes - fromHour * 60) / 60) * HOUR_PX;
   const nowMinutes = minutesToday(now.toISOString(), dayStart);
+  // Bei langen Tagen nur jede zweite Stunde beschriften, sonst kleben die Zahlen.
+  const labelEvery = hours.length > 12 ? 2 : 1;
   const showNow = nowMinutes >= fromHour * 60 && nowMinutes <= toHour * 60;
 
   return (
@@ -109,9 +112,11 @@ export function DayTimeline({
           style={{ top: top(hour * 60) }}
           aria-hidden
         >
-          <span className="text-text-subtle absolute -top-2.5 left-0 text-xs tabular-nums">
-            {String(hour).padStart(2, '0')}:00
-          </span>
+          {(hour - fromHour) % labelEvery === 0 ? (
+            <span className="text-text-subtle absolute -top-2 left-0 text-[11px] tabular-nums">
+              {String(hour).padStart(2, '0')}:00
+            </span>
+          ) : null}
         </div>
       ))}
 
@@ -122,13 +127,17 @@ export function DayTimeline({
             className="absolute px-0.5"
             style={{
               top: top(block.start),
-              height: Math.max(top(block.end) - top(block.start), 24),
+              height: Math.max(top(block.end) - top(block.start), MIN_BLOCK_PX),
               left: `${(block.lane / block.lanes) * 100}%`,
               width: `${100 / block.lanes}%`,
             }}
           >
             {block.kind === 'assignment' ? (
-              <AssignmentBlock item={block.item} urls={urls} className={styles.assignment} />
+              <AssignmentBlock
+                item={block.item}
+                showAddress={top(block.end) - top(block.start) >= ADDRESS_MIN_PX}
+                className={styles.assignment}
+              />
             ) : (
               <EventBlock
                 item={block.item}
@@ -158,11 +167,11 @@ export function DayTimeline({
 
 function AssignmentBlock({
   item,
-  urls,
+  showAddress,
   className,
 }: {
   item: TodayAssignment;
-  urls: Record<string, string>;
+  showAddress: boolean;
   className: string;
 }) {
   const { t } = useTranslation();
@@ -174,28 +183,23 @@ function AssignmentBlock({
       href={link.href}
       onClick={link.onClick}
       className={mergeClasses(
-        'flex h-full flex-col gap-1 overflow-hidden rounded-md px-2 py-1.5 transition-colors',
+        'flex h-full flex-col overflow-hidden rounded-md px-2 py-0.5 transition-colors',
         className,
       )}
       aria-label={`${t('domain:overview.today.assignment')}: ${item.orderName}, ${time}`}
     >
-      <span className="flex items-start justify-between gap-2">
-        <Text weight="semibold" size={300} truncate wrap={false} className="min-w-0">
+      <span className="flex items-baseline gap-2">
+        <Text weight="semibold" size={200} truncate wrap={false} className="min-w-0">
           {item.orderName}
         </Text>
-        <Text size={200} className="text-text-secondary shrink-0 tabular-nums">
+        <Text size={100} className="text-text-secondary shrink-0 tabular-nums">
           {time}
         </Text>
       </span>
-      {item.location ? (
-        <Text size={200} truncate wrap={false} className="text-text-secondary">
+      {showAddress && item.location ? (
+        <Text size={100} truncate wrap={false} className="text-text-secondary">
           {item.location}
         </Text>
-      ) : null}
-      {item.crew.length > 0 ? (
-        <span className="mt-auto">
-          <CrewAvatars crew={item.crew} urls={urls} size={24} />
-        </span>
       ) : null}
     </a>
   );
@@ -212,7 +216,7 @@ function EventBlock({ item, className }: { item: TodayEvent; className: string }
     <Tooltip content={kind} relationship="description" positioning="above-start">
       <div
         className={mergeClasses(
-          'flex h-full items-start gap-1.5 overflow-hidden rounded-md px-2 py-1',
+          'flex h-full items-start gap-1.5 overflow-hidden rounded-md px-2 py-0.5',
           className,
         )}
       >

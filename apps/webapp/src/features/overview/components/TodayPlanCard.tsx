@@ -1,7 +1,6 @@
 import { SkeletonBlock } from '@bautakt/ui';
 import { Badge, Card, CardHeader, Divider, MessageBar, Text } from '@fluentui/react-components';
 import { AddRegular, CalendarRegular, WeatherSunnyRegular } from '@fluentui/react-icons';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { LinkButton } from '@/components/common/LinkButton';
@@ -14,16 +13,7 @@ import { routes, withCreate } from '@/lib/routes';
 import type { OverviewAbsence, TodayAssignment, TodayEvent } from '../useTodayData';
 import { CrewAvatars, MemberAvatar } from './CrewAvatars';
 import { DayTimeline } from './DayTimeline';
-
-/** Die Uhrzeit für die Jetzt-Linie; jede Minute neu. */
-function useNow(): Date {
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 60_000);
-    return () => window.clearInterval(id);
-  }, []);
-  return now;
-}
+import { useNow } from './useNow';
 
 /**
  * „Heute“: wer fehlt, was ganztägig ansteht, und der Tag als Zeitleiste
@@ -146,7 +136,7 @@ export function TodayPlanCard({
       ) : isMobile ? (
         <TodayList assignments={assignments} events={timed} urls={urls} />
       ) : (
-        <DayTimeline assignments={assignments} events={timed} urls={urls} now={now} />
+        <DayTimeline assignments={assignments} events={timed} now={now} />
       )}
     </Card>
   );

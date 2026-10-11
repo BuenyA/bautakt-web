@@ -534,6 +534,19 @@
       "noneOverdue": "Nichts überfällig",
       "chartA11y": "Verlauf je Monat",
       "loadError": "Die Zahlen konnten nicht geladen werden."
+    },
+    "crew": {
+      "title": "Einsatzplan heute",
+      "count_one": "{{count}} Einsatz",
+      "count_other": "{{count}} Einsätze",
+      "toPlan": "Zum Einsatzplan",
+      "empty": "Heute sind keine Einsätze geplant.",
+      "running": "läuft",
+      "done": "vorbei",
+      "order": "Auftrag",
+      "maps": "Maps",
+      "mapsA11y": "{{address}} in Google Maps öffnen (neuer Tab)",
+      "assignment": "Zum Einsatz"
     }
   },
   "documentType": {

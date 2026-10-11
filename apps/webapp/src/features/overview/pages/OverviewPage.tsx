@@ -2,9 +2,11 @@ import { useMemo } from 'react';
 
 import { useProfileImageUrls } from '@/features/team/useProfileImageUrls';
 
+import { CrewPlanSection } from '../components/CrewPlanSection';
 import { type GreetingChip, OverviewGreeting } from '../components/OverviewGreeting';
 import { TodayPlanCard } from '../components/TodayPlanCard';
 import { TodoPanel } from '../components/TodoPanel';
+import { useNow } from '../components/useNow';
 import { YearKpiRow } from '../components/YearKpiRow';
 import { useOverviewData } from '../useOverviewData';
 import { useMyFirstName } from '../useTodayData';
@@ -12,8 +14,9 @@ import { useMyFirstName } from '../useTodayData';
 /**
  * Die Startseite: der ganze Betrieb auf einen Blick.
  *
- * Oben, was heute ist — wer wo arbeitet, wer fehlt, welche Termine anstehen —
- * und daneben, was jemand anfassen muss. Darunter die Zahlen des Jahres.
+ * Oben, was heute ist — wer fehlt, welche Termine anstehen, der Tag als
+ * Zeitleiste — und daneben, was jemand anfassen muss. Darunter der Einsatzplan
+ * mit einer Kachel je Einsatz, ganz unten die Zahlen des Jahres.
  * „Heute zuerst“, weil sich das über den Tag ändert; die Jahreszahlen nicht.
  *
  * ⚠️ Ohne Finanzrecht entfällt die Zahlenzeile ganz — nicht mit Nullen darin.
@@ -23,6 +26,7 @@ import { useMyFirstName } from '../useTodayData';
 export function OverviewPage() {
   const data = useOverviewData();
   const firstName = useMyFirstName();
+  const now = useNow();
   const { today, todo, finance, access } = data;
 
   const imagePaths = useMemo(
@@ -77,6 +81,14 @@ export function OverviewPage() {
           />
         </div>
       </div>
+
+      <CrewPlanSection
+        assignments={today.assignments}
+        urls={urls}
+        canPlan={access.canPlan}
+        isLoading={today.isLoading}
+        now={now}
+      />
 
       {finance ? (
         <YearKpiRow
