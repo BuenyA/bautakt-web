@@ -19,27 +19,28 @@ verlinkt, nie kopiert.
 
 ## Subsysteme
 
-| Seite                                                      | Inhalt                                                               |
-| ---------------------------------------------------------- | -------------------------------------------------------------------- |
-| [auth-web.md](pages/auth-web.md)                           | Sitzung, Guards, Passwort-Reset und die Abweichungen zur App.        |
-| [berechtigungen-im-web.md](pages/berechtigungen-im-web.md) | Die 33 Rechte, drei Durchsetzungsebenen, Drift-Check.                |
-| [deployment-vercel.md](pages/deployment-vercel.md)         | Zwei Projekte aus einem Repo, der SPA-Rewrite, Env-Präfixe.          |
-| [webapp-shell.md](pages/webapp-shell.md)                   | Shell-Layout, kanonische Top-Nav IA, Listen-Muster.                  |
-| [fluent-ui.md](pages/fluent-ui.md)                         | Fluent UI 2: Themes, Provider, Tailwind-Regel, Bausteine.            |
-| [uebersicht.md](pages/uebersicht.md)                       | Startseite: Tagesplan, Zu erledigen, Jahresergebnis.                 |
-| [auftragsfotos.md](pages/auftragsfotos.md)                 | Fotos am Auftrag anzeigen, hochladen und löschen.                    |
-| [auftragsnotizen.md](pages/auftragsnotizen.md)             | Notizen am Auftrag lesen, anlegen, bearbeiten, löschen.              |
-| [auftragszeiten.md](pages/auftragszeiten.md)               | Zeiten am Auftrag anlegen, ändern, löschen; Stunden je Mitarbeiter.  |
-| [mitarbeiterseite.md](pages/mitarbeiterseite.md)           | Seite je Mitarbeiter mit Stammdaten und Zeiten (`/mitarbeiter/:id`). |
-| [auftragsmaterial.md](pages/auftragsmaterial.md)           | Material am Auftrag lesen, anlegen, ändern, löschen.                 |
-| [bautagebuch.md](pages/bautagebuch.md)                     | Bautagebuch am Auftrag lesen, anlegen, ändern, löschen.              |
-| [auftragscheckliste.md](pages/auftragscheckliste.md)       | Checkliste am Auftrag lesen, abhaken, zuweisen.                      |
-| [auftrag-anlegen.md](pages/auftrag-anlegen.md)             | Auftrag aus der Liste anlegen, dieselbe `orders`-Zeile.              |
-| [auftrag-bearbeiten.md](pages/auftrag-bearbeiten.md)       | Stammdaten eines Auftrags ändern, Teilpatch wie in der App.          |
-| [einsatz-anlegen.md](pages/einsatz-anlegen.md)             | Einsatz anlegen und löschen, Zeiten bleiben stehen.                  |
-| [kostenstellen.md](pages/kostenstellen.md)                 | Kostenstelle anlegen und löschen, Auftragssumme je Zeile.            |
-| [demo-gf-2026-10-10.md](pages/demo-gf-2026-10-10.md)       | Klickpfad GF-Demo 10.10.2026 (Spahrbau).                             |
-| [datumseingabe.md](pages/datumseingabe.md)                 | Deutsche Datums- und Uhrzeitfelder, Wert bleibt ISO.                 |
+| Seite                                                      | Inhalt                                                                    |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [auth-web.md](pages/auth-web.md)                           | Sitzung, Guards, Passwort-Reset und die Abweichungen zur App.             |
+| [berechtigungen-im-web.md](pages/berechtigungen-im-web.md) | Die 33 Rechte, drei Durchsetzungsebenen, Drift-Check.                     |
+| [deployment-vercel.md](pages/deployment-vercel.md)         | Zwei Projekte aus einem Repo, der SPA-Rewrite, Env-Präfixe.               |
+| [webapp-shell.md](pages/webapp-shell.md)                   | Shell-Layout, kanonische Top-Nav IA, Listen-Muster.                       |
+| [fluent-ui.md](pages/fluent-ui.md)                         | Fluent UI 2: Themes, Provider, Tailwind-Regel, Bausteine.                 |
+| [uebersicht.md](pages/uebersicht.md)                       | Startseite: Tagesplan, Zu erledigen, Jahresergebnis.                      |
+| [auftragsfotos.md](pages/auftragsfotos.md)                 | Fotos am Auftrag anzeigen, hochladen und löschen.                         |
+| [auftragsnotizen.md](pages/auftragsnotizen.md)             | Notizen am Auftrag lesen, anlegen, bearbeiten, löschen.                   |
+| [kalender.md](pages/kalender.md)                           | Kalender mit Terminen, Einsätzen, Abwesenheiten; Termine anlegen, Serien. |
+| [auftragszeiten.md](pages/auftragszeiten.md)               | Zeiten am Auftrag anlegen, ändern, löschen; Stunden je Mitarbeiter.       |
+| [mitarbeiterseite.md](pages/mitarbeiterseite.md)           | Seite je Mitarbeiter mit Stammdaten und Zeiten (`/mitarbeiter/:id`).      |
+| [auftragsmaterial.md](pages/auftragsmaterial.md)           | Material am Auftrag lesen, anlegen, ändern, löschen.                      |
+| [bautagebuch.md](pages/bautagebuch.md)                     | Bautagebuch am Auftrag lesen, anlegen, ändern, löschen.                   |
+| [auftragscheckliste.md](pages/auftragscheckliste.md)       | Checkliste am Auftrag lesen, abhaken, zuweisen.                           |
+| [auftrag-anlegen.md](pages/auftrag-anlegen.md)             | Auftrag aus der Liste anlegen, dieselbe `orders`-Zeile.                   |
+| [auftrag-bearbeiten.md](pages/auftrag-bearbeiten.md)       | Stammdaten eines Auftrags ändern, Teilpatch wie in der App.               |
+| [einsatz-anlegen.md](pages/einsatz-anlegen.md)             | Einsatz anlegen und löschen, Zeiten bleiben stehen.                       |
+| [kostenstellen.md](pages/kostenstellen.md)                 | Kostenstelle anlegen und löschen, Auftragssumme je Zeile.                 |
+| [demo-gf-2026-10-10.md](pages/demo-gf-2026-10-10.md)       | Klickpfad GF-Demo 10.10.2026 (Spahrbau).                                  |
+| [datumseingabe.md](pages/datumseingabe.md)                 | Deutsche Datums- und Uhrzeitfelder, Wert bleibt ISO.                      |
 
 ## Protokolle
 
@@ -101,6 +102,7 @@ verlinkt, nie kopiert.
 | 2026-10-11 | [Neue Übersicht](logs/2026-10-11-uebersicht.md)                                                   |
 | 2026-10-11 | [Ein Logo überall: der orangene Bauhelm](logs/2026-10-11-logo.md)                                 |
 | 2026-10-11 | [Zeiten ohne eigenen Bereich, Mitarbeiterseite](logs/2026-10-11-zeiten-ohne-bereich.md)           |
+| 2026-10-11 | [Kalender: Termine wie in der App](logs/2026-10-11-kalender-termine.md)                           |
 
 ## Die drei wichtigsten Sätze
 
