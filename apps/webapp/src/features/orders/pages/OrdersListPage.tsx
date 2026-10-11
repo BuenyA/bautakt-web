@@ -24,6 +24,23 @@ import { OrderSheet } from '../OrderSheet';
 import { OrderStatusBadge } from '../OrderStatusBadge';
 import { type OrderListRow, useOrders } from '../useOrders';
 
+/**
+ * Fehlt das Datum, steht ein gedämpfter Strich da. „Offen“ stand früher hier
+ * und war vom Status nicht zu unterscheiden (#95). Vorgelesen wird
+ * „Kein Datum“ statt „Gedankenstrich“.
+ */
+function OrderDateCell({ value }: { value: string | null }) {
+  const { t } = useTranslation();
+  const formatted = formatDate(value);
+  if (formatted) return <span className="text-muted-foreground tabular-nums">{formatted}</span>;
+  return (
+    <span className="text-muted-foreground">
+      <span aria-hidden="true">{t('common:state.emptyValue')}</span>
+      <span className="sr-only">{t('domain:orders.noDate')}</span>
+    </span>
+  );
+}
+
 export function OrdersListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -86,22 +103,22 @@ export function OrdersListPage() {
         cell: ({ row }) => <OrderStatusBadge status={row.original.status} />,
       },
       {
-        accessorKey: 'start_date',
+        id: 'start_date',
+        // `undefined` statt `null`: Nur so greift `sortUndefined` und Aufträge
+        // ohne Datum landen in beiden Richtungen am Ende.
+        accessorFn: (row) => row.start_date ?? undefined,
+        sortFn: 'text',
+        sortUndefined: 'last',
         header: t('domain:orders.columns.start'),
-        cell: ({ row }) => (
-          <span className="text-muted-foreground">
-            {formatDate(row.original.start_date) || t('domain:orders.noDate')}
-          </span>
-        ),
+        cell: ({ row }) => <OrderDateCell value={row.original.start_date} />,
       },
       {
-        accessorKey: 'end_date',
+        id: 'end_date',
+        accessorFn: (row) => row.end_date ?? undefined,
+        sortFn: 'text',
+        sortUndefined: 'last',
         header: t('domain:orders.columns.end'),
-        cell: ({ row }) => (
-          <span className="text-muted-foreground">
-            {formatDate(row.original.end_date) || t('domain:orders.noDate')}
-          </span>
-        ),
+        cell: ({ row }) => <OrderDateCell value={row.original.end_date} />,
       },
     ],
     [t],
