@@ -115,12 +115,22 @@ export function TimeGridView({
                       entry={entry}
                       onOpenEvent={onOpenEvent}
                       label={`${entry.title}, ${time}`}
-                      className="flex h-full w-full flex-col overflow-hidden rounded-md px-1.5 py-0.5 text-xs"
+                      // `overflow-clip` statt `hidden`: hidden machte den Block zum
+                      // Scrollcontainer, und der Kopf könnte nicht mehr kleben.
+                      // `flex` ist für Termine nötig: ein <button> zentriert seinen
+                      // Inhalt sonst in einer inneren Box, in der nichts klebt.
+                      className="flex h-full w-full flex-col overflow-clip rounded-md text-xs"
                     >
-                      <span className="truncate font-semibold">{entry.title}</span>
-                      {height >= 2 * MIN_BLOCK_PX ? (
-                        <span className="text-muted-foreground truncate tabular-nums">{time}</span>
-                      ) : null}
+                      {/* Klebt oben im sichtbaren Bereich: Titel und Uhrzeit bleiben
+                          lesbar, bis der Block ganz aus dem Bild gescrollt ist. */}
+                      <span className="sticky top-0 flex flex-col px-1.5 py-0.5">
+                        <span className="truncate font-semibold">{entry.title}</span>
+                        {height >= 2 * MIN_BLOCK_PX ? (
+                          <span className="text-muted-foreground truncate tabular-nums">
+                            {time}
+                          </span>
+                        ) : null}
+                      </span>
                     </EntryElement>
                   </div>
                 );

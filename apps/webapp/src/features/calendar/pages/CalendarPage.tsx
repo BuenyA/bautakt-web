@@ -1,4 +1,4 @@
-import { Button, MessageBar, Tab, TabList } from '@fluentui/react-components';
+import { Button, MessageBar, Switch, Tab, TabList } from '@fluentui/react-components';
 import { AddRegular, ChevronLeftRegular, ChevronRightRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +30,7 @@ import { TimeGridView } from '../components/TimeGridView';
 import { YearView } from '../components/YearView';
 import { type CalendarEventDraft, draftFromOccurrence, emptyEventDraft } from '../eventDraft';
 import { useCalendarEvents } from '../useCalendarEvents';
+import { useShowAssignments } from '../useShowAssignments';
 
 type View = 'jahr' | 'monat' | 'woche' | 'tag';
 const VIEWS: readonly View[] = ['jahr', 'monat', 'woche', 'tag'];
@@ -37,7 +38,7 @@ const VIEWS: readonly View[] = ['jahr', 'monat', 'woche', 'tag'];
 const SHOWN_ABSENCE = new Set(['genehmigt', 'ausstehend']);
 
 function viewFromSearch(value: string | null): View {
-  return VIEWS.includes(value as View) ? (value as View) : 'monat';
+  return VIEWS.includes(value as View) ? (value as View) : 'woche';
 }
 
 function dayFromSearch(value: string | null): string {
@@ -101,8 +102,8 @@ function rangeLabel(view: View, dayIso: string, days: readonly string[]): string
  * (`calendar_events`, privat blau, Firma rot), Einsätze und die eigenen
  * Abwesenheiten. Termine lassen sich hier anlegen, ändern und löschen.
  *
- * Ansicht und Datum stehen in der URL (`?ansicht=woche&datum=2026-10-12`),
- * damit ein Neuladen dieselbe Stelle zeigt.
+ * Ansicht und Datum stehen in der URL (`?ansicht=monat&datum=2026-10-12`),
+ * damit ein Neuladen dieselbe Stelle zeigt. Ohne Parameter: diese Woche.
  */
 export function CalendarPage() {
   const { t } = useTranslation();
@@ -120,10 +121,11 @@ export function CalendarPage() {
   const events = useCalendarEvents(from, to);
   const assignments = useAssignments(from, to);
   const absences = useAbsences();
+  const [showAssignments, setShowAssignments] = useShowAssignments();
 
   function go(nextView: View, nextDay: string) {
     const params = new URLSearchParams(searchParams);
-    if (nextView === 'monat') params.delete('ansicht');
+    if (nextView === 'woche') params.delete('ansicht');
     else params.set('ansicht', nextView);
     if (nextDay === todayIso) params.delete('datum');
     else params.set('datum', nextDay);
@@ -147,7 +149,7 @@ export function CalendarPage() {
       occurrence,
     }));
 
-    for (const assignment of assignments.data ?? []) {
+    for (const assignment of showAssignments ? (assignments.data ?? []) : []) {
       if (!inRange(assignment.starts_at, assignment.ends_at)) continue;
       list.push({
         key: `a-${assignment.id}`,
@@ -181,7 +183,16 @@ export function CalendarPage() {
       });
     }
     return list;
-  }, [events.data, assignments.data, absences.data, membership?.employmentId, from, to, t]);
+  }, [
+    events.data,
+    assignments.data,
+    showAssignments,
+    absences.data,
+    membership?.employmentId,
+    from,
+    to,
+    t,
+  ]);
 
   function openEvent(occurrence: Occurrence) {
     const master = events.data?.rows.find((row) => row.id === occurrence.masterId);
@@ -193,7 +204,7 @@ export function CalendarPage() {
     (draft.occurrence.eventType === 'all' ? !canManageAll : draft.occurrence.userId !== user?.id),
   );
 
-  const isLoading = events.isPending || assignments.isPending;
+  const isLoading = events.isPending || (showAssignments && assignments.isPending);
 
   return (
     <div className="flex flex-col gap-6">
@@ -243,7 +254,14 @@ export function CalendarPage() {
         </div>
       </div>
 
-      <CalendarLegend />
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+        <CalendarLegend showAssignments={showAssignments} />
+        <Switch
+          checked={showAssignments}
+          onChange={(_, data) => setShowAssignments(data.checked)}
+          label={t('domain:calendar.showAssignments')}
+        />
+      </div>
 
       {events.isError ? (
         <MessageBar intent="error">{t('domain:calendar.loadError')}</MessageBar>

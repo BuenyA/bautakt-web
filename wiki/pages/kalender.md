@@ -7,18 +7,24 @@ Terminen wie in der Handy-App. Vorher zeigte die Seite nur Einsätze im Monat.
 
 - **Termine** aus `calendar_events`: privat (`event_type = 'me'`, blau) und
   Firma (`'all'`, rot) — dieselben Farben wie in der App.
-- **Einsätze** (grün), Link auf `/einsatzplanung/:id`.
+- **Einsätze** (grün), Link auf `/einsatzplanung/:id`. Der Schalter
+  „Einsätze anzeigen“ blendet sie in allen Ansichten aus (samt Legendenpunkt).
+  Die Wahl steht im localStorage (`bautakt-calendar-assignments:<userId>`),
+  gilt also je Nutzer und Browser, nicht geräteübergreifend. Standard: an.
 - **Eigene Abwesenheiten** (gelb, offene gestrichelt), nur lesend, wie in der
   App. Wer sonst fehlt, steht in „Abwesenheiten“ und auf der Übersicht.
 
-Ansichten Jahr, Monat, Woche, Tag (`?ansicht=jahr|woche|tag`, Monat ohne
+Ansichten Jahr, Monat, Woche, Tag (`?ansicht=jahr|monat|tag`, Woche ohne
 Parameter; `?datum=YYYY-MM-DD`, heute ohne Parameter).
 
 - **Monat:** Raster ab Montag, je Tag drei Einträge und „+N weitere“. Das Plus
   im Tag legt dort einen Termin an. Am Handy stehen Punkte statt Text.
 - **Woche/Tag:** Zeitraster 0–24 Uhr, scrollt auf 7 Uhr, Ganztägiges oben,
   Überlappendes nebeneinander (`layoutLanes` aus der Übersicht). Klick in eine
-  Stunde legt dort einen Termin an.
+  Stunde legt dort einen Termin an. Titel und Uhrzeit kleben oben, solange ein
+  Block sichtbar ist (`sticky` im Block, Block mit `overflow-clip`, Termin-
+  `<button>` mit `flex` — sonst zentriert der Button und nichts klebt).
+  Standardansicht seit 2026-10-11 (vorher Monat).
 - **Jahr:** zwölf kleine Monate, Punkt an Tagen mit Einträgen.
 
 ## Termin anlegen, ändern, löschen

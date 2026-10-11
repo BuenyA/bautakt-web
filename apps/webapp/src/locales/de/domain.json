@@ -820,6 +820,7 @@
     "openDayBusy": "{{date}} öffnen, mit Einträgen",
     "createOnDay": "Termin am {{date}} anlegen",
     "createAt": "Termin am {{date}} um {{hour}} Uhr anlegen",
+    "showAssignments": "Einsätze anzeigen",
     "loadError": "Termine konnten nicht geladen werden. Einsätze und Abwesenheiten werden trotzdem gezeigt.",
     "legend": {
       "me": "Privater Termin",
