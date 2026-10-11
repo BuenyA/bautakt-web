@@ -128,14 +128,15 @@ und `sm:col-span-2`.
 | Finanzen    | Auswertungen           | `/auswertungen`  | `canViewCompanyFinance`           |
 | Mitarbeiter | Mitarbeiterverzeichnis | `/mitarbeiter`   | `canManageEmployees`              |
 | Mitarbeiter | Abwesenheiten          | `/abwesenheiten` | `canManageAbsences`               |
-| Mitarbeiter | Lohn                   | `/lohn`          | Lohnkosten oder Sätze             |
-| Mitarbeiter | Mitarbeiter hinzufügen | `/mitarbeiter`   | `canManageEmployees`              |
 | Material    | Katalog                | `/katalog`       | `canManageCatalog`                |
 | Material    | Kostenstellen          | `/kostenstellen` | `canManageCostCenters`            |
 
-„Mitarbeiter hinzufügen“ hängt kein `?neu=1` an. Die Liste öffnet das
-Anlege-Sheet über den bestehenden Button; eine Create-Query gibt es nicht
-(Stand 2026-10-01, `EmployeesListPage`).
+Seit 2026-10-11 (Owner) hat der Mitarbeiter-Hub nur noch Verzeichnis und
+Abwesenheiten. „Mitarbeiter hinzufügen“ führte auf dieselbe Liste und ist weg;
+angelegt wird über den Knopf in der Liste oder `/mitarbeiter?neu=1`
+(Schnellsuche). „Lohn“ ist nicht mehr verlinkt, weil es um die Sätze des
+Betriebs geht, nicht um einzelne Mitarbeiter. Seite und Route `/lohn`
+bestehen weiter und ziehen später unter die Unternehmenseinstellungen.
 
 Sind nach dem Rechtefilter null Karten übrig, zeigt die Seite das bestehende
 `EmptyState` („Keine Bereiche freigeschaltet“). Das passiert beim Direktaufruf,

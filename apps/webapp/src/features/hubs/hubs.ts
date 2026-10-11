@@ -10,7 +10,6 @@ import {
   LayerRegular,
   MegaphoneRegular,
   MoneyRegular,
-  PersonAddRegular,
   PersonRegular,
   ReceiptRegular,
   WalletRegular,
@@ -148,23 +147,11 @@ export const personalHub: Hub = {
       icon: BeachRegular,
       permission: 'canManageAbsences',
     },
-    {
-      titleKey: 'common:nav.payroll',
-      descriptionKey: 'common:hub.personal.payrollDescription',
-      to: routes.payroll,
-      icon: WalletRegular,
-      anyPermission: ['canViewWageCosts', 'canManageRates'],
-    },
-    {
-      // Die Liste oeffnet das Anlege-Sheet ueber einen Button, nicht ueber
-      // eine Query. `?neu=1` gibt es nicht — die Karte zeigt dieselbe Liste.
-      titleKey: 'common:hub.personal.addTitle',
-      descriptionKey: 'common:hub.personal.addDescription',
-      to: routes.employees,
-      icon: PersonAddRegular,
-      permission: 'canManageEmployees',
-      duplicate: true,
-    },
+    // „Mitarbeiter hinzufügen“ führte auf dieselbe Liste wie das Verzeichnis
+    // und ist deshalb weg (anlegen: Knopf in der Liste oder `?neu=1`).
+    // „Lohn“ (`routes.payroll`) ist hier bewusst nicht mehr verlinkt: es geht
+    // um Sätze des Betriebs, nicht um einzelne Mitarbeiter. Die Seite zieht
+    // später unter die Unternehmenseinstellungen (Owner, 2026-10-11).
   ],
 };
 

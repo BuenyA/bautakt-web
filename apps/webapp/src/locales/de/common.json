@@ -67,7 +67,6 @@
     "reports": "Auswertungen",
     "employees": "Mitarbeiter",
     "absences": "Abwesenheiten",
-    "payroll": "Lohn",
     "customers": "Kunden",
     "catalog": "Katalog",
     "costCenters": "Kostenstellen",
@@ -94,13 +93,10 @@
       "reportsDescription": "Reports"
     },
     "personal": {
-      "description": "Verzeichnis, Abwesenheiten und Lohn.",
+      "description": "Verzeichnis und Abwesenheiten.",
       "directoryTitle": "Mitarbeiterverzeichnis",
       "directoryDescription": "Alle Mitarbeitenden",
-      "absencesDescription": "Urlaub & krank",
-      "payrollDescription": "Lohn / Sätze",
-      "addTitle": "Mitarbeiter hinzufügen",
-      "addDescription": "Neuen anlegen"
+      "absencesDescription": "Urlaub & krank"
     },
     "material": {
       "description": "Artikel, Leistungen und Kostenstellen.",
