@@ -98,6 +98,7 @@ verlinkt, nie kopiert.
 | 2026-10-09 | [Login ohne Registrierungslink](logs/2026-10-09-login-ohne-registrierung.md)                      |
 | 2026-10-10 | [Web-App auf Fluent UI 2](logs/2026-10-10-fluent-ui.md)                                           |
 | 2026-10-11 | [Neue Übersicht](logs/2026-10-11-uebersicht.md)                                                   |
+| 2026-10-11 | [Ein Logo überall: der orangene Bauhelm](logs/2026-10-11-logo.md)                                 |
 
 ## Die drei wichtigsten Sätze
 

@@ -16,7 +16,7 @@ Zweifel: dichte Tabellen und Tastaturbedienung schlagen große Touch-Ziele.
 Stand 2026-10-10 (dritter Durchgang nach Owner-Rückmeldung). `AppShell.tsx`
 baut die Leiste aus Fluents `NavDrawer`:
 
-- **Kopf in einer Zeile:** links Signet und „Bautakt“ (`AppItem`, führt zur
+- **Kopf in einer Zeile:** links der Bauhelm (`BautaktSignet`) und „Bautakt“ (`AppItem`, führt zur
   Übersicht), rechts das Einklapp-Symbol (`PanelLeftContract20Regular`, eingeklappt
   `PanelLeftExpand20Regular`). Kein Hamburger in der Leiste — Owner-Vorgabe:
   wie in anderen Apps, und am Symbol soll man sehen, dass hier etwas einklappt.
