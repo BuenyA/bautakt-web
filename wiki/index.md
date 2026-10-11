@@ -106,6 +106,7 @@ verlinkt, nie kopiert.
 | 2026-10-11 | [Kalender: Termine wie in der App](logs/2026-10-11-kalender-termine.md)                           |
 | 2026-10-11 | [Einsatzplanung als Wochenplan](logs/2026-10-11-einsatzplanung-woche.md)                          |
 | 2026-10-11 | [Kalender: Woche als Standard, Einsätze ausblendbar](logs/2026-10-11-kalender-woche-einsaetze.md) |
+| 2026-10-11 | [Abwesenheit sperrt Einsatzplanung](logs/2026-10-11-abwesenheit-sperrt-einsatz.md)                |
 
 ## Die drei wichtigsten Sätze
 

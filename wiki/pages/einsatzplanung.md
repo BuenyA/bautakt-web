@@ -52,13 +52,16 @@ denselben Hook für seinen sichtbaren Zeitraum.
 Dasselbe Panel wie beim Anlegen (`AssignmentSheet` mit `assignment`).
 `useUpdateAssignment`:
 
-1. `update` auf `work_assignments` (Auftrag, Zeiten, Notiz, `modified_at`) mit
+1. Entfernte Mitarbeiter austragen (`delete`, aus `diffEmployees`). Zuerst,
+   weil die Datenbank das Verschieben in eine genehmigte Abwesenheit eines
+   Eingeteilten sperrt; wer gerade rausfliegt, darf nicht mehr mitzählen.
+2. `update` auf `work_assignments` (Auftrag, Zeiten, Notiz, `modified_at`) mit
    `select('id')`. Null Zeilen heißt: kein Recht oder schon gelöscht.
-2. Mitarbeiter als Differenz (`diffEmployees`): entfernte per `delete`, neue
-   per `insert`. Nicht alles löschen und neu anlegen — der Insert-Trigger
-   `notify_work_assignment_assigned` benachrichtigt jeden eingefügten
-   Mitarbeiter.
-3. Danach `['assignments', companyId]` invalidieren, auch nach einem Fehler.
+3. Neue Mitarbeiter per `insert`. Nicht alles löschen und neu anlegen — der
+   Insert-Trigger `notify_work_assignment_assigned` benachrichtigt jeden
+   eingefügten Mitarbeiter, und die Abwesenheitssperre würde den ganzen
+   Insert abweisen.
+4. Danach `['assignments', companyId]` invalidieren, auch nach einem Fehler.
 
 Gemessen 2026-10-11 in einer zurückgerollten Transaktion als Geschäftsführer:
 Update trifft eine Zeile, nach dem Tausch eines Mitarbeiters gibt es genau eine
@@ -67,6 +70,38 @@ neue Benachrichtigung (für den neu Eingeteilten), die Zuordnung stimmt.
 Schon eingeteilte, inzwischen ausgeschiedene Mitarbeiter stehen im Panel mit
 Vermerk „ausgeschieden“ und bleiben angehakt. Sonst fielen sie beim Speichern
 stillschweigend heraus.
+
+## Abwesenheit sperrt Einteilen
+
+Seit 2026-10-11 (Migration `20261011211438_work_assignment_absence_conflict`
+in bautakt-app) prüft die Datenbank beide Richtungen:
+
+- **Abwesenheit genehmigen**, obwohl ein Einsatz liegt →
+  `ABSENCE_WORK_ASSIGNMENT_CONFLICT` (gab es schon).
+- **Einteilen** bei genehmigter Abwesenheit (Insert in
+  `work_assignment_employees`) → `WORK_ASSIGNMENT_ABSENCE_CONFLICT`. Gilt für
+  jede Abwesenheitsart.
+- **Verschieben** eines Einsatzes in die genehmigte Abwesenheit eines
+  Eingeteilten → derselbe Code. Nur neue Konflikte: Altfälle (eingeteilt,
+  bevor es die Sperre gab) lassen sich weiter verschieben und bearbeiten.
+- Offene Anträge (`ausstehend`) sperren nicht, nur Hinweis (Owner-Entscheidung).
+- Verglichen werden Kalendertage in `Europe/Berlin`. Vorher nahm der
+  Absence-Trigger den UTC-Tag.
+
+Anlass: am 2026-10-11 wurde der Owner um 21:07 per „Bearbeiten“ in einen
+Einsatz eingeteilt, für den er um 21:06 Urlaub genehmigt hatte.
+
+Oberfläche (`absenceConflict.ts`, getestet):
+
+- Panel: genehmigt Abwesende sind ausgegraut und nicht wählbar
+  („Krankheit 10.10. – 14.10.“). Schon Eingeteilte bleiben angehakt, rot mit
+  „bitte austragen“. Beantragt: gelber Vermerk, wählbar.
+- Einsatzseite: rote Kachel „Urlaub (genehmigt)“ bei Altfällen.
+- Kalender: eigener privater Termin an einem eigenen Abwesenheitstag zeigt
+  einen Hinweis, Speichern geht (Owner-Entscheidung: Termine nur Hinweis).
+- ⚠️ Ohne `canManageAbsences` liefert RLS nur die eigenen Abwesenheiten; das
+  Panel markiert dann fremde nicht. Die Sperre greift trotzdem, die Meldung
+  kommt beim Speichern (`dbErrors.ts`).
 
 ## Code
 

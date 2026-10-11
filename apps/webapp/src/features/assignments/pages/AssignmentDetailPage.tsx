@@ -1,5 +1,13 @@
-import { DangerButton } from '@bautakt/ui';
-import { Button, Card, CardHeader, Link as FluentLink, Text } from '@fluentui/react-components';
+import { cn, DangerButton } from '@bautakt/ui';
+import {
+  Button,
+  Card,
+  CardHeader,
+  Link as FluentLink,
+  makeStyles,
+  Text,
+  tokens,
+} from '@fluentui/react-components';
 import {
   CalendarRegular,
   ClockRegular,
@@ -20,13 +28,19 @@ import { localIsoDay, startOfWeek } from '@/features/calendar/calendarModel';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { MemberAvatar } from '@/features/overview/components/CrewAvatars';
+import { useAbsences } from '@/features/team/useAbsences';
 import { useProfileImageUrls } from '@/features/team/useProfileImageUrls';
 import { formatDate, formatDateTime, formatTime } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import { absenceConflict } from '../absenceConflict';
 import { AssignmentDeleteDialog } from '../AssignmentDeleteDialog';
 import { AssignmentSheet } from '../AssignmentSheet';
 import { type AssignmentDetail, useAssignment } from '../useAssignment';
+
+const useStyles = makeStyles({
+  pending: { color: tokens.colorPaletteMarigoldForeground2 },
+});
 
 const longDate = new Intl.DateTimeFormat('de-DE', {
   weekday: 'short',
@@ -142,6 +156,10 @@ function AssignmentView({
 }) {
   const { t } = useTranslation();
   const canOpenEmployees = usePermission('canManageEmployees');
+  const styles = useStyles();
+  const absences = useAbsences().data ?? [];
+  const startDay = localIsoDay(new Date(assignment.starts_at));
+  const endDay = localIsoDay(new Date(assignment.ends_at));
   const urls = useProfileImageUrls(assignment.crew.map((member) => member.imagePath)).data ?? {};
   const { date, time } = periodHeading(assignment.starts_at, assignment.ends_at);
   const weekOf = startOfWeek(localIsoDay(new Date(assignment.starts_at)));
@@ -216,16 +234,46 @@ function AssignmentView({
             ) : (
               <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
                 {assignment.crew.map((member) => {
+                  // Altfälle: eingeteilt, obwohl inzwischen (oder schon vorher)
+                  // abwesend. Neu einteilen sperrt die Datenbank.
+                  const { approved, pending } = absenceConflict(
+                    absences,
+                    member.employmentId,
+                    startDay,
+                    endDay,
+                  );
+                  const absence = approved ?? pending;
                   const content = (
                     <>
                       <MemberAvatar member={member} urls={urls} size={56} />
                       <span className="text-foreground line-clamp-2 text-center text-sm font-medium">
                         {member.name || t('domain:assignments.unnamedEmployee')}
                       </span>
+                      {absence ? (
+                        <span
+                          className={cn(
+                            'text-center text-xs',
+                            approved ? 'text-destructive font-medium' : styles.pending,
+                          )}
+                        >
+                          {t(
+                            approved
+                              ? 'domain:assignments.absence.onTile'
+                              : 'domain:assignments.absence.onTilePending',
+                            {
+                              type: t(`domain:absences.types.${absence.type}`, {
+                                defaultValue: absence.type,
+                              }),
+                            },
+                          )}
+                        </span>
+                      ) : null}
                     </>
                   );
-                  const tile =
-                    'border-border flex flex-col items-center gap-2 rounded-lg border px-3 py-4';
+                  const tile = cn(
+                    'border-border flex flex-col items-center gap-2 rounded-lg border px-3 py-4',
+                    approved && 'border-destructive',
+                  );
                   return (
                     <li key={member.employmentId}>
                       {canOpenEmployees ? (
