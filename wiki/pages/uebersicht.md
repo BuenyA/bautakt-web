@@ -15,7 +15,8 @@ Ziel: der ganze Betrieb auf einen Blick.
      `WorkAssignmentCard` der App — Auftrag, Baustelle, Uhrzeit als Pill, Team mit
      Avatar-Stapel (`CrewAvatars`, Fluent `AvatarGroup`), Notiz, Knöpfe „Auftrag“,
      „Maps“ (Google-Maps-Suche, neuer Tab, `mapsSearchUrl`) und „Zum Einsatz“.
-     Laufende Einsätze mit Brand-Rahmen und „läuft“, vergangene gedämpft.
+     Laufende Einsätze nur mit schmalem Brand-Akzent links und „läuft“ (keine blaue
+     Fläche — die zog den Blick zu stark), vergangene gedämpft.
    - **Zu erledigen** (Mitte, `TodoPanel`, so breit wie der Einsatzplan): Anträge (mit
      „Genehmigen“ über `approve_absence`), neu eingegangene Eingangsrechnungen, Fristen
      (7 Tage + Überfälliges), überfällige Rechnungen, mahnfähige Belege und Entwürfe.

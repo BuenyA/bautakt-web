@@ -29,10 +29,10 @@ import { CrewAvatars } from './CrewAvatars';
 import { COLUMN_SCROLL } from './layout';
 
 const useStyles = makeStyles({
-  // Wie der „heute“-Look der App: Brand-Rahmen und zarte Brand-Fläche.
+  // Bewusst dezent: nur ein schmaler Akzent links. Eine blaue Fläche zog den
+  // Blick auf den Einsatzplan, obwohl er nicht der wichtigste Bereich ist.
   running: {
-    backgroundColor: tokens.colorBrandBackground2,
-    border: `1px solid ${tokens.colorBrandStroke1}`,
+    borderLeft: `3px solid ${tokens.colorBrandStroke1}`,
   },
   done: {
     opacity: 0.7,
@@ -40,10 +40,6 @@ const useStyles = makeStyles({
   timePill: {
     backgroundColor: tokens.colorNeutralBackground3,
     color: tokens.colorNeutralForeground1,
-  },
-  timePillRunning: {
-    backgroundColor: tokens.colorBrandBackground,
-    color: tokens.colorNeutralForegroundOnBrand,
   },
   noCrew: {
     color: tokens.colorPaletteMarigoldForeground2,
@@ -171,13 +167,12 @@ function AssignmentTile({
             className={mergeClasses(
               'rounded-full px-2.5 py-0.5 text-sm font-semibold tabular-nums',
               styles.timePill,
-              phase === 'running' && styles.timePillRunning,
             )}
           >
             {time}
           </span>
           {phase === 'running' ? (
-            <Badge appearance="tint" color="brand" size="small">
+            <Badge appearance="outline" color="brand" size="small">
               {t('domain:overview.crew.running')}
             </Badge>
           ) : phase === 'done' ? (
