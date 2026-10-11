@@ -11,7 +11,7 @@ export function BautaktSignet({ className }: { className?: string }) {
       src="/bautakt-logo.png"
       alt="Bautakt"
       width={480}
-      height={293}
+      height={351}
       className={cn('size-8 object-contain', className)}
     />
   );

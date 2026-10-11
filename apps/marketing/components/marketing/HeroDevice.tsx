@@ -15,7 +15,7 @@ export function HeroDevice() {
             {/* App-Header mit Signet */}
             <div className="flex items-center justify-between">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/bautakt-logo.png" alt="" width={480} height={293} className="h-7 w-auto" />
+              <img src="/bautakt-logo.png" alt="" width={480} height={351} className="h-7 w-auto" />
               <div className="size-7 rounded-full bg-background-third" />
             </div>
 

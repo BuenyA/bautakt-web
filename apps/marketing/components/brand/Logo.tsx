@@ -25,7 +25,7 @@ export function Logo({ className, linked = true }: LogoProps) {
       )}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- kleines Logo, kein next/image nötig */}
-      <img src="/bautakt-logo.png" alt="" width={480} height={293} className="h-8 w-auto" />
+      <img src="/bautakt-logo.png" alt="" width={480} height={351} className="h-8 w-auto" />
       <span className="text-xl font-semibold tracking-tight">{site.name}</span>
     </span>
   );
