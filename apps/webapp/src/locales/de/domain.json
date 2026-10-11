@@ -540,8 +540,6 @@
       "count_other": "{{count}} Einsätze",
       "toPlan": "Zum Einsatzplan",
       "empty": "Heute sind keine Einsätze geplant.",
-      "running": "läuft",
-      "done": "vorbei",
       "order": "Auftrag",
       "maps": "Maps",
       "mapsA11y": "{{address}} in Google Maps öffnen (neuer Tab)",

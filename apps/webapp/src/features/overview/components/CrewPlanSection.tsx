@@ -1,6 +1,5 @@
 import { SkeletonBlock } from '@bautakt/ui';
 import {
-  Badge,
   Button,
   Card,
   CardHeader,
@@ -29,11 +28,9 @@ import { CrewAvatars } from './CrewAvatars';
 import { COLUMN_SCROLL } from './layout';
 
 const useStyles = makeStyles({
-  // Bewusst dezent: nur ein schmaler Akzent links. Eine blaue Fläche zog den
-  // Blick auf den Einsatzplan, obwohl er nicht der wichtigste Bereich ist.
-  running: {
-    borderLeft: `3px solid ${tokens.colorBrandStroke1}`,
-  },
+  // Vergangene Einsätze treten zurück. Laufende bekommen bewusst keine
+  // Hervorhebung: Farbe zog den Blick auf den Einsatzplan, obwohl er nicht der
+  // wichtigste Bereich ist.
   done: {
     opacity: 0.7,
   },
@@ -146,10 +143,7 @@ function AssignmentTile({
     <Card
       size="medium"
       appearance="outline"
-      className={mergeClasses(
-        phase === 'running' && styles.running,
-        phase === 'done' && styles.done,
-      )}
+      className={mergeClasses(phase === 'done' && styles.done)}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-0.5">
@@ -162,25 +156,14 @@ function AssignmentTile({
             </Text>
           ) : null}
         </div>
-        <div className="flex shrink-0 flex-col items-end gap-1">
-          <span
-            className={mergeClasses(
-              'rounded-full px-2.5 py-0.5 text-sm font-semibold tabular-nums',
-              styles.timePill,
-            )}
-          >
-            {time}
-          </span>
-          {phase === 'running' ? (
-            <Badge appearance="outline" color="brand" size="small">
-              {t('domain:overview.crew.running')}
-            </Badge>
-          ) : phase === 'done' ? (
-            <Badge appearance="tint" color="informative" size="small">
-              {t('domain:overview.crew.done')}
-            </Badge>
-          ) : null}
-        </div>
+        <span
+          className={mergeClasses(
+            'shrink-0 rounded-full px-2.5 py-0.5 text-sm font-semibold tabular-nums',
+            styles.timePill,
+          )}
+        >
+          {time}
+        </span>
       </div>
 
       <div className="flex items-center justify-between gap-3">
@@ -228,9 +211,12 @@ function AssignmentTile({
             {t('domain:overview.crew.maps')}
           </Button>
         ) : null}
-        <RouterLink to={routes.assignment(assignment.id)} className="ml-auto text-sm">
-          {t('domain:overview.crew.assignment')}
-        </RouterLink>
+        {/* Fluent setzt an Knöpfen und Links eigene Ränder; ml-auto sitzt deshalb am Wrapper. */}
+        <span className="ml-auto">
+          <LinkButton to={routes.assignment(assignment.id)} size="small">
+            {t('domain:overview.crew.assignment')}
+          </LinkButton>
+        </span>
       </div>
     </Card>
   );
