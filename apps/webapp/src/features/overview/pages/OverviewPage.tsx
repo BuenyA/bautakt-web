@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { useProfileImageUrls } from '@/features/team/useProfileImageUrls';
 
 import { CrewPlanSection } from '../components/CrewPlanSection';
-import { type GreetingChip, OverviewGreeting } from '../components/OverviewGreeting';
+import { OverviewGreeting } from '../components/OverviewGreeting';
 import { TodayPlanCard } from '../components/TodayPlanCard';
 import { TodoPanel } from '../components/TodoPanel';
 import { useNow } from '../components/useNow';
@@ -41,21 +41,9 @@ export function OverviewPage() {
   );
   const urls = useProfileImageUrls(imagePaths).data ?? {};
 
-  const chips: GreetingChip[] = [
-    { key: 'pendingAbsences', count: todo.pendingAbsences.length, target: 'antraege' },
-    { key: 'absentToday', count: today.absences.length, target: 'heute' },
-    { key: 'newIncoming', count: todo.newIncoming.length, target: 'eingang' },
-    {
-      key: 'deadlinesDue',
-      count: todo.deadlines.filter((deadline) => deadline.daysLeft <= 0).length,
-      target: 'fristen',
-    },
-    { key: 'overdue', count: todo.overdue.length, target: 'ueberfaellig', tone: 'danger' },
-  ];
-
   return (
     <div className="flex flex-col gap-6">
-      <OverviewGreeting firstName={firstName.data ?? ''} chips={chips} />
+      <OverviewGreeting firstName={firstName.data ?? ''} />
 
       {/*
         Eine Reihe auf breiten Bildschirmen: links der Einsatzplan (wer ist wo —

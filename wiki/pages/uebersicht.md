@@ -3,10 +3,8 @@
 Route `/uebersicht` (`HOME_ROUTE`), Code in `apps/webapp/src/features/overview/`.
 Ziel: der ganze Betrieb auf einen Blick.
 
-1. **Kopf** (`OverviewGreeting`): Gruß mit Vorname (`profiles.first_name`), Datum,
-   Fluent-`InteractionTag`-Chips mit Zählern (offene Anträge, abwesend, neue
-   Eingangsrechnungen, Fristen heute/vorbei, überfällige Rechnungen). Ein Chip
-   erscheint nur mit Zähler > 0 und springt zum Abschnitt.
+1. **Kopf** (`OverviewGreeting`): Gruß mit Vorname ohne Komma („Guten Tag Bünyamin“,
+   `profiles.first_name`) und Datum. Keine Zähler-Chips — sie wiederholten nur die Spalten.
 2. **Eine Reihe aus drei Spalten** (ab 1280 px im Verhältnis 5 : 5 : 3; 1024–1279 px:
    Einsatzplan und Zu erledigen nebeneinander, Heute darunter; schmaler: untereinander).
    Jede Spalte ist eine Fluent-`Card`, gleich hoch, Inhalt scrollt ab 640 px selbst

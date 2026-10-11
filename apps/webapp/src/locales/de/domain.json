@@ -449,21 +449,7 @@
       "morning": "Guten Morgen",
       "day": "Guten Tag",
       "evening": "Guten Abend",
-      "withName": "{{greeting}}, {{name}}"
-    },
-    "chips": {
-      "label": "Auf einen Blick",
-      "pendingAbsences_one": "{{count}} Antrag offen",
-      "pendingAbsences_other": "{{count}} Anträge offen",
-      "absentToday_one": "{{count}} abwesend",
-      "absentToday_other": "{{count}} abwesend",
-      "newIncoming_one": "{{count}} neue Eingangsrechnung",
-      "newIncoming_other": "{{count}} neue Eingangsrechnungen",
-      "deadlinesDue_one": "{{count}} Frist heute oder vorbei",
-      "deadlinesDue_other": "{{count}} Fristen heute oder vorbei",
-      "overdue_one": "{{count}} Rechnung überfällig",
-      "overdue_other": "{{count}} Rechnungen überfällig",
-      "allClear": "Nichts Dringendes — alles im Griff."
+      "withName": "{{greeting}} {{name}}"
     },
     "today": {
       "title": "Heute",
