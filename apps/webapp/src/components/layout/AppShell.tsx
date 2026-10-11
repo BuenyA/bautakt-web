@@ -361,12 +361,12 @@ export function AppShell() {
           {isMobile ? (
             <Hamburger onClick={toggle} aria-label={toggleLabel} aria-expanded={mobileOpen} />
           ) : null}
-          <div className="flex min-w-0 flex-1">
-            <QuickSearch />
-          </div>
-
-          <div className="flex items-center gap-2">
+          {/* Rechtsbündig: Glocke links neben der Suche, die Suche ganz rechts. */}
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
             <NotificationsBell />
+            <div className="flex max-w-md min-w-0 flex-1">
+              <QuickSearch />
+            </div>
           </div>
         </header>
 
