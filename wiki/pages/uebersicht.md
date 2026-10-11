@@ -1,26 +1,34 @@
 # Übersicht (Startseite der Web-App)
 
 Route `/uebersicht` (`HOME_ROUTE`), Code in `apps/webapp/src/features/overview/`.
-Ziel: der ganze Betrieb auf einen Blick. Aufbau „Heute zuerst“:
+Ziel: der ganze Betrieb auf einen Blick.
 
 1. **Kopf** (`OverviewGreeting`): Gruß mit Vorname (`profiles.first_name`), Datum,
    Fluent-`InteractionTag`-Chips mit Zählern (offene Anträge, abwesend, neue
    Eingangsrechnungen, Fristen heute/vorbei, überfällige Rechnungen). Ein Chip
    erscheint nur mit Zähler > 0 und springt zum Abschnitt.
-2. **Heute** (`TodayPlanCard`, 2/3 Breite): Abwesende mit Profilbild, ganztägige
-   Termine, darunter die flache Zeitleiste (`DayTimeline`, 32 px je Stunde, 7–18 Uhr,
-   wächst bei Bedarf, rote Jetzt-Linie, Überlappendes nebeneinander). Einsätze als
-   schmale Brand-Blöcke mit Auftrag und Uhrzeit, ohne Bilder. Unter 768px eine Liste.
-3. **Zu erledigen** (`TodoPanel`, 1/3): Anträge (mit „Genehmigen“ über
-   `approve_absence`), neu eingegangene Eingangsrechnungen, Fristen (7 Tage +
-   Überfälliges), überfällige Rechnungen, mahnfähige Belege und Entwürfe.
-4. **Einsatzplan heute** (`CrewPlanSection`, volle Breite): eine Kachel je Einsatz wie
-   `WorkAssignmentCard` der App — Auftrag, Baustelle, Uhrzeit als Pill, Team mit
-   Avatar-Stapel (`CrewAvatars`, Fluent `AvatarGroup`), Notiz, Knöpfe „Auftrag“,
-   „Maps“ (Google-Maps-Suche, neuer Tab, `mapsSearchUrl`) und „Zum Einsatz“.
-   Laufende Einsätze mit Brand-Rahmen und „läuft“, vergangene gedämpft.
-5. **Zahlen des Jahres** (`YearKpiRow`): Umsatz, Aufwände, Ergebnis, offene
+2. **Eine Reihe aus drei Spalten** (ab 1280 px; 1024–1279 px: Einsatzplan und Heute
+   nebeneinander, Zu erledigen darunter; schmaler: untereinander). Jede Spalte ist eine
+   Fluent-`Card`, gleich hoch, Inhalt scrollt ab 640 px selbst (`COLUMN_SCROLL`).
+   - **Einsatzplan heute** (links, `CrewPlanSection`, breiteste Spalte): eine Kachel je
+     Einsatz wie `WorkAssignmentCard` der App — Auftrag, Baustelle, Uhrzeit als Pill,
+     Team mit Avatar-Stapel (`CrewAvatars`, Fluent `AvatarGroup`), Notiz, Knöpfe
+     „Auftrag“, „Maps“ (Google-Maps-Suche, neuer Tab, `mapsSearchUrl`) und „Zum
+     Einsatz“. Laufende Einsätze mit Brand-Rahmen und „läuft“, vergangene gedämpft.
+   - **Heute** (Mitte, `TodayPlanCard`): Abwesende mit Profilbild, ganztägige Termine,
+     darunter die flache Zeitleiste (`DayTimeline`, 32 px je Stunde, 7–18 Uhr, wächst bei
+     Bedarf, rote Jetzt-Linie). Überlappendes steht nebeneinander; in schmalen Spalten
+     nur der Name, Zeit im Tooltip. Unter 768 px eine Liste.
+   - **Zu erledigen** (rechts, `TodoPanel`): Anträge (mit „Genehmigen“ über
+     `approve_absence`), neu eingegangene Eingangsrechnungen, Fristen (7 Tage +
+     Überfälliges), überfällige Rechnungen, mahnfähige Belege und Entwürfe.
+3. **Zahlen des Jahres** (`YearKpiRow`): Umsatz, Aufwände, Ergebnis, offene
    Forderungen — netto, 01.01. bis heute.
+
+**Warum diese Reihenfolge:** gelesen wird links → rechts, und die erste Frage am Morgen
+ist „wer ist wo“ — die Kacheln brauchen die meiste Breite. Die Zeitleiste in der Mitte
+verbindet beide Seiten. Aufgaben stehen rechts als Aktionsleiste, wie man es aus
+Outlook/Teams kennt.
 
 ## Regeln
 

@@ -136,11 +136,13 @@ export function DayTimeline({
               <AssignmentBlock
                 item={block.item}
                 showAddress={top(block.end) - top(block.start) >= ADDRESS_MIN_PX}
+                narrow={block.lanes > 1}
                 className={styles.assignment}
               />
             ) : (
               <EventBlock
                 item={block.item}
+                narrow={block.lanes > 1}
                 className={mergeClasses(
                   styles.event,
                   block.item.eventType === 'all' && styles.companyEvent,
@@ -168,10 +170,13 @@ export function DayTimeline({
 function AssignmentBlock({
   item,
   showAddress,
+  narrow,
   className,
 }: {
   item: TodayAssignment;
   showAddress: boolean;
+  /** Mehrere Einträge nebeneinander: nur der Name, die Zeit steht im Tooltip. */
+  narrow: boolean;
   className: string;
 }) {
   const { t } = useTranslation();
@@ -187,16 +192,19 @@ function AssignmentBlock({
         className,
       )}
       aria-label={`${t('domain:overview.today.assignment')}: ${item.orderName}, ${time}`}
+      title={`${item.orderName} · ${time}`}
     >
       <span className="flex items-baseline gap-2">
         <Text weight="semibold" size={200} truncate wrap={false} className="min-w-0">
           {item.orderName}
         </Text>
-        <Text size={100} className="text-text-secondary shrink-0 tabular-nums">
-          {time}
-        </Text>
+        {narrow ? null : (
+          <Text size={100} className="text-text-secondary shrink-0 tabular-nums">
+            {time}
+          </Text>
+        )}
       </span>
-      {showAddress && item.location ? (
+      {showAddress && !narrow && item.location ? (
         <Text size={100} truncate wrap={false} className="text-text-secondary">
           {item.location}
         </Text>
@@ -205,7 +213,15 @@ function AssignmentBlock({
   );
 }
 
-function EventBlock({ item, className }: { item: TodayEvent; className: string }) {
+function EventBlock({
+  item,
+  narrow,
+  className,
+}: {
+  item: TodayEvent;
+  narrow: boolean;
+  className: string;
+}) {
   const { t } = useTranslation();
   const kind =
     item.eventType === 'all'
@@ -213,7 +229,11 @@ function EventBlock({ item, className }: { item: TodayEvent; className: string }
       : t('domain:overview.today.privateEvent');
 
   return (
-    <Tooltip content={kind} relationship="description" positioning="above-start">
+    <Tooltip
+      content={`${kind} · ${item.title} · ${formatTime(item.startsAt)}`}
+      relationship="description"
+      positioning="above-start"
+    >
       <div
         className={mergeClasses(
           'flex h-full items-start gap-1.5 overflow-hidden rounded-md px-2 py-0.5',
@@ -224,9 +244,11 @@ function EventBlock({ item, className }: { item: TodayEvent; className: string }
         <Text size={200} weight="semibold" truncate wrap={false} className="min-w-0">
           {item.title}
         </Text>
-        <Text size={200} className="text-text-secondary ml-auto shrink-0 tabular-nums">
-          {formatTime(item.startsAt)}
-        </Text>
+        {narrow ? null : (
+          <Text size={200} className="text-text-secondary ml-auto shrink-0 tabular-nums">
+            {formatTime(item.startsAt)}
+          </Text>
+        )}
       </div>
     </Tooltip>
   );

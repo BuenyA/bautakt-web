@@ -21,6 +21,7 @@ import { routes } from '@/lib/routes';
 import type { Deadline } from '../today';
 import type { OverviewAbsence } from '../useTodayData';
 import { MemberAvatar } from './CrewAvatars';
+import { COLUMN_SCROLL } from './layout';
 
 /** Je Abschnitt so viele Zeilen; der Rest steckt hinter „Alle anzeigen“. */
 const VISIBLE_ROWS = 4;
@@ -67,110 +68,112 @@ export function TodoPanel({
         }
       />
 
-      {isLoading ? (
-        <SkeletonBlock className="h-48 w-full" />
-      ) : isEmpty ? (
-        <Text size={300} className="text-muted-foreground py-6 text-center">
-          {t('domain:overview.todo.empty')}
-        </Text>
-      ) : (
-        <div className="flex flex-col gap-5">
-          {pendingAbsences.length > 0 ? (
-            <Section
-              id="antraege"
-              title={t('domain:overview.todo.pendingAbsences')}
-              count={pendingAbsences.length}
-              to={`${routes.absences}?status=offen`}
-            >
-              {pendingAbsences.slice(0, VISIBLE_ROWS).map((absence) => (
-                <AbsenceRow key={absence.id} absence={absence} urls={urls} />
-              ))}
-            </Section>
-          ) : null}
+      <div className={COLUMN_SCROLL}>
+        {isLoading ? (
+          <SkeletonBlock className="h-48 w-full" />
+        ) : isEmpty ? (
+          <Text size={300} className="text-muted-foreground py-6 text-center">
+            {t('domain:overview.todo.empty')}
+          </Text>
+        ) : (
+          <div className="flex flex-col gap-5">
+            {pendingAbsences.length > 0 ? (
+              <Section
+                id="antraege"
+                title={t('domain:overview.todo.pendingAbsences')}
+                count={pendingAbsences.length}
+                to={`${routes.absences}?status=offen`}
+              >
+                {pendingAbsences.slice(0, VISIBLE_ROWS).map((absence) => (
+                  <AbsenceRow key={absence.id} absence={absence} urls={urls} />
+                ))}
+              </Section>
+            ) : null}
 
-          {newIncoming.length > 0 ? (
-            <Section
-              id="eingang"
-              title={t('domain:overview.todo.newIncoming')}
-              hint={t('domain:overview.todo.newIncomingHint')}
-              count={newIncoming.length}
-              to={routes.expenses}
-            >
-              {newIncoming.slice(0, VISIBLE_ROWS).map((invoice) => (
-                <Row
-                  key={invoice.id}
-                  to={routes.expenses}
-                  title={invoice.vendor_name || invoice.invoice_number}
-                  subtitle={
-                    invoice.due_date
-                      ? t('domain:overview.todo.due', { date: formatDate(invoice.due_date) })
-                      : invoice.invoice_number
-                  }
-                  trailing={formatMoney(eurosToMinor(invoice.gross_total))}
-                />
-              ))}
-            </Section>
-          ) : null}
+            {newIncoming.length > 0 ? (
+              <Section
+                id="eingang"
+                title={t('domain:overview.todo.newIncoming')}
+                hint={t('domain:overview.todo.newIncomingHint')}
+                count={newIncoming.length}
+                to={routes.expenses}
+              >
+                {newIncoming.slice(0, VISIBLE_ROWS).map((invoice) => (
+                  <Row
+                    key={invoice.id}
+                    to={routes.expenses}
+                    title={invoice.vendor_name || invoice.invoice_number}
+                    subtitle={
+                      invoice.due_date
+                        ? t('domain:overview.todo.due', { date: formatDate(invoice.due_date) })
+                        : invoice.invoice_number
+                    }
+                    trailing={formatMoney(eurosToMinor(invoice.gross_total))}
+                  />
+                ))}
+              </Section>
+            ) : null}
 
-          {deadlines.length > 0 ? (
-            <Section
-              id="fristen"
-              title={t('domain:overview.todo.deadlines')}
-              count={deadlines.length}
-            >
-              {deadlines.slice(0, VISIBLE_ROWS).map((deadline) => (
-                <Row
-                  key={`${deadline.kind}-${deadline.id}`}
-                  to={deadlineTarget(deadline)}
-                  title={deadline.label}
-                  subtitle={t(`domain:overview.todo.deadlineKinds.${deadline.kind}`)}
-                  trailing={<DueLabel daysLeft={deadline.daysLeft} />}
-                />
-              ))}
-            </Section>
-          ) : null}
+            {deadlines.length > 0 ? (
+              <Section
+                id="fristen"
+                title={t('domain:overview.todo.deadlines')}
+                count={deadlines.length}
+              >
+                {deadlines.slice(0, VISIBLE_ROWS).map((deadline) => (
+                  <Row
+                    key={`${deadline.kind}-${deadline.id}`}
+                    to={deadlineTarget(deadline)}
+                    title={deadline.label}
+                    subtitle={t(`domain:overview.todo.deadlineKinds.${deadline.kind}`)}
+                    trailing={<DueLabel daysLeft={deadline.daysLeft} />}
+                  />
+                ))}
+              </Section>
+            ) : null}
 
-          {overdue.length > 0 ? (
-            <Section
-              id="ueberfaellig"
-              title={t('domain:overview.todo.overdue')}
-              count={overdue.length}
-              to={`${routes.receivables}?klasse=1_30`}
-            >
-              {overdue.slice(0, VISIBLE_ROWS).map((item) => (
-                <Row
-                  key={item.document.id}
-                  to={routes.invoice(item.document.id)}
-                  title={item.document.document_number ?? ''}
-                  subtitle={t('domain:overview.todo.daysOverdue', { count: item.daysOverdue })}
-                  trailing={
-                    <span className="text-destructive font-semibold tabular-nums">
-                      {formatMoney(item.openMinor)}
-                    </span>
-                  }
-                />
-              ))}
-            </Section>
-          ) : null}
+            {overdue.length > 0 ? (
+              <Section
+                id="ueberfaellig"
+                title={t('domain:overview.todo.overdue')}
+                count={overdue.length}
+                to={`${routes.receivables}?klasse=1_30`}
+              >
+                {overdue.slice(0, VISIBLE_ROWS).map((item) => (
+                  <Row
+                    key={item.document.id}
+                    to={routes.invoice(item.document.id)}
+                    title={item.document.document_number ?? ''}
+                    subtitle={t('domain:overview.todo.daysOverdue', { count: item.daysOverdue })}
+                    trailing={
+                      <span className="text-destructive font-semibold tabular-nums">
+                        {formatMoney(item.openMinor)}
+                      </span>
+                    }
+                  />
+                ))}
+              </Section>
+            ) : null}
 
-          {tasks && hasTasks ? (
-            <Section id="belege" title={t('domain:overview.todo.billing')}>
-              {tasks.dunnable > 0 ? (
-                <Row
-                  to={routes.dunning}
-                  title={t('domain:overview.todo.taskDunnable', { count: tasks.dunnable })}
-                />
-              ) : null}
-              {tasks.draftDocuments > 0 ? (
-                <Row
-                  to={`${routes.invoices}?status=entwurf`}
-                  title={t('domain:overview.todo.taskDrafts', { count: tasks.draftDocuments })}
-                />
-              ) : null}
-            </Section>
-          ) : null}
-        </div>
-      )}
+            {tasks && hasTasks ? (
+              <Section id="belege" title={t('domain:overview.todo.billing')}>
+                {tasks.dunnable > 0 ? (
+                  <Row
+                    to={routes.dunning}
+                    title={t('domain:overview.todo.taskDunnable', { count: tasks.dunnable })}
+                  />
+                ) : null}
+                {tasks.draftDocuments > 0 ? (
+                  <Row
+                    to={`${routes.invoices}?status=entwurf`}
+                    title={t('domain:overview.todo.taskDrafts', { count: tasks.draftDocuments })}
+                  />
+                ) : null}
+              </Section>
+            ) : null}
+          </div>
+        )}
+      </div>
     </Card>
   );
 }

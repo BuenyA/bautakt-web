@@ -3,6 +3,7 @@ import {
   Badge,
   Button,
   Card,
+  CardHeader,
   Divider,
   makeStyles,
   mergeClasses,
@@ -25,6 +26,7 @@ import { routes, withCreate } from '@/lib/routes';
 import { type AssignmentPhase, assignmentPhase, mapsSearchUrl } from '../today';
 import type { TodayAssignment } from '../useTodayData';
 import { CrewAvatars } from './CrewAvatars';
+import { COLUMN_SCROLL } from './layout';
 
 const useStyles = makeStyles({
   // Wie der „heute“-Look der App: Brand-Rahmen und zarte Brand-Fläche.
@@ -70,57 +72,60 @@ export function CrewPlanSection({
   const { t } = useTranslation();
 
   return (
-    <section
-      id="einsatzplan"
-      aria-labelledby="einsatzplan-titel"
-      className="flex scroll-mt-20 flex-col gap-3"
-    >
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <div className="flex items-baseline gap-2">
-          <Text as="h2" id="einsatzplan-titel" weight="semibold" size={400}>
+    <Card size="large" className="h-full" id="einsatzplan">
+      <CardHeader
+        image={<PeopleTeamRegular fontSize={20} aria-hidden />}
+        header={
+          <Text as="h2" weight="semibold" size={400}>
             {t('domain:overview.crew.title')}
+            {assignments.length > 0 ? (
+              <Text size={200} weight="regular" className="text-text-secondary ml-2">
+                {t('domain:overview.crew.count', { count: assignments.length })}
+              </Text>
+            ) : null}
           </Text>
-          {assignments.length > 0 ? (
-            <Text size={200} className="text-text-secondary">
-              {t('domain:overview.crew.count', { count: assignments.length })}
-            </Text>
-          ) : null}
-        </div>
-        <RouterLink to={routes.assignments}>{t('domain:overview.crew.toPlan')}</RouterLink>
-      </div>
+        }
+        action={<RouterLink to={routes.assignments}>{t('domain:overview.crew.toPlan')}</RouterLink>}
+      />
 
-      {isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          <SkeletonBlock className="h-44 w-full" />
-          <SkeletonBlock className="h-44 w-full" />
-        </div>
-      ) : assignments.length === 0 ? (
-        <Card size="large">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <span className="flex items-center gap-3">
-              <PeopleTeamRegular fontSize={24} className="text-muted-foreground" aria-hidden />
-              <Text className="text-muted-foreground">{t('domain:overview.crew.empty')}</Text>
+      <div className={COLUMN_SCROLL}>
+        {isLoading ? (
+          <div className="flex flex-col gap-3">
+            <SkeletonBlock className="h-36 w-full" />
+            <SkeletonBlock className="h-36 w-full" />
+          </div>
+        ) : assignments.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 py-10 text-center">
+            <span className="bg-muted text-muted-foreground flex size-12 items-center justify-center rounded-full">
+              <PeopleTeamRegular fontSize={24} aria-hidden />
             </span>
+            <Text className="text-muted-foreground">{t('domain:overview.crew.empty')}</Text>
             {canPlan ? (
-              <LinkButton to={withCreate(routes.assignments)} icon={<AddRegular />}>
+              <LinkButton
+                to={withCreate(routes.assignments)}
+                appearance="primary"
+                icon={<AddRegular />}
+                className="mt-2"
+              >
                 {t('domain:overview.today.plan')}
               </LinkButton>
             ) : null}
           </div>
-        </Card>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {assignments.map((assignment) => (
-            <AssignmentTile
-              key={assignment.id}
-              assignment={assignment}
-              urls={urls}
-              phase={assignmentPhase(assignment.startsAt, assignment.endsAt, now)}
-            />
-          ))}
-        </div>
-      )}
-    </section>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {assignments.map((assignment) => (
+              <li key={assignment.id}>
+                <AssignmentTile
+                  assignment={assignment}
+                  urls={urls}
+                  phase={assignmentPhase(assignment.startsAt, assignment.endsAt, now)}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </Card>
   );
 }
 
@@ -143,16 +148,16 @@ function AssignmentTile({
 
   return (
     <Card
-      size="large"
+      size="medium"
+      appearance="outline"
       className={mergeClasses(
-        'h-full',
         phase === 'running' && styles.running,
         phase === 'done' && styles.done,
       )}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-0.5">
-          <Text weight="bold" size={400} truncate wrap={false}>
+          <Text weight="bold" size={300} truncate wrap={false}>
             {assignment.orderName}
           </Text>
           {assignment.location ? (
@@ -195,7 +200,7 @@ function AssignmentTile({
             >
               {crewLabel}
             </Text>
-            <CrewAvatars crew={assignment.crew} urls={urls} size={28} />
+            <CrewAvatars crew={assignment.crew} urls={urls} size={24} />
           </>
         ) : (
           <Text size={200} weight="medium" className={styles.noCrew}>
@@ -210,7 +215,7 @@ function AssignmentTile({
         </Text>
       ) : null}
 
-      <Divider className="mt-auto" />
+      <Divider />
       <div className="flex flex-wrap items-center gap-2">
         <LinkButton to={routes.order(assignment.orderId)} size="small" icon={<BriefcaseRegular />}>
           {t('domain:overview.crew.order')}

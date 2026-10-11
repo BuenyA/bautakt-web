@@ -13,6 +13,7 @@ import { routes, withCreate } from '@/lib/routes';
 import type { OverviewAbsence, TodayAssignment, TodayEvent } from '../useTodayData';
 import { CrewAvatars, MemberAvatar } from './CrewAvatars';
 import { DayTimeline } from './DayTimeline';
+import { COLUMN_SCROLL } from './layout';
 import { useNow } from './useNow';
 
 /**
@@ -58,86 +59,92 @@ export function TodayPlanCard({
         }
       />
 
-      {absences.length > 0 || allDay.length > 0 ? (
-        <div className="flex flex-col gap-2">
-          {absences.length > 0 ? (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <Text size={200} weight="semibold" className="text-text-secondary">
-                {t('domain:overview.today.absent')}
-              </Text>
-              {absences.map((absence) => (
-                <span key={absence.id} className="flex items-center gap-2">
-                  <MemberAvatar member={absence.member} urls={urls} size={24} />
-                  <span className="flex flex-col leading-tight">
-                    <Text size={200} weight="semibold">
-                      {absence.member.name}
-                    </Text>
-                    <Text size={100} className="text-text-secondary">
-                      {t(`domain:absences.types.${absence.type}`)}
-                      {absence.endDate !== absence.startDate
-                        ? ` · ${t('domain:overview.today.untilDate', { date: formatDate(absence.endDate) })}`
-                        : ''}
-                    </Text>
-                  </span>
-                  {absence.status === 'ausstehend' ? (
-                    <Badge appearance="tint" color="warning" size="small">
-                      {t('domain:overview.today.pendingSick')}
+      <div className={COLUMN_SCROLL}>
+        {absences.length > 0 || allDay.length > 0 ? (
+          <div className="flex flex-col gap-2">
+            {absences.length > 0 ? (
+              <div className="flex flex-col gap-1.5">
+                <Text size={200} weight="semibold" className="text-text-secondary">
+                  {t('domain:overview.today.absent')}
+                </Text>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                  {absences.map((absence) => (
+                    <span key={absence.id} className="flex items-center gap-2">
+                      <MemberAvatar member={absence.member} urls={urls} size={24} />
+                      <span className="flex flex-col leading-tight">
+                        <Text size={200} weight="semibold">
+                          {absence.member.name}
+                        </Text>
+                        <Text size={100} className="text-text-secondary">
+                          {t(`domain:absences.types.${absence.type}`)}
+                          {absence.endDate !== absence.startDate
+                            ? ` · ${t('domain:overview.today.untilDate', { date: formatDate(absence.endDate) })}`
+                            : ''}
+                        </Text>
+                      </span>
+                      {absence.status === 'ausstehend' ? (
+                        <Badge appearance="tint" color="warning" size="small">
+                          {t('domain:overview.today.pendingSick')}
+                        </Badge>
+                      ) : null}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            {allDay.length > 0 ? (
+              <div className="flex flex-col gap-1.5">
+                <Text size={200} weight="semibold" className="text-text-secondary">
+                  {t('domain:overview.today.allDay')}
+                </Text>
+                <div className="flex flex-wrap items-center gap-2">
+                  {allDay.map((event) => (
+                    <Badge
+                      key={event.id}
+                      appearance="tint"
+                      color={event.eventType === 'all' ? 'warning' : 'informative'}
+                      shape="rounded"
+                    >
+                      {event.title}
                     </Badge>
-                  ) : null}
-                </span>
-              ))}
-            </div>
-          ) : null}
-          {allDay.length > 0 ? (
-            <div className="flex flex-wrap items-center gap-2">
-              <Text size={200} weight="semibold" className="text-text-secondary">
-                {t('domain:overview.today.allDay')}
-              </Text>
-              {allDay.map((event) => (
-                <Badge
-                  key={event.id}
-                  appearance="tint"
-                  color={event.eventType === 'all' ? 'warning' : 'informative'}
-                  shape="rounded"
-                >
-                  {event.title}
-                </Badge>
-              ))}
-            </div>
-          ) : null}
-          <Divider />
-        </div>
-      ) : null}
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            <Divider />
+          </div>
+        ) : null}
 
-      {isError ? (
-        <MessageBar intent="error">{t('domain:overview.today.loadError')}</MessageBar>
-      ) : isLoading ? (
-        <SkeletonBlock className="h-72 w-full" />
-      ) : isEmpty ? (
-        <div className="flex flex-col items-center gap-2 py-10 text-center">
-          <span className="bg-muted text-muted-foreground flex size-12 items-center justify-center rounded-full">
-            <WeatherSunnyRegular fontSize={24} aria-hidden />
-          </span>
-          <Text weight="semibold">{t('domain:overview.today.emptyTitle')}</Text>
-          <Text size={200} className="text-muted-foreground">
-            {t('domain:overview.today.emptyDescription')}
-          </Text>
-          {canPlan ? (
-            <LinkButton
-              to={withCreate(routes.assignments)}
-              appearance="primary"
-              icon={<AddRegular />}
-              className="mt-2"
-            >
-              {t('domain:overview.today.plan')}
-            </LinkButton>
-          ) : null}
-        </div>
-      ) : isMobile ? (
-        <TodayList assignments={assignments} events={timed} urls={urls} />
-      ) : (
-        <DayTimeline assignments={assignments} events={timed} now={now} />
-      )}
+        {isError ? (
+          <MessageBar intent="error">{t('domain:overview.today.loadError')}</MessageBar>
+        ) : isLoading ? (
+          <SkeletonBlock className="h-72 w-full" />
+        ) : isEmpty ? (
+          <div className="flex flex-col items-center gap-2 py-10 text-center">
+            <span className="bg-muted text-muted-foreground flex size-12 items-center justify-center rounded-full">
+              <WeatherSunnyRegular fontSize={24} aria-hidden />
+            </span>
+            <Text weight="semibold">{t('domain:overview.today.emptyTitle')}</Text>
+            <Text size={200} className="text-muted-foreground">
+              {t('domain:overview.today.emptyDescription')}
+            </Text>
+            {canPlan ? (
+              <LinkButton
+                to={withCreate(routes.assignments)}
+                appearance="primary"
+                icon={<AddRegular />}
+                className="mt-2"
+              >
+                {t('domain:overview.today.plan')}
+              </LinkButton>
+            ) : null}
+          </div>
+        ) : isMobile ? (
+          <TodayList assignments={assignments} events={timed} urls={urls} />
+        ) : (
+          <DayTimeline assignments={assignments} events={timed} now={now} />
+        )}
+      </div>
     </Card>
   );
 }

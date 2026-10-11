@@ -14,9 +14,9 @@ import { useMyFirstName } from '../useTodayData';
 /**
  * Die Startseite: der ganze Betrieb auf einen Blick.
  *
- * Oben, was heute ist — wer fehlt, welche Termine anstehen, der Tag als
- * Zeitleiste — und daneben, was jemand anfassen muss. Darunter der Einsatzplan
- * mit einer Kachel je Einsatz, ganz unten die Zahlen des Jahres.
+ * Oben in einer Reihe: Einsatzplan (eine Kachel je Einsatz), der Tag als
+ * Zeitleiste mit Abwesenden und Terminen, und was jemand anfassen muss.
+ * Darunter die Zahlen des Jahres.
  * „Heute zuerst“, weil sich das über den Tag ändert; die Jahreszahlen nicht.
  *
  * ⚠️ Ohne Finanzrecht entfällt die Zahlenzeile ganz — nicht mit Nullen darin.
@@ -57,8 +57,22 @@ export function OverviewPage() {
     <div className="flex flex-col gap-6">
       <OverviewGreeting firstName={firstName.data ?? ''} chips={chips} />
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <div className="min-w-0 lg:col-span-2">
+      {/*
+        Eine Reihe auf breiten Bildschirmen: links der Einsatzplan (wer ist wo —
+        die erste Frage am Morgen, braucht die meiste Breite), in der Mitte der
+        Tag auf der Zeitachse, rechts die Aufgaben als Aktionsleiste.
+      */}
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-[5fr_4fr_4fr]">
+        <div className="min-w-0">
+          <CrewPlanSection
+            assignments={today.assignments}
+            urls={urls}
+            canPlan={access.canPlan}
+            isLoading={today.isLoading}
+            now={now}
+          />
+        </div>
+        <div className="min-w-0">
           <TodayPlanCard
             assignments={today.assignments}
             events={today.events}
@@ -69,7 +83,7 @@ export function OverviewPage() {
             isError={today.isError}
           />
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 lg:col-span-2 xl:col-span-1">
           <TodoPanel
             pendingAbsences={todo.pendingAbsences}
             newIncoming={todo.newIncoming}
@@ -81,14 +95,6 @@ export function OverviewPage() {
           />
         </div>
       </div>
-
-      <CrewPlanSection
-        assignments={today.assignments}
-        urls={urls}
-        canPlan={access.canPlan}
-        isLoading={today.isLoading}
-        now={now}
-      />
 
       {finance ? (
         <YearKpiRow
