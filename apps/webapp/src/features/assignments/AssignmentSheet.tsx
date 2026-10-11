@@ -1,4 +1,5 @@
 import {
+  cn,
   FormDrawer,
   FormDrawerDescription,
   FormDrawerFooter,
@@ -11,8 +12,10 @@ import {
   DrawerBody,
   DrawerHeader,
   Label,
+  makeStyles,
   Select,
   Textarea,
+  tokens,
 } from '@fluentui/react-components';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useId, useState } from 'react';
@@ -23,15 +26,22 @@ import { DatePicker, TimeInput } from '@/components/form/dateTime';
 import { useAuth } from '@/features/auth/useAuth';
 import { useMembership } from '@/features/company/useMembership';
 import { useOrders } from '@/features/orders/useOrders';
+import { useAbsences } from '@/features/team/useAbsences';
 import { useEmployees } from '@/features/team/useEmployees';
 import { toTimestamp } from '@/features/times/timeEntryDraft';
 import { readableDbError } from '@/lib/dbErrors';
+import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 import { supabase } from '@/lib/supabase';
 
+import { absenceConflict } from './absenceConflict';
 import { type AssignmentDraft, draftFromAssignment, emptyAssignment } from './assignmentDraft';
 import type { AssignmentDetail } from './useAssignment';
 import { useUpdateAssignment } from './useUpdateAssignment';
+
+const useStyles = makeStyles({
+  pending: { color: tokens.colorPaletteMarigoldForeground2 },
+});
 
 /**
  * Legt einen Einsatz in `work_assignments` an und die Zuordnung in
@@ -148,6 +158,7 @@ function AssignmentForm({
   onDone: () => void;
 }) {
   const orderFieldId = useId();
+  const styles = useStyles();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const create = useCreateAssignment();
@@ -156,6 +167,9 @@ function AssignmentForm({
   const isEdit = Boolean(assignment);
   const orders = useOrders();
   const employees = useEmployees();
+  // Ohne `canManageAbsences` liefert RLS nur die eigenen Abwesenheiten. Die
+  // Sperre selbst sitzt in der Datenbank und greift trotzdem.
+  const absences = useAbsences();
   const [draft, setDraft] = useState<AssignmentDraft>(() =>
     assignment
       ? draftFromAssignment({ ...assignment, employmentIds: assignedBefore })
@@ -357,10 +371,44 @@ function AssignmentForm({
             <div className="border-border flex max-h-48 flex-col gap-2 overflow-y-auto rounded-lg border p-3">
               {selectableEmployees.map((employee) => {
                 const checked = draft.employmentIds.includes(employee.id);
+                const { approved, pending } = absenceConflict(
+                  absences.data ?? [],
+                  employee.id,
+                  draft.startDate,
+                  draft.endDate,
+                );
+                const absence = approved ?? pending;
+                const absenceText = absence
+                  ? t(
+                      approved
+                        ? checked
+                          ? 'domain:assignments.absence.approvedAssigned'
+                          : 'domain:assignments.absence.approved'
+                        : 'domain:assignments.absence.pending',
+                      {
+                        type: t(`domain:absences.types.${absence.type}`, {
+                          defaultValue: absence.type,
+                        }),
+                        period:
+                          absence.start_date === absence.end_date
+                            ? formatDate(absence.start_date)
+                            : `${formatDate(absence.start_date)} – ${formatDate(absence.end_date)}`,
+                      },
+                    )
+                  : null;
                 return (
-                  <label key={employee.id} className="flex items-center gap-2 text-sm">
+                  <label
+                    key={employee.id}
+                    className={cn(
+                      'flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm',
+                      approved && !checked && 'text-text-subtle',
+                    )}
+                  >
                     <Checkbox
                       checked={checked}
+                      // Genehmigt abwesend: nicht neu einteilen (die Datenbank
+                      // lehnt es ab). Wer schon drin ist, lässt sich austragen.
+                      disabled={Boolean(approved) && !checked}
                       onChange={(_, { checked: value }) =>
                         toggleEmployee(employee.id, value === true)
                       }
@@ -369,6 +417,20 @@ function AssignmentForm({
                     {employee.ended_at ? (
                       <span className="text-text-subtle text-xs">
                         {t('domain:assignments.edit.formerEmployee')}
+                      </span>
+                    ) : null}
+                    {absenceText ? (
+                      <span
+                        className={cn(
+                          'text-xs',
+                          approved
+                            ? checked
+                              ? 'text-destructive font-medium'
+                              : 'text-text-subtle'
+                            : styles.pending,
+                        )}
+                      >
+                        {absenceText}
                       </span>
                     ) : null}
                   </label>

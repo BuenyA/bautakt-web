@@ -13,6 +13,8 @@
 const MESSAGES: Record<string, string> = {
   ABSENCE_WORK_ASSIGNMENT_CONFLICT:
     'In diesem Zeitraum ist für den Mitarbeiter schon ein Einsatz geplant. Erst den Einsatz umplanen, dann die Abwesenheit eintragen.',
+  WORK_ASSIGNMENT_ABSENCE_CONFLICT:
+    'Ein Mitarbeiter ist in diesem Zeitraum abwesend (genehmigt). Erst die Abwesenheit klären oder ihn aus dem Einsatz nehmen.',
   INVALID_DATE_RANGE: 'Das Ende liegt vor dem Beginn.',
   INVALID_STATUS: 'Über diese Abwesenheit wurde bereits entschieden.',
   ABSENCE_NOT_FOUND: 'Diese Abwesenheit existiert nicht mehr.',

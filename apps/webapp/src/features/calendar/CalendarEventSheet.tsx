@@ -18,6 +18,8 @@ import {
   DrawerHeader,
   Input,
   Label,
+  MessageBar,
+  MessageBarBody,
   Radio,
   RadioGroup,
   Select,
@@ -29,6 +31,9 @@ import { useTranslation } from 'react-i18next';
 
 import { useDismissLock } from '@/components/common/useDismissLock';
 import { DatePicker, TimeInput } from '@/components/form/dateTime';
+import { absenceConflict } from '@/features/assignments/absenceConflict';
+import { useMembership } from '@/features/company/useMembership';
+import { useAbsences } from '@/features/team/useAbsences';
 import { readableDbError } from '@/lib/dbErrors';
 
 import {
@@ -118,6 +123,22 @@ function EventForm({
   const recurrenceLocked = readOnly || Boolean(initial.occurrence?.isException);
   const showType = canManageAll || initial.eventType === 'all';
   const busy = save.isPending || remove.isPending;
+  const { data: membership } = useMembership();
+  const absences = useAbsences().data ?? [];
+  // Eigener Termin an einem eigenen Abwesenheitstag: nur ein Hinweis, kein
+  // Verbot — anders als beim Einsatz (Owner-Entscheidung 2026-10-11).
+  const ownAbsence =
+    !readOnly && draft.eventType === 'me' && membership?.employmentId
+      ? (() => {
+          const { approved, pending } = absenceConflict(
+            absences,
+            membership.employmentId,
+            draft.startDate,
+            draft.endDate,
+          );
+          return approved ?? pending;
+        })()
+      : null;
 
   useEffect(() => {
     onBusyChange(busy);
@@ -199,6 +220,22 @@ function EventForm({
       </DrawerHeader>
 
       <DrawerBody className="flex flex-col gap-4">
+        {ownAbsence ? (
+          <MessageBar intent="warning">
+            <MessageBarBody>
+              {t(
+                ownAbsence.status === 'genehmigt'
+                  ? 'domain:calendar.form.absenceHint'
+                  : 'domain:calendar.form.absenceHintPending',
+                {
+                  type: t(`domain:absences.types.${ownAbsence.type}`, {
+                    defaultValue: ownAbsence.type,
+                  }),
+                },
+              )}
+            </MessageBarBody>
+          </MessageBar>
+        ) : null}
         <div className="grid gap-2">
           <Label htmlFor={ids.title} required>
             {t('domain:calendar.form.title')}

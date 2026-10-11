@@ -296,6 +296,13 @@
       "saved": "Einsatz gespeichert.",
       "notAllowed": "Dafür fehlt die Berechtigung, oder der Einsatz wurde inzwischen gelöscht.",
       "formerEmployee": "ausgeschieden"
+    },
+    "absence": {
+      "approved": "{{type}} {{period}}",
+      "approvedAssigned": "{{type}} {{period}} – bitte austragen",
+      "pending": "{{type}} beantragt ({{period}})",
+      "onTile": "{{type}} (genehmigt)",
+      "onTilePending": "{{type}} beantragt"
     }
   },
   "times": {
@@ -845,6 +852,8 @@
       "before": "{{minutes}} Minuten vorher"
     },
     "form": {
+      "absenceHint": "In diesem Zeitraum hast du {{type}} (genehmigt). Speichern geht trotzdem.",
+      "absenceHintPending": "In diesem Zeitraum hast du {{type}} beantragt. Speichern geht trotzdem.",
       "newTitle": "Termin anlegen",
       "editTitle": "Termin bearbeiten",
       "viewTitle": "Termin",

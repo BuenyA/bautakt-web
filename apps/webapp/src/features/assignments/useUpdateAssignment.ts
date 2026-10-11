@@ -30,6 +30,20 @@ export function useUpdateAssignment(assignmentId: string, employmentIdsBefore: r
       const endsAt = toTimestamp(draft.endDate, draft.endTime);
       if (!startsAt || !endsAt) throw new Error('INVALID_PERIOD');
 
+      // Erst austragen, dann verschieben, dann eintragen: die Datenbank sperrt
+      // das Verschieben in eine genehmigte Abwesenheit eines Eingeteilten
+      // (WORK_ASSIGNMENT_ABSENCE_CONFLICT). Wer gerade ausgetragen wird, darf
+      // dabei nicht mehr mitzählen.
+      const { added, removed } = diffEmployees(employmentIdsBefore, draft.employmentIds);
+      if (removed.length > 0) {
+        const { error: removeError } = await supabase
+          .from('work_assignment_employees')
+          .delete()
+          .eq('assignment_id', assignmentId)
+          .in('employment_id', removed);
+        if (removeError) throw removeError;
+      }
+
       const { data, error } = await supabase
         .from('work_assignments')
         .update({
@@ -45,15 +59,6 @@ export function useUpdateAssignment(assignmentId: string, employmentIdsBefore: r
       if (error) throw error;
       if (!data || data.length === 0) throw new Error('NOT_UPDATED');
 
-      const { added, removed } = diffEmployees(employmentIdsBefore, draft.employmentIds);
-      if (removed.length > 0) {
-        const { error: removeError } = await supabase
-          .from('work_assignment_employees')
-          .delete()
-          .eq('assignment_id', assignmentId)
-          .in('employment_id', removed);
-        if (removeError) throw removeError;
-      }
       if (added.length > 0) {
         const { error: addError } = await supabase.from('work_assignment_employees').insert(
           added.map((employmentId) => ({
