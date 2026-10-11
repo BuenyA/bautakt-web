@@ -48,11 +48,14 @@ Geschäftsführer (Transaktion, nichts gespeichert): Serie anlegen, Ausnahme,
 
 ## Fallstricke
 
-⚠️ **Serien rechnen in UTC, wie die App.** Die App faltet mit der Bibliothek
-`rrule` auf, die in UTC rechnet: ein wöchentlicher Termin um 08:00 steht nach
-der Umstellung auf Winterzeit um 07:00. `calendarModel.ts` rechnet bewusst
-genauso, sonst fände das Web die Ausnahmen der App nicht (`recurrence_id` ist
-ein exakter Zeitpunkt). Wer das korrigiert, muss App und Web zusammen ändern.
+⚠️ **Serien rechnen in Ortszeit, in App und Web gleich.** Ein wöchentlicher
+Termin um 09:00 bleibt auch nach der Zeitumstellung um 09:00, wie
+`build_morning_briefing` auf dem Server. Bis 2026-10-11 rechneten App
+(`rrule`) und Web in UTC, und der Termin rutschte im Winter auf 08:00.
+Ausnahmen finden ihr Vorkommen deshalb über den **lokalen Tag** von
+`recurrence_id`, nicht über den exakten Zeitpunkt — so passen auch die alten,
+noch in UTC gerechneten Ausnahmen. Wer das ändert, ändert
+`calendarModel.ts` und `lib/calendar/recurrence.ts` der App zusammen.
 
 - RRULE-Format byte-gleich zu `buildRecurrenceRule` der App:
   `RRULE:FREQ=WEEKLY;INTERVAL=1;UNTIL=20261231T225959Z`.

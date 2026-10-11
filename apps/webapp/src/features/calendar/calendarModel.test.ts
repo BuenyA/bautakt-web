@@ -1,6 +1,6 @@
-// Die erwarteten Zeitpunkte stammen aus `rrule` 2.8.1 (wie die Handy-App) in
-// Europe/Berlin. Ohne feste Zeitzone wären die Fälle zur Zeitumstellung
-// rechnerabhängig.
+// Die erwarteten Zeitpunkte gelten für Europe/Berlin und stimmen mit der
+// Handy-App (`rrule` in Ortszeit) überein. Ohne feste Zeitzone wären die
+// Fälle zur Zeitumstellung rechnerabhängig.
 process.env.TZ = 'Europe/Berlin';
 
 import assert from 'node:assert/strict';
@@ -61,13 +61,27 @@ describe('buildRecurrenceRule / parseRecurrence', () => {
 });
 
 describe('expandOccurrences', () => {
-  it('wöchentlich in UTC wie rrule, auch über die Zeitumstellung', () => {
+  it('wöchentlich bleibt über die Zeitumstellung um dieselbe Ortszeit (08:00)', () => {
     const master = row({ id: 'm', recurrence_rule: 'RRULE:FREQ=WEEKLY;INTERVAL=1' });
     assert.deepEqual(starts([master], '2026-10-01T00:00:00Z', '2026-10-31T23:00:00Z'), [
       '2026-10-12T06:00:00.000Z',
       '2026-10-19T06:00:00.000Z',
-      '2026-10-26T06:00:00.000Z',
+      '2026-10-26T07:00:00.000Z',
     ]);
+  });
+
+  it('alte, in UTC gerechnete Ausnahmen finden ihr Vorkommen über den Tag', () => {
+    const master = row({ id: 'm', recurrence_rule: 'RRULE:FREQ=WEEKLY;INTERVAL=1' });
+    const oldCancel = row({
+      id: 'x',
+      parent_event_id: 'm',
+      recurrence_id: '2026-10-26T06:00:00.000Z',
+      is_cancelled: true,
+    });
+    assert.deepEqual(
+      starts([master, oldCancel], '2026-10-20T00:00:00Z', '2026-10-31T23:00:00Z'),
+      [],
+    );
   });
 
   it('endet mit UNTIL einschließlich des letzten Tages', () => {
@@ -78,8 +92,8 @@ describe('expandOccurrences', () => {
     assert.deepEqual(starts([master], '2026-10-01T00:00:00Z', '2026-12-01T00:00:00Z'), [
       '2026-10-12T06:00:00.000Z',
       '2026-10-19T06:00:00.000Z',
-      '2026-10-26T06:00:00.000Z',
-      '2026-11-02T06:00:00.000Z',
+      '2026-10-26T07:00:00.000Z',
+      '2026-11-02T07:00:00.000Z',
     ]);
   });
 
@@ -92,8 +106,8 @@ describe('expandOccurrences', () => {
     });
     assert.deepEqual(starts([master], '2026-01-01T00:00:00Z', '2026-07-01T00:00:00Z'), [
       '2026-01-31T07:00:00.000Z',
-      '2026-03-31T07:00:00.000Z',
-      '2026-05-31T07:00:00.000Z',
+      '2026-03-31T06:00:00.000Z',
+      '2026-05-31T06:00:00.000Z',
     ]);
   });
 

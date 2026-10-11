@@ -4,13 +4,14 @@
  *
  * Rein und ohne `@/`-Importe, damit `node --test` die Datei direkt lädt.
  *
- * ⚠️ Gleich wie die Handy-App, sonst passen Ausnahmen nicht. Die App faltet
- * mit der Bibliothek `rrule` auf, und die rechnet in UTC: ein wöchentlicher
- * Termin um 08:00 im Sommer steht nach der Zeitumstellung um 07:00. Eine
- * Ausnahme („nur dieser Termin“) trägt als `recurrence_id` genau den
- * Zeitpunkt dieses Vorkommens. Rechnete das Web lokal, fände es die
- * Ausnahmen der App nicht mehr. Deshalb rechnet `nthOccurrence` in UTC wie
- * `rrule` — Abweichungen bitte in beiden Apps gleichzeitig ändern.
+ * ⚠️ Gleich wie die Handy-App, sonst passen Ausnahmen nicht. Serien rechnen
+ * in Ortszeit: ein wöchentlicher Termin um 09:00 bleibt auch nach der
+ * Zeitumstellung um 09:00 (wie `build_morning_briefing` auf dem Server).
+ * Ausnahmen finden ihr Vorkommen über den lokalen Tag, nicht über den exakten
+ * Zeitpunkt: bis 2026-10-11 rechneten App und Web in UTC, und so alte
+ * Ausnahmen lägen nach der Umstellung eine Stunde daneben. Jede unterstützte
+ * Regel hat höchstens ein Vorkommen pro Tag. Änderungen hier bitte auch in
+ * `lib/calendar/recurrence.ts` der App.
  */
 
 export type EventType = 'me' | 'all';
@@ -189,25 +190,20 @@ export function parseRecurrence(rule: string | null | undefined): {
   return { type, untilIso: type === 'none' || !until ? null : localIsoDay(until) };
 }
 
-/** n-tes Vorkommen ab `start`, in UTC wie `rrule`; `null`, wenn es den Tag nicht gibt (31. im April). */
+/** n-tes Vorkommen ab `start` in Ortszeit; `null`, wenn es den Tag nicht gibt (31. im April). */
 function nthOccurrence(start: Date, type: RecurrenceType, n: number): Date | null {
-  if (type === 'daily') return new Date(start.getTime() + n * DAY_MS);
-  if (type === 'weekly') return new Date(start.getTime() + n * 7 * DAY_MS);
-  const year = start.getUTCFullYear() + (type === 'yearly' ? n : 0);
-  const month = start.getUTCMonth() + (type === 'monthly' ? n : 0);
-  const day = start.getUTCDate();
+  const day = start.getDate();
+  const month = start.getMonth();
   const date = new Date(
-    Date.UTC(
-      year,
-      month,
-      day,
-      start.getUTCHours(),
-      start.getUTCMinutes(),
-      start.getUTCSeconds(),
-      start.getUTCMilliseconds(),
-    ),
+    start.getFullYear() + (type === 'yearly' ? n : 0),
+    month + (type === 'monthly' ? n : 0),
+    day + (type === 'daily' ? n : type === 'weekly' ? 7 * n : 0),
+    start.getHours(),
+    start.getMinutes(),
+    start.getSeconds(),
+    start.getMilliseconds(),
   );
-  if (date.getUTCDate() !== day) return null;
+  if ((type === 'monthly' || type === 'yearly') && date.getDate() !== day) return null;
   return date;
 }
 
@@ -232,11 +228,11 @@ export function expandOccurrences(
   from: Date,
   to: Date,
 ): Occurrence[] {
-  const exceptionsByMaster = new Map<string, Map<number, CalendarEventRow>>();
+  const exceptionsByMaster = new Map<string, Map<string, CalendarEventRow>>();
   for (const row of rows) {
     if (!row.parent_event_id || !row.recurrence_id) continue;
-    const map = exceptionsByMaster.get(row.parent_event_id) ?? new Map<number, CalendarEventRow>();
-    map.set(new Date(row.recurrence_id).getTime(), row);
+    const map = exceptionsByMaster.get(row.parent_event_id) ?? new Map<string, CalendarEventRow>();
+    map.set(localIsoDay(new Date(row.recurrence_id)), row);
     exceptionsByMaster.set(row.parent_event_id, map);
   }
 
@@ -268,7 +264,8 @@ export function expandOccurrences(
     const duration = Math.max(0, new Date(master.ends_at).getTime() - start.getTime());
     const until = parseUntil(ruleParts(master.recurrence_rule).get('UNTIL'));
     const exceptions = exceptionsByMaster.get(master.id);
-    // Tägliche und wöchentliche Serien springen direkt vor den Zeitraum.
+    // Tägliche und wöchentliche Serien springen direkt vor den Zeitraum
+    // (eine Stunde Zeitumstellung fängt das `- 1` ab).
     const period = type === 'daily' ? DAY_MS : type === 'weekly' ? 7 * DAY_MS : 0;
     const firstStep = period
       ? Math.max(0, Math.floor((from.getTime() - duration - start.getTime()) / period) - 1)
@@ -283,7 +280,7 @@ export function expandOccurrences(
       if (occurrenceEnd < from) continue;
 
       const recurrenceId = occurrenceStart.toISOString();
-      const exception = exceptions?.get(occurrenceStart.getTime());
+      const exception = exceptions?.get(localIsoDay(occurrenceStart));
       if (exception) {
         if (exception.is_cancelled || !overlaps(exception.starts_at, exception.ends_at)) continue;
         result.push({

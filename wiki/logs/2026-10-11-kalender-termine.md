@@ -13,10 +13,9 @@ Owner-Vorgabe: Termine ließen sich bisher nur in der Handy-App anlegen.
 
 ## Was man wissen muss
 
-- Serien rechnen in UTC wie `rrule` in der App, damit Ausnahmen passen. Dadurch
-  verschiebt sich ein Serientermin nach der Zeitumstellung um eine Stunde — in
-  App und Web gleich. Korrektur nur in beiden zusammen.
-- In der App gefunden, nicht behoben: Beim Bearbeiten geht eine geänderte
-  Erinnerung verloren (`updateCalendarEvent` kopiert `reminderMinutes` nicht),
-  und „Alle Termine“ aus einem Vorkommen setzt den Serienbeginn auf dieses
-  Vorkommen.
+- Nachtrag am selben Tag: Serien rechnen jetzt in Ortszeit (App und Web),
+  Ausnahmen passen über den lokalen Tag. Vorher rutschte ein Serientermin nach
+  der Zeitumstellung um eine Stunde.
+- In der App behoben: Eine beim Bearbeiten geänderte Erinnerung ging verloren,
+  und „Alle Termine“ aus einem Vorkommen setzte den Serienbeginn auf dieses
+  Vorkommen. Das Web hatte beide Fehler nie.
