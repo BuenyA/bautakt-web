@@ -1,5 +1,7 @@
 import { toIsoDate } from '@bautakt/finance';
-import { Button, cn, Uicon } from '@bautakt/ui';
+import { cn } from '@bautakt/ui';
+import { Button } from '@fluentui/react-components';
+import { ChevronLeftRegular, ChevronRightRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -95,27 +97,17 @@ export function CalendarPage() {
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
-              size="icon"
-              className="size-9"
               aria-label={t('domain:calendar.previous')}
               onClick={() => shift(-1)}
-            >
-              <Uicon name="angle-left" size={16} />
-            </Button>
+              icon={<ChevronLeftRegular />}
+            />
             <span className="min-w-40 text-center text-sm font-medium">{monthLabel}</span>
             <Button
-              variant="outline"
-              size="icon"
-              className="size-9"
               aria-label={t('domain:calendar.next')}
               onClick={() => shift(1)}
-            >
-              <Uicon name="angle-right" size={16} />
-            </Button>
+              icon={<ChevronRightRegular />}
+            />
             <Button
-              variant="outline"
-              size="sm"
               onClick={() => {
                 const now = new Date();
                 setCursor({ year: now.getFullYear(), month: now.getMonth() });

@@ -1,5 +1,7 @@
 import { hasPermission } from '@bautakt/core';
-import { Badge, Button, Skeleton, Uicon } from '@bautakt/ui';
+import { ActionCard, SkeletonBlock, StatusBadge } from '@bautakt/ui';
+import { Button, Card, Link as FluentLink } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -57,13 +59,9 @@ export function OrderMaterials({ orderId }: { orderId: string }) {
         title={t('domain:orders.materials.loadErrorTitle')}
         description={t('domain:orders.materials.loadErrorDescription')}
         action={
-          <button
-            type="button"
-            className="text-sm font-medium text-primary hover:underline"
-            onClick={() => void refetch()}
-          >
+          <FluentLink as="button" onClick={() => void refetch()}>
             {t('common:action.retry')}
-          </button>
+          </FluentLink>
         }
       />
     );
@@ -78,8 +76,7 @@ export function OrderMaterials({ orderId }: { orderId: string }) {
         }
         action={
           canCreate ? (
-            <Button size="sm" onClick={openNew}>
-              <Uicon name="plus" size={16} />
+            <Button onClick={openNew} icon={<AddRegular />}>
               {t('domain:materialForm.newTitle')}
             </Button>
           ) : undefined
@@ -88,7 +85,7 @@ export function OrderMaterials({ orderId }: { orderId: string }) {
     );
   } else {
     body = (
-      <ul className="flex max-w-3xl flex-col gap-3">
+      <ul className="flex flex-col gap-3">
         {data.map((row) => (
           <MaterialCard
             key={row.id}
@@ -105,7 +102,7 @@ export function OrderMaterials({ orderId }: { orderId: string }) {
 
   return (
     <section className="flex flex-col gap-4" aria-labelledby="order-materials-title">
-      <div className="flex max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-2">
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <h2
           id="order-materials-title"
           className="text-foreground text-lg font-semibold tracking-tight"
@@ -113,8 +110,7 @@ export function OrderMaterials({ orderId }: { orderId: string }) {
           {t('domain:orders.materials.title')}
         </h2>
         {canCreate ? (
-          <Button size="sm" onClick={openNew}>
-            <Uicon name="plus" size={16} />
+          <Button appearance="primary" onClick={openNew} icon={<AddRegular />}>
             {t('domain:materialForm.newTitle')}
           </Button>
         ) : null}
@@ -160,15 +156,18 @@ function MaterialCard({
       ? t('domain:orders.materials.price', { price: formatCurrency(row.unitPrice) })
       : '',
   ].filter(Boolean);
-  const className =
-    'flex w-full flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3 text-left shadow-sm transition-colors';
+  // Fluent-`Card`; als `button`, wenn die Zeile bearbeitet werden darf.
+  const className = 'w-full text-left';
+  const bodyClassName = 'flex flex-col gap-1';
 
   const content = (
     <>
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <span className="text-foreground flex flex-wrap items-center gap-2 text-sm font-medium">
           {title}
-          {row.billed ? <Badge variant="muted">{t('domain:orders.materials.billed')}</Badge> : null}
+          {row.billed ? (
+            <StatusBadge tone="neutral">{t('domain:orders.materials.billed')}</StatusBadge>
+          ) : null}
         </span>
         <span className="text-muted-foreground text-sm whitespace-nowrap tabular-nums">
           {amount}
@@ -188,15 +187,13 @@ function MaterialCard({
   return (
     <li>
       {editable ? (
-        <button
-          type="button"
-          className={`${className} cursor-pointer hover:border-border-strong`}
-          onClick={onEdit}
-        >
-          {content}
-        </button>
+        <ActionCard className={className} onAction={onEdit}>
+          <div className={bodyClassName}>{content}</div>
+        </ActionCard>
       ) : (
-        <div className={className}>{content}</div>
+        <Card className={className}>
+          <div className={bodyClassName}>{content}</div>
+        </Card>
       )}
     </li>
   );
@@ -204,10 +201,10 @@ function MaterialCard({
 
 function MaterialListSkeleton({ label }: { label: string }) {
   return (
-    <div className="flex max-w-3xl flex-col gap-3" role="status">
+    <div className="flex flex-col gap-3" role="status">
       <span className="sr-only">{label}</span>
       {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-        <Skeleton key={index} className="h-16 rounded-xl" />
+        <SkeletonBlock key={index} className="h-16 rounded-xl" />
       ))}
     </div>
   );

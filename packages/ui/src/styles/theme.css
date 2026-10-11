@@ -1,321 +1,136 @@
 /**
- * Design-Tokens von Bautakt für das Web.
+ * Tailwind auf Fluent-Tokens.
  *
- * Portiert aus bautakt-app/app/constants/theme.ts (Stand 2026-08-26). Die dort
- * notierten WCAG-Kontrastwerte sind mitgenommen — sie sind der halbe Wert der
- * Datei. Die Werte sind berechnet (relative Luminanz nach WCAG 2.1) und gelten
- * gegen die jeweils genannte Fläche.
+ * Die Web-App nutzt Fluent UI 2 mit den Standard-Themes (`webLightTheme`,
+ * `webDarkTheme`, siehe `theme/themes.ts`). Tailwind bleibt nur für Layout und
+ * Abstände. Farben, Radien, Schatten und Schrift kommen aus den CSS-Variablen,
+ * die `FluentProvider` setzt (`--colorNeutralBackground1` …).
  *
- * ⚠️ Diese Datei ist für das Web kanonisch. Flächen, Text und Statusfarben
- * weichen nicht von bautakt-app ab: dort zuerst ändern, dann hierher holen.
- * Ausnahme, datiert 2026-10-01 (Owner-Override): Light- und Dark-Primary sind
- * Electric #0064E0. Die Designer-Spec hielt Light bei Marketing #3B86E0
- * (Stand 2026-09-24). Der Owner hat Light am selben Tag nachgezogen: Primary,
- * Ring, Accent-Foreground, Sidebar-Primary, Sidebar-Ring und statusFills.blue.
- * Die Light-Accent-Fläche ist #E6F0FC (10 % Electric auf Weiss), nicht das
- * Marketing-Wash #E8F2FC. Marketing pinnt #3B86E0 / #E8F2FC weiter in
- * apps/marketing/app/globals.css. Statusfarben ausser blue sind unangetastet.
- * Die Mobile-Palette zieht in einem eigenen PR nach.
+ * ⚠️ In dieser Datei steht kein einziger Hex-Wert. Die Utility-Namen
+ * (`bg-card`, `text-muted-foreground` …) bleiben, damit bestehende Klassen
+ * gültig sind, zeigen aber ausschließlich auf Fluent-Tokens. Eine neue Farbe
+ * bekommt einen neuen Namen hier, der auf ein Fluent-Token zeigt, nie einen Wert.
  *
- * Ausnahme, datiert 2026-10-01: die Dark-Flächen sind Meta-Feeling
- * (Charcoal + Electric #0064E0, weißer CTA-Text). Das ersetzt Dark Mode v2
- * (2026-09-24: #0F1115 / Card #1E2430 / Primary #4FA3E3).
- *
- * Die Variablennamen folgen der Konvention von shadcn/ui, damit dessen
- * Komponenten unverändert funktionieren. Bautakt-eigene Tokens stehen darunter.
+ * ⚠️ Die Variablen existieren nur innerhalb von `FluentProvider` (und in
+ * seinen Portalen). Ausserhalb davon greifen diese Klassen ins Leere.
  */
 
 @import 'tailwindcss';
 
-@custom-variant dark (&:is(.dark *));
-
-:root {
-  /* shadcn-Basis = --radius-lg. Die Stufen stehen explizit, nicht als calc,
-     damit Light und Dark dieselbe Weichheit haben (Meta-Feeling, 2026-10-01). */
-  --radius: 1rem;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-pill: 9999px;
-
-  /* Weiche Schatten. Dark überschreibt dieselben Namen. */
-  --shadow-sm: 0 1px 2px rgba(15, 17, 21, 0.06);
-  --shadow-md: 0 8px 24px rgba(15, 17, 21, 0.08);
-  --shadow-lg: 0 16px 40px rgba(15, 17, 21, 0.1);
-
-  /* --- Flächen / Elevation --- */
-  --background: #ffffff;
-  --background-second: #f7f8fa;
-  --background-third: #eceff3;
-  --card: #ffffff;
-  --card-raised: #ffffff; /* Light hat keine Extra-Stufe; Alias existiert in beiden Modi */
-  --popover: #ffffff;
-  --surface: #f4f6f8; /* minimal kühler, harmoniert mit dem blauen Primary */
-  --input: #f1f3f6; /* hebt sich bewusst von surface ab */
-  --border: #e4e7ec;
-  --border-strong: #cfd4dc;
-
-  /* --- Text --- */
-  --foreground: #111827; /* 17.74:1 auf background — AAA */
-  --card-foreground: #111827;
-  --popover-foreground: #111827;
-  --text-secondary: #374151; /* 10.31:1 — AAA */
-  --muted-foreground: #4b5563; /* 7.56:1 */
-  --text-subtle: #646d7a; /* war #9ca3af (2.54:1, FAIL) — jetzt 5.24:1 */
-  /* Bewusst schwach: ein Platzhalter darf sich nicht wie eingegebener Inhalt
-     lesen. 1.97:1 auf input. Siehe Hinweis am Dateiende. */
-  --text-placeholder: #a9b0ba;
-
-  /* Schleier hinter Dialog, AlertDialog und Sheet.
-     Light bleibt die Vordergrundfarbe bei 40 % — bisher `bg-foreground/40`
-     (#111827). Dark darf dieselbe Klasse nicht erben: --foreground ist dort
-     #fafafa, und 40 % Weiß über der Fläche wirkt hellgrau. */
-  --overlay: color-mix(in oklab, var(--foreground) 40%, transparent);
-
-  /* --- Primary --- */
-  /* Light = Electric #0064E0 (Owner-Override 2026-10-01; Spec hielt #3B86E0).
-     Gemessen (WCAG 2.1): #0064E0 auf #ffffff 5.39:1 — AA für normalen Text.
-     Weiss auf dem Primary ebenfalls 5.39:1. Accent #E6F0FC ist 10 % Electric
-     auf Weiss; Primary darauf 4.68:1 (AA). Der vorige Wash #E8F2FC war auf
-     #3B86E0 gemischt (Primary darauf nur 3.27:1). */
-  --primary: #0064e0; /* 5.39:1 auf background */
-  --primary-foreground: #ffffff; /* 5.39:1 */
-  --accent: #e6f0fc; /* primary darauf: 4.68:1 */
-  --accent-foreground: #0064e0;
-  --ring: #0064e0;
-
-  /* --- Sekundär / Muted --- */
-  --secondary: #f4f6f8;
-  --secondary-foreground: #374151;
-  --muted: #f4f6f8;
-
-  /* --- Danger --- */
-  --destructive: #d82121; /* war #EF4444 (3.76:1, FAIL) — jetzt 5.05:1 auf card */
-  --destructive-foreground: #ffffff;
-  --destructive-solid: #dc2626; /* weißer Text darauf 4.83:1 */
-  --destructive-bg: #fff5f5; /* destructive darauf 4.72:1 */
-
-  /* --- Success --- */
-  --success: #15803d; /* war #16a34a (3.05:1, FAIL) — jetzt 5.02:1 */
-  --success-foreground: #ffffff;
-  --success-bg: #f0fdf4; /* success darauf: 4.79:1 */
-
-  /* --- Warnung --- */
-  --warning: #ff5c00;
-  --warning-bg: rgba(255, 92, 0, 0.08);
-  --warning-border: rgba(255, 92, 0, 0.2);
-
-  /* --- Shell ---
-   * Expo-Docs-Sidebar (2026-09-24). Bewusst keine Aliase:
-   * --sidebar ist Weiss, nicht --background-second (#F7F8FA).
-   * --sidebar-accent ist die graue Active-Pill, nicht --accent (#E6F0FC).
-   * Sonst wird der aktive Eintrag blau. Primary bleibt Fokus-Ring und
-   * Badge-Zahl, nie die Active-Flaeche. Hover im Light ist dieselbe Flaeche
-   * wie Active; die Unterscheidung ist das Schriftgewicht. */
-  --sidebar: #ffffff;
-  --sidebar-foreground: #111827;
-  --sidebar-primary: #0064e0;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f3f4f6;
-  --sidebar-accent-foreground: #111827;
-  --sidebar-accent-hover: #f3f4f6;
-  --sidebar-border: #e4e7ec;
-  --sidebar-ring: #0064e0;
-}
-
-.dark {
-  /* Meta-Feeling (2026-10-01): neutrales Charcoal, Tiefe über Flächenstufen.
-     background, Sidebar (second), surface, third, card, card-raised.
-     Kein Blau-Cast mehr (Dark Mode v2 war #0F1115 / #1E2430). */
-
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
-
-  /* --- Flächen / Elevation --- */
-  --background: #111112;
-  --background-second: #161618; /* Sidebar */
-  --background-third: #1c1c1f;
-  --card: #1f1f22; /* eine Stufe über surface */
-  --card-raised: #28292c; /* innere Panels; nicht die Card-Fläche */
-  --popover: #1f1f22;
-  --surface: #1a1a1d;
-  --input: #1a1a1d; /* == surface, bewusst (wie im Light-Mode) */
-  --border: #2e2e32;
-  --border-strong: #3f3f46;
-
-  /* --- Text --- */
-  --foreground: #fafafa; /* 18.08:1 auf background, AAA */
-  --card-foreground: #fafafa;
-  --popover-foreground: #fafafa;
-  --text-secondary: #a1a1aa; /* 7.36:1 auf background — AAA */
-  --muted-foreground: #8b8b96; /* 5.60:1 auf background, 4.88:1 auf card */
-  --text-subtle: #71717a; /* 3.90:1 auf background, 3.40:1 auf card — unter AA 4.5:1 */
-  --text-placeholder: #52525b; /* 2.25:1 auf input, eingegebener Text 16.64:1 */
-
-  /* Schwarz bei 65 %. Siehe --overlay im Light. */
-  --overlay: color-mix(in oklab, black 65%, transparent);
-
-  /* --- Primary --- */
-  /* Electric #0064E0, gleich dem Light. Weiß darauf 5.39:1 (AA). Als Text
-     auf Canvas 3.50:1, auf Card 3.05:1 — über 3:1 für UI, unter AA 4.5:1
-     für Fließtext. */
-  --primary: #0064e0;
-  --primary-foreground: #ffffff; /* 5.39:1 auf primary */
-  --accent: #0a1628; /* primary darauf: 3.37:1 */
-  --accent-foreground: #0064e0;
-  --ring: #0064e0;
-
-  /* --- Sekundär / Muted --- */
-  --secondary: #1a1a1d;
-  --secondary-foreground: #a1a1aa;
-  --muted: #1a1a1d;
-
-  /* --- Danger --- */
-  --destructive: #f87171; /* 6.82:1 auf background, 5.94:1 auf card */
-  --destructive-foreground: #0f1115; /* 6.83:1 auf destructive; Weiß darauf nur 2.77:1 */
-  --destructive-solid: #dc2626;
-  --destructive-bg: #2a1518;
-
-  /* --- Success --- */
-  --success: #4ade80;
-  --success-foreground: #0f1115; /* 10.84:1 auf success */
-  --success-bg: #10231a;
-
-  /* --- Warnung --- */
-  --warning: #ff5c00;
-  --warning-bg: rgba(255, 92, 0, 0.14);
-  --warning-border: rgba(255, 92, 0, 0.28);
-
-  /* --- Shell ---
-   * Dieselben Rollen wie im Light. --sidebar hat denselben Wert wie
-   * --background-second, steht aber explizit, damit eine spaetere
-   * Flaechenaenderung die Leiste nicht mitzieht. Active-Pill = Card
-   * (grau, nie Primary-Fill), Hover = Surface. Badge-Text auf Electric
-   * ist weiss, wie --primary-foreground. */
-  --sidebar: #161618;
-  --sidebar-foreground: #fafafa;
-  --sidebar-primary: #0064e0;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1f1f22;
-  --sidebar-accent-foreground: #fafafa;
-  --sidebar-accent-hover: #1a1a1d;
-  --sidebar-border: #2e2e32;
-  --sidebar-ring: #0064e0;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-background-second: var(--background-second);
-  --color-background-third: var(--background-third);
-  --color-foreground: var(--foreground);
-  --color-overlay: var(--overlay);
-  --color-card: var(--card);
-  --color-card-raised: var(--card-raised);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-surface: var(--surface);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-destructive-solid: var(--destructive-solid);
-  --color-destructive-bg: var(--destructive-bg);
-  --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
-  --color-success-bg: var(--success-bg);
-  --color-warning: var(--warning);
-  --color-warning-bg: var(--warning-bg);
-  --color-warning-border: var(--warning-border);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent-hover: var(--sidebar-accent-hover);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-border: var(--border);
-  --color-border-strong: var(--border-strong);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-text-secondary: var(--text-secondary);
-  --color-text-subtle: var(--text-subtle);
-  --color-text-placeholder: var(--text-placeholder);
+  /* --- Flächen --- */
+  --color-background: var(--colorNeutralBackground1);
+  --color-background-second: var(--colorNeutralBackground2);
+  --color-background-third: var(--colorNeutralBackground3);
+  --color-card: var(--colorNeutralBackground1);
+  --color-card-raised: var(--colorNeutralBackground3);
+  --color-popover: var(--colorNeutralBackground1);
+  --color-surface: var(--colorNeutralBackground3);
+  --color-muted: var(--colorNeutralBackground3);
+  --color-secondary: var(--colorNeutralBackground3);
+  --color-input: var(--colorNeutralBackground1);
+  --color-overlay: var(--colorBackgroundOverlay);
 
-  /* inline, damit die Utilities `var(--shadow-*)` lesen und .dark die
-     Schatten umschaltet. Die Literale stehen unlayered in :root / .dark
-     und gewinnen gegen die Selbstreferenz in @layer theme. */
-  --radius-sm: var(--radius-sm);
-  --radius-md: var(--radius-md);
-  --radius-lg: var(--radius-lg);
-  --radius-xl: var(--radius-xl);
-  --radius-pill: var(--radius-pill);
-  --shadow-sm: var(--shadow-sm);
-  --shadow-md: var(--shadow-md);
-  --shadow-lg: var(--shadow-lg);
+  /* --- Text --- */
+  --color-foreground: var(--colorNeutralForeground1);
+  --color-card-foreground: var(--colorNeutralForeground1);
+  --color-popover-foreground: var(--colorNeutralForeground1);
+  --color-text-secondary: var(--colorNeutralForeground2);
+  --color-secondary-foreground: var(--colorNeutralForeground2);
+  --color-muted-foreground: var(--colorNeutralForeground3);
+  --color-text-subtle: var(--colorNeutralForeground3);
+  --color-text-placeholder: var(--colorNeutralForeground4);
+
+  /* --- Brand ---
+     `primary` ist die Brand-Fläche, `brand` die Brand-Schrift. Getrennt, weil
+     Fluent für Text auf der Fläche (dunkel #479ef5) einen anderen Ton nimmt als
+     für die Fläche selbst. Text in Brand-Farbe ist immer `text-brand`. */
+  --color-primary: var(--colorBrandBackground);
+  --color-primary-foreground: var(--colorNeutralForegroundOnBrand);
+  --color-brand: var(--colorBrandForeground1);
+  --color-brand-stroke: var(--colorCompoundBrandStroke);
+  --color-accent: var(--colorBrandBackground2);
+  --color-accent-foreground: var(--colorBrandForeground2);
+
+  /* --- Status --- */
+  --color-destructive: var(--colorStatusDangerForeground1);
+  --color-destructive-bg: var(--colorStatusDangerBackground1);
+  --color-destructive-border: var(--colorStatusDangerBorder1);
+  --color-success: var(--colorStatusSuccessForeground1);
+  --color-success-bg: var(--colorStatusSuccessBackground1);
+  --color-warning: var(--colorStatusWarningForeground1);
+  --color-warning-bg: var(--colorStatusWarningBackground1);
+  --color-warning-border: var(--colorStatusWarningBorder1);
+
+  /* --- Linien und Fokus --- */
+  --color-border: var(--colorNeutralStroke2);
+  --color-border-strong: var(--colorNeutralStroke1);
+  --color-ring: var(--colorStrokeFocus2);
+
+  /* --- Radien: Fluent-Stufen statt Tailwind-Defaults --- */
+  --radius-xs: var(--borderRadiusSmall);
+  --radius-sm: var(--borderRadiusMedium);
+  --radius-md: var(--borderRadiusMedium);
+  --radius-lg: var(--borderRadiusLarge);
+  --radius-xl: var(--borderRadiusXLarge);
+  --radius-2xl: var(--borderRadiusXLarge);
+
+  /* --- Schatten --- */
+  --shadow-xs: var(--shadow2);
+  --shadow-sm: var(--shadow4);
+  --shadow-md: var(--shadow8);
+  --shadow-lg: var(--shadow16);
+
+  /* --- Schrift: Fluent-Typo-Rampe --- */
+  --font-sans: var(--fontFamilyBase);
+  --font-mono: var(--fontFamilyMonospace);
+  --text-xs: var(--fontSizeBase200);
+  --text-xs--line-height: var(--lineHeightBase200);
+  --text-sm: var(--fontSizeBase300);
+  --text-sm--line-height: var(--lineHeightBase300);
+  --text-base: var(--fontSizeBase400);
+  --text-base--line-height: var(--lineHeightBase400);
+  --text-lg: var(--fontSizeBase500);
+  --text-lg--line-height: var(--lineHeightBase500);
+  --text-xl: var(--fontSizeBase600);
+  --text-xl--line-height: var(--lineHeightBase600);
+  --text-2xl: var(--fontSizeHero700);
+  --text-2xl--line-height: var(--lineHeightHero700);
+  --text-3xl: var(--fontSizeHero800);
+  --text-3xl--line-height: var(--lineHeightHero800);
+  --font-weight-normal: var(--fontWeightRegular);
+  --font-weight-medium: var(--fontWeightMedium);
+  --font-weight-semibold: var(--fontWeightSemibold);
+  --font-weight-bold: var(--fontWeightBold);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
+
+  /* Fluents Eingabefelder sind `inline-flex` ohne Breite und nehmen damit die
+     Breite ihres Inhalts (rund 20 Zeichen) statt der ihrer Spalte. In einem
+     Formular-Raster schieben sie sich dann über das Nachbarfeld. In `base`,
+     damit eine Utility wie `sm:w-80` (Suchfeld) weiter gewinnt. */
+  .fui-Input,
+  .fui-Textarea,
+  .fui-Select {
+    width: 100%;
+    min-width: 0;
   }
 }
 
 /**
- * Sidebar-Scrollbar. Nur die scrollende Inhaltsregion (`SidebarContent`,
- * `data-sidebar="content"` mit overflow-y-auto) — nicht die Seite und nicht
- * der Sidebar-Wrapper, der `overflow-hidden` trägt.
- * Firefox: thin + Farbe. WebKit: 6px, Track transparent, Thumb --border-strong.
+ * Rahmen um Dialoge und Drawer im Dunkelmodus (Owner-Entscheidung 2026-10-10).
+ *
+ * Im Dunkeln liegt die Fläche fast ununterscheidbar auf dem Overlay. Ein
+ * 1-px-Rahmen in `colorNeutralStroke1` hebt sie ab. Kein Token, deshalb hier:
+ * `data-theme` setzt der ThemeProvider der App auf `<html>`. `fui-*` sind die
+ * stabilen Klassennamen, die Fluent für genau solche Overrides vergibt. Die
+ * Spezifität (Attribut + Klasse) gewinnt gegen Griffels atomare Klassen.
  */
-[data-sidebar='content'] {
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-strong) transparent;
+:root[data-theme='dark'] .fui-DialogSurface,
+:root[data-theme='dark'] .fui-OverlayDrawer {
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
 }
-
-[data-sidebar='content']::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-[data-sidebar='content']::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-[data-sidebar='content']::-webkit-scrollbar-thumb {
-  background-color: var(--border-strong);
-  border-radius: 999px;
-}
-
-[data-sidebar='content']::-webkit-scrollbar-thumb:hover {
-  background-color: var(--muted-foreground);
-}
-
-/**
- * Bewusste Abweichung von WCAG AA
- *
- * --text-placeholder liegt in beiden Modi bei etwa 2:1 (Light 1.97:1 auf
- * input, Dark 2.25:1 auf input) und damit unter der AA-Schwelle von 4.5:1.
- * Das ist eine bewusste Entscheidung: ein Platzhalter,
- * der wie ein bereits eingegebener Wert aussieht, ist selbst ein
- * Usability-Fehler. Abgemildert dadurch, dass jedes Feld ein sichtbares Label
- * trägt — der Platzhalter ist Hinweis, nicht Beschriftung.
- *
- * Deshalb ausschließlich für Placeholder verwenden. Für echten Sekundärtext
- * gehören --muted-foreground / --text-subtle her.
- *
- * --border / --border-strong liegen absichtlich unter AA: sie sind dekorative
- * Trenner und nicht das alleinige Erkennungsmerkmal einer Komponente.
- */

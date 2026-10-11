@@ -48,7 +48,10 @@ export type ChecklistItemDraft = {
   assigneeName: string;
 };
 
-/** Wert der Auswahl „Niemand“. Radix Select nimmt keinen leeren String. */
+/**
+ * Wert der Auswahl „Niemand“. Kein leerer String: der ist im Formular
+ * „noch nichts gewählt“, „Niemand“ ist eine bewusste Wahl.
+ */
 export const CHECKLIST_UNASSIGNED = 'none';
 
 export type ChecklistFieldIssue = 'title' | 'date' | 'assignee';

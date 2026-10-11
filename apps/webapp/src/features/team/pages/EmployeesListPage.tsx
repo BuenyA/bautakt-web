@@ -1,4 +1,6 @@
-import { Badge, Button, DataTable, type DataTableColumn, Uicon } from '@bautakt/ui';
+import { DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
+import { Button, Link as FluentLink } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
@@ -6,6 +8,7 @@ import { useSearchParams } from 'react-router';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ListFilterChips } from '@/components/common/ListFilterChips';
 import { PageHeader } from '@/components/common/PageHeader';
+import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
@@ -27,6 +30,8 @@ export function EmployeesListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = employeeFilterFromSearch(searchParams.get('status'));
   const [draft, setDraft] = useState<EmployeeDraft | null>(null);
+  // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel.
+  useCreateFromUrl(canManage, () => setDraft(emptyEmployee()));
   const employees = useEmployees();
   const { data, isError, refetch } = employees;
 
@@ -82,7 +87,7 @@ export function EmployeesListPage() {
               {row.original.name || t('domain:employees.unnamed')}
             </span>
             {row.original.ended_at ? (
-              <Badge variant="muted">{t('domain:employees.former')}</Badge>
+              <StatusBadge tone="neutral">{t('domain:employees.former')}</StatusBadge>
             ) : null}
           </span>
         ),
@@ -130,13 +135,9 @@ export function EmployeesListPage() {
           title={t('domain:employees.loadErrorTitle')}
           description={t('domain:employees.loadErrorDescription')}
           action={
-            <button
-              type="button"
-              className="text-primary cursor-pointer text-sm font-medium hover:underline"
-              onClick={() => void refetch()}
-            >
+            <FluentLink as="button" onClick={() => void refetch()}>
               {t('common:action.retry')}
-            </button>
+            </FluentLink>
           }
         />
       </div>
@@ -150,8 +151,11 @@ export function EmployeesListPage() {
         description={t('domain:employees.description')}
         actions={
           canManage ? (
-            <Button size="sm" onClick={() => setDraft(emptyEmployee())}>
-              <Uicon name="plus" size={16} />
+            <Button
+              appearance="primary"
+              onClick={() => setDraft(emptyEmployee())}
+              icon={<AddRegular />}
+            >
               {t('domain:employeeForm.newTitle')}
             </Button>
           ) : null

@@ -1,4 +1,6 @@
-import { Button, Checkbox, Skeleton, toast, Uicon } from '@bautakt/ui';
+import { SkeletonBlock, toast } from '@bautakt/ui';
+import { Button, Card, Checkbox, Link as FluentLink } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -69,13 +71,9 @@ export function OrderChecklist({ orderId }: { orderId: string }) {
         title={t('domain:orders.checklist.loadErrorTitle')}
         description={t('domain:orders.checklist.loadErrorDescription')}
         action={
-          <button
-            type="button"
-            className="text-sm font-medium text-primary hover:underline"
-            onClick={() => void refetch()}
-          >
+          <FluentLink as="button" onClick={() => void refetch()}>
             {t('common:action.retry')}
-          </button>
+          </FluentLink>
         }
       />
     );
@@ -90,8 +88,7 @@ export function OrderChecklist({ orderId }: { orderId: string }) {
         }
         action={
           canEdit ? (
-            <Button size="sm" onClick={openNew}>
-              <Uicon name="plus" size={16} />
+            <Button onClick={openNew} icon={<AddRegular />}>
               {t('domain:checklistForm.newTitle')}
             </Button>
           ) : undefined
@@ -100,7 +97,7 @@ export function OrderChecklist({ orderId }: { orderId: string }) {
     );
   } else {
     body = (
-      <ul className="flex max-w-3xl flex-col gap-3">
+      <ul className="flex flex-col gap-3">
         {items.map((item) => (
           <ChecklistRow
             key={item.id}
@@ -116,7 +113,7 @@ export function OrderChecklist({ orderId }: { orderId: string }) {
 
   return (
     <section className="flex flex-col gap-4" aria-labelledby="order-checklist-title">
-      <div className="flex max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-2">
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <div className="flex flex-col gap-1">
           <h2
             id="order-checklist-title"
@@ -131,8 +128,7 @@ export function OrderChecklist({ orderId }: { orderId: string }) {
           ) : null}
         </div>
         {canEdit ? (
-          <Button size="sm" onClick={openNew}>
-            <Uicon name="plus" size={16} />
+          <Button appearance="primary" onClick={openNew} icon={<AddRegular />}>
             {t('domain:checklistForm.newTitle')}
           </Button>
         ) : null}
@@ -178,8 +174,6 @@ function ChecklistRow({
       ? t('domain:checklistForm.assigneeEnded', { name: item.assignee })
       : item.assignee
     : '';
-  const className =
-    'flex w-full items-start gap-3 rounded-xl border border-border bg-card px-4 py-3 shadow-sm';
 
   const text = (
     <>
@@ -205,38 +199,44 @@ function ChecklistRow({
   );
 
   return (
-    <li className={editable ? `${className} hover:border-border-strong` : className}>
-      <Checkbox
-        className="mt-0.5"
-        checked={item.isDone}
-        disabled={!editable}
-        aria-label={t('domain:orders.checklist.toggle', { title })}
-        onCheckedChange={(value) => {
-          if (value === 'indeterminate') return;
-          onToggle(value === true);
-        }}
-      />
-      {editable ? (
-        <button
-          type="button"
-          className="flex min-w-0 flex-1 flex-col gap-1 text-left"
-          onClick={onEdit}
-        >
-          {text}
-        </button>
-      ) : (
-        <div className="flex min-w-0 flex-1 flex-col gap-1">{text}</div>
-      )}
+    <li>
+      {/* Fluent-`Card` als Fläche. Der Text daneben ist ein ungestylter Knopf: er
+          öffnet die Bearbeitung, ohne dass der Klick auf die Checkbox es tut. */}
+      <Card>
+        <div className="flex items-start gap-3">
+          <Checkbox
+            className="mt-0.5"
+            checked={item.isDone}
+            disabled={!editable}
+            aria-label={t('domain:orders.checklist.toggle', { title })}
+            onChange={(_, { checked: value }) => {
+              if (value === 'mixed') return;
+              onToggle(value);
+            }}
+          />
+          {editable ? (
+            <button
+              type="button"
+              className="flex min-w-0 flex-1 cursor-pointer flex-col gap-1 text-left"
+              onClick={onEdit}
+            >
+              {text}
+            </button>
+          ) : (
+            <div className="flex min-w-0 flex-1 flex-col gap-1">{text}</div>
+          )}
+        </div>
+      </Card>
     </li>
   );
 }
 
 function ChecklistSkeleton({ label }: { label: string }) {
   return (
-    <div className="flex max-w-3xl flex-col gap-3" role="status">
+    <div className="flex flex-col gap-3" role="status">
       <span className="sr-only">{label}</span>
       {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-        <Skeleton key={index} className="h-16 rounded-xl" />
+        <SkeletonBlock key={index} className="h-16 rounded-xl" />
       ))}
     </div>
   );

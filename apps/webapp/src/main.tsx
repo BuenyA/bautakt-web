@@ -6,6 +6,7 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router';
 
 import { Providers } from '@/app/Providers';
+import { ThemeProvider } from '@/app/ThemeProvider';
 import { BootErrorPage } from '@/components/common/BootErrorPage';
 import { supabaseBootError } from '@/lib/supabase';
 import { router } from '@/router';
@@ -23,14 +24,19 @@ if (import.meta.env.DEV && window.location.pathname.startsWith('/dev/datum')) {
   void import('@/dev/DatePickerHarness').then(({ DatePickerHarness }) => {
     root.render(
       <StrictMode>
-        <DatePickerHarness />
+        <ThemeProvider>
+          <DatePickerHarness />
+        </ThemeProvider>
       </StrictMode>,
     );
   });
 } else if (supabaseBootError) {
   root.render(
     <StrictMode>
-      <BootErrorPage message={supabaseBootError} />
+      {/* Ohne Provider gäbe es die Fluent-Variablen nicht, auf die die Klassen zeigen. */}
+      <ThemeProvider>
+        <BootErrorPage message={supabaseBootError} />
+      </ThemeProvider>
     </StrictMode>,
   );
 } else {

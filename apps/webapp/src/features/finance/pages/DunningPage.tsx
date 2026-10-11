@@ -6,27 +6,24 @@ import {
   type ReceivableItem,
   todayIso,
 } from '@bautakt/finance';
+import { DataTable, type DataTableColumn, StatusBadge, toast } from '@bautakt/ui';
 import {
-  Badge,
   Button,
-  DataTable,
-  type DataTableColumn,
   Dialog,
+  DialogActions,
+  DialogBody,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
+  DialogSurface,
   DialogTitle,
   Input,
   Label,
-  toast,
-} from '@bautakt/ui';
+} from '@fluentui/react-components';
 import { type FormEvent, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
+import { RouterLink } from '@/components/common/RouterLink';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { readableDbError } from '@/lib/dbErrors';
@@ -105,12 +102,11 @@ export function DunningPage() {
         accessorFn: (row) => row.document.document_number ?? '',
         header: t('domain:receivables.columns.number'),
         cell: ({ row }) => (
-          <Link
-            to={routes.invoice(row.original.document.id)}
-            className="text-foreground hover:text-primary font-medium whitespace-nowrap hover:underline"
-          >
-            {row.original.document.document_number || t('domain:invoices.noNumber')}
-          </Link>
+          <RouterLink appearance="subtle" to={routes.invoice(row.original.document.id)}>
+            <span className="font-medium whitespace-nowrap">
+              {row.original.document.document_number || t('domain:invoices.noNumber')}
+            </span>
+          </RouterLink>
         ),
       },
       {
@@ -137,11 +133,11 @@ export function DunningPage() {
         header: t('domain:dunning.columns.level'),
         cell: ({ row }) =>
           row.original.level === 0 ? (
-            <Badge variant="muted">{t('domain:dunning.noNotice')}</Badge>
+            <StatusBadge tone="neutral">{t('domain:dunning.noNotice')}</StatusBadge>
           ) : (
-            <Badge variant="warning">
+            <StatusBadge tone="warning">
               {t('domain:dunning.levelLabel', { level: row.original.level })}
-            </Badge>
+            </StatusBadge>
           ),
       },
       {
@@ -159,7 +155,7 @@ export function DunningPage() {
         cell: ({ row }) =>
           access.canWriteSalesDocuments ? (
             <span className="flex justify-end">
-              <Button variant="outline" size="sm" onClick={() => openFor(row.original)}>
+              <Button onClick={() => openFor(row.original)}>
                 {t('domain:dunning.createAction', { level: row.original.level + 1 })}
               </Button>
             </span>
@@ -187,59 +183,59 @@ export function DunningPage() {
         }
       />
 
-      <Dialog open={pending !== null} onOpenChange={(open) => !open && setPending(null)}>
-        <DialogContent>
-          <form onSubmit={(event) => void onConfirm(event)} className="grid gap-4">
-            <DialogHeader>
+      <Dialog open={pending !== null} onOpenChange={(_, { open }) => !open && setPending(null)}>
+        <DialogSurface>
+          <DialogBody>
+            <form onSubmit={(event) => void onConfirm(event)} className="grid gap-4">
               <DialogTitle>
                 {t('domain:dunning.confirmTitle', { level: (pending?.level ?? 0) + 1 })}
               </DialogTitle>
-              <DialogDescription>
-                {t('domain:dunning.confirmDescription', {
-                  number: pending?.document.document_number ?? '',
-                  amount: formatMoney(pending?.openMinor ?? 0),
-                })}
-              </DialogDescription>
-            </DialogHeader>
-
-            {/* Bewusst ohne Vorbelegung: Gebuehr und Zinsen haengen an Vertrag
+              <DialogContent className="flex flex-col gap-3">
+                <p>
+                  {t('domain:dunning.confirmDescription', {
+                    number: pending?.document.document_number ?? '',
+                    amount: formatMoney(pending?.openMinor ?? 0),
+                  })}
+                </p>
+                {/* Bewusst ohne Vorbelegung: Gebuehr und Zinsen haengen an Vertrag
                 und Verzugsdauer. Ein geratener Standardwert landete sonst
                 ungeprueft auf der Mahnung. */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="grid gap-2">
-                <Label htmlFor="mahngebuehr">{t('domain:dunning.fee')}</Label>
-                <Input
-                  id="mahngebuehr"
-                  inputMode="decimal"
-                  className="text-right tabular-nums"
-                  placeholder="0,00"
-                  value={fee}
-                  onChange={(event) => setFee(event.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="verzugszinsen">{t('domain:dunning.interest')}</Label>
-                <Input
-                  id="verzugszinsen"
-                  inputMode="decimal"
-                  className="text-right tabular-nums"
-                  placeholder="0,00"
-                  value={interest}
-                  onChange={(event) => setInterest(event.target.value)}
-                />
-              </div>
-            </div>
-
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setPending(null)}>
-                {t('common:action.cancel')}
-              </Button>
-              <Button type="submit" disabled={createNotice.isPending}>
-                {t('domain:dunning.confirmAction')}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-2">
+                    <Label htmlFor="mahngebuehr">{t('domain:dunning.fee')}</Label>
+                    <Input
+                      id="mahngebuehr"
+                      inputMode="decimal"
+                      input={{ className: 'text-right tabular-nums' }}
+                      placeholder="0,00"
+                      value={fee}
+                      onChange={(event) => setFee(event.target.value)}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="verzugszinsen">{t('domain:dunning.interest')}</Label>
+                    <Input
+                      id="verzugszinsen"
+                      inputMode="decimal"
+                      input={{ className: 'text-right tabular-nums' }}
+                      placeholder="0,00"
+                      value={interest}
+                      onChange={(event) => setInterest(event.target.value)}
+                    />
+                  </div>
+                </div>
+              </DialogContent>
+              <DialogActions>
+                <Button type="button" onClick={() => setPending(null)}>
+                  {t('common:action.cancel')}
+                </Button>
+                <Button appearance="primary" type="submit" disabled={createNotice.isPending}>
+                  {t('domain:dunning.confirmAction')}
+                </Button>
+              </DialogActions>
+            </form>
+          </DialogBody>
+        </DialogSurface>
       </Dialog>
     </div>
   );

@@ -1,4 +1,4 @@
-import { Badge } from '@bautakt/ui';
+import { StatusBadge, type StatusTone } from '@bautakt/ui';
 import { useTranslation } from 'react-i18next';
 
 const KNOWN_STATUSES = [
@@ -9,27 +9,27 @@ const KNOWN_STATUSES = [
   'paid',
   'overdue',
   'cancelled',
-] as const;
+];
 
 /**
  * Farbe folgt der Bedeutung: bezahlt gruen, ueberfaellig rot, Entwurf neutral.
  * „Versendet" bleibt bewusst blass — versendet heisst noch nicht bezahlt.
  */
-function statusVariant(status: string) {
+function statusTone(status: string): StatusTone {
   switch (status) {
     case 'paid':
-      return 'success' as const;
+      return 'success';
     case 'overdue':
-      return 'destructive' as const;
+      return 'danger';
     case 'partially_paid':
-      return 'warning' as const;
+      return 'warning';
     case 'sent':
     case 'issued':
-      return 'accent' as const;
+      return 'brand';
     case 'cancelled':
-      return 'outline' as const;
+      return 'outline';
     default:
-      return 'muted' as const;
+      return 'neutral';
   }
 }
 
@@ -38,8 +38,8 @@ export function DocumentStatusBadge({ status }: { status: string }) {
   const known = (KNOWN_STATUSES as readonly string[]).includes(status);
 
   return (
-    <Badge variant={statusVariant(status)}>
+    <StatusBadge tone={statusTone(status)}>
       {known ? t(`domain:documentStatus.${status}`) : status}
-    </Badge>
+    </StatusBadge>
   );
 }

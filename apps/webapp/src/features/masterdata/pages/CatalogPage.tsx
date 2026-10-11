@@ -1,5 +1,5 @@
 import { eurosToMinor, formatMoney } from '@bautakt/finance';
-import { Badge, DataTable, type DataTableColumn } from '@bautakt/ui';
+import { DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -27,7 +27,7 @@ export function CatalogPage() {
           <span className="flex items-center gap-2">
             <span className="text-foreground font-medium">{row.original.title}</span>
             {!row.original.is_active ? (
-              <Badge variant="muted">{t('domain:catalog.inactive')}</Badge>
+              <StatusBadge tone="neutral">{t('domain:catalog.inactive')}</StatusBadge>
             ) : null}
           </span>
         ),

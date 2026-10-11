@@ -1,8 +1,9 @@
-import { Button, Input, Label } from '@bautakt/ui';
+import { Button, Input, Label, Link } from '@fluentui/react-components';
 import { type FormEvent, type ReactNode, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 
+import { LinkButton } from '@/components/common/LinkButton';
+import { RouterLink } from '@/components/common/RouterLink';
 import { type LegalPage, legalUrl } from '@/lib/legal';
 import { routes } from '@/lib/routes';
 
@@ -42,9 +43,7 @@ export function RegisterPage() {
     return (
       <AuthCard title={t('auth:signUp.title')}>
         <p className="text-sm text-muted-foreground">{t('auth:signUp.checkInbox')}</p>
-        <Button asChild variant="outline">
-          <Link to={routes.login}>{t('auth:signUp.toSignIn')}</Link>
-        </Button>
+        <LinkButton to={routes.login}>{t('auth:signUp.toSignIn')}</LinkButton>
       </AuthCard>
     );
   }
@@ -52,7 +51,7 @@ export function RegisterPage() {
   const footer = (
     <Trans
       i18nKey="auth:signUp.hasAccount"
-      components={{ signin: <Link to={routes.login} className="text-primary hover:underline" /> }}
+      components={{ signin: <RouterLink to={routes.login} /> }}
     />
   );
 
@@ -97,7 +96,7 @@ export function RegisterPage() {
           />
         </div>
 
-        <Button type="submit" disabled={pending}>
+        <Button appearance="primary" type="submit" disabled={pending}>
           {t('auth:signUp.submit')}
         </Button>
 
@@ -119,14 +118,9 @@ export function RegisterPage() {
 function LegalTextLink({ page, children }: { page: LegalPage; children?: ReactNode }) {
   const { t } = useTranslation();
   return (
-    <a
-      href={legalUrl(page)}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-foreground hover:text-primary underline underline-offset-4"
-    >
+    <Link href={legalUrl(page)} target="_blank" rel="noopener noreferrer" inline>
       {children}
       <span className="sr-only"> {t('common:legal.newTab')}</span>
-    </a>
+    </Link>
   );
 }

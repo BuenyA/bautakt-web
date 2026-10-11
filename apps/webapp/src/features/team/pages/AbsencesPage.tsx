@@ -1,21 +1,14 @@
 import { daysBetween } from '@bautakt/finance';
-import {
-  Badge,
-  Button,
-  DataTable,
-  type DataTableColumn,
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  toast,
-  Uicon,
-} from '@bautakt/ui';
+import { DataTable, type DataTableColumn, StatusBadge, type StatusTone, toast } from '@bautakt/ui';
+import { Button, Tab, TabList } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
+import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
@@ -26,16 +19,16 @@ import { AbsenceSheet } from '../AbsenceSheet';
 import { ABSENCE_TYPES, PENDING_STATUS } from '../absenceValues';
 import { type AbsenceRow, useAbsences, useApproveAbsence } from '../useAbsences';
 
-function statusVariant(status: string) {
+function statusTone(status: string): StatusTone {
   switch (status) {
     case 'genehmigt':
-      return 'success' as const;
+      return 'success';
     case 'abgelehnt':
-      return 'destructive' as const;
+      return 'danger';
     case 'ausstehend':
-      return 'warning' as const;
+      return 'warning';
     default:
-      return 'muted' as const;
+      return 'neutral';
   }
 }
 
@@ -47,6 +40,8 @@ export function AbsencesPage() {
   const filter = searchParams.get('status') === 'offen' ? 'pending' : 'all';
 
   const [sheetOpen, setSheetOpen] = useState(false);
+  // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel.
+  useCreateFromUrl(canManage, () => setSheetOpen(true));
   const absences = useAbsences();
   const { data } = absences;
   const approve = useApproveAbsence();
@@ -122,11 +117,11 @@ export function AbsencesPage() {
         accessorKey: 'status',
         header: t('domain:absences.columns.status'),
         cell: ({ row }) => (
-          <Badge variant={statusVariant(row.original.status)}>
+          <StatusBadge tone={statusTone(row.original.status)}>
             {t(`domain:absences.status.${row.original.status}`, {
               defaultValue: row.original.status,
             })}
-          </Badge>
+          </StatusBadge>
         ),
       },
       {
@@ -135,12 +130,7 @@ export function AbsencesPage() {
         cell: ({ row }) =>
           canManage && row.original.status === PENDING_STATUS ? (
             <span className="flex justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={approve.isPending}
-                onClick={() => void onApprove(row.original)}
-              >
+              <Button disabled={approve.isPending} onClick={() => void onApprove(row.original)}>
                 {t('domain:absences.approve')}
               </Button>
             </span>
@@ -157,8 +147,7 @@ export function AbsencesPage() {
         description={t('domain:absences.description')}
         actions={
           canManage ? (
-            <Button size="sm" onClick={() => setSheetOpen(true)}>
-              <Uicon name="plus" size={16} />
+            <Button appearance="primary" onClick={() => setSheetOpen(true)} icon={<AddRegular />}>
               {t('domain:absenceForm.title')}
             </Button>
           ) : null
@@ -172,17 +161,15 @@ export function AbsencesPage() {
         labels={labels}
         exportFileName="abwesenheiten"
         toolbar={
-          <Tabs
-            value={filter}
-            onValueChange={(next) =>
-              setSearchParams(next === 'pending' ? { status: 'offen' } : {}, { replace: true })
+          <TabList
+            selectedValue={filter}
+            onTabSelect={(_, { value }) =>
+              setSearchParams(value === 'pending' ? { status: 'offen' } : {}, { replace: true })
             }
           >
-            <TabsList>
-              <TabsTrigger value="all">{t('domain:absences.filterAll')}</TabsTrigger>
-              <TabsTrigger value="pending">{t('domain:absences.filterPending')}</TabsTrigger>
-            </TabsList>
-          </Tabs>
+            <Tab value="all">{t('domain:absences.filterAll')}</Tab>
+            <Tab value="pending">{t('domain:absences.filterPending')}</Tab>
+          </TabList>
         }
         empty={
           <EmptyState

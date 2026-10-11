@@ -1,22 +1,19 @@
 import {
-  Button,
-  Checkbox,
-  Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  Textarea,
+  FormDrawer,
+  FormDrawerDescription,
+  FormDrawerFooter,
+  FormDrawerTitle,
   toast,
 } from '@bautakt/ui';
+import {
+  Button,
+  Checkbox,
+  DrawerBody,
+  DrawerHeader,
+  Label,
+  Select,
+  Textarea,
+} from '@fluentui/react-components';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -114,15 +111,14 @@ export function AssignmentSheet({
   onOpenChange: (open: boolean) => void;
 }) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="p-0">
-        {open ? <AssignmentForm onDone={() => onOpenChange(false)} /> : null}
-      </SheetContent>
-    </Sheet>
+    <FormDrawer open={open} onOpenChange={onOpenChange}>
+      {open ? <AssignmentForm onDone={() => onOpenChange(false)} /> : null}
+    </FormDrawer>
   );
 }
 
 function AssignmentForm({ onDone }: { onDone: () => void }) {
+  const orderFieldId = useId();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const create = useCreateAssignment();
@@ -200,26 +196,33 @@ function AssignmentForm({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
-      <SheetHeader>
-        <SheetTitle>{t('domain:assignments.create.title')}</SheetTitle>
-        <SheetDescription>{t('domain:assignments.create.description')}</SheetDescription>
-      </SheetHeader>
+    <form
+      onSubmit={(event) => void onSubmit(event)}
+      className="flex h-full min-h-0 w-full flex-col"
+    >
+      <DrawerHeader>
+        <FormDrawerTitle closeLabel={t('common:action.close')}>
+          {t('domain:assignments.create.title')}
+        </FormDrawerTitle>
+        <FormDrawerDescription>{t('domain:assignments.create.description')}</FormDrawerDescription>
+      </DrawerHeader>
 
-      <SheetBody className="flex flex-col gap-4">
+      <DrawerBody className="flex flex-col gap-4">
         <div className="grid gap-2">
-          <Label>{t('domain:assignments.fields.order')}</Label>
-          <Select value={draft.orderId} onValueChange={(value) => set({ orderId: value })}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder={t('domain:assignments.create.chooseOrder')} />
-            </SelectTrigger>
-            <SelectContent>
-              {orderOptions.map((order) => (
-                <SelectItem key={order.id} value={order.id}>
-                  {order.name.trim() || t('domain:assignments.create.unnamedOrder')}
-                </SelectItem>
-              ))}
-            </SelectContent>
+          <Label htmlFor={orderFieldId}>{t('domain:assignments.fields.order')}</Label>
+          <Select
+            id={orderFieldId}
+            value={draft.orderId}
+            onChange={(_, { value }) => set({ orderId: value })}
+          >
+            <option value="" disabled>
+              {t('domain:assignments.create.chooseOrder')}
+            </option>
+            {orderOptions.map((order) => (
+              <option key={order.id} value={order.id}>
+                {order.name.trim() || t('domain:assignments.create.unnamedOrder')}
+              </option>
+            ))}
           </Select>
           {orders.isError ? (
             <p className="text-destructive text-sm">{t('domain:assignments.create.ordersError')}</p>
@@ -301,7 +304,9 @@ function AssignmentForm({ onDone }: { onDone: () => void }) {
                   <label key={employee.id} className="flex items-center gap-2 text-sm">
                     <Checkbox
                       checked={checked}
-                      onCheckedChange={(value) => toggleEmployee(employee.id, value === true)}
+                      onChange={(_, { checked: value }) =>
+                        toggleEmployee(employee.id, value === true)
+                      }
                     />
                     <span>{employee.name || t('domain:employees.unnamed')}</span>
                   </label>
@@ -330,16 +335,20 @@ function AssignmentForm({ onDone }: { onDone: () => void }) {
             {error}
           </p>
         ) : null}
-      </SheetBody>
+      </DrawerBody>
 
-      <SheetFooter>
-        <Button type="button" variant="outline" onClick={onDone}>
+      <FormDrawerFooter>
+        <Button type="button" onClick={onDone}>
           {t('common:action.cancel')}
         </Button>
-        <Button type="submit" disabled={create.isPending || datesInverted || clockInverted}>
+        <Button
+          appearance="primary"
+          type="submit"
+          disabled={create.isPending || datesInverted || clockInverted}
+        >
           {t('common:action.save')}
         </Button>
-      </SheetFooter>
+      </FormDrawerFooter>
     </form>
   );
 }

@@ -16,5 +16,6 @@ export function useDataTableLabels(): DataTableLabels {
     rows: t('common:table.rows'),
     previous: t('common:table.previous'),
     next: t('common:table.next'),
+    actions: t('common:table.actions'),
   };
 }

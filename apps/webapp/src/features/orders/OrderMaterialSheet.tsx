@@ -1,23 +1,22 @@
 import {
-  Badge,
+  DangerButton,
+  FormDrawer,
+  FormDrawerDescription,
+  FormDrawerFooter,
+  FormDrawerTitle,
+  StatusBadge,
+  toast,
+} from '@bautakt/ui';
+import {
   Button,
+  DrawerBody,
+  DrawerHeader,
   Input,
   Label,
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
   Textarea,
-  toast,
-} from '@bautakt/ui';
+  ToggleButton,
+} from '@fluentui/react-components';
 import { type FormEvent, useEffect, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -65,17 +64,15 @@ export function OrderMaterialSheet({
 }) {
   const dismiss = useDismissLock(onOpenChange);
   return (
-    <Sheet open={open} onOpenChange={dismiss.handleOpenChange}>
-      <SheetContent className="p-0">
-        {open && draft ? (
-          <OrderMaterialForm
-            initial={draft}
-            onBusyChange={dismiss.onBusyChange}
-            onDone={() => onOpenChange(false)}
-          />
-        ) : null}
-      </SheetContent>
-    </Sheet>
+    <FormDrawer open={open} onOpenChange={dismiss.handleOpenChange}>
+      {open && draft ? (
+        <OrderMaterialForm
+          initial={draft}
+          onBusyChange={dismiss.onBusyChange}
+          onDone={() => onOpenChange(false)}
+        />
+      ) : null}
+    </FormDrawer>
   );
 }
 
@@ -88,6 +85,7 @@ function OrderMaterialForm({
   onBusyChange: (busy: boolean) => void;
   onDone: () => void;
 }) {
+  const articleFieldId = useId();
   const { t } = useTranslation();
   const save = useSaveOrderMaterial();
   const articles = useArticles();
@@ -203,20 +201,23 @@ function OrderMaterialForm({
   const deleteLabel = (draft.mode === 'custom' ? draft.customTitle : selected?.title)?.trim() ?? '';
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex h-full flex-col">
-      <SheetHeader>
-        <SheetTitle>
+    <form
+      onSubmit={(event) => void onSubmit(event)}
+      className="flex h-full min-h-0 w-full flex-col"
+    >
+      <DrawerHeader>
+        <FormDrawerTitle closeLabel={t('common:action.close')}>
           <span className="inline-flex flex-wrap items-center gap-2">
             {draft.id ? t('domain:materialForm.editTitle') : t('domain:materialForm.newTitle')}
             {draft.billed ? (
-              <Badge variant="muted">{t('domain:orders.materials.billed')}</Badge>
+              <StatusBadge tone="neutral">{t('domain:orders.materials.billed')}</StatusBadge>
             ) : null}
           </span>
-        </SheetTitle>
-        <SheetDescription>{t('domain:materialForm.description')}</SheetDescription>
-      </SheetHeader>
+        </FormDrawerTitle>
+        <FormDrawerDescription>{t('domain:materialForm.description')}</FormDrawerDescription>
+      </DrawerHeader>
 
-      <SheetBody className="flex flex-col gap-4">
+      <DrawerBody className="flex flex-col gap-4">
         {locked ? (
           <p role="status" className="text-muted-foreground text-sm">
             {t('domain:materialForm.billedHint')}
@@ -228,55 +229,45 @@ function OrderMaterialForm({
           role="group"
           aria-label={t('domain:materialForm.mode')}
         >
-          <Button
+          <ToggleButton
             type="button"
-            size="sm"
-            variant={draft.mode === 'article' ? 'default' : 'outline'}
+            checked={draft.mode === 'article'}
             disabled={locked}
-            aria-pressed={draft.mode === 'article'}
             onClick={() => setMode('article')}
           >
             {t('domain:materialForm.modeCatalog')}
-          </Button>
-          <Button
+          </ToggleButton>
+          <ToggleButton
             type="button"
-            size="sm"
-            variant={draft.mode === 'custom' ? 'default' : 'outline'}
+            checked={draft.mode === 'custom'}
             disabled={locked}
-            aria-pressed={draft.mode === 'custom'}
             onClick={() => setMode('custom')}
           >
             {t('domain:materialForm.modeCustom')}
-          </Button>
+          </ToggleButton>
         </div>
 
         {draft.mode === 'article' ? (
           <div className="grid gap-2" data-material-field="article">
-            <Label>{t('domain:materialForm.article')}</Label>
+            <Label htmlFor={articleFieldId}>{t('domain:materialForm.article')}</Label>
             <Select
+              id={articleFieldId}
+              aria-invalid={issue === 'article'}
               key={articleSelectKey}
-              value={draft.articleId || undefined}
-              onValueChange={onArticle}
+              value={draft.articleId}
+              onChange={(_, { value }) => onArticle(value)}
               disabled={locked}
             >
-              <SelectTrigger className="w-full" aria-invalid={issue === 'article'}>
-                <SelectValue
-                  placeholder={
-                    articles.isPending
-                      ? t('common:state.loading')
-                      : t('domain:materialForm.chooseArticle')
-                  }
-                >
-                  {selected ? articleOptionLabel(selected.title, selected.sale_price) : undefined}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {catalog.map((article) => (
-                  <SelectItem key={article.id} value={article.id}>
-                    {articleOptionLabel(article.title, article.sale_price)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
+              <option value="" disabled>
+                {articles.isPending
+                  ? t('common:state.loading')
+                  : t('domain:materialForm.chooseArticle')}
+              </option>
+              {catalog.map((article) => (
+                <option key={article.id} value={article.id}>
+                  {articleOptionLabel(article.title, article.sale_price)}
+                </option>
+              ))}
             </Select>
             {articles.isError ? (
               <p className="text-destructive text-sm">{t('domain:materialForm.articlesError')}</p>
@@ -308,7 +299,7 @@ function OrderMaterialForm({
               inputMode="decimal"
               disabled={locked}
               aria-invalid={issue === 'quantity'}
-              className="text-right tabular-nums"
+              input={{ className: 'text-right tabular-nums' }}
               value={draft.quantity}
               onChange={(event) => set({ quantity: event.target.value })}
             />
@@ -334,7 +325,7 @@ function OrderMaterialForm({
               inputMode="decimal"
               disabled={locked}
               aria-invalid={issue === 'cost'}
-              className="text-right tabular-nums"
+              input={{ className: 'text-right tabular-nums' }}
               value={draft.unitCost}
               onChange={(event) => set({ unitCost: event.target.value })}
             />
@@ -347,7 +338,7 @@ function OrderMaterialForm({
               inputMode="decimal"
               disabled={locked}
               aria-invalid={issue === 'price'}
-              className="text-right tabular-nums"
+              input={{ className: 'text-right tabular-nums' }}
               value={draft.unitPrice}
               onChange={(event) => set({ unitPrice: event.target.value })}
             />
@@ -385,29 +376,28 @@ function OrderMaterialForm({
             {error}
           </p>
         ) : null}
-      </SheetBody>
+      </DrawerBody>
 
-      <SheetFooter className="sm:flex-wrap">
+      <FormDrawerFooter className="sm:flex-wrap">
         {draft.id && !locked ? (
-          <Button
+          <DangerButton
             type="button"
-            variant="destructive"
             className="sm:mr-auto"
             disabled={busy}
             onClick={() => setConfirmDelete(true)}
           >
             {t('domain:materialForm.delete.action')}
-          </Button>
+          </DangerButton>
         ) : null}
-        <Button type="button" variant="outline" onClick={onDone} disabled={busy}>
+        <Button type="button" onClick={onDone} disabled={busy}>
           {t('common:action.cancel')}
         </Button>
         {locked ? null : (
-          <Button type="submit" disabled={busy}>
+          <Button appearance="primary" type="submit" disabled={busy}>
             {t('common:action.save')}
           </Button>
         )}
-      </SheetFooter>
+      </FormDrawerFooter>
 
       {draft.id ? (
         <OrderMaterialDeleteDialog

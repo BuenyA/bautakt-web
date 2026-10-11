@@ -1,12 +1,16 @@
 import { eurosToMinor, formatMoney } from '@bautakt/finance';
-import { Button, DataTable, type DataTableColumn, Uicon } from '@bautakt/ui';
+import { DataTable, type DataTableColumn } from '@bautakt/ui';
+import { Link as FluentLink } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useSearchParams } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { ListFilterChips } from '@/components/common/ListFilterChips';
 import { PageHeader } from '@/components/common/PageHeader';
+import { RouterLink } from '@/components/common/RouterLink';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { formatDate } from '@/lib/format';
@@ -78,13 +82,11 @@ export function InvoicesListPage() {
         accessorKey: 'document_number',
         header: t('domain:invoices.columns.number'),
         cell: ({ row }) => (
-          <Link
-            to={routes.invoice(row.original.id)}
-            className="text-foreground hover:text-primary font-medium whitespace-nowrap hover:underline"
-            onClick={(event) => event.stopPropagation()}
-          >
-            {row.original.document_number || t('domain:invoices.noNumber')}
-          </Link>
+          <RouterLink appearance="subtle" to={routes.invoice(row.original.id)} stopPropagation>
+            <span className="font-medium whitespace-nowrap">
+              {row.original.document_number || t('domain:invoices.noNumber')}
+            </span>
+          </RouterLink>
         ),
       },
       {
@@ -146,13 +148,9 @@ export function InvoicesListPage() {
           title={t('domain:invoices.loadErrorTitle')}
           description={t('domain:invoices.loadErrorDescription')}
           action={
-            <button
-              type="button"
-              className="text-primary cursor-pointer text-sm font-medium hover:underline"
-              onClick={() => void refetch()}
-            >
+            <FluentLink as="button" onClick={() => void refetch()}>
               {t('common:action.retry')}
-            </button>
+            </FluentLink>
           }
         />
       </div>
@@ -166,12 +164,9 @@ export function InvoicesListPage() {
         description={t('domain:invoices.listDescription')}
         actions={
           access.canWriteSalesDocuments ? (
-            <Button asChild size="sm">
-              <Link to={routes.invoiceNew}>
-                <Uicon name="plus" size={16} />
-                {t('domain:invoices.new')}
-              </Link>
-            </Button>
+            <LinkButton appearance="primary" to={routes.invoiceNew} icon={<AddRegular />}>
+              {t('domain:invoices.new')}
+            </LinkButton>
           ) : null
         }
       />

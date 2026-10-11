@@ -1,4 +1,6 @@
-import { Button, Skeleton, Uicon } from '@bautakt/ui';
+import { ActionCard, SkeletonBlock } from '@bautakt/ui';
+import { Button, Card, Link as FluentLink } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -81,13 +83,9 @@ export function OrderDailyReports({ orderId }: { orderId: string }) {
         title={t('domain:orders.dailyReports.loadErrorTitle')}
         description={t('domain:orders.dailyReports.loadErrorDescription')}
         action={
-          <button
-            type="button"
-            className="text-sm font-medium text-primary hover:underline"
-            onClick={() => void refetch()}
-          >
+          <FluentLink as="button" onClick={() => void refetch()}>
             {t('common:action.retry')}
-          </button>
+          </FluentLink>
         }
       />
     );
@@ -97,8 +95,12 @@ export function OrderDailyReports({ orderId }: { orderId: string }) {
         title={t('domain:orders.dailyReports.emptyTitle')}
         description={t('domain:orders.dailyReports.emptyDescriptionWrite')}
         action={
-          <Button size="sm" onClick={openNew} disabled={staffLoading}>
-            <Uicon name="plus" size={16} />
+          <Button
+            appearance="primary"
+            onClick={openNew}
+            disabled={staffLoading}
+            icon={<AddRegular />}
+          >
             {t('domain:dailyReportForm.newTitle')}
           </Button>
         }
@@ -106,7 +108,7 @@ export function OrderDailyReports({ orderId }: { orderId: string }) {
     );
   } else {
     body = (
-      <ul className="flex max-w-3xl flex-col gap-3">
+      <ul className="flex flex-col gap-3">
         {data.map((report) => (
           <ReportCard
             key={report.id}
@@ -122,15 +124,19 @@ export function OrderDailyReports({ orderId }: { orderId: string }) {
 
   return (
     <section className="flex flex-col gap-4" aria-labelledby="order-daily-reports-title">
-      <div className="flex max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-2">
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <h2
           id="order-daily-reports-title"
           className="text-foreground text-lg font-semibold tracking-tight"
         >
           {t('domain:orders.dailyReports.title')}
         </h2>
-        <Button size="sm" onClick={openNew} disabled={staffLoading}>
-          <Uicon name="plus" size={16} />
+        <Button
+          appearance="primary"
+          onClick={openNew}
+          disabled={staffLoading}
+          icon={<AddRegular />}
+        >
           {t('domain:dailyReportForm.newTitle')}
         </Button>
       </div>
@@ -189,8 +195,9 @@ function ReportCard({
   const { t } = useTranslation();
   const dateLabel = formatReportDate(report.date);
   const weather = weatherLine(report, t);
-  const className =
-    'flex w-full flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3 text-left shadow-sm transition-colors';
+  // Fluent-`Card`; als `button`, wenn die Zeile bearbeitet werden darf.
+  const className = 'w-full text-left';
+  const bodyClassName = 'flex flex-col gap-1';
 
   const content = (
     <>
@@ -225,16 +232,17 @@ function ReportCard({
   return (
     <li>
       {editable ? (
-        <button
-          type="button"
-          className={`${className} cursor-pointer hover:border-border-strong`}
+        <ActionCard
+          className={className}
           aria-label={t('domain:orders.dailyReports.openLabel', { date: dateLabel })}
-          onClick={onEdit}
+          onAction={onEdit}
         >
-          {content}
-        </button>
+          <div className={bodyClassName}>{content}</div>
+        </ActionCard>
       ) : (
-        <div className={className}>{content}</div>
+        <Card className={className}>
+          <div className={bodyClassName}>{content}</div>
+        </Card>
       )}
     </li>
   );
@@ -249,10 +257,10 @@ function LinkCounts({ counts }: { counts: DailyReportLinkCounts }) {
 
 function ReportListSkeleton({ label }: { label: string }) {
   return (
-    <div className="flex max-w-3xl flex-col gap-3" role="status">
+    <div className="flex flex-col gap-3" role="status">
       <span className="sr-only">{label}</span>
       {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-        <Skeleton key={index} className="h-24 rounded-xl" />
+        <SkeletonBlock key={index} className="h-24 rounded-xl" />
       ))}
     </div>
   );

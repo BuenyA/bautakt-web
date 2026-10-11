@@ -4,13 +4,6 @@ import { IS_PRODUCTION_SITE } from './lib/site';
 
 const nextConfig: NextConfig = {
   /**
-   * Die geteilten Pakete werden als TypeScript-Quelle ausgeliefert (kein
-   * Build-Schritt, siehe AGENTS.md). Next muss sie deshalb selbst
-   * transpilieren.
-   */
-  transpilePackages: ['@bautakt/ui'],
-
-  /**
    * Dritte Indexierungs-Sperre neben robots.txt und dem Meta-Tag.
    *
    * Vercel setzt `X-Robots-Tag: noindex` nur auf *Preview*-Deployments.

@@ -1,4 +1,5 @@
 import { cn } from '@bautakt/ui';
+import { Link } from '@fluentui/react-components';
 import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -24,15 +25,15 @@ export function LegalLinks({ className }: { className?: string }) {
               </li>
             ) : null}
             <li>
-              <a
+              <Link
                 href={legalUrl(page)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-foreground rounded-sm underline-offset-4 hover:underline focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-hidden"
+                appearance="subtle"
               >
                 {t(`common:legal.${page}`)}
                 <span className="sr-only"> {t('common:legal.newTab')}</span>
-              </a>
+              </Link>
             </li>
           </Fragment>
         ))}

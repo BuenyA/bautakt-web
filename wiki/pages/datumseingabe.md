@@ -13,9 +13,13 @@ Handy-App schon kennen.
 
 `DatePicker`, `DateRangePicker` und `TimeInput` liegen in `@bautakt/ui`. Die
 App reicht die Texte aus `validation.json` durch
-(`apps/webapp/src/components/form/dateTime.tsx`). Der Kalender ist der
-shadcn-`Calendar` im `Popover`, mit `date-fns/locale/de` und Wochenanfang
-Montag.
+(`apps/webapp/src/components/form/dateTime.tsx`). Seit 2026-10-10 ist der
+Kalender Fluents `Calendar` (`@fluentui/react-calendar-compat`) in einem
+Fluent-`Popover`, Wochenanfang Montag, erste Kalenderwoche nach ISO
+(`FirstWeekOfYear.FirstFourDayWeek`). Monats- und Tagesnamen kommen aus `Intl`
+mit `de-DE` (`germanCalendarNames` in `packages/ui/src/lib/date-time.ts`, mit
+Test), nicht aus der Browsersprache. Maske und Prüfung (`use-masked-field.ts`,
+`date-time.ts`) sind unverändert; nur die Optik ist Fluent.
 
 Getippt wird ins Textfeld. `31.02.2026` und `25:00` bleiben lokal und zeigen
 eine Meldung; sie landen nicht im Formularzustand. Ein leeres Pflichtfeld
@@ -27,10 +31,10 @@ Tippen, überzählige Ziffern eines Feldes rutschen ins nächste. Aus
 `15082026` wird `15.08.2026`, das Jahr wird nicht abgeschnitten. Mehr als
 acht Ziffern bleiben bei vier Stellen für das Jahr.
 
-Der gewählte Tag im Kalender hat die Primary-Fläche und helle Schrift.
-`aria-selected` steht an der Tageszelle, nicht am Knopf — die Markierung
-hängt an `selected`, nicht an `aria-selected:` auf dem Knopf. Heute behält
-nur den Ring. `selected` und `defaultMonth` kommen vom aktuellen Wert.
+Der gewählte Tag trägt Fluents Auswahlfläche; `aria-selected` steht an der
+Tageszelle (`td`), die Fläche am Knopf darin. Heute markiert Fluent mit
+`fui-CalendarDayGrid__dayIsToday`. Der Kalender öffnet im Monat des aktuellen
+Werts, weil er bei jedem Öffnen neu gemountet wird.
 
 `type="date"` und `type="time"` gibt es in `apps/webapp/src` nicht mehr. Das
 native Feld folgt der Browsersprache und zeigte bei englischem Browser
@@ -71,19 +75,26 @@ die Uhrzeit des Endes vor der des Beginns, ist das eine Nachtschicht und endet
 am nächsten Tag. Der Hinweis unter dem Feld sagt das. Die Prüfung steckt in
 `entryRange`, nicht im Uhrzeitfeld.
 
-## Kalender im Sheet
+## Kalender in Drawer und Dialog
 
-Der Popover liegt im Portal. Sheet, Dialog und AlertDialog schließen nicht,
-wenn der Fokus dorthin wandert (`isFloatingLayerTarget`). Der Popover steht
-auf `z-[70]`, über Dialog und AlertDialog auf `z-[60]`.
+Stand 2026-10-10. Fluent stapelt seine Ebenen selbst: ein Klick in den
+Kalender schließt weder den Drawer noch den Dialog dahinter, und Escape
+schließt zuerst den Kalender, dann die Ebene darunter. Die eigene Ausnahme
+`isFloatingLayerTarget` und die z-Indizes aus der shadcn-Zeit sind deshalb
+entfallen.
 
-Der Anker ist die ganze Zeile aus Feld und Knopf (`PopoverTrigger`). Ein
-eigenes `PopoverAnchor` daneben darf nicht dazukommen: Radix trägt den
-Trigger zuerst als Anker ein, das Anchor erst im Effect. Gibt der Trigger
-den Anker danach ab, bleibt im Popper der abgebaute Knoten. Dessen Rechteck
-ist 0×0, der Kalender öffnet oben links. Gemessen 2026-10-09: vorher
-`translate(0px, 4px)`, danach am Feld (Abstand 4px, links bündig), allein,
-im Sheet und im Dialog.
+Der Popover hängt an der ganzen Zeile aus Feld und Knopf
+(`positioning.target`). Die Zeile kommt über State statt Ref an den Popover,
+weil er den Anker beim Rendern braucht. Beim Öffnen fängt der Kalender den
+Fokus (`trapFocus`) und setzt ihn auf den gewählten Tag (sonst heute); nach der
+Wahl geht der Fokus ins Feld zurück. Fluent lässt den Popover rund 300 ms
+einfahren; gemessen 2026-10-10 steht er danach bündig unter dem Feld (Abstand
+0px, links 1px), allein, im Drawer und im Dialog
+(`apps/webapp/e2e/date-picker-popover.spec.ts`).
+
+Bis 2026-10-10 galt hier eine Radix-Falle: ein zusätzliches `PopoverAnchor`
+neben dem Trigger ließ den Kalender bei (0, 0) öffnen. Mit Fluent gibt es kein
+Anchor-Rennen mehr; die Messung im E2E-Test bleibt trotzdem.
 
 Das Duplikat im Bautagebuch hängt weiter am gespeicherten Kalendertag: sobald
 ein gültiges Datum im Entwurf steht, läuft die Prüfung. Unfertiges Tippen

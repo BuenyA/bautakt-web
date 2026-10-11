@@ -1,13 +1,13 @@
+import { DangerButton, toast } from '@bautakt/ui';
 import {
   Button,
   Dialog,
+  DialogActions,
+  DialogBody,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
+  DialogSurface,
   DialogTitle,
-  toast,
-} from '@bautakt/ui';
+} from '@fluentui/react-components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -68,41 +68,40 @@ export function TimeEntryDeleteDialog({
   return (
     <Dialog
       open={open}
-      onOpenChange={(next) => {
+      onOpenChange={(_, { open: next }) => {
         if (remove.isPending) return;
         if (!next) setError(null);
         onOpenChange(next);
       }}
     >
-      <DialogContent>
-        <DialogHeader>
+      <DialogSurface>
+        <DialogBody>
           <DialogTitle>{t('domain:timeForm.delete.title')}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
-
-        {error ? (
-          <p role="alert" className="text-destructive text-sm">
-            {error}
-          </p>
-        ) : null}
-
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={close} disabled={remove.isPending}>
-            {t('common:action.cancel')}
-          </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            disabled={remove.isPending}
-            aria-busy={remove.isPending}
-            onClick={() => void onConfirm()}
-          >
-            {remove.isPending
-              ? t('domain:timeForm.delete.pending')
-              : t('domain:timeForm.delete.confirm')}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
+          <DialogContent className="flex flex-col gap-3">
+            <p>{description}</p>
+            {error ? (
+              <p role="alert" className="text-destructive text-sm">
+                {error}
+              </p>
+            ) : null}
+          </DialogContent>
+          <DialogActions>
+            <Button type="button" onClick={close} disabled={remove.isPending}>
+              {t('common:action.cancel')}
+            </Button>
+            <DangerButton
+              type="button"
+              disabled={remove.isPending}
+              aria-busy={remove.isPending}
+              onClick={() => void onConfirm()}
+            >
+              {remove.isPending
+                ? t('domain:timeForm.delete.pending')
+                : t('domain:timeForm.delete.confirm')}
+            </DangerButton>
+          </DialogActions>
+        </DialogBody>
+      </DialogSurface>
     </Dialog>
   );
 }

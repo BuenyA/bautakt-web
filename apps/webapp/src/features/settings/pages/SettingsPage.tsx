@@ -1,4 +1,5 @@
-import { Badge, Card, CardContent, CardHeader, CardTitle, Skeleton } from '@bautakt/ui';
+import { SkeletonBlock, StatusBadge } from '@bautakt/ui';
+import { Card, CardHeader, Text } from '@fluentui/react-components';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
@@ -60,7 +61,7 @@ export function SettingsPage() {
       />
 
       {isLoading ? (
-        <Skeleton className="h-64 w-full max-w-3xl" />
+        <SkeletonBlock className="h-64 w-full max-w-3xl" />
       ) : (
         <div className="grid gap-4 xl:grid-cols-2">
           <DetailCard title={t('domain:settings.company')} className="xl:col-span-2">
@@ -113,20 +114,24 @@ export function SettingsPage() {
             <DetailRow label={t('domain:settings.bank')} value={company?.bank_name ?? ''} />
           </DetailCard>
 
-          <Card className="xl:col-span-2">
-            <CardHeader>
-              <CardTitle className="text-base">{t('domain:settings.roles')}</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-2">
+          <Card size="large" className="xl:col-span-2">
+            <CardHeader
+              header={
+                <Text as="h2" size={400} weight="semibold">
+                  {t('domain:settings.roles')}
+                </Text>
+              }
+            />
+            <div className="flex flex-wrap gap-2">
               {(data?.roles ?? []).map((role) => (
-                <Badge key={role.id} variant={role.is_system ? 'accent' : 'outline'}>
+                <StatusBadge key={role.id} tone={role.is_system ? 'brand' : 'outline'}>
                   {role.name}
-                </Badge>
+                </StatusBadge>
               ))}
               {data?.roles.length === 0 ? (
                 <p className="text-muted-foreground text-sm">{t('domain:settings.noRoles')}</p>
               ) : null}
-            </CardContent>
+            </div>
           </Card>
         </div>
       )}

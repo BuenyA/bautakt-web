@@ -1,11 +1,15 @@
-import { Button, DataTable, type DataTableColumn, Uicon } from '@bautakt/ui';
+import { DataTable, type DataTableColumn } from '@bautakt/ui';
+import { Button, Link as FluentLink } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useSearchParams } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { ListFilterChips } from '@/components/common/ListFilterChips';
 import { PageHeader } from '@/components/common/PageHeader';
+import { RouterLink } from '@/components/common/RouterLink';
+import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
@@ -28,6 +32,8 @@ export function CustomersListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = customerFilterFromSearch(searchParams.get('filter'));
   const [draft, setDraft] = useState<CustomerDraft | null>(null);
+  // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel.
+  useCreateFromUrl(canManage, () => setDraft(emptyCustomer()));
   const customers = useCustomers();
   const { data, isError, refetch } = customers;
 
@@ -65,13 +71,11 @@ export function CustomersListPage() {
         accessorFn: (row) => customerDisplayName(row),
         header: t('domain:customers.columns.name'),
         cell: ({ row }) => (
-          <Link
-            to={routes.customer(row.original.id)}
-            className="text-foreground hover:text-primary font-medium hover:underline"
-            onClick={(event) => event.stopPropagation()}
-          >
-            {customerDisplayName(row.original) || t('domain:customers.unnamed')}
-          </Link>
+          <RouterLink appearance="subtle" to={routes.customer(row.original.id)} stopPropagation>
+            <span className="font-medium">
+              {customerDisplayName(row.original) || t('domain:customers.unnamed')}
+            </span>
+          </RouterLink>
         ),
       },
       {
@@ -125,13 +129,9 @@ export function CustomersListPage() {
           title={t('domain:customers.loadErrorTitle')}
           description={t('domain:customers.loadErrorDescription')}
           action={
-            <button
-              type="button"
-              className="text-primary cursor-pointer text-sm font-medium hover:underline"
-              onClick={() => void refetch()}
-            >
+            <FluentLink as="button" onClick={() => void refetch()}>
               {t('common:action.retry')}
-            </button>
+            </FluentLink>
           }
         />
       </div>
@@ -145,8 +145,11 @@ export function CustomersListPage() {
         description={t('domain:customers.listDescription')}
         actions={
           canManage ? (
-            <Button size="sm" onClick={() => setDraft(emptyCustomer())}>
-              <Uicon name="plus" size={16} />
+            <Button
+              appearance="primary"
+              onClick={() => setDraft(emptyCustomer())}
+              icon={<AddRegular />}
+            >
               {t('domain:customerForm.newTitle')}
             </Button>
           ) : null

@@ -1,11 +1,13 @@
 import { eurosToMinor, formatMoney, vatByRateGroups } from '@bautakt/finance';
-import { Button } from '@bautakt/ui';
+import { lightTheme } from '@bautakt/ui';
+import { FluentProvider, Link as FluentLink } from '@fluentui/react-components';
 import { useQuery } from '@tanstack/react-query';
 import { type ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { useMembership } from '@/features/company/useMembership';
@@ -84,17 +86,11 @@ export function InvoicePrintPage() {
         action={
           <div className="flex flex-wrap items-center justify-center gap-4">
             {isError ? (
-              <button
-                type="button"
-                className="text-primary cursor-pointer text-sm font-medium hover:underline"
-                onClick={() => void refetch()}
-              >
+              <FluentLink as="button" onClick={() => void refetch()}>
                 {t('common:action.retry')}
-              </button>
+              </FluentLink>
             ) : null}
-            <Button asChild variant="outline" size="sm">
-              <Link to={routes.invoices}>{t('common:action.back')}</Link>
-            </Button>
+            <LinkButton to={routes.invoices}>{t('common:action.back')}</LinkButton>
           </div>
         }
       />
@@ -109,7 +105,14 @@ export function InvoicePrintPage() {
   );
 
   return (
-    <div className="bautakt-print bg-background text-foreground mx-auto max-w-[210mm] p-10 print:p-0">
+    // Eigener heller Provider: der Beleg druckt auch im Dunkelmodus schwarz auf weiss.
+    // `applyStylesToPortals={false}`, sonst landen Breite und Polster auch auf
+    // Fluents Portal-Knoten (siehe ThemeProvider).
+    <FluentProvider
+      theme={lightTheme}
+      applyStylesToPortals={false}
+      className="bautakt-print mx-auto max-w-[210mm] p-10 print:p-0"
+    >
       <header className="flex items-start justify-between gap-8">
         <div className="text-sm">
           <p className="text-foreground text-lg font-semibold">{company?.name}</p>
@@ -246,7 +249,7 @@ export function InvoicePrintPage() {
           <p>{company?.bic ? `BIC ${company.bic}` : ''}</p>
         </div>
       </footer>
-    </div>
+    </FluentProvider>
   );
 }
 

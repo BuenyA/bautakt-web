@@ -1,4 +1,4 @@
-import { Button } from '@bautakt/ui';
+import { Button } from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';
 import { useRouteError } from 'react-router';
 
@@ -16,7 +16,7 @@ export function ErrorBoundaryPage() {
           {error.message}
         </pre>
       ) : null}
-      <Button className="mt-4" onClick={() => window.location.reload()}>
+      <Button appearance="primary" className="mt-4" onClick={() => window.location.reload()}>
         {t('common:action.retry')}
       </Button>
     </div>

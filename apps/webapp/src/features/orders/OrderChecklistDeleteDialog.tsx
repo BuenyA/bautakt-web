@@ -1,13 +1,13 @@
+import { DangerButton, toast } from '@bautakt/ui';
 import {
   Button,
   Dialog,
+  DialogActions,
+  DialogBody,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
+  DialogSurface,
   DialogTitle,
-  toast,
-} from '@bautakt/ui';
+} from '@fluentui/react-components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -71,41 +71,40 @@ export function OrderChecklistDeleteDialog({
   return (
     <Dialog
       open={open}
-      onOpenChange={(next) => {
+      onOpenChange={(_, { open: next }) => {
         if (save.isPending) return;
         if (!next) setError(null);
         onOpenChange(next);
       }}
     >
-      <DialogContent>
-        <DialogHeader>
+      <DialogSurface>
+        <DialogBody>
           <DialogTitle>{t('domain:checklistForm.delete.title')}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
-
-        {error ? (
-          <p role="alert" className="text-destructive text-sm">
-            {error}
-          </p>
-        ) : null}
-
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={close} disabled={save.isPending}>
-            {t('common:action.cancel')}
-          </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            disabled={save.isPending}
-            aria-busy={save.isPending}
-            onClick={() => void onConfirm()}
-          >
-            {save.isPending
-              ? t('domain:checklistForm.delete.pending')
-              : t('domain:checklistForm.delete.confirm')}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
+          <DialogContent className="flex flex-col gap-3">
+            <p>{description}</p>
+            {error ? (
+              <p role="alert" className="text-destructive text-sm">
+                {error}
+              </p>
+            ) : null}
+          </DialogContent>
+          <DialogActions>
+            <Button type="button" onClick={close} disabled={save.isPending}>
+              {t('common:action.cancel')}
+            </Button>
+            <DangerButton
+              type="button"
+              disabled={save.isPending}
+              aria-busy={save.isPending}
+              onClick={() => void onConfirm()}
+            >
+              {save.isPending
+                ? t('domain:checklistForm.delete.pending')
+                : t('domain:checklistForm.delete.confirm')}
+            </DangerButton>
+          </DialogActions>
+        </DialogBody>
+      </DialogSurface>
     </Dialog>
   );
 }

@@ -1,14 +1,16 @@
+import { ActionCard, SkeletonBlock, toast } from '@bautakt/ui';
 import {
   Button,
+  CardPreview,
   Dialog,
+  DialogActions,
+  DialogBody,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
+  DialogSurface,
   DialogTitle,
-  Skeleton,
-  toast,
-  Uicon,
-} from '@bautakt/ui';
+  Link as FluentLink,
+} from '@fluentui/react-components';
+import { ArrowUploadRegular, DeleteRegular } from '@fluentui/react-icons';
 import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -113,13 +115,9 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
         title={t('domain:orders.photos.loadErrorTitle')}
         description={t('domain:orders.photos.loadErrorDescription')}
         action={
-          <button
-            type="button"
-            className="text-sm font-medium text-primary hover:underline"
-            onClick={() => void refetch()}
-          >
+          <FluentLink as="button" onClick={() => void refetch()}>
             {t('common:action.retry')}
-          </button>
+          </FluentLink>
         }
       />
     );
@@ -170,12 +168,12 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
         </h2>
         {canTakePhotos ? (
           <Button
+            appearance="primary"
             type="button"
-            size="sm"
             disabled={progress !== null}
             onClick={() => inputRef.current?.click()}
+            icon={<ArrowUploadRegular />}
           >
-            <Uicon name="upload" size={16} />
             {t('domain:photoForm.upload')}
           </Button>
         ) : null}
@@ -219,44 +217,41 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
 
       <Dialog
         open={openPhoto !== null}
-        onOpenChange={(open) => {
+        onOpenChange={(_, { open }) => {
           if (!open) setOpenId(null);
         }}
       >
-        <DialogContent className="sm:max-w-3xl">
-          <DialogHeader>
+        {/* Breiter als Fluents 600 px: das Foto ist der Inhalt. */}
+        <DialogSurface style={{ maxWidth: 'min(48rem, calc(100vw - 2rem))' }}>
+          <DialogBody>
             <DialogTitle>{t('domain:orders.photos.lightboxTitle')}</DialogTitle>
-            <DialogDescription>
-              {openDate
-                ? t('domain:orders.photos.takenAt', { date: openDate })
-                : t('domain:orders.photos.openLabelUndated')}
-            </DialogDescription>
-          </DialogHeader>
-          {openPhoto ? (
-            <img
-              src={openPhoto.signedUrl}
-              alt={
-                openDate
-                  ? t('domain:orders.photos.openLabel', { date: openDate })
-                  : t('domain:orders.photos.openLabelUndated')
-              }
-              className="max-h-[70vh] w-full rounded-xl bg-surface object-contain"
-            />
-          ) : null}
-          {openPhoto && canDeleteOpen ? (
-            <div className="flex justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => askDelete(openPhoto)}
-              >
-                <Uicon name="trash" size={16} />
-                {t('domain:photoForm.delete.action')}
-              </Button>
-            </div>
-          ) : null}
-        </DialogContent>
+            <DialogContent className="flex flex-col gap-3">
+              <p className="text-muted-foreground text-sm">
+                {openDate
+                  ? t('domain:orders.photos.takenAt', { date: openDate })
+                  : t('domain:orders.photos.openLabelUndated')}
+              </p>
+              {openPhoto ? (
+                <img
+                  src={openPhoto.signedUrl}
+                  alt={
+                    openDate
+                      ? t('domain:orders.photos.openLabel', { date: openDate })
+                      : t('domain:orders.photos.openLabelUndated')
+                  }
+                  className="max-h-[70vh] w-full rounded-xl bg-surface object-contain"
+                />
+              ) : null}
+            </DialogContent>
+            {openPhoto && canDeleteOpen ? (
+              <DialogActions>
+                <Button type="button" onClick={() => askDelete(openPhoto)} icon={<DeleteRegular />}>
+                  {t('domain:photoForm.delete.action')}
+                </Button>
+              </DialogActions>
+            ) : null}
+          </DialogBody>
+        </DialogSurface>
       </Dialog>
 
       {deletePhoto ? (
@@ -292,38 +287,30 @@ function PhotoTile({
 
   return (
     <li className="relative">
-      <button
-        type="button"
-        className="focus-visible:ring-ring flex w-full cursor-pointer flex-col overflow-hidden rounded-xl border border-border bg-card text-left shadow-sm transition-colors hover:border-border-strong hover:shadow-md focus-visible:ring-2 focus-visible:outline-none"
-        aria-label={label}
-        onClick={onOpen}
-      >
-        <img
-          src={photo.signedUrl}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="aspect-square w-full bg-surface object-cover"
-        />
-        {takenAt ? (
-          <span className="truncate bg-card px-2.5 py-2 text-xs text-muted-foreground">
-            {takenAt}
-          </span>
-        ) : null}
-      </button>
+      <ActionCard className="w-full text-left" aria-label={label} onAction={onOpen}>
+        <CardPreview>
+          <img
+            src={photo.signedUrl}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="bg-surface aspect-square w-full object-cover"
+          />
+        </CardPreview>
+        {takenAt ? <span className="text-muted-foreground truncate text-xs">{takenAt}</span> : null}
+      </ActionCard>
       {deletable ? (
-        <button
-          type="button"
-          className="focus-visible:ring-ring absolute top-2 right-2 z-10 flex size-8 items-center justify-center rounded-full border border-border bg-card text-destructive shadow-sm hover:bg-accent focus-visible:ring-2 focus-visible:outline-none"
+        <Button
+          shape="circular"
+          icon={<DeleteRegular />}
+          className="absolute! top-2 right-2 z-10"
           aria-label={
             takenAt
               ? t('domain:photoForm.delete.label', { date: takenAt })
               : t('domain:photoForm.delete.labelUndated')
           }
           onClick={onDelete}
-        >
-          <Uicon name="trash" size={16} />
-        </button>
+        />
       ) : null}
     </li>
   );
@@ -334,7 +321,7 @@ function PhotoGridSkeleton({ label }: { label: string }) {
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4" role="status">
       <span className="sr-only">{label}</span>
       {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-        <Skeleton key={index} className="aspect-square rounded-xl" />
+        <SkeletonBlock key={index} className="aspect-square rounded-xl" />
       ))}
     </div>
   );

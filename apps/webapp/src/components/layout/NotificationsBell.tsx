@@ -1,42 +1,40 @@
-import { Button, Popover, PopoverContent, PopoverTrigger, Uicon } from '@bautakt/ui';
+import { Button, Popover, PopoverSurface, PopoverTrigger, Text } from '@fluentui/react-components';
+import { Alert20Regular, AlertRegular } from '@fluentui/react-icons';
 import { useTranslation } from 'react-i18next';
 
 /**
  * Glocke im Seitenkopf. Bis das Benachrichtigungszentrum steht (#92), öffnet
  * sie nur den Leerzustand — ein Klick soll etwas Erwartbares tun, statt
  * stumm zu bleiben oder interne Planungssprache zu zeigen (#91).
+ *
+ * Fluent-`Popover` unter der Glocke, rechtsbündig.
  */
 export function NotificationsBell() {
   const { t } = useTranslation();
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
+    <Popover positioning="below-end" withArrow={false}>
+      <PopoverTrigger disableButtonEnhancement>
         <Button
-          variant="ghost"
-          size="icon"
-          className="size-9"
+          appearance="subtle"
+          icon={<Alert20Regular />}
           aria-label={t('common:notifications.title')}
-        >
-          <Uicon name="bell" size={18} />
-        </Button>
+        />
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-80 p-0">
-        <p className="border-border border-b px-4 py-3 text-sm font-semibold">
+      <PopoverSurface aria-label={t('common:notifications.title')} className="w-80">
+        <Text as="h2" weight="semibold">
           {t('common:notifications.title')}
-        </p>
-        <div className="flex flex-col items-center gap-2 px-6 py-8 text-center">
+        </Text>
+        <div className="flex flex-col items-center gap-2 py-6 text-center">
           <span className="bg-muted text-muted-foreground flex size-10 items-center justify-center rounded-full">
-            <Uicon name="bell" size={18} />
+            <AlertRegular fontSize={20} aria-hidden />
           </span>
-          <p className="text-foreground text-sm font-medium">
-            {t('common:notifications.emptyTitle')}
-          </p>
-          <p className="text-muted-foreground text-xs">
+          <Text weight="semibold">{t('common:notifications.emptyTitle')}</Text>
+          <Text size={200} className="text-muted-foreground">
             {t('common:notifications.emptyDescription')}
-          </p>
+          </Text>
         </div>
-      </PopoverContent>
+      </PopoverSurface>
     </Popover>
   );
 }

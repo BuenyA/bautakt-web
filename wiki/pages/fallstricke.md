@@ -560,6 +560,10 @@ Parent beim Ändern nur an `modified_at` anfassen. Siehe
 
 ## Dialog-Overlay im Dunkelmodus wirkt hellgrau
 
+> Stand 2026-10-10: Das betraf die shadcn/Radix-Bauteile. Seit der Umstellung auf
+> Fluent UI ([fluent-ui.md](fluent-ui.md)) gibt es den Mechanismus nicht mehr; der
+> Eintrag bleibt als Begründung stehen.
+
 _Festgestellt 2026-10-08, Issue #122._
 
 **Symptom:** Hinter Dialog, AlertDialog und Sheet liegt im Dunkelmodus ein
@@ -576,6 +580,10 @@ Overlay-Token, deshalb an jeder Seite dieselbe Klasse.
 [webapp-shell.md](webapp-shell.md).
 
 ## Gesperrter Primary-Knopf im Dunkelmodus bleibt satt blau
+
+> Stand 2026-10-10: Das betraf die shadcn/Radix-Bauteile. Seit der Umstellung auf
+> Fluent UI ([fluent-ui.md](fluent-ui.md)) gibt es den Mechanismus nicht mehr; der
+> Eintrag bleibt als Begründung stehen.
 
 _Festgestellt 2026-10-09, Issue #126. Speichern im Bautagebuch bei einem
 belegten Tag._
@@ -595,6 +603,10 @@ für jede Variante. Hell bleibt bei 50 %. Siehe
 [webapp-shell.md](webapp-shell.md).
 
 ## Kalender öffnet oben links bei (0, 0)
+
+> Stand 2026-10-10: Das betraf die shadcn/Radix-Bauteile. Seit der Umstellung auf
+> Fluent UI ([fluent-ui.md](fluent-ui.md)) gibt es den Mechanismus nicht mehr; der
+> Eintrag bleibt als Begründung stehen.
 
 _Festgestellt 2026-10-09, Issue #129. Smoke von #128._
 
@@ -648,6 +660,10 @@ sichtbarem Vorschlag. Siehe [datumseingabe.md](datumseingabe.md).
 
 ## Kalender im Sheet schließt das Panel
 
+> Stand 2026-10-10: Das betraf die shadcn/Radix-Bauteile. Seit der Umstellung auf
+> Fluent UI ([fluent-ui.md](fluent-ui.md)) gibt es den Mechanismus nicht mehr; der
+> Eintrag bleibt als Begründung stehen.
+
 _Festgestellt 2026-10-09, Issue #93. Dieselbe Falle wie der Löschdialog über
 der Checkliste (#121)._
 
@@ -663,3 +679,26 @@ dort als „draußen“ und schließt das Panel. Dialog und AlertDialog liegen a
 oder Klick auf Popover, Dialog oder den Popper-Wrapper schließt die Ebene
 darunter nicht. Der Popover liegt auf `z-[70]`. Siehe
 [datumseingabe.md](datumseingabe.md).
+
+## Ein Popover deckt die ganze Seite weiß zu
+
+2026-10-10, Fluent-Umstellung. Beim Öffnen des Kalenders verschwand alles außer
+dem Kalender. Ursache: `FluentProvider` trug `className="min-h-svh"`, und Fluent
+kopiert die Klassen des Providers auf seine Portal-Knoten. Der Knoten liegt
+absolut über der Seite (`z-index: 1000000`) und hatte damit volle Höhe und die
+Canvas-Farbe. Gefunden mit `document.elementFromPoint`, das den Portal-Knoten
+statt der Seite meldete.
+
+Regel: keine Klassen an den `FluentProvider`. Die Mindesthöhe trägt ein `div`
+darin (`ThemeProvider.tsx`). Wo ein Provider Klassen braucht (Druckansicht),
+steht `applyStylesToPortals={false}`.
+
+## Tailwind-Klasse an einer Fluent-Komponente wirkt nicht
+
+2026-10-10. `className="h-9"` an `Input`, `p-0` an `PopoverSurface`, `w-full`
+am Button der Leiste: ohne Wirkung. Tailwind v4 legt Utilities in eine
+Cascade-Layer, Griffel schreibt ungeschichtet, und ungeschichtete Regeln
+gewinnen unabhängig von der Spezifität. Abhilfe: Fluent-Props, `makeStyles` mit
+`tokens`, Slots (`input={{ className }}`) oder ein eigenes `div` außen herum.
+Was Griffel nicht setzt (Außenabstand, Grid-Platzierung), darf Tailwind
+bleiben. Siehe [fluent-ui.md](fluent-ui.md#tailwind-und-fluent-nebeneinander).

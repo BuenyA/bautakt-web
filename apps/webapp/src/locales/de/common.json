@@ -11,7 +11,8 @@
     "search": "Suchen …",
     "export": "CSV-Export",
     "columns": "Spalten",
-    "edit": "Bearbeiten"
+    "edit": "Bearbeiten",
+    "close": "Schließen"
   },
   "state": {
     "loading": "Wird geladen …",
@@ -29,7 +30,18 @@
     "of": "von",
     "rows": "Einträge",
     "previous": "Zurück",
-    "next": "Weiter"
+    "next": "Weiter",
+    "actions": "Aktionen"
+  },
+  "search": {
+    "label": "Seite oder Aktion suchen",
+    "placeholder": "Suchen oder springen … (Strg+K)",
+    "actions": "Aktionen",
+    "pages": "Seiten",
+    "empty": "Nichts gefunden"
+  },
+  "toaster": {
+    "label": "Benachrichtigungen (Alt+T)"
   },
   "forbidden": {
     "title": "Kein Zugriff",
@@ -37,6 +49,9 @@
     "action": "Zur Übersicht"
   },
   "nav": {
+    "toggleSidebar": "Seitenleiste ein- oder ausblenden",
+    "collapseSidebar": "Seitenleiste einklappen",
+    "expandSidebar": "Seitenleiste ausklappen",
     "overview": "Übersicht",
     "finance": "Finanzen",
     "material": "Material",
@@ -57,7 +72,6 @@
     "catalog": "Katalog",
     "costCenters": "Kostenstellen",
     "settings": "Einstellungen",
-    "detail": "Detail",
     "openMenu": "Menü öffnen",
     "closeMenu": "Menü schließen",
     "main": "Hauptnavigation"

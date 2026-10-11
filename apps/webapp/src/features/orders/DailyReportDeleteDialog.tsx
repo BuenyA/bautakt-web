@@ -1,13 +1,13 @@
+import { DangerButton, toast } from '@bautakt/ui';
 import {
   Button,
   Dialog,
+  DialogActions,
+  DialogBody,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
+  DialogSurface,
   DialogTitle,
-  toast,
-} from '@bautakt/ui';
+} from '@fluentui/react-components';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -138,44 +138,43 @@ export function DailyReportDeleteDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent>
-        <DialogHeader>
+    <Dialog open={open} onOpenChange={(_, data) => handleOpenChange(data.open)}>
+      <DialogSurface>
+        <DialogBody>
           <DialogTitle>{t('domain:dailyReportForm.delete.title')}</DialogTitle>
-          <DialogDescription>
-            {block
-              ? blockMessage(block)
-              : allowed
-                ? confirmDescription()
-                : t('domain:dailyReportForm.delete.countsLoading')}
-          </DialogDescription>
-        </DialogHeader>
+          <DialogContent className="flex flex-col gap-3">
+            <p>
+              {block
+                ? blockMessage(block)
+                : allowed
+                  ? confirmDescription()
+                  : t('domain:dailyReportForm.delete.countsLoading')}
+            </p>
+            {summary ? <p className="text-foreground text-sm">{summary}</p> : null}
 
-        {summary ? <p className="text-foreground text-sm">{summary}</p> : null}
-
-        {error ? (
-          <p role="alert" className="text-destructive text-sm">
-            {error}
-          </p>
-        ) : null}
-
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={close} disabled={remove.isPending}>
-            {t('common:action.cancel')}
-          </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            disabled={remove.isPending || !allowed}
-            aria-busy={remove.isPending}
-            onClick={() => void onConfirm()}
-          >
-            {remove.isPending
-              ? t('domain:dailyReportForm.delete.pending')
-              : t('domain:dailyReportForm.delete.confirm')}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
+            {error ? (
+              <p role="alert" className="text-destructive text-sm">
+                {error}
+              </p>
+            ) : null}
+          </DialogContent>
+          <DialogActions>
+            <Button type="button" onClick={close} disabled={remove.isPending}>
+              {t('common:action.cancel')}
+            </Button>
+            <DangerButton
+              type="button"
+              disabled={remove.isPending || !allowed}
+              aria-busy={remove.isPending}
+              onClick={() => void onConfirm()}
+            >
+              {remove.isPending
+                ? t('domain:dailyReportForm.delete.pending')
+                : t('domain:dailyReportForm.delete.confirm')}
+            </DangerButton>
+          </DialogActions>
+        </DialogBody>
+      </DialogSurface>
     </Dialog>
   );
 }

@@ -1,10 +1,9 @@
 import { hasPermission, type PermissionKey } from '@bautakt/core';
-import { Button } from '@bautakt/ui';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { HOME_ROUTE } from '@/lib/routes';
 
@@ -39,11 +38,7 @@ export function RequirePermission({
     <EmptyState
       title={t('common:forbidden.title')}
       description={t('common:forbidden.description')}
-      action={
-        <Button asChild variant="outline" size="sm">
-          <Link to={HOME_ROUTE}>{t('common:forbidden.action')}</Link>
-        </Button>
-      }
+      action={<LinkButton to={HOME_ROUTE}>{t('common:forbidden.action')}</LinkButton>}
     />
   );
 }
