@@ -336,7 +336,7 @@ Symbole.
 
 Hell/Dunkel über `ThemeProvider` (`apps/webapp/src/app/ThemeProvider.tsx`):
 `FluentProvider` mit `lightTheme` oder `darkTheme` aus `@bautakt/ui`, Wahl im
-localStorage (`bautakt-theme`), Standard: Systemeinstellung. Umgeschaltet wird
+localStorage (`bautakt-theme`), Standard: Hell, auch bei dunklem System (seit 2026-10-11). Umgeschaltet wird
 im Benutzermenü unten in der Leiste (Fluent `Menu`, Gruppe „Darstellung“ mit
 `MenuItemRadio` Hell / Dunkel / Wie das System). Details und die drei
 Dunkel-Abweichungen: [fluent-ui.md](fluent-ui.md).

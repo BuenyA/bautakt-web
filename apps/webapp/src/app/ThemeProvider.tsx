@@ -7,17 +7,18 @@ import { type Theme, ThemeContext } from './ThemeContext';
 const STORAGE_KEY = 'bautakt-theme';
 
 function readStoredTheme(): Theme {
-  if (typeof window === 'undefined') return 'system';
+  if (typeof window === 'undefined') return 'light';
   const stored = window.localStorage.getItem(STORAGE_KEY);
-  return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+  return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'light';
 }
 
 /**
  * Hell/Dunkel über Fluents `FluentProvider` mit den Standard-Themes
  * (`theme/themes.ts` in `@bautakt/ui`).
  *
- * Standard ist die Systemeinstellung — wer am Rechner dunkel arbeitet, will das
- * meistens ueberall. Das Menü „Darstellung“ in der Shell setzt `theme`.
+ * Standard ist Hell, auch wenn der Rechner dunkel eingestellt ist (Owner-Vorgabe
+ * 2026-10-11). Dunkel oder „System“ wählt man im Menü „Darstellung“ in der
+ * Shell; die Wahl bleibt im localStorage.
  *
  * Am `<html>` stehen zusätzlich `data-theme` (für den Rahmen um Dialoge und
  * Drawer im Dunkeln, siehe `styles/theme.css`), `color-scheme` (Scrollbars,
