@@ -1,5 +1,5 @@
 export { ActionCard } from './components/action-card';
-export { DangerButton } from './components/danger-button';
+export { DangerButton, DangerIconButton } from './components/danger-button';
 export { downloadCsv, toCsv } from './components/data-table/csv';
 export {
   DataTable,

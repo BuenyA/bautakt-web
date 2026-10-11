@@ -46,3 +46,35 @@ export const DangerButton = React.forwardRef<HTMLButtonElement, ButtonProps>(fun
     />
   );
 });
+
+/**
+ * Löschen als reines Symbol, z. B. in einer Tabellenzeile oder auf einer
+ * Foto-Kachel: rotes Symbol ohne roten Block, damit eine lange Liste ruhig
+ * bleibt. Standard ist `subtle`; auf Bildern `appearance="secondary"`, damit
+ * das Symbol eine helle Fläche hat. Mit Text immer `DangerButton`.
+ */
+const useIconStyles = makeStyles({
+  root: {
+    color: tokens.colorStatusDangerForeground1,
+    ':hover': { color: tokens.colorStatusDangerForeground1 },
+    ':hover:active': { color: tokens.colorStatusDangerForeground1 },
+    '& .fui-Button__icon': { color: tokens.colorStatusDangerForeground1 },
+  },
+});
+
+export const DangerIconButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  function DangerIconButton({ className, disabled, disabledFocusable, ...props }, ref) {
+    const styles = useIconStyles();
+    const inactive = disabled || disabledFocusable;
+    return (
+      <Button
+        ref={ref as React.Ref<HTMLButtonElement & HTMLAnchorElement>}
+        appearance="subtle"
+        disabled={disabled}
+        disabledFocusable={disabledFocusable}
+        className={mergeClasses(!inactive && styles.root, className)}
+        {...props}
+      />
+    );
+  },
+);

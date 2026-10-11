@@ -1,5 +1,11 @@
 import { eurosToMinor, formatMoney } from '@bautakt/finance';
-import { DangerButton, DataTable, type DataTableColumn, toast } from '@bautakt/ui';
+import {
+  DangerButton,
+  DangerIconButton,
+  DataTable,
+  type DataTableColumn,
+  toast,
+} from '@bautakt/ui';
 import {
   Button,
   Dialog,
@@ -119,8 +125,7 @@ export function CostCentersPage() {
         enableSorting: false,
         cell: ({ row }) => (
           <span className="flex justify-end">
-            <Button
-              appearance="subtle"
+            <DangerIconButton
               type="button"
               aria-label={t('domain:costCenters.delete.actionLabel', {
                 code: row.original.code,

@@ -1,4 +1,4 @@
-import { ActionCard, SkeletonBlock, toast } from '@bautakt/ui';
+import { ActionCard, DangerButton, DangerIconButton, SkeletonBlock, toast } from '@bautakt/ui';
 import {
   Button,
   CardPreview,
@@ -245,9 +245,13 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
             </DialogContent>
             {openPhoto && canDeleteOpen ? (
               <DialogActions>
-                <Button type="button" onClick={() => askDelete(openPhoto)} icon={<DeleteRegular />}>
+                <DangerButton
+                  type="button"
+                  onClick={() => askDelete(openPhoto)}
+                  icon={<DeleteRegular />}
+                >
                   {t('domain:photoForm.delete.action')}
-                </Button>
+                </DangerButton>
               </DialogActions>
             ) : null}
           </DialogBody>
@@ -300,7 +304,8 @@ function PhotoTile({
         {takenAt ? <span className="text-muted-foreground truncate text-xs">{takenAt}</span> : null}
       </ActionCard>
       {deletable ? (
-        <Button
+        <DangerIconButton
+          appearance="secondary"
           shape="circular"
           icon={<DeleteRegular />}
           className="absolute! top-2 right-2 z-10"

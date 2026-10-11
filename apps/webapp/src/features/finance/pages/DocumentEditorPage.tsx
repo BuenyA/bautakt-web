@@ -1,5 +1,5 @@
 import { formatMoney, formatMoneyInput, todayIso } from '@bautakt/finance';
-import { toast } from '@bautakt/ui';
+import { DangerIconButton, toast } from '@bautakt/ui';
 import {
   Button,
   Card,
@@ -346,8 +346,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                 </span>
               </div>
               <div className="flex items-end justify-end">
-                <Button
-                  appearance="subtle"
+                <DangerIconButton
                   aria-label={t('domain:editor.removeLine')}
                   disabled={state.lines.length === 1}
                   onClick={() =>

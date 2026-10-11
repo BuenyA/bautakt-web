@@ -111,10 +111,15 @@ Festgelegt im zweiten Durchgang am 2026-10-10 nach Rückmeldung des Owners
 | `DatePicker`, `DateRangePicker`, `TimeInput`                | Deutsche Maske, Fluent-Optik. Siehe [datumseingabe.md](datumseingabe.md).                                            |
 | `FormDrawer` + `FormDrawerTitle`, `-Description`, `-Footer` | `OverlayDrawer` von rechts für die kurzen Formulare; Titel mit Schließen-Knopf.                                      |
 | `DangerButton`                                              | Primary-Button auf den Status-Danger-Tokens. Fluent hat keine Danger-Variante.                                       |
+| `DangerIconButton`                                          | Rotes Symbol ohne roten Block (`subtle`, auf Bildern `secondary`), für Löschen in Tabellenzeilen und Kacheln.        |
 | `StatusBadge`                                               | Fluent-`Badge` mit Tönen `neutral`, `brand`, `success`, `warning`, `danger`, `outline`.                              |
 | `ActionCard`                                                | Fluent-`Card`, die eine Aktion auslöst: `role="button"`, Tab, Enter/Leertaste. Fluents `Card` rendert nur als `div`. |
 | `SkeletonBlock`                                             | Fluent-`Skeleton`, Größe per Tailwind am Rahmen.                                                                     |
 | `toast`, `AppToaster`                                       | `toast.success(text, { description })` an Fluents `Toaster`.                                                         |
+
+**Regel (Owner-Vorgabe 2026-10-11):** Alles, was löscht oder entfernt, ist schon am
+ersten Knopf rot, nicht erst im Bestätigungsdialog: mit Text `DangerButton`, als
+reines Symbol `DangerIconButton`. Der Bestätigungsdialog nutzt ebenfalls `DangerButton`.
 
 In `apps/webapp/src/components/common/`: `RouterLink` (Fluent-`Link` auf eine Route, mit `stopPropagation` für Links in klickbaren Tabellenzeilen), `LinkButton` (Fluent-`Button` als
 `<a>` auf eine Route) und `useRouterLink` (`href` und Klick-Handler für jedes
