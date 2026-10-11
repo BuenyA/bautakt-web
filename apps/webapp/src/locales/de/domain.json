@@ -782,12 +782,88 @@
   },
   "calendar": {
     "title": "Kalender",
-    "description": "Einsätze im Monatsüberblick.",
-    "previous": "Voriger Monat",
-    "next": "Nächster Monat",
+    "description": "Termine, Einsätze und eigene Abwesenheiten.",
+    "previous": "Zurück",
+    "next": "Weiter",
     "today": "Heute",
     "more_one": "{{count}} weiterer",
-    "more_other": "{{count}} weitere"
+    "more_other": "{{count}} weitere",
+    "newEvent": "Termin anlegen",
+    "viewLabel": "Ansicht",
+    "views": {
+      "jahr": "Jahr",
+      "monat": "Monat",
+      "woche": "Woche",
+      "tag": "Tag"
+    },
+    "allDay": "Ganztägig",
+    "untitled": "Ohne Titel",
+    "openDay": "{{date}} öffnen",
+    "openDayBusy": "{{date}} öffnen, mit Einträgen",
+    "createOnDay": "Termin am {{date}} anlegen",
+    "createAt": "Termin am {{date}} um {{hour}} Uhr anlegen",
+    "loadError": "Termine konnten nicht geladen werden. Einsätze und Abwesenheiten werden trotzdem gezeigt.",
+    "legend": {
+      "me": "Privater Termin",
+      "all": "Firmentermin",
+      "assignment": "Einsatz",
+      "absence": "Abwesenheit"
+    },
+    "types": {
+      "me": "Für mich",
+      "all": "Für alle"
+    },
+    "recurrence": {
+      "none": "Keine",
+      "daily": "Täglich",
+      "weekly": "Wöchentlich",
+      "monthly": "Monatlich",
+      "yearly": "Jährlich"
+    },
+    "reminder": {
+      "none": "Keine",
+      "atStart": "Zu Beginn",
+      "before": "{{minutes}} Minuten vorher"
+    },
+    "form": {
+      "newTitle": "Termin anlegen",
+      "editTitle": "Termin bearbeiten",
+      "viewTitle": "Termin",
+      "description": "Der Termin erscheint auch im Kalender der Handy-App.",
+      "readOnlyHint": "Firmentermine darf nur ändern, wer den Kalender für alle verwalten darf.",
+      "title": "Titel",
+      "titlePlaceholder": "z. B. Baubesprechung",
+      "allDay": "Ganztägig",
+      "startDate": "Beginn",
+      "startTime": "Uhrzeit Beginn",
+      "endDate": "Ende",
+      "endTime": "Uhrzeit Ende",
+      "type": "Termintyp",
+      "recurrence": "Wiederholung",
+      "until": "Endet am",
+      "untilNone": "Kein Enddatum",
+      "reminder": "Erinnerung",
+      "reminderHint": "Die Erinnerung kommt als Hinweis in der Handy-App, nicht im Browser.",
+      "notes": "Notizen",
+      "titleRequired": "Bitte einen Titel eingeben.",
+      "companyForbidden": "Firmentermine darf nur anlegen, wer den Kalender für alle verwalten darf.",
+      "saved": "Termin gespeichert.",
+      "saveError": "Der Termin konnte nicht gespeichert werden.",
+      "delete": "Termin löschen",
+      "deleteTitle": "Termin löschen?",
+      "deleteDescription": "„{{title}}“ wird gelöscht. Das lässt sich nicht rückgängig machen.",
+      "deleteConfirm": "Endgültig löschen",
+      "deleted": "Termin gelöscht.",
+      "deleteError": "Der Termin konnte nicht gelöscht werden.",
+      "notChanged": "Der Termin wurde nicht geändert. Vielleicht fehlt das Recht dazu, oder er wurde inzwischen gelöscht."
+    },
+    "scope": {
+      "saveTitle": "Serie bearbeiten",
+      "deleteTitle": "Serie löschen",
+      "description": "Dieser Termin gehört zu einer Serie. Was soll sich ändern?",
+      "this": "Nur dieser Termin",
+      "all": "Alle Termine"
+    }
   },
   "editor": {
     "title": "Beleg",
