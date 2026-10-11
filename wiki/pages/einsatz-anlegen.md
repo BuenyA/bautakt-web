@@ -7,7 +7,7 @@ sonst, wie sie seit der Demo sind.
 
 ## Anlegen
 
-Ein Seitenpanel auf `/einsaetze`, Knopf „Einsatz anlegen“, auch im leeren
+Ein Seitenpanel auf `/einsatzplanung`, Knopf „Einsatz anlegen“, auch im leeren
 Zustand. Das Panel ist nur gemountet, solange es offen ist, und startet deshalb
 jedes Mal leer (`AssignmentSheet`). Vorbelegt sind der heutige Tag und 07:00
 bis 16:00, wie beim Zeiteintrag. Beginn und Ende haben eigene Daten, ein
@@ -37,7 +37,7 @@ das der Nutzer sehen darf.
 
 ## Löschen
 
-Knopf „Einsatz löschen“ auf `/einsaetze/:id`, danach ein Dialog. Die
+Knopf „Einsatz löschen“ auf `/einsatzplanung/:id`, danach ein Dialog. Die
 Mitarbeiterzuordnung fällt mit dem Einsatz weg (`ON DELETE CASCADE` auf
 `work_assignment_employees`, gemessen 2026-10-05).
 
@@ -78,8 +78,8 @@ Zeiten-Guard greift für sie also über die Zählung und nicht über die Sperre
 ## Nach dem Speichern
 
 Die Mutation invalidiert `['assignments', companyId]`. Liste und Detail hängen
-an diesem Präfix. Danach Navigation auf `/einsaetze/:id`. Nach dem Löschen
-zurück auf `/einsaetze`.
+an diesem Präfix. Danach Navigation auf `/einsatzplanung/:id`. Nach dem Löschen
+zurück auf `/einsatzplanung`.
 
 ## Code
 

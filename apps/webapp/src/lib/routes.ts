@@ -35,8 +35,8 @@ export const routes = {
   // Arbeit — direkt in der Leiste
   orders: '/auftraege',
   order: (id: string) => `/auftraege/${id}`,
-  assignments: '/einsaetze',
-  assignment: (id: string) => `/einsaetze/${id}`,
+  assignments: '/einsatzplanung',
+  assignment: (id: string) => `/einsatzplanung/${id}`,
   calendar: '/kalender',
   times: '/zeiten',
   /**
@@ -80,6 +80,8 @@ export const routes = {
   // `/mitarbeiter`, `/finanzen` und `/kalender` sind echte Seiten. `/finanzen`
   // ist der Hub, kein Redirect mehr auf Rechnungen.
   legacyNotifications: '/benachrichtigungen',
+  /** Bis 2026-10-11 hieß die Einsatzplanung „Einsätze“. */
+  legacyAssignments: '/einsaetze',
 } as const;
 
 /** Startseite nach dem Anmelden. */

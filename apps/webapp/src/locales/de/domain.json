@@ -212,7 +212,7 @@
     "notFoundDescription": "Dieser Kunde existiert nicht oder ist für Sie nicht sichtbar."
   },
   "assignments": {
-    "listTitle": "Einsätze",
+    "listTitle": "Einsatzplanung",
     "listDescription": "Geplante Einsätze Ihres Betriebs.",
     "detailTitle": "Einsatz",
     "detailDescription": "Zeitraum, Auftrag und zugewiesene Mitarbeiter.",
@@ -524,7 +524,7 @@
       "title": "Einsatzplan heute",
       "count_one": "{{count}} Einsatz",
       "count_other": "{{count}} Einsätze",
-      "toPlan": "Zum Einsatzplan",
+      "toPlan": "Zur Einsatzplanung",
       "empty": "Heute sind keine Einsätze geplant.",
       "order": "Auftrag",
       "maps": "Maps",

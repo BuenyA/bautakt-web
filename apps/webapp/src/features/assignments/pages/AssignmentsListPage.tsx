@@ -135,7 +135,7 @@ export function AssignmentsListPage() {
         data={data ?? []}
         isLoading={isLoading}
         labels={labels}
-        exportFileName="einsaetze"
+        exportFileName="einsatzplanung"
         onRowClick={(assignment) => void navigate(routes.assignment(assignment.id))}
         toolbar={
           <TabList

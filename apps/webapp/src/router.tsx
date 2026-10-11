@@ -5,6 +5,7 @@ import { NotFoundPage } from '@/components/common/NotFoundPage';
 import { AppShell } from '@/components/layout/AppShell';
 import { AssignmentDetailPage } from '@/features/assignments/pages/AssignmentDetailPage';
 import { AssignmentsListPage } from '@/features/assignments/pages/AssignmentsListPage';
+import { LegacyAssignmentRedirect } from '@/features/assignments/pages/LegacyAssignmentRedirect';
 import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { RegisterPage } from '@/features/auth/pages/RegisterPage';
@@ -231,6 +232,11 @@ export const router = createBrowserRouter([
               // Alte Pfade umleiten, damit Bookmarks nicht leer laufen.
               // `/finanzen` ist der Hub, kein Redirect auf Rechnungen.
               { path: routes.legacyNotifications, element: <Navigate to={HOME_ROUTE} replace /> },
+              {
+                path: routes.legacyAssignments,
+                element: <Navigate to={routes.assignments} replace />,
+              },
+              { path: `${routes.legacyAssignments}/:id`, element: <LegacyAssignmentRedirect /> },
             ],
           },
         ],
