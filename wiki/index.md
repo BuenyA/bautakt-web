@@ -37,6 +37,7 @@ verlinkt, nie kopiert.
 | [auftragscheckliste.md](pages/auftragscheckliste.md)       | Checkliste am Auftrag lesen, abhaken, zuweisen.                           |
 | [auftrag-anlegen.md](pages/auftrag-anlegen.md)             | Auftrag aus der Liste anlegen, dieselbe `orders`-Zeile.                   |
 | [auftrag-bearbeiten.md](pages/auftrag-bearbeiten.md)       | Stammdaten eines Auftrags ändern, Teilpatch wie in der App.               |
+| [einsatzplanung.md](pages/einsatzplanung.md)               | Wochenplan mit Gesichtern, Einsatzseite, Einsatz bearbeiten.              |
 | [einsatz-anlegen.md](pages/einsatz-anlegen.md)             | Einsatz anlegen und löschen, Zeiten bleiben stehen.                       |
 | [kostenstellen.md](pages/kostenstellen.md)                 | Kostenstelle anlegen und löschen, Auftragssumme je Zeile.                 |
 | [demo-gf-2026-10-10.md](pages/demo-gf-2026-10-10.md)       | Klickpfad GF-Demo 10.10.2026 (Spahrbau).                                  |
@@ -103,6 +104,7 @@ verlinkt, nie kopiert.
 | 2026-10-11 | [Ein Logo überall: der orangene Bauhelm](logs/2026-10-11-logo.md)                                 |
 | 2026-10-11 | [Zeiten ohne eigenen Bereich, Mitarbeiterseite](logs/2026-10-11-zeiten-ohne-bereich.md)           |
 | 2026-10-11 | [Kalender: Termine wie in der App](logs/2026-10-11-kalender-termine.md)                           |
+| 2026-10-11 | [Einsatzplanung als Wochenplan](logs/2026-10-11-einsatzplanung-woche.md)                          |
 
 ## Die drei wichtigsten Sätze
 

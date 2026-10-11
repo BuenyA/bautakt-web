@@ -29,7 +29,9 @@ import { readableDbError } from '@/lib/dbErrors';
 import { routes } from '@/lib/routes';
 import { supabase } from '@/lib/supabase';
 
-import { type AssignmentDraft, emptyAssignment } from './assignmentDraft';
+import { type AssignmentDraft, draftFromAssignment, emptyAssignment } from './assignmentDraft';
+import type { AssignmentDetail } from './useAssignment';
+import { useUpdateAssignment } from './useUpdateAssignment';
 
 /**
  * Legt einen Einsatz in `work_assignments` an und die Zuordnung in
@@ -97,34 +99,68 @@ function useCreateAssignment() {
 }
 
 /**
- * Einsatz anlegen.
+ * Einsatz anlegen oder bearbeiten.
  *
- * Seitenpanel, wie Auftrag und Abwesenheit: die Liste bleibt dahinter
+ * Seitenpanel, wie Auftrag und Abwesenheit: der Plan bleibt dahinter
  * sichtbar. Das Formular wird nur gemountet, solange das Panel offen ist,
  * und startet damit jedes Mal frisch.
+ *
+ * - `assignment` gesetzt: bearbeiten, das Panel schließt nach dem Speichern.
+ * - `initial`: Tag und Stunde aus einem Klick in den Wochenplan.
+ * - `onCreated`: was nach dem Anlegen passiert; ohne Angabe geht es zum Einsatz.
  */
 export function AssignmentSheet({
   open,
   onOpenChange,
+  assignment,
+  initial,
+  onCreated,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  assignment?: AssignmentDetail;
+  initial?: { dayIso: string; hour: number };
+  onCreated?: (id: string) => void;
 }) {
   return (
     <FormDrawer open={open} onOpenChange={onOpenChange}>
-      {open ? <AssignmentForm onDone={() => onOpenChange(false)} /> : null}
+      {open ? (
+        <AssignmentForm
+          assignment={assignment}
+          initial={initial}
+          onCreated={onCreated}
+          onDone={() => onOpenChange(false)}
+        />
+      ) : null}
     </FormDrawer>
   );
 }
 
-function AssignmentForm({ onDone }: { onDone: () => void }) {
+function AssignmentForm({
+  assignment,
+  initial,
+  onCreated,
+  onDone,
+}: {
+  assignment?: AssignmentDetail;
+  initial?: { dayIso: string; hour: number };
+  onCreated?: (id: string) => void;
+  onDone: () => void;
+}) {
   const orderFieldId = useId();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const create = useCreateAssignment();
+  const assignedBefore = assignment?.crew.map((member) => member.employmentId) ?? [];
+  const update = useUpdateAssignment(assignment?.id ?? '', assignedBefore);
+  const isEdit = Boolean(assignment);
   const orders = useOrders();
   const employees = useEmployees();
-  const [draft, setDraft] = useState<AssignmentDraft>(emptyAssignment);
+  const [draft, setDraft] = useState<AssignmentDraft>(() =>
+    assignment
+      ? draftFromAssignment({ ...assignment, employmentIds: assignedBefore })
+      : emptyAssignment(initial),
+  );
   const [error, setError] = useState<string | null>(null);
   const ids = {
     startDate: useId(),
@@ -144,7 +180,11 @@ function AssignmentForm({ onDone }: { onDone: () => void }) {
   const clockInverted = !datesInverted && Boolean(startsAt && endsAt && endsAt <= startsAt);
 
   // Ausgeschiedene stehen nicht zur Auswahl — fuer sie wird nichts mehr geplant.
-  const selectableEmployees = (employees.data ?? []).filter((employee) => !employee.ended_at);
+  // Ausnahme beim Bearbeiten: wer schon eingeteilt ist, bleibt sichtbar, sonst
+  // fiele die Person beim Speichern stillschweigend aus dem Einsatz.
+  const selectableEmployees = (employees.data ?? []).filter(
+    (employee) => !employee.ended_at || assignedBefore.includes(employee.id),
+  );
   const orderOptions = [...(orders.data ?? [])].sort((a, b) => a.name.localeCompare(b.name, 'de'));
 
   function set(patch: Partial<AssignmentDraft>) {
@@ -183,12 +223,25 @@ function AssignmentForm({ onDone }: { onDone: () => void }) {
     }
 
     try {
+      if (isEdit) {
+        await update.mutateAsync(draft);
+        toast.success(t('domain:assignments.edit.saved'));
+        onDone();
+        return;
+      }
       const id = await create.mutateAsync(draft);
       toast.success(t('domain:assignments.create.saved'));
-      navigate(routes.assignment(id));
+      if (onCreated) {
+        onCreated(id);
+        onDone();
+      } else navigate(routes.assignment(id));
     } catch (caught) {
       if (caught instanceof Error && caught.message === 'INVALID_PERIOD') {
         setError(t('domain:assignments.create.periodRequired'));
+        return;
+      }
+      if (caught instanceof Error && caught.message === 'NOT_UPDATED') {
+        setError(t('domain:assignments.edit.notAllowed'));
         return;
       }
       setError(readableDbError(caught) ?? t('domain:assignments.create.saveError'));
@@ -202,9 +255,13 @@ function AssignmentForm({ onDone }: { onDone: () => void }) {
     >
       <DrawerHeader>
         <FormDrawerTitle closeLabel={t('common:action.close')}>
-          {t('domain:assignments.create.title')}
+          {isEdit ? t('domain:assignments.edit.title') : t('domain:assignments.create.title')}
         </FormDrawerTitle>
-        <FormDrawerDescription>{t('domain:assignments.create.description')}</FormDrawerDescription>
+        <FormDrawerDescription>
+          {isEdit
+            ? t('domain:assignments.edit.description')
+            : t('domain:assignments.create.description')}
+        </FormDrawerDescription>
       </DrawerHeader>
 
       <DrawerBody className="flex flex-col gap-4">
@@ -309,6 +366,11 @@ function AssignmentForm({ onDone }: { onDone: () => void }) {
                       }
                     />
                     <span>{employee.name || t('domain:employees.unnamed')}</span>
+                    {employee.ended_at ? (
+                      <span className="text-text-subtle text-xs">
+                        {t('domain:assignments.edit.formerEmployee')}
+                      </span>
+                    ) : null}
                   </label>
                 );
               })}
@@ -344,7 +406,7 @@ function AssignmentForm({ onDone }: { onDone: () => void }) {
         <Button
           appearance="primary"
           type="submit"
-          disabled={create.isPending || datesInverted || clockInverted}
+          disabled={create.isPending || update.isPending || datesInverted || clockInverted}
         >
           {t('common:action.save')}
         </Button>

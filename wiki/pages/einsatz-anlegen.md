@@ -1,14 +1,14 @@
 # Einsatz anlegen und löschen
 
-Die Einsatzliste legt einen Einsatz an, die Detailseite löscht ihn. Die Zeile
+Der Wochenplan legt einen Einsatz an, die Einsatzseite löscht ihn. Die Zeile
 liegt in `work_assignments`, die Zuordnung in `work_assignment_employees` —
-dieselben Tabellen, die die Handy-App liest. Die Liste und das Detail bleiben
-sonst, wie sie seit der Demo sind.
+dieselben Tabellen, die die Handy-App liest. Wochenplan, Einsatzseite und
+Bearbeiten: [einsatzplanung.md](einsatzplanung.md).
 
 ## Anlegen
 
-Ein Seitenpanel auf `/einsatzplanung`, Knopf „Einsatz anlegen“, auch im leeren
-Zustand. Das Panel ist nur gemountet, solange es offen ist, und startet deshalb
+Ein Seitenpanel auf `/einsatzplanung`, Knopf „Einsatz anlegen“ oder Klick in
+eine Stunde des Wochenplans (dann ist Tag und Stunde vorbelegt). Das Panel ist nur gemountet, solange es offen ist, und startet deshalb
 jedes Mal leer (`AssignmentSheet`). Vorbelegt sind der heutige Tag und 07:00
 bis 16:00, wie beim Zeiteintrag. Beginn und Ende haben eigene Daten, ein
 Einsatz darf also über mehrere Tage gehen.
@@ -24,8 +24,7 @@ angemeldeten Nutzers. Die Insert-Policy verlangt, dass sie `auth.uid()` ist.
 Zeitpunkt wird abgelehnt.
 
 Mitarbeiter sind keine Pflicht. Eine Zeile ohne Eintrag in
-`work_assignment_employees` ist der Zustand, den die Liste als „Keine
-Zuweisung“ schon anzeigt. Ausgeschiedene (`ended_at`) stehen nicht zur Auswahl,
+`work_assignment_employees` zeigt der Wochenplan als „Niemand eingeteilt“. Ausgeschiedene (`ended_at`) stehen nicht zur Auswahl,
 wie bei Zeit und Abwesenheit. Schlägt die Zuordnung nach dem Einsatz fehl, wird
 der Einsatz wieder gelöscht — sonst bliebe eine Zeile, die das Formular gerade
 als Fehler gemeldet hat. Der Trigger `notify_work_assignment_assigned` läuft
@@ -60,7 +59,7 @@ Schemaänderung in `bautakt-app`.
 
 ## Recht
 
-Knopf und leerer Zustand hängen an `usePermission('canManageWorkAssignments')`.
+Knöpfe und das Anlegen per Klick hängen an `usePermission('canManageWorkAssignments')`.
 Das blendet sie aus und ist keine Kontrolle. Insert, Update und Delete auf
 `work_assignments` sowie Insert und Delete auf `work_assignment_employees`
 verlangen dasselbe Recht. Lehnt die Datenbank ab, zeigt das Formular „Dafür
@@ -77,8 +76,9 @@ Zeiten-Guard greift für sie also über die Zählung und nicht über die Sperre
 
 ## Nach dem Speichern
 
-Die Mutation invalidiert `['assignments', companyId]`. Liste und Detail hängen
-an diesem Präfix. Danach Navigation auf `/einsatzplanung/:id`. Nach dem Löschen
+Die Mutation invalidiert `['assignments', companyId]`. Wochenplan, Detail,
+Kalender und Übersicht hängen an diesem Präfix. Danach Navigation auf
+`/einsatzplanung/:id`, außer beim Anlegen per Klick in den Wochenplan. Nach dem Löschen
 zurück auf `/einsatzplanung`.
 
 ## Code

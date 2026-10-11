@@ -216,35 +216,16 @@
   },
   "assignments": {
     "listTitle": "Einsatzplanung",
-    "listDescription": "Geplante Einsätze Ihres Betriebs.",
+    "listDescription": "Wer wann auf welcher Baustelle ist, Woche für Woche.",
     "detailTitle": "Einsatz",
-    "detailDescription": "Zeitraum, Auftrag und zugewiesene Mitarbeiter.",
-    "filtersLabel": "Zeitraumfilter",
-    "filterAll": "Alle",
-    "filterThisWeek": "Diese Woche",
-    "columns": {
-      "period": "Zeitraum",
+    "fields": {
       "order": "Auftrag",
       "employees": "Mitarbeiter",
       "note": "Notiz"
     },
-    "fields": {
-      "period": "Zeitraum",
-      "order": "Auftrag",
-      "employees": "Mitarbeiter",
-      "note": "Notiz",
-      "created": "Angelegt"
-    },
     "noOrder": "Kein Auftrag",
-    "noEmployees": "Keine Zuweisung",
     "noNote": "Keine Notiz",
     "unnamedEmployee": "Ohne Namen",
-    "emptyTitle": "Noch keine Einsätze",
-    "emptyDescription": "Sobald Einsätze geplant sind, erscheinen sie hier.",
-    "emptyDescriptionManage": "Legen Sie den ersten Einsatz an. Er ist danach auch in der Handy-App sichtbar.",
-    "emptyWeekTitle": "Keine Einsätze in dieser Woche",
-    "emptyWeekDescription": "In der aktuellen Kalenderwoche sind keine Einsätze geplant. Wechseln Sie zu „Alle“, um alle Einsätze zu sehen.",
-    "emptyWeekShowAll": "Alle Einsätze anzeigen",
     "loadErrorTitle": "Einsätze konnten nicht geladen werden",
     "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
     "notFoundTitle": "Einsatz nicht gefunden",
@@ -268,7 +249,7 @@
       "noOrders": "Es gibt noch keinen Auftrag. Legen Sie zuerst einen Auftrag an.",
       "employeesError": "Mitarbeiter konnten nicht geladen werden.",
       "saved": "Einsatz angelegt.",
-      "saveError": "Einsatz konnte nicht angelegt werden."
+      "saveError": "Einsatz konnte nicht gespeichert werden."
     },
     "delete": {
       "action": "Einsatz löschen",
@@ -282,6 +263,39 @@
       "blockedUnverified": "Ob an diesem Einsatz Arbeitszeiten hängen, ist mit diesem Konto nicht sichtbar. Der Einsatz bleibt, damit keine Zeiten mitgelöscht werden.",
       "forbidden": "Dafür fehlt die Berechtigung, oder der Einsatz wurde bereits gelöscht.",
       "error": "Einsatz konnte nicht gelöscht werden."
+    },
+    "week": {
+      "label": "Wochenplan",
+      "previous": "Vorherige Woche",
+      "next": "Nächste Woche",
+      "thisWeek": "Diese Woche",
+      "noCrew": "Niemand eingeteilt",
+      "createAt": "Einsatz am {{date}} um {{hour}}:00 anlegen",
+      "openAssignment": "{{order}}, {{time}}, {{crew}}",
+      "today": "Heute"
+    },
+    "detail": {
+      "heading": "Einsatz vom {{date}}",
+      "crewTitle": "Mitarbeiter",
+      "noCrew": "Noch niemand eingeteilt.",
+      "assignCrew": "Mitarbeiter einteilen",
+      "notesTitle": "Notizen",
+      "noNote": "Keine Notiz.",
+      "infoTitle": "Auf einen Blick",
+      "date": "Datum",
+      "time": "Uhrzeit",
+      "duration": "Dauer",
+      "durationValue": "{{hours}} Std.",
+      "created": "Angelegt",
+      "createdBy": "{{date}} von {{name}}"
+    },
+    "edit": {
+      "action": "Bearbeiten",
+      "title": "Einsatz bearbeiten",
+      "description": "Änderungen sind sofort auch in der Handy-App sichtbar. Neu Eingeteilte bekommen eine Benachrichtigung.",
+      "saved": "Einsatz gespeichert.",
+      "notAllowed": "Dafür fehlt die Berechtigung, oder der Einsatz wurde inzwischen gelöscht.",
+      "formerEmployee": "ausgeschieden"
     }
   },
   "times": {
