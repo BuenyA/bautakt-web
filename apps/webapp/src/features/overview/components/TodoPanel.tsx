@@ -296,6 +296,7 @@ function DueLabel({ daysLeft }: { daysLeft: number }) {
 function AbsenceRow({ absence, urls }: { absence: OverviewAbsence; urls: Record<string, string> }) {
   const { t } = useTranslation();
   const approve = useApproveAbsence();
+  const link = useRouterLink(routes.absence(absence.id));
   const [rejecting, setRejecting] = useState(false);
   const range =
     absence.startDate === absence.endDate
@@ -316,14 +317,20 @@ function AbsenceRow({ absence, urls }: { absence: OverviewAbsence; urls: Record<
   return (
     <li className="border-border flex items-center gap-3 border-b py-2 last:border-b-0">
       <MemberAvatar member={absence.member} urls={urls} size={32} />
-      <span className="flex min-w-0 flex-1 flex-col">
+      {/* Name und Zeitraum führen zur Abwesenheit; die Knöpfe nur mit Symbol,
+          damit sie auf kleinen Laptops nicht in den Text drücken. */}
+      <a
+        href={link.href}
+        onClick={link.onClick}
+        className="hover:bg-muted -my-1 flex min-w-0 flex-1 flex-col rounded-md px-1 py-1 transition-colors"
+      >
         <Text size={300} weight="semibold" truncate wrap={false}>
           {absence.member.name}
         </Text>
         <Text size={200} className="text-text-secondary" truncate wrap={false}>
           {t(`domain:absences.types.${absence.type}`)} · {range}
         </Text>
-      </span>
+      </a>
       <Button
         size="small"
         appearance="primary"
@@ -331,17 +338,15 @@ function AbsenceRow({ absence, urls }: { absence: OverviewAbsence; urls: Record<
         disabled={approve.isPending}
         onClick={onApprove}
         aria-label={t('domain:overview.todo.approveA11y', { name: absence.member.name })}
-      >
-        {t('domain:overview.todo.approve')}
-      </Button>
+        title={t('domain:overview.todo.approve')}
+      />
       <Button
         size="small"
         icon={<DismissRegular />}
         onClick={() => setRejecting(true)}
         aria-label={t('domain:overview.todo.rejectA11y', { name: absence.member.name })}
-      >
-        {t('domain:overview.todo.reject')}
-      </Button>
+        title={t('domain:overview.todo.reject')}
+      />
       <AbsenceActionDialog
         action={rejecting ? 'reject' : null}
         absence={{

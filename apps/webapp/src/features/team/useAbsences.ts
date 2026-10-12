@@ -1,5 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import {
+  type CrewMember,
+  crewMember,
+  EMPLOYMENT_SELECT,
+  type EmploymentJoin,
+} from '@/features/assignments/crew';
 import { useMembership } from '@/features/company/useMembership';
 import { employmentDisplayName } from '@/lib/employeeName';
 import { supabase } from '@/lib/supabase';
@@ -53,6 +59,67 @@ export function useAbsences() {
   });
 }
 
+export type AbsenceDetail = AbsenceRow & {
+  /** Name und Profilbild für die Kopfzeile, wie in der Einsatzplanung. */
+  member: CrewMember;
+  created_at: string;
+  /** Leer, wenn das Profil nicht lesbar ist oder keinen Namen hat. */
+  requested_by_name: string;
+  decided_by_name: string;
+};
+
+type PersonJoin = { first_name: string | null; last_name: string | null } | null;
+
+function personName(person: PersonJoin): string {
+  return [person?.first_name, person?.last_name]
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .join(' ');
+}
+
+/**
+ * Eine Abwesenheit für die Detailseite. Liegt unter `['absences', companyId]`,
+ * damit jede Änderung sie mit der Liste zusammen neu lädt.
+ */
+export function useAbsence(absenceId: string | undefined) {
+  const { data: membership } = useMembership();
+  const companyId = membership?.companyId;
+
+  return useQuery({
+    queryKey: ['absences', companyId, 'detail', absenceId],
+    enabled: Boolean(companyId && absenceId),
+    queryFn: async (): Promise<AbsenceDetail | null> => {
+      const { data, error } = await supabase
+        .from('absences')
+        .select(
+          `id, employment_id, type, status, start_date, end_date, note, decided_at, decision_note, created_at,
+           employments ( ${EMPLOYMENT_SELECT} ),
+           requester:profiles!requested_by_user_id ( first_name, last_name ),
+           decider:profiles!decided_by_user_id ( first_name, last_name )`,
+        )
+        .eq('company_id', companyId!)
+        .eq('id', absenceId!)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) return null;
+
+      const { employments, requester, decider, ...row } = data as unknown as Omit<
+        AbsenceDetail,
+        'member' | 'employee_name' | 'requested_by_name' | 'decided_by_name'
+      > & { employments: EmploymentJoin; requester: PersonJoin; decider: PersonJoin };
+      const member = crewMember(row.employment_id, employments);
+      return {
+        ...row,
+        member,
+        employee_name: member.name,
+        requested_by_name: personName(requester),
+        decided_by_name: personName(decider),
+      };
+    },
+  });
+}
+
 /**
  * Abwesenheit genehmigen.
  *
@@ -91,12 +158,14 @@ export function useApproveAbsence() {
  */
 function useAbsenceMutation<T>(
   run: (companyId: string, input: T) => PromiseLike<{ data: unknown[] | null; error: unknown }>,
+  mutationKey?: readonly string[],
 ) {
   const queryClient = useQueryClient();
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
 
   return useMutation({
+    mutationKey,
     mutationFn: async (input: T) => {
       if (!companyId) throw new Error('NOT_AUTHENTICATED');
       const { data, error } = await run(companyId, input);
@@ -154,9 +223,14 @@ export function useUpdateAbsence() {
   );
 }
 
+/** Schlüssel des Löschens: die Detailseite zeigt währenddessen nicht „nicht gefunden“. */
+export const DELETE_ABSENCE_KEY = ['absences', 'delete'] as const;
+
 /** Endgültig löschen — auch aus dem Urlaubskonto. Nicht rückgängig zu machen. */
 export function useDeleteAbsence() {
-  return useAbsenceMutation((companyId, id: string) =>
-    supabase.from('absences').delete().eq('company_id', companyId).eq('id', id).select('id'),
+  return useAbsenceMutation(
+    (companyId, id: string) =>
+      supabase.from('absences').delete().eq('company_id', companyId).eq('id', id).select('id'),
+    DELETE_ABSENCE_KEY,
   );
 }

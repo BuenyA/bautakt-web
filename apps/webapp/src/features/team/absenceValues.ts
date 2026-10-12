@@ -1,3 +1,5 @@
+import type { StatusTone } from '@bautakt/ui';
+
 /**
  * Arten und Status einer Abwesenheit.
  *
@@ -31,3 +33,17 @@ export type AbsenceStatus = (typeof ABSENCE_STATUSES)[number];
 
 /** Offen heisst hier „ausstehend" — der Status, auf den jemand warten muss. */
 export const PENDING_STATUS: AbsenceStatus = 'ausstehend';
+
+/** Farbe des Status-Badges, in Liste und Detailseite gleich. */
+export function absenceStatusTone(status: string): StatusTone {
+  switch (status) {
+    case 'genehmigt':
+      return 'success';
+    case 'abgelehnt':
+      return 'danger';
+    case PENDING_STATUS:
+      return 'warning';
+    default:
+      return 'neutral';
+  }
+}

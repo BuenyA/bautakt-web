@@ -715,7 +715,6 @@
     "edit": "Bearbeiten",
     "cancelAction": "Stornieren",
     "delete": "Endgültig löschen",
-    "moreActions": "Weitere Aktionen für {{name}}",
     "emptyTitle": "Keine Abwesenheiten",
     "emptyDescription": "Es liegt nichts vor.",
     "actions": {
@@ -744,6 +743,26 @@
         "done": "Abwesenheit gelöscht.",
         "error": "Löschen nicht möglich."
       }
+    },
+    "detail": {
+      "title": "Abwesenheit",
+      "loadErrorTitle": "Abwesenheit konnte nicht geladen werden",
+      "loadErrorDescription": "Bitte versuch es gleich noch einmal.",
+      "notFoundTitle": "Abwesenheit nicht gefunden",
+      "notFoundDescription": "Sie wurde gelöscht, oder du hast keinen Zugriff darauf.",
+      "infoTitle": "Details",
+      "period": "Zeitraum",
+      "days": "Dauer",
+      "daysValue_one": "{{count}} Kalendertag",
+      "daysValue_other": "{{count}} Kalendertage",
+      "requested": "Eingetragen",
+      "requestedBy": "{{date}} von {{name}}",
+      "decided": "Entschieden",
+      "decisionNote": "Grund der Ablehnung",
+      "noteTitle": "Notiz",
+      "noNote": "Keine Notiz.",
+      "toEmployee": "Zum Mitarbeiter",
+      "locked": "Abgelehnte und stornierte Abwesenheiten lassen sich nicht mehr bearbeiten, nur noch löschen."
     }
   },
   "payroll": {

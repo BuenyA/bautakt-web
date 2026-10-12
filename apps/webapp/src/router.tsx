@@ -32,6 +32,7 @@ import { OrderDetailPage } from '@/features/orders/pages/OrderDetailPage';
 import { OrdersListPage } from '@/features/orders/pages/OrdersListPage';
 import { OverviewPage } from '@/features/overview/pages/OverviewPage';
 import { SettingsPage } from '@/features/settings/pages/SettingsPage';
+import { AbsenceDetailPage } from '@/features/team/pages/AbsenceDetailPage';
 import { AbsencesPage } from '@/features/team/pages/AbsencesPage';
 import { EmployeeDetailPage } from '@/features/team/pages/EmployeeDetailPage';
 import { EmployeesListPage } from '@/features/team/pages/EmployeesListPage';
@@ -202,6 +203,14 @@ export const router = createBrowserRouter([
                 element: (
                   <RequirePermission anyOf={['canManageAbsences']}>
                     <AbsencesPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: `${routes.absences}/:id`,
+                element: (
+                  <RequirePermission anyOf={['canManageAbsences']}>
+                    <AbsenceDetailPage />
                   </RequirePermission>
                 ),
               },

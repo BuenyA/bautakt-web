@@ -1,27 +1,10 @@
 import { daysBetween } from '@bautakt/finance';
-import { DataTable, type DataTableColumn, StatusBadge, type StatusTone, toast } from '@bautakt/ui';
-import {
-  Button,
-  Menu,
-  MenuItem,
-  MenuList,
-  MenuPopover,
-  MenuTrigger,
-  Tab,
-  TabList,
-} from '@fluentui/react-components';
-import {
-  AddRegular,
-  CheckmarkRegular,
-  DeleteRegular,
-  DismissCircleRegular,
-  DismissRegular,
-  EditRegular,
-  MoreHorizontalRegular,
-} from '@fluentui/react-icons';
+import { DataTable, type DataTableColumn, StatusBadge, toast } from '@bautakt/ui';
+import { Button, Tab, TabList } from '@fluentui/react-components';
+import { AddRegular, CheckmarkRegular, DismissRegular } from '@fluentui/react-icons';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -32,31 +15,16 @@ import { useCompanyListLoading } from '@/features/company/useCompanyListLoading'
 import { usePermission } from '@/features/company/usePermission';
 import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
+import { routes } from '@/lib/routes';
 
-import {
-  type AbsenceAction,
-  AbsenceActionDialog,
-  type AbsenceTarget,
-} from '../AbsenceActionDialog';
+import { AbsenceActionDialog, type AbsenceTarget } from '../AbsenceActionDialog';
 import { AbsenceSheet } from '../AbsenceSheet';
-import { ABSENCE_TYPES, PENDING_STATUS } from '../absenceValues';
+import { ABSENCE_TYPES, absenceStatusTone, PENDING_STATUS } from '../absenceValues';
 import { type AbsenceRow, useAbsences, useApproveAbsence } from '../useAbsences';
-
-function statusTone(status: string): StatusTone {
-  switch (status) {
-    case 'genehmigt':
-      return 'success';
-    case 'abgelehnt':
-      return 'danger';
-    case 'ausstehend':
-      return 'warning';
-    default:
-      return 'neutral';
-  }
-}
 
 export function AbsencesPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const labels = useDataTableLabels();
   const canManage = usePermission('canManageAbsences');
   const [searchParams, setSearchParams] = useSearchParams();
@@ -68,24 +36,18 @@ export function AbsencesPage() {
   const absences = useAbsences();
   const { data } = absences;
   const approve = useApproveAbsence();
-  // Am Handy ist die Tabelle zu schmal für zwei Knöpfe: dort stehen Genehmigen
-  // und Ablehnen oben im Menü.
+  // Am Handy ist die Tabelle zu schmal für alle Spalten: dort fallen
+  // Kalendertage und Knöpfe weg. Beides steht auf der Detailseite.
   const compact = useMediaQuery('(max-width: 639px)');
-  const [editing, setEditing] = useState<AbsenceRow | null>(null);
-  const [pending, setPending] = useState<{ action: AbsenceAction; absence: AbsenceTarget } | null>(
-    null,
-  );
-  const ask = useCallback(
-    (action: AbsenceAction, row: AbsenceRow) =>
-      setPending({
-        action,
-        absence: {
-          id: row.id,
-          name: row.employee_name,
-          type: row.type,
-          startDate: row.start_date,
-          endDate: row.end_date,
-        },
+  const [rejecting, setRejecting] = useState<AbsenceTarget | null>(null);
+  const askReject = useCallback(
+    (row: AbsenceRow) =>
+      setRejecting({
+        id: row.id,
+        name: row.employee_name,
+        type: row.type,
+        startDate: row.start_date,
+        endDate: row.end_date,
       }),
     [],
   );
@@ -116,8 +78,8 @@ export function AbsencesPage() {
 
   const isLoading = useCompanyListLoading(absences);
 
-  const columns = useMemo<DataTableColumn<AbsenceRow>[]>(
-    () => [
+  const columns = useMemo<DataTableColumn<AbsenceRow>[]>(() => {
+    const all: DataTableColumn<AbsenceRow>[] = [
       {
         accessorKey: 'employee_name',
         header: t('domain:absences.columns.employee'),
@@ -130,17 +92,22 @@ export function AbsencesPage() {
       {
         accessorKey: 'type',
         header: t('domain:absences.columns.type'),
-        cell: ({ row }) =>
-          (ABSENCE_TYPES as readonly string[]).includes(row.original.type)
-            ? t(`domain:absences.types.${row.original.type}`)
-            : row.original.type,
+        cell: ({ row }) => (
+          <span className="hyphens-auto">
+            {(ABSENCE_TYPES as readonly string[]).includes(row.original.type)
+              ? t(`domain:absences.types.${row.original.type}`)
+              : row.original.type}
+          </span>
+        ),
       },
       {
         accessorKey: 'start_date',
         header: t('domain:absences.columns.period'),
         cell: ({ row }) => (
-          <span className="text-muted-foreground whitespace-nowrap">
-            {formatDate(row.original.start_date)} – {formatDate(row.original.end_date)}
+          // Am Handy bricht der Zeitraum zwischen den beiden Daten um, nie mitten im Datum.
+          <span className="text-muted-foreground sm:whitespace-nowrap">
+            <span className="whitespace-nowrap">{formatDate(row.original.start_date)}</span>{' '}
+            <span className="whitespace-nowrap">– {formatDate(row.original.end_date)}</span>
           </span>
         ),
       },
@@ -162,7 +129,7 @@ export function AbsencesPage() {
         header: t('domain:absences.columns.status'),
         cell: ({ row }) => (
           <span className="flex flex-col items-start gap-0.5">
-            <StatusBadge tone={statusTone(row.original.status)}>
+            <StatusBadge tone={absenceStatusTone(row.original.status)}>
               {t(`domain:absences.status.${row.original.status}`, {
                 defaultValue: row.original.status,
               })}
@@ -178,75 +145,43 @@ export function AbsencesPage() {
       {
         id: 'action',
         header: '',
+        // Nur Symbole, wie in der Übersicht; alles Weitere auf der Detailseite.
+        // `stopPropagation`, sonst öffnet der Klick zusätzlich die Zeile.
         cell: ({ row }) => {
-          if (!canManage) return null;
           const absence = row.original;
-          const isPending = absence.status === PENDING_STATUS;
-          const editable = isPending || absence.status === 'genehmigt';
+          if (!canManage || absence.status !== PENDING_STATUS) return null;
+          const name = absence.employee_name || t('domain:employees.unnamed');
           return (
             <span className="flex items-center justify-end gap-2">
-              {isPending && !compact ? (
-                <>
-                  <Button disabled={approve.isPending} onClick={() => void onApprove(absence)}>
-                    {t('domain:absences.approve')}
-                  </Button>
-                  <Button onClick={() => ask('reject', absence)}>
-                    {t('domain:absences.reject')}
-                  </Button>
-                </>
-              ) : null}
-              <Menu positioning="below-end">
-                <MenuTrigger disableButtonEnhancement>
-                  <Button
-                    appearance="subtle"
-                    icon={<MoreHorizontalRegular />}
-                    aria-label={t('domain:absences.moreActions', {
-                      name: absence.employee_name || t('domain:employees.unnamed'),
-                    })}
-                  />
-                </MenuTrigger>
-                <MenuPopover>
-                  <MenuList>
-                    {isPending && compact ? (
-                      <>
-                        <MenuItem
-                          icon={<CheckmarkRegular />}
-                          disabled={approve.isPending}
-                          onClick={() => void onApprove(absence)}
-                        >
-                          {t('domain:absences.approve')}
-                        </MenuItem>
-                        <MenuItem icon={<DismissRegular />} onClick={() => ask('reject', absence)}>
-                          {t('domain:absences.reject')}
-                        </MenuItem>
-                      </>
-                    ) : null}
-                    {editable ? (
-                      <MenuItem icon={<EditRegular />} onClick={() => setEditing(absence)}>
-                        {t('domain:absences.edit')}
-                      </MenuItem>
-                    ) : null}
-                    {absence.status === 'genehmigt' ? (
-                      <MenuItem
-                        icon={<DismissCircleRegular />}
-                        onClick={() => ask('cancel', absence)}
-                      >
-                        {t('domain:absences.cancelAction')}
-                      </MenuItem>
-                    ) : null}
-                    <MenuItem icon={<DeleteRegular />} onClick={() => ask('delete', absence)}>
-                      {t('domain:absences.delete')}
-                    </MenuItem>
-                  </MenuList>
-                </MenuPopover>
-              </Menu>
+              <Button
+                size="small"
+                appearance="primary"
+                icon={<CheckmarkRegular />}
+                disabled={approve.isPending}
+                title={t('domain:absences.approve')}
+                aria-label={t('domain:overview.todo.approveA11y', { name })}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  void onApprove(absence);
+                }}
+              />
+              <Button
+                size="small"
+                icon={<DismissRegular />}
+                title={t('domain:absences.reject')}
+                aria-label={t('domain:overview.todo.rejectA11y', { name })}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  askReject(absence);
+                }}
+              />
             </span>
           );
         },
       },
-    ],
-    [t, canManage, approve.isPending, onApprove, ask, compact],
-  );
+    ];
+    return compact ? all.filter((column) => column.id !== 'days' && column.id !== 'action') : all;
+  }, [t, canManage, approve.isPending, onApprove, askReject, compact]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -268,6 +203,7 @@ export function AbsencesPage() {
         isLoading={isLoading}
         labels={labels}
         exportFileName="abwesenheiten"
+        onRowClick={(absence) => void navigate(routes.absence(absence.id))}
         toolbar={
           <TabList
             selectedValue={filter}
@@ -288,15 +224,10 @@ export function AbsencesPage() {
       />
 
       <AbsenceSheet open={sheetOpen} onOpenChange={setSheetOpen} />
-      <AbsenceSheet
-        open={editing !== null}
-        onOpenChange={(open) => !open && setEditing(null)}
-        absence={editing ?? undefined}
-      />
       <AbsenceActionDialog
-        action={pending?.action ?? null}
-        absence={pending?.absence ?? null}
-        onClose={() => setPending(null)}
+        action={rejecting ? 'reject' : null}
+        absence={rejecting}
+        onClose={() => setRejecting(null)}
       />
     </div>
   );

@@ -25,3 +25,21 @@ Bearbeiten von Art, Zeitraum und Notiz bei offenen und genehmigten.
 - Harness mit Testdaten: Tabelle, Menü, Ablehnen-, Löschen-Dialog,
   Bearbeiten-Panel; hell, dunkel, 390 px; keine Konsolenfehler. Den Knopf
   in der Übersicht nicht im Browser angesehen, nur Typprüfung.
+
+## Nachtrag: Detailseite statt Menü
+
+Owner-Rückmeldung am selben Tag:
+
+- Übersicht: Genehmigen und Ablehnen nur noch als Haken und Kreuz.
+- Kein Menü „⋯“ mehr: die Zeile öffnet `/abwesenheiten/:id` mit Profilbild,
+  Bearbeiten, Stornieren und Löschen.
+- „Rückwirkend ändern geht nicht“: In Produktion fehlte das Bearbeiten noch
+  ganz (dieser PR war nicht gemergt). Die Datenbank begrenzt das Datum nicht;
+  im Harness ließ sich eine vergangene genehmigte Abwesenheit öffnen und
+  bearbeiten.
+- Tabelle am Handy: Kalendertage und Knöpfe ausgeblendet, Zeitraum bricht
+  zwischen den Daten um; keine Überlappung mehr bei 390 px.
+
+Geprüft im Harness (hell, dunkel, 390 px): Zeilenklick öffnet die Seite,
+Kreuz in der Zeile öffnet nur den Dialog, Knöpfe je Status richtig, keine
+Konsolenfehler außer Fluents Keyborg-Hinweis beim Seitenwechsel.

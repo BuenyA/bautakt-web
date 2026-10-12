@@ -35,21 +35,31 @@ der Übersicht (`overview/components/TodoPanel.tsx`). Alle Aktionen nur mit
 
 ## Oberfläche
 
-- Tabelle: offene Zeilen haben „Genehmigen“ und „Ablehnen“, jede Zeile ein
-  Menü „⋯“ mit Bearbeiten (offen/genehmigt), Stornieren (genehmigt) und
-  Endgültig löschen. Unter 640 px stehen Genehmigen und Ablehnen im Menü, weil
-  die Tabelle sonst überläuft (`useMediaQuery`; Tailwind `sm:hidden` greift an
-  Fluents `MenuItem` nicht, dessen eigenes `display` gewinnt).
-- Abgelehnte zeigen ihren Grund unter dem Status.
+- Detailseite `/abwesenheiten/:id` (`AbsenceDetailPage.tsx`, Owner-Wunsch
+  2026-10-12): Profilbild und Name vorn wie in der Einsatzplanung (mit
+  `canManageEmployees` ein Link zum Mitarbeiter), darunter Status und
+  Zeitraum. Knöpfe je nach Status: Genehmigen/Ablehnen (offen), Bearbeiten
+  (offen, genehmigt), Stornieren (genehmigt), Endgültig löschen (immer).
+  Bearbeiten geht auch **rückwirkend** (etwa Urlaub → Krankheit); die
+  Datenbank begrenzt das Datum nicht.
+- Tabelle: die ganze Zeile öffnet die Detailseite, kein Menü „⋯“ mehr.
+  Offene Zeilen haben Haken und Kreuz als reine Symbolknöpfe
+  (`stopPropagation`, sonst öffnet der Klick die Zeile mit). Unter 640 px
+  fallen Kalendertage und Knöpfe weg, und der Zeitraum bricht zwischen den
+  Daten um — vorher überlappten sich die Spalten (Fluents `Table` hat feste
+  Spaltenbreiten).
+- Übersicht → Anträge: Haken (blau) und Kreuz (weiß) ohne Text, damit sie auf
+  kleinen Laptops nicht in Name und Zeitraum drücken; Name und Zeitraum
+  führen zur Detailseite.
+- Abgelehnte zeigen ihren Grund unter dem Status und auf der Detailseite.
 - `AbsenceActionDialog` ist die Rückfrage für Ablehnen (mit freiwilligem
-  Grund), Stornieren und Löschen; dieselbe Komponente nutzt die Übersicht.
+  Grund), Stornieren und Löschen; `onDone` führt nach dem Löschen zurück zur
+  Liste. Solange gelöscht wird (`DELETE_ABSENCE_KEY`), zeigt die Detailseite
+  den Spinner statt „nicht gefunden“.
 - `AbsenceSheet` mit `absence` bearbeitet; der Mitarbeiter ist dann gesperrt.
 
 ## Bekannt
 
-- Bei 390 px überlappen sich in der Tabelle „Zeitraum“ und „Kalendertage“
-  (Stand 2026-10-12). Das kommt von der allgemeinen `DataTable`, nicht von den
-  Aktionen.
 - Die Handy-App kann ablehnen und stornieren, aber (noch) nicht bearbeiten
   oder endgültig löschen. Gelöschtes verschwindet dort beim nächsten Abgleich,
   weil `syncAbsencesFromSupabase` den Cache komplett ersetzt.

@@ -59,6 +59,7 @@ export const routes = {
   employees: '/mitarbeiter',
   employee: (id: string) => `/mitarbeiter/${id}`,
   absences: '/abwesenheiten',
+  absence: (id: string) => `/abwesenheiten/${id}`,
   payroll: '/lohn',
 
   // Kunden direkt, Material als Hub. Katalog und Kostenstellen bleiben.

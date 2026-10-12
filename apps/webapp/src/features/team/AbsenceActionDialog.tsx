@@ -40,17 +40,20 @@ export function AbsenceActionDialog({
   action,
   absence,
   onClose,
+  onDone,
 }: {
   action: AbsenceAction | null;
   absence: AbsenceTarget | null;
   onClose: () => void;
+  /** Nach Erfolg, vor dem Schließen — etwa um nach dem Löschen zurückzugehen. */
+  onDone?: (action: AbsenceAction) => void;
 }) {
   const open = action !== null && absence !== null;
   return (
     <Dialog open={open} onOpenChange={(_, { open: next }) => !next && onClose()}>
       {/* Geschlossen leer, damit Grund und Fehler beim nächsten Öffnen neu starten. */}
       {open ? (
-        <ActionSurface action={action} absence={absence} onClose={onClose} />
+        <ActionSurface action={action} absence={absence} onClose={onClose} onDone={onDone} />
       ) : (
         <DialogSurface />
       )}
@@ -62,10 +65,12 @@ function ActionSurface({
   action,
   absence,
   onClose,
+  onDone,
 }: {
   action: AbsenceAction;
   absence: AbsenceTarget;
   onClose: () => void;
+  onDone?: (action: AbsenceAction) => void;
 }) {
   const { t } = useTranslation();
   const reasonId = useId();
@@ -93,6 +98,7 @@ function ActionSurface({
       else if (action === 'cancel') await cancel.mutateAsync(absence.id);
       else await remove.mutateAsync(absence.id);
       toast.success(t(`domain:absences.actions.${action}.done`));
+      onDone?.(action);
       onClose();
     } catch (caught) {
       if (caught instanceof Error && caught.message === 'NOT_UPDATED') {
