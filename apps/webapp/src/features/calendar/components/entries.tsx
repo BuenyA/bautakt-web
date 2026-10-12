@@ -6,7 +6,14 @@ import { routes } from '@/lib/routes';
 
 import type { Occurrence } from '../calendarModel';
 export type { EntryTone } from './entryStyles';
-import { type EntryTone, useEntryStyles, useToneClass } from './entryStyles';
+import {
+  type CalendarColor,
+  type EntryTone,
+  useDotColorStyles,
+  useEntryStyles,
+  useToneClass,
+  useToneColor,
+} from './entryStyles';
 
 /** Ein Eintrag im Kalender: Termin, Einsatz oder eigene Abwesenheit. */
 export type CalendarEntry = {
@@ -24,15 +31,17 @@ export type CalendarEntry = {
 };
 
 export function ToneDot({ tone }: { tone: EntryTone }) {
+  return <ColorDot color={useToneColor(tone)} />;
+}
+
+export function ColorDot({ color, className }: { color: CalendarColor; className?: string }) {
   const styles = useEntryStyles();
-  const toneClass = {
-    me: styles.dotMe,
-    all: styles.dotAll,
-    assignment: styles.dotAssignment,
-    absence: styles.dotAbsence,
-  }[tone];
+  const colors = useDotColorStyles();
   return (
-    <span aria-hidden className={mergeClasses(styles.dot, toneClass, 'inline-block shrink-0')} />
+    <span
+      aria-hidden
+      className={mergeClasses(styles.dot, colors[color], 'inline-block shrink-0', className)}
+    />
   );
 }
 

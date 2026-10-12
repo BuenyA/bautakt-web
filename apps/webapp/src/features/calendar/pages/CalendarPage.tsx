@@ -1,4 +1,4 @@
-import { Button, MessageBar, Switch, Tab, TabList } from '@fluentui/react-components';
+import { Button, MessageBar, Tab, TabList } from '@fluentui/react-components';
 import { AddRegular, ChevronLeftRegular, ChevronRightRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,14 +23,15 @@ import {
   parseIsoDay,
   startOfWeek,
 } from '../calendarModel';
-import { CalendarLegend } from '../components/CalendarLegend';
+import { CalendarSettingsPopover } from '../components/CalendarSettingsPopover';
 import type { CalendarEntry } from '../components/entries';
+import { ToneColorsContext } from '../components/entryStyles';
 import { MonthView } from '../components/MonthView';
 import { TimeGridView } from '../components/TimeGridView';
 import { YearView } from '../components/YearView';
 import { type CalendarEventDraft, draftFromOccurrence, emptyEventDraft } from '../eventDraft';
 import { useCalendarEvents } from '../useCalendarEvents';
-import { useShowAssignments } from '../useShowAssignments';
+import { useCalendarSettings } from '../useCalendarSettings';
 
 type View = 'jahr' | 'monat' | 'woche' | 'tag';
 const VIEWS: readonly View[] = ['jahr', 'monat', 'woche', 'tag'];
@@ -99,8 +100,9 @@ function rangeLabel(view: View, dayIso: string, days: readonly string[]): string
 
 /**
  * Kalender wie in der Handy-App: Jahr, Monat, Woche, Tag. Zeigt Termine
- * (`calendar_events`, privat blau, Firma rot), Einsätze und die eigenen
- * Abwesenheiten. Termine lassen sich hier anlegen, ändern und löschen.
+ * (`calendar_events`, privat und Firma), Einsätze und die eigenen
+ * Abwesenheiten. Farbe und Sichtbarkeit je Art stehen hinter dem Zahnrad
+ * (`useCalendarSettings`). Termine lassen sich hier anlegen, ändern und löschen.
  *
  * Ansicht und Datum stehen in der URL (`?ansicht=monat&datum=2026-10-12`),
  * damit ein Neuladen dieselbe Stelle zeigt. Ohne Parameter: diese Woche.
@@ -121,7 +123,8 @@ export function CalendarPage() {
   const events = useCalendarEvents(from, to);
   const assignments = useAssignments(from, to);
   const absences = useAbsences();
-  const [showAssignments, setShowAssignments] = useShowAssignments();
+  const { settings, setColor, setShow } = useCalendarSettings();
+  const show = settings.show;
 
   function go(nextView: View, nextDay: string) {
     const params = new URLSearchParams(searchParams);
@@ -138,18 +141,20 @@ export function CalendarPage() {
     const inRange = (startsAt: string, endsAt: string) =>
       new Date(startsAt).getTime() <= toMs && new Date(endsAt).getTime() >= fromMs;
 
-    const list: CalendarEntry[] = (events.data?.occurrences ?? []).map((occurrence) => ({
-      key: `e-${occurrence.key}`,
-      kind: 'event',
-      tone: occurrence.eventType,
-      title: occurrence.title.trim() || t('domain:calendar.untitled'),
-      startsAt: occurrence.startsAt,
-      endsAt: occurrence.endsAt,
-      allDay: occurrence.allDay,
-      occurrence,
-    }));
+    const list: CalendarEntry[] = (events.data?.occurrences ?? [])
+      .filter((occurrence) => show[occurrence.eventType])
+      .map((occurrence) => ({
+        key: `e-${occurrence.key}`,
+        kind: 'event',
+        tone: occurrence.eventType,
+        title: occurrence.title.trim() || t('domain:calendar.untitled'),
+        startsAt: occurrence.startsAt,
+        endsAt: occurrence.endsAt,
+        allDay: occurrence.allDay,
+        occurrence,
+      }));
 
-    for (const assignment of showAssignments ? (assignments.data ?? []) : []) {
+    for (const assignment of show.assignment ? (assignments.data ?? []) : []) {
       if (!inRange(assignment.starts_at, assignment.ends_at)) continue;
       list.push({
         key: `a-${assignment.id}`,
@@ -165,7 +170,7 @@ export function CalendarPage() {
 
     // Wie in der App nur die eigenen Abwesenheiten: der Kalender ist persönlich,
     // wer sonst fehlt, steht in „Abwesenheiten“ und auf der Übersicht.
-    for (const absence of absences.data ?? []) {
+    for (const absence of show.absence ? (absences.data ?? []) : []) {
       if (absence.employment_id !== membership?.employmentId) continue;
       if (!SHOWN_ABSENCE.has(absence.status)) continue;
       const startsAt = combineLocal(absence.start_date, '00:00').toISOString();
@@ -183,16 +188,7 @@ export function CalendarPage() {
       });
     }
     return list;
-  }, [
-    events.data,
-    assignments.data,
-    showAssignments,
-    absences.data,
-    membership?.employmentId,
-    from,
-    to,
-    t,
-  ]);
+  }, [events.data, assignments.data, show, absences.data, membership?.employmentId, from, to, t]);
 
   function openEvent(occurrence: Occurrence) {
     const master = events.data?.rows.find((row) => row.id === occurrence.masterId);
@@ -204,13 +200,13 @@ export function CalendarPage() {
     (draft.occurrence.eventType === 'all' ? !canManageAll : draft.occurrence.userId !== user?.id),
   );
 
-  const isLoading = events.isPending || (showAssignments && assignments.isPending);
+  const isLoading = events.isPending || (show.assignment && assignments.isPending);
 
   return (
-    <div className="flex flex-col gap-6">
+    // Knapper Kopf (gap-3, ohne Beschreibung), damit die Woche ohne Scrollen ins Bild passt.
+    <div className="flex flex-col gap-3">
       <PageHeader
         title={t('domain:calendar.title')}
-        description={t('domain:calendar.description')}
         actions={
           <Button
             appearance="primary"
@@ -236,13 +232,13 @@ export function CalendarPage() {
             </Tab>
           ))}
         </TabList>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full items-center gap-2 sm:w-auto">
           <Button
             aria-label={t('domain:calendar.previous')}
             onClick={() => go(view, shiftDay(view, dayIso, -1))}
             icon={<ChevronLeftRegular />}
           />
-          <span className="min-w-44 text-center text-sm font-medium capitalize">
+          <span className="min-w-0 flex-1 truncate text-center text-sm font-medium capitalize sm:min-w-44 sm:flex-none">
             {rangeLabel(view, dayIso, days)}
           </span>
           <Button
@@ -251,56 +247,54 @@ export function CalendarPage() {
             icon={<ChevronRightRegular />}
           />
           <Button onClick={() => go(view, todayIso)}>{t('domain:calendar.today')}</Button>
+          <CalendarSettingsPopover
+            settings={settings}
+            onColorChange={setColor}
+            onShowChange={setShow}
+          />
         </div>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-        <CalendarLegend showAssignments={showAssignments} />
-        <Switch
-          checked={showAssignments}
-          onChange={(_, data) => setShowAssignments(data.checked)}
-          label={t('domain:calendar.showAssignments')}
-        />
       </div>
 
       {events.isError ? (
         <MessageBar intent="error">{t('domain:calendar.loadError')}</MessageBar>
       ) : null}
 
-      {isLoading ? (
-        <PageSpinner />
-      ) : view === 'jahr' ? (
-        <YearView
-          year={parseIsoDay(dayIso).getFullYear()}
-          todayIso={todayIso}
-          entries={entries}
-          onOpenDay={(iso) => go('tag', iso)}
-          onOpenMonth={(month) =>
-            go('monat', localIsoDay(new Date(parseIsoDay(dayIso).getFullYear(), month, 1)))
-          }
-        />
-      ) : view === 'monat' ? (
-        <MonthView
-          days={days}
-          month={parseIsoDay(dayIso).getMonth()}
-          todayIso={todayIso}
-          entries={entries}
-          onOpenEvent={openEvent}
-          onCreate={(iso) => setDraft(emptyEventDraft(iso))}
-          onOpenDay={(iso) => go('tag', iso)}
-        />
-      ) : (
-        <TimeGridView
-          key={`${view}-${days[0]}`}
-          days={days}
-          todayIso={todayIso}
-          now={now}
-          entries={entries}
-          onOpenEvent={openEvent}
-          onCreate={(iso, hour) => setDraft(emptyEventDraft(iso, hour))}
-          onOpenDay={(iso) => go('tag', iso)}
-        />
-      )}
+      <ToneColorsContext value={settings.colors}>
+        {isLoading ? (
+          <PageSpinner />
+        ) : view === 'jahr' ? (
+          <YearView
+            year={parseIsoDay(dayIso).getFullYear()}
+            todayIso={todayIso}
+            entries={entries}
+            onOpenDay={(iso) => go('tag', iso)}
+            onOpenMonth={(month) =>
+              go('monat', localIsoDay(new Date(parseIsoDay(dayIso).getFullYear(), month, 1)))
+            }
+          />
+        ) : view === 'monat' ? (
+          <MonthView
+            days={days}
+            month={parseIsoDay(dayIso).getMonth()}
+            todayIso={todayIso}
+            entries={entries}
+            onOpenEvent={openEvent}
+            onCreate={(iso) => setDraft(emptyEventDraft(iso))}
+            onOpenDay={(iso) => go('tag', iso)}
+          />
+        ) : (
+          <TimeGridView
+            key={`${view}-${days[0]}`}
+            days={days}
+            todayIso={todayIso}
+            now={now}
+            entries={entries}
+            onOpenEvent={openEvent}
+            onCreate={(iso, hour) => setDraft(emptyEventDraft(iso, hour))}
+            onOpenDay={(iso) => go('tag', iso)}
+          />
+        )}
+      </ToneColorsContext>
 
       <CalendarEventSheet
         draft={draft}
