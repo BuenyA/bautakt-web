@@ -41,7 +41,7 @@ der Übersicht (`overview/components/TodoPanel.tsx`). Alle Aktionen nur mit
   Zeitraum. Oben rechts je nach Status Zurück, Bearbeiten (offen,
   genehmigt), Stornieren (genehmigt), Endgültig löschen (immer).
   Genehmigen/Ablehnen stehen bewusst getrennt davon in einer eigenen Karte
-  „Antrag entscheiden“ unter dem Inhalt (Owner-Wunsch).
+  „Antrag entscheiden“ über Notiz und Details (Owner-Wunsch).
   Bearbeiten geht auch **rückwirkend** (etwa Urlaub → Krankheit); die
   Datenbank begrenzt das Datum nicht.
 - Tabelle: die ganze Zeile öffnet die Detailseite, kein Menü „⋯“ mehr.
