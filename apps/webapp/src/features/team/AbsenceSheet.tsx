@@ -24,6 +24,7 @@ import { readableDbError } from '@/lib/dbErrors';
 import { supabase } from '@/lib/supabase';
 
 import { ABSENCE_TYPES } from './absenceValues';
+import { type AbsenceRow, useUpdateAbsence } from './useAbsences';
 import { useEmployees } from './useEmployees';
 
 /**
@@ -68,36 +69,51 @@ function useCreateAbsence() {
   });
 }
 
+/**
+ * Abwesenheit eintragen oder bearbeiten.
+ *
+ * Mit `absence` bearbeitet das Panel Art, Zeitraum und Notiz; der Mitarbeiter
+ * steht fest, eine Genehmigung bleibt bestehen (Trigger
+ * `enforce_absence_update_integrity`, bautakt-app `20261011213845`).
+ */
 export function AbsenceSheet({
   open,
   onOpenChange,
+  absence,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  absence?: AbsenceRow;
 }) {
   return (
     <FormDrawer open={open} onOpenChange={onOpenChange}>
-      {open ? <AbsenceForm onDone={() => onOpenChange(false)} /> : null}
+      {open ? <AbsenceForm absence={absence} onDone={() => onOpenChange(false)} /> : null}
     </FormDrawer>
   );
 }
 
-function AbsenceForm({ onDone }: { onDone: () => void }) {
+function AbsenceForm({ absence, onDone }: { absence?: AbsenceRow; onDone: () => void }) {
   const typeFieldId = useId();
   const employeeFieldId = useId();
   const { t } = useTranslation();
   const create = useCreateAbsence();
+  const update = useUpdateAbsence();
+  const isEdit = Boolean(absence);
   const employees = useEmployees();
   const ids = { start: useId(), end: useId(), note: useId() };
 
-  const [employmentId, setEmploymentId] = useState('');
-  const [type, setType] = useState<string>('urlaub');
-  const [startDate, setStartDate] = useState(todayIso);
-  const [endDate, setEndDate] = useState(todayIso);
-  const [note, setNote] = useState('');
+  const [employmentId, setEmploymentId] = useState(absence?.employment_id ?? '');
+  const [type, setType] = useState<string>(absence?.type ?? 'urlaub');
+  const [startDate, setStartDate] = useState(absence?.start_date ?? todayIso);
+  const [endDate, setEndDate] = useState(absence?.end_date ?? todayIso);
+  const [note, setNote] = useState(absence?.note ?? '');
   const [error, setError] = useState<string | null>(null);
 
-  const selectable = (employees.data ?? []).filter((employee) => !employee.ended_at);
+  // Beim Bearbeiten steht der Mitarbeiter fest — auch wenn er inzwischen
+  // ausgeschieden ist, muss er im Feld stehen.
+  const selectable = (employees.data ?? []).filter(
+    (employee) => !employee.ended_at || employee.id === absence?.employment_id,
+  );
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -112,10 +128,19 @@ function AbsenceForm({ onDone }: { onDone: () => void }) {
     }
 
     try {
-      await create.mutateAsync({ employmentId, type, startDate, endDate, note });
-      toast.success(t('domain:absenceForm.saved'));
+      if (absence) {
+        await update.mutateAsync({ id: absence.id, type, startDate, endDate, note });
+        toast.success(t('domain:absenceForm.editSaved'));
+      } else {
+        await create.mutateAsync({ employmentId, type, startDate, endDate, note });
+        toast.success(t('domain:absenceForm.saved'));
+      }
       onDone();
     } catch (caught) {
+      if (caught instanceof Error && caught.message === 'NOT_UPDATED') {
+        setError(t('domain:absences.actions.notUpdated'));
+        return;
+      }
       setError(readableDbError(caught) ?? t('domain:absenceForm.saveError'));
     }
   }
@@ -127,9 +152,15 @@ function AbsenceForm({ onDone }: { onDone: () => void }) {
     >
       <DrawerHeader>
         <FormDrawerTitle closeLabel={t('common:action.close')}>
-          {t('domain:absenceForm.title')}
+          {isEdit ? t('domain:absenceForm.editTitle') : t('domain:absenceForm.title')}
         </FormDrawerTitle>
-        <FormDrawerDescription>{t('domain:absenceForm.description')}</FormDrawerDescription>
+        <FormDrawerDescription>
+          {isEdit
+            ? absence?.status === 'genehmigt'
+              ? t('domain:absenceForm.editDescriptionApproved')
+              : t('domain:absenceForm.editDescriptionPending')
+            : t('domain:absenceForm.description')}
+        </FormDrawerDescription>
       </DrawerHeader>
 
       <DrawerBody className="flex flex-col gap-4">
@@ -138,6 +169,7 @@ function AbsenceForm({ onDone }: { onDone: () => void }) {
           <Select
             id={employeeFieldId}
             value={employmentId}
+            disabled={isEdit}
             onChange={(_, { value }) => setEmploymentId(value)}
           >
             <option value="" disabled>
@@ -197,7 +229,7 @@ function AbsenceForm({ onDone }: { onDone: () => void }) {
         <Button type="button" onClick={onDone}>
           {t('common:action.cancel')}
         </Button>
-        <Button appearance="primary" type="submit" disabled={create.isPending}>
+        <Button appearance="primary" type="submit" disabled={create.isPending || update.isPending}>
           {t('common:action.save')}
         </Button>
       </FormDrawerFooter>

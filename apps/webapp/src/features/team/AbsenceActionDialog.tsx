@@ -48,7 +48,12 @@ export function AbsenceActionDialog({
   const open = action !== null && absence !== null;
   return (
     <Dialog open={open} onOpenChange={(_, { open: next }) => !next && onClose()}>
-      {open ? <ActionSurface action={action} absence={absence} onClose={onClose} /> : null}
+      {/* Geschlossen leer, damit Grund und Fehler beim nächsten Öffnen neu starten. */}
+      {open ? (
+        <ActionSurface action={action} absence={absence} onClose={onClose} />
+      ) : (
+        <DialogSurface />
+      )}
     </Dialog>
   );
 }

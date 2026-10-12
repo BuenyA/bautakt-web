@@ -17,6 +17,8 @@ const MESSAGES: Record<string, string> = {
     'Ein Mitarbeiter ist in diesem Zeitraum abwesend (genehmigt). Erst die Abwesenheit klären oder ihn aus dem Einsatz nehmen.',
   INVALID_DATE_RANGE: 'Das Ende liegt vor dem Beginn.',
   INVALID_STATUS: 'Über diese Abwesenheit wurde bereits entschieden.',
+  INVALID_STATUS_TRANSITION:
+    'Diese Abwesenheit wurde inzwischen schon bearbeitet. Bitte die Liste neu laden.',
   ABSENCE_NOT_FOUND: 'Diese Abwesenheit existiert nicht mehr.',
   EMPLOYMENT_NOT_FOUND: 'Diesen Mitarbeiter gibt es nicht mehr.',
   INVALID_DAILY_REPORT: 'Dem Bericht fehlt ein Pflichtfeld.',

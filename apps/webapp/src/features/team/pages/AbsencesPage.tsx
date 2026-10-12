@@ -1,7 +1,24 @@
 import { daysBetween } from '@bautakt/finance';
 import { DataTable, type DataTableColumn, StatusBadge, type StatusTone, toast } from '@bautakt/ui';
-import { Button, Tab, TabList } from '@fluentui/react-components';
-import { AddRegular } from '@fluentui/react-icons';
+import {
+  Button,
+  Menu,
+  MenuItem,
+  MenuList,
+  MenuPopover,
+  MenuTrigger,
+  Tab,
+  TabList,
+} from '@fluentui/react-components';
+import {
+  AddRegular,
+  CheckmarkRegular,
+  DeleteRegular,
+  DismissCircleRegular,
+  DismissRegular,
+  EditRegular,
+  MoreHorizontalRegular,
+} from '@fluentui/react-icons';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
@@ -10,11 +27,17 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
+import { useMediaQuery } from '@/components/layout/useMediaQuery';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
 
+import {
+  type AbsenceAction,
+  AbsenceActionDialog,
+  type AbsenceTarget,
+} from '../AbsenceActionDialog';
 import { AbsenceSheet } from '../AbsenceSheet';
 import { ABSENCE_TYPES, PENDING_STATUS } from '../absenceValues';
 import { type AbsenceRow, useAbsences, useApproveAbsence } from '../useAbsences';
@@ -45,6 +68,27 @@ export function AbsencesPage() {
   const absences = useAbsences();
   const { data } = absences;
   const approve = useApproveAbsence();
+  // Am Handy ist die Tabelle zu schmal für zwei Knöpfe: dort stehen Genehmigen
+  // und Ablehnen oben im Menü.
+  const compact = useMediaQuery('(max-width: 639px)');
+  const [editing, setEditing] = useState<AbsenceRow | null>(null);
+  const [pending, setPending] = useState<{ action: AbsenceAction; absence: AbsenceTarget } | null>(
+    null,
+  );
+  const ask = useCallback(
+    (action: AbsenceAction, row: AbsenceRow) =>
+      setPending({
+        action,
+        absence: {
+          id: row.id,
+          name: row.employee_name,
+          type: row.type,
+          startDate: row.start_date,
+          endDate: row.end_date,
+        },
+      }),
+    [],
+  );
 
   const rows = useMemo(
     () =>
@@ -117,27 +161,91 @@ export function AbsencesPage() {
         accessorKey: 'status',
         header: t('domain:absences.columns.status'),
         cell: ({ row }) => (
-          <StatusBadge tone={statusTone(row.original.status)}>
-            {t(`domain:absences.status.${row.original.status}`, {
-              defaultValue: row.original.status,
-            })}
-          </StatusBadge>
+          <span className="flex flex-col items-start gap-0.5">
+            <StatusBadge tone={statusTone(row.original.status)}>
+              {t(`domain:absences.status.${row.original.status}`, {
+                defaultValue: row.original.status,
+              })}
+            </StatusBadge>
+            {row.original.status === 'abgelehnt' && row.original.decision_note ? (
+              <span className="text-muted-foreground max-w-56 text-xs break-words">
+                {row.original.decision_note}
+              </span>
+            ) : null}
+          </span>
         ),
       },
       {
         id: 'action',
         header: '',
-        cell: ({ row }) =>
-          canManage && row.original.status === PENDING_STATUS ? (
-            <span className="flex justify-end">
-              <Button disabled={approve.isPending} onClick={() => void onApprove(row.original)}>
-                {t('domain:absences.approve')}
-              </Button>
+        cell: ({ row }) => {
+          if (!canManage) return null;
+          const absence = row.original;
+          const isPending = absence.status === PENDING_STATUS;
+          const editable = isPending || absence.status === 'genehmigt';
+          return (
+            <span className="flex items-center justify-end gap-2">
+              {isPending && !compact ? (
+                <>
+                  <Button disabled={approve.isPending} onClick={() => void onApprove(absence)}>
+                    {t('domain:absences.approve')}
+                  </Button>
+                  <Button onClick={() => ask('reject', absence)}>
+                    {t('domain:absences.reject')}
+                  </Button>
+                </>
+              ) : null}
+              <Menu positioning="below-end">
+                <MenuTrigger disableButtonEnhancement>
+                  <Button
+                    appearance="subtle"
+                    icon={<MoreHorizontalRegular />}
+                    aria-label={t('domain:absences.moreActions', {
+                      name: absence.employee_name || t('domain:employees.unnamed'),
+                    })}
+                  />
+                </MenuTrigger>
+                <MenuPopover>
+                  <MenuList>
+                    {isPending && compact ? (
+                      <>
+                        <MenuItem
+                          icon={<CheckmarkRegular />}
+                          disabled={approve.isPending}
+                          onClick={() => void onApprove(absence)}
+                        >
+                          {t('domain:absences.approve')}
+                        </MenuItem>
+                        <MenuItem icon={<DismissRegular />} onClick={() => ask('reject', absence)}>
+                          {t('domain:absences.reject')}
+                        </MenuItem>
+                      </>
+                    ) : null}
+                    {editable ? (
+                      <MenuItem icon={<EditRegular />} onClick={() => setEditing(absence)}>
+                        {t('domain:absences.edit')}
+                      </MenuItem>
+                    ) : null}
+                    {absence.status === 'genehmigt' ? (
+                      <MenuItem
+                        icon={<DismissCircleRegular />}
+                        onClick={() => ask('cancel', absence)}
+                      >
+                        {t('domain:absences.cancelAction')}
+                      </MenuItem>
+                    ) : null}
+                    <MenuItem icon={<DeleteRegular />} onClick={() => ask('delete', absence)}>
+                      {t('domain:absences.delete')}
+                    </MenuItem>
+                  </MenuList>
+                </MenuPopover>
+              </Menu>
             </span>
-          ) : null,
+          );
+        },
       },
     ],
-    [t, canManage, approve.isPending, onApprove],
+    [t, canManage, approve.isPending, onApprove, ask, compact],
   );
 
   return (
@@ -180,6 +288,16 @@ export function AbsencesPage() {
       />
 
       <AbsenceSheet open={sheetOpen} onOpenChange={setSheetOpen} />
+      <AbsenceSheet
+        open={editing !== null}
+        onOpenChange={(open) => !open && setEditing(null)}
+        absence={editing ?? undefined}
+      />
+      <AbsenceActionDialog
+        action={pending?.action ?? null}
+        absence={pending?.absence ?? null}
+        onClose={() => setPending(null)}
+      />
     </div>
   );
 }

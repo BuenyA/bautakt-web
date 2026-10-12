@@ -6,13 +6,19 @@ import {
 } from '@bautakt/finance';
 import { SkeletonBlock, toast } from '@bautakt/ui';
 import { Button, Card, CardHeader, Text } from '@fluentui/react-components';
-import { CheckmarkRegular, ChevronRightRegular, TaskListLtrRegular } from '@fluentui/react-icons';
-import type { ReactNode } from 'react';
+import {
+  CheckmarkRegular,
+  ChevronRightRegular,
+  DismissRegular,
+  TaskListLtrRegular,
+} from '@fluentui/react-icons';
+import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { RouterLink } from '@/components/common/RouterLink';
 import { useRouterLink } from '@/components/common/useRouterLink';
 import type { IncomingInvoiceListRow } from '@/features/finance/useExpenses';
+import { AbsenceActionDialog } from '@/features/team/AbsenceActionDialog';
 import { useApproveAbsence } from '@/features/team/useAbsences';
 import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
@@ -290,6 +296,7 @@ function DueLabel({ daysLeft }: { daysLeft: number }) {
 function AbsenceRow({ absence, urls }: { absence: OverviewAbsence; urls: Record<string, string> }) {
   const { t } = useTranslation();
   const approve = useApproveAbsence();
+  const [rejecting, setRejecting] = useState(false);
   const range =
     absence.startDate === absence.endDate
       ? formatDate(absence.startDate)
@@ -327,6 +334,25 @@ function AbsenceRow({ absence, urls }: { absence: OverviewAbsence; urls: Record<
       >
         {t('domain:overview.todo.approve')}
       </Button>
+      <Button
+        size="small"
+        icon={<DismissRegular />}
+        onClick={() => setRejecting(true)}
+        aria-label={t('domain:overview.todo.rejectA11y', { name: absence.member.name })}
+      >
+        {t('domain:overview.todo.reject')}
+      </Button>
+      <AbsenceActionDialog
+        action={rejecting ? 'reject' : null}
+        absence={{
+          id: absence.id,
+          name: absence.member.name,
+          type: absence.type,
+          startDate: absence.startDate,
+          endDate: absence.endDate,
+        }}
+        onClose={() => setRejecting(false)}
+      />
     </li>
   );
 }

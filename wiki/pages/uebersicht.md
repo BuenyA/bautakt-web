@@ -17,7 +17,8 @@ Ziel: der ganze Betrieb auf einen Blick.
      den Blick zu stark), vergangene nicht gedämpft (Owner-Vorgabe). „Zum Einsatz“
      steht rechtsbündig.
    - **Zu erledigen** (Mitte, `TodoPanel`, so breit wie der Einsatzplan): Anträge (mit
-     „Genehmigen“ über `approve_absence`), neu eingegangene Eingangsrechnungen, Fristen
+     „Genehmigen“ über `approve_absence` und „Ablehnen“ mit Grund, siehe
+     [abwesenheiten.md](abwesenheiten.md)), neu eingegangene Eingangsrechnungen, Fristen
      (7 Tage + Überfälliges), überfällige Rechnungen, mahnfähige Belege und Entwürfe.
    - **Heute** (rechts, `TodayPlanCard`, schmalste Spalte): Abwesende mit Profilbild,
      ganztägige Termine, darunter die Zeitleiste (`DayTimeline`, 32 px je Stunde) für den
