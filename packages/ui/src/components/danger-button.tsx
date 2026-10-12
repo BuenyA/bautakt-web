@@ -4,7 +4,9 @@ import {
   makeStyles,
   mergeClasses,
   tokens,
+  Tooltip,
 } from '@fluentui/react-components';
+import { DeleteRegular } from '@fluentui/react-icons';
 import * as React from 'react';
 
 /**
@@ -48,10 +50,29 @@ export const DangerButton = React.forwardRef<HTMLButtonElement, ButtonProps>(fun
 });
 
 /**
+ * Löschen auf Seiten und in Panels: roter Block, nur der Mülleimer, damit der
+ * Knopf neben Zurück und Bearbeiten wenig Platz nimmt (Owner-Wunsch). Der Text
+ * steht als Tooltip und Name für Screenreader dran; die Rückfrage danach trägt
+ * ihn ausgeschrieben, ihr Bestätigungsknopf bleibt ein `DangerButton` mit Text.
+ */
+export const DeleteButton = React.forwardRef<HTMLButtonElement, ButtonProps & { label: string }>(
+  function DeleteButton({ label, ...props }, ref) {
+    // Symbol und Inhalt fest: ein Text würde den Knopf wieder breit machen.
+    return (
+      <Tooltip content={label} relationship="label">
+        <DangerButton ref={ref} {...props} icon={<DeleteRegular />}>
+          {null}
+        </DangerButton>
+      </Tooltip>
+    );
+  },
+);
+
+/**
  * Löschen als reines Symbol, z. B. in einer Tabellenzeile oder auf einer
  * Foto-Kachel: rotes Symbol ohne roten Block, damit eine lange Liste ruhig
  * bleibt. Standard ist `subtle`; auf Bildern `appearance="secondary"`, damit
- * das Symbol eine helle Fläche hat. Mit Text immer `DangerButton`.
+ * das Symbol eine helle Fläche hat. Als roter Block `DeleteButton`.
  */
 const useIconStyles = makeStyles({
   root: {

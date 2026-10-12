@@ -1,4 +1,4 @@
-import { cn, DangerButton } from '@bautakt/ui';
+import { cn, DeleteButton } from '@bautakt/ui';
 import {
   Button,
   Card,
@@ -11,7 +11,6 @@ import {
 import {
   CalendarRegular,
   ClockRegular,
-  DeleteRegular,
   EditRegular,
   LocationRegular,
   PeopleAddRegular,
@@ -207,9 +206,7 @@ function AssignmentView({
               <Button appearance="primary" icon={<EditRegular />} onClick={onEdit}>
                 {t('domain:assignments.edit.action')}
               </Button>
-              <DangerButton onClick={onDelete} icon={<DeleteRegular />}>
-                {t('domain:assignments.delete.action')}
-              </DangerButton>
+              <DeleteButton label={t('domain:assignments.delete.action')} onClick={onDelete} />
             </>
           ) : null}
         </div>

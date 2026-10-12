@@ -1,10 +1,9 @@
 import { daysBetween } from '@bautakt/finance';
-import { DangerButton, StatusBadge, toast } from '@bautakt/ui';
+import { DeleteButton, StatusBadge, toast } from '@bautakt/ui';
 import { Button, Card, CardHeader, Link as FluentLink, Text } from '@fluentui/react-components';
 import {
   CalendarRegular,
   CheckmarkRegular,
-  DeleteRegular,
   DismissCircleRegular,
   DismissRegular,
   EditRegular,
@@ -207,9 +206,7 @@ function AbsenceView({
               {t('domain:absences.cancelAction')}
             </Button>
           ) : null}
-          <DangerButton icon={<DeleteRegular />} onClick={() => onAction('delete')}>
-            {t('domain:absences.delete')}
-          </DangerButton>
+          <DeleteButton label={t('domain:absences.delete')} onClick={() => onAction('delete')} />
         </div>
       </div>
 

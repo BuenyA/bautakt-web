@@ -1,5 +1,6 @@
 import {
   DangerButton,
+  DeleteButton,
   FormDrawer,
   FormDrawerDescription,
   FormDrawerFooter,
@@ -402,9 +403,13 @@ function EventForm({
 
       <FormDrawerFooter className="sm:flex-wrap">
         {editing && !readOnly ? (
-          <DangerButton type="button" className="sm:mr-auto" disabled={busy} onClick={askDelete}>
-            {t('domain:calendar.form.delete')}
-          </DangerButton>
+          <DeleteButton
+            type="button"
+            label={t('domain:calendar.form.delete')}
+            className="mr-auto!"
+            disabled={busy}
+            onClick={askDelete}
+          />
         ) : null}
         <Button type="button" onClick={onDone} disabled={busy}>
           {readOnly ? t('common:action.close') : t('common:action.cancel')}

@@ -1,6 +1,6 @@
 import { hasPermission } from '@bautakt/core';
 import {
-  DangerButton,
+  DeleteButton,
   FormDrawer,
   FormDrawerDescription,
   FormDrawerFooter,
@@ -378,14 +378,13 @@ function TimeEntryForm({
 
       <FormDrawerFooter className="sm:flex-wrap">
         {draft.id && !locked ? (
-          <DangerButton
+          <DeleteButton
             type="button"
-            className="sm:mr-auto"
+            label={t('domain:timeForm.delete.action')}
+            className="mr-auto!"
             disabled={busy}
             onClick={() => setConfirmDelete(true)}
-          >
-            {t('domain:timeForm.delete.action')}
-          </DangerButton>
+          />
         ) : null}
         <Button type="button" onClick={onDone} disabled={busy}>
           {t('common:action.cancel')}

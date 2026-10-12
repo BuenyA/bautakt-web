@@ -1,6 +1,6 @@
 import { hasPermission } from '@bautakt/core';
 import {
-  DangerButton,
+  DeleteButton,
   FormDrawer,
   FormDrawerDescription,
   FormDrawerFooter,
@@ -511,14 +511,13 @@ function DailyReportForm({
         ) : null}
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
           {draft.id && canDelete ? (
-            <DangerButton
+            <DeleteButton
               type="button"
-              className="sm:mr-auto"
+              label={t('domain:dailyReportForm.delete.action')}
+              className="mr-auto! self-start"
               disabled={busy}
               onClick={() => setConfirmDelete(true)}
-            >
-              {t('domain:dailyReportForm.delete.action')}
-            </DangerButton>
+            />
           ) : null}
           <Button type="button" onClick={onDone} disabled={busy}>
             {t('common:action.cancel')}

@@ -1,5 +1,5 @@
 import {
-  DangerButton,
+  DeleteButton,
   FormDrawer,
   FormDrawerDescription,
   FormDrawerFooter,
@@ -244,14 +244,13 @@ function ChecklistItemForm({
 
       <FormDrawerFooter className="sm:flex-wrap">
         {draft.id ? (
-          <DangerButton
+          <DeleteButton
             type="button"
-            className="sm:mr-auto"
+            label={t('domain:checklistForm.delete.action')}
+            className="mr-auto!"
             disabled={busy}
             onClick={() => setConfirmDelete(true)}
-          >
-            {t('domain:checklistForm.delete.action')}
-          </DangerButton>
+          />
         ) : null}
         <Button type="button" onClick={onDone} disabled={busy}>
           {t('common:action.cancel')}

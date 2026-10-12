@@ -109,6 +109,7 @@ verlinkt, nie kopiert.
 | 2026-10-11 | [Kalender: Woche als Standard, Einsätze ausblendbar](logs/2026-10-11-kalender-woche-einsaetze.md)   |
 | 2026-10-11 | [Abwesenheit sperrt Einsatzplanung](logs/2026-10-11-abwesenheit-sperrt-einsatz.md)                  |
 | 2026-10-12 | [Abwesenheiten ablehnen, bearbeiten, löschen](logs/2026-10-12-abwesenheiten-ablehnen-bearbeiten.md) |
+| 2026-10-12 | [Löschen nur noch als Mülleimer](logs/2026-10-12-loeschen-als-symbol.md)                            |
 
 ## Die drei wichtigsten Sätze
 
