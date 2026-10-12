@@ -491,6 +491,8 @@
       "pendingAbsences": "Anträge",
       "approve": "Genehmigen",
       "approveA11y": "Antrag von {{name}} genehmigen",
+      "reject": "Ablehnen",
+      "rejectA11y": "Antrag von {{name}} ablehnen",
       "open": "Öffnen",
       "newIncoming": "Neu eingegangen",
       "newIncomingHint": "Seit dem letzten Arbeitstag",
@@ -709,8 +711,61 @@
     "approve": "Genehmigen",
     "approved": "Abwesenheit genehmigt.",
     "approveError": "Genehmigung nicht möglich",
+    "reject": "Ablehnen",
+    "edit": "Bearbeiten",
+    "cancelAction": "Stornieren",
+    "delete": "Endgültig löschen",
     "emptyTitle": "Keine Abwesenheiten",
-    "emptyDescription": "Es liegt nichts vor."
+    "emptyDescription": "Es liegt nichts vor.",
+    "actions": {
+      "summary": "{{name}} · {{type}} · {{period}}",
+      "notUpdated": "Nichts geändert: Das Recht fehlt, oder die Abwesenheit wurde inzwischen geändert.",
+      "reject": {
+        "title": "Antrag ablehnen?",
+        "hint": "Der Mitarbeiter wird benachrichtigt.",
+        "reason": "Grund (freiwillig)",
+        "reasonPlaceholder": "z. B. Baustelle braucht dich in dieser Woche",
+        "confirm": "Ablehnen",
+        "done": "Antrag abgelehnt.",
+        "error": "Ablehnen nicht möglich."
+      },
+      "cancel": {
+        "title": "Abwesenheit stornieren?",
+        "hint": "Sie bleibt als „Storniert“ in der Liste, zählt aber nicht mehr.",
+        "confirm": "Stornieren",
+        "done": "Abwesenheit storniert.",
+        "error": "Stornieren nicht möglich."
+      },
+      "delete": {
+        "title": "Endgültig löschen?",
+        "hint": "Die Abwesenheit verschwindet ganz, auch aus dem Urlaubskonto. Das lässt sich nicht rückgängig machen.",
+        "confirm": "Endgültig löschen",
+        "done": "Abwesenheit gelöscht.",
+        "error": "Löschen nicht möglich."
+      }
+    },
+    "detail": {
+      "title": "Abwesenheit",
+      "loadErrorTitle": "Abwesenheit konnte nicht geladen werden",
+      "loadErrorDescription": "Bitte versuch es gleich noch einmal.",
+      "notFoundTitle": "Abwesenheit nicht gefunden",
+      "notFoundDescription": "Sie wurde gelöscht, oder du hast keinen Zugriff darauf.",
+      "infoTitle": "Details",
+      "period": "Zeitraum",
+      "days": "Dauer",
+      "daysValue_one": "{{count}} Kalendertag",
+      "daysValue_other": "{{count}} Kalendertage",
+      "requested": "Eingetragen",
+      "requestedBy": "{{date}} von {{name}}",
+      "decided": "Entschieden",
+      "decisionNote": "Grund der Ablehnung",
+      "noteTitle": "Notiz",
+      "noNote": "Keine Notiz.",
+      "toEmployee": "Zum Mitarbeiter",
+      "locked": "Abgelehnte und stornierte Abwesenheiten lassen sich nicht mehr bearbeiten, nur noch löschen.",
+      "decisionTitle": "Antrag entscheiden",
+      "decisionHint": "Der Mitarbeiter wird über die Entscheidung benachrichtigt."
+    }
   },
   "payroll": {
     "title": "Lohn",
@@ -1169,7 +1224,11 @@
     "employeeRequired": "Bitte einen Mitarbeiter wählen.",
     "endBeforeStart": "Das Ende liegt vor dem Beginn.",
     "saved": "Abwesenheit eingetragen.",
-    "saveError": "Abwesenheit konnte nicht eingetragen werden."
+    "saveError": "Abwesenheit konnte nicht eingetragen werden.",
+    "editTitle": "Abwesenheit bearbeiten",
+    "editDescriptionPending": "Der Antrag bleibt offen. Genehmigen oder ablehnen geht danach in der Liste.",
+    "editDescriptionApproved": "Die Genehmigung bleibt bestehen. Liegt im neuen Zeitraum ein Einsatz des Mitarbeiters, lehnt Bautakt die Änderung ab.",
+    "editSaved": "Abwesenheit gespeichert."
   },
   "expenseForm": {
     "title": "Ausgabe erfassen",

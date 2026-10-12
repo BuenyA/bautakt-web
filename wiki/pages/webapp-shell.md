@@ -362,7 +362,9 @@ Zwei Muster, bewusst getrennt:
   Breite.
 
 Was die Datenbank besser weiß, macht die Datenbank: die Belegnummer vergibt
-`finalize_sales_document`, die Genehmigung einer Abwesenheit `approve_absence`.
+`finalize_sales_document`, die Genehmigung einer Abwesenheit `approve_absence`
+(Ablehnen, Bearbeiten und Löschen laufen per `update`/`delete`, geprüft vom
+Trigger, siehe [abwesenheiten.md](abwesenheiten.md)).
 Beide tragen Prüfungen, die ein direktes `update` umginge.
 
 `update_document_payment_status` setzt den Beleg auf `paid`, sobald die
