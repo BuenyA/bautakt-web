@@ -79,7 +79,7 @@ export function TimeGridView({
         </div>
       ) : null}
 
-      <TimeGridBody dayCount={days.length} fill>
+      <TimeGridBody dayCount={days.length}>
         {days.map((iso) => {
           const timed = entries
             .filter((entry) => !entry.allDay && coversDay(entry.startsAt, entry.endsAt, false, iso))

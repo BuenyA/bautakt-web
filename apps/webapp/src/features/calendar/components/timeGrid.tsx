@@ -1,6 +1,6 @@
 import { cn } from '@bautakt/ui';
 import { mergeClasses } from '@fluentui/react-components';
-import { type ReactNode, type RefObject, useLayoutEffect, useRef, useState } from 'react';
+import { type ReactNode, useLayoutEffect, useRef } from 'react';
 
 import { parseIsoDay } from '../calendarModel';
 import {
@@ -69,52 +69,13 @@ export function TimeGridHeader({
   );
 }
 
-/** Abstand unter dem Raster: Padding von `<main>` (sm:p-6) plus Rahmen der Karte. */
-const FILL_BOTTOM_PX = 26;
-const FILL_MIN_PX = 320;
-
-/**
- * Höhe, mit der der Bereich bis zum Fensterrand reicht: so passt die Woche
- * ohne Seiten-Scroll ins Bild, egal wie hoch das Fenster ist. Nie unter
- * 320 px (sonst sieht man kaum Stunden), nie über den ganzen Tag.
- */
-function useFillHeight(ref: RefObject<HTMLElement | null>, enabled: boolean, max: number) {
-  const [height, setHeight] = useState<number | null>(null);
-
-  useLayoutEffect(() => {
-    if (!enabled) return;
-    function measure() {
-      if (!ref.current) return;
-      const top = ref.current.getBoundingClientRect().top + window.scrollY;
-      const available = window.innerHeight - top - FILL_BOTTOM_PX;
-      setHeight(Math.min(max, Math.max(FILL_MIN_PX, Math.floor(available))));
-    }
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, [ref, enabled, max]);
-
-  return height;
-}
-
 /**
  * Scrollbarer Bereich 0–24 Uhr mit Stundenbeschriftung. Beim ersten Zeichnen
  * steht er auf 7 Uhr — danach gehört die Position der Person. `children`
- * sind die Tagesspalten. Mit `fill` reicht er bis zum Fensterrand
- * (Kalender), sonst zeigt er fest zwölf Stunden (Einsatzplanung).
+ * sind die Tagesspalten.
  */
-export function TimeGridBody({
-  dayCount,
-  fill = false,
-  children,
-}: {
-  dayCount: number;
-  fill?: boolean;
-  children: ReactNode;
-}) {
+export function TimeGridBody({ dayCount, children }: { dayCount: number; children: ReactNode }) {
   const viewportRef = useRef<HTMLDivElement>(null);
-  const fullHeight = 24 * HOUR_PX + 16;
-  const fillHeight = useFillHeight(viewportRef, fill, fullHeight);
 
   useLayoutEffect(() => {
     if (viewportRef.current) viewportRef.current.scrollTop = SCROLL_TO_HOUR * HOUR_PX;
@@ -124,7 +85,7 @@ export function TimeGridBody({
     <div
       ref={viewportRef}
       className="border-border overflow-x-hidden overflow-y-auto overscroll-contain border-t"
-      style={{ height: fillHeight ?? VISIBLE_HOURS * HOUR_PX + 16 }}
+      style={{ height: VISIBLE_HOURS * HOUR_PX + 16 }}
     >
       <div
         className="relative grid"

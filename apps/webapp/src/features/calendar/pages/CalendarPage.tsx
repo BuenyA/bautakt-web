@@ -203,10 +203,10 @@ export function CalendarPage() {
   const isLoading = events.isPending || (show.assignment && assignments.isPending);
 
   return (
-    // Knapper Kopf (gap-3, ohne Beschreibung), damit die Woche ohne Scrollen ins Bild passt.
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title={t('domain:calendar.title')}
+        description={t('domain:calendar.description')}
         actions={
           <Button
             appearance="primary"
@@ -220,81 +220,87 @@ export function CalendarPage() {
         }
       />
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <TabList
-          selectedValue={view}
-          onTabSelect={(_, data) => go(data.value as View, dayIso)}
-          aria-label={t('domain:calendar.viewLabel')}
-        >
-          {VIEWS.map((value) => (
-            <Tab key={value} value={value}>
-              {t(`domain:calendar.views.${value}`)}
-            </Tab>
-          ))}
-        </TabList>
-        <div className="flex w-full items-center gap-2 sm:w-auto">
-          <Button
-            aria-label={t('domain:calendar.previous')}
-            onClick={() => go(view, shiftDay(view, dayIso, -1))}
-            icon={<ChevronLeftRegular />}
-          />
-          <span className="min-w-0 flex-1 truncate text-center text-sm font-medium capitalize sm:min-w-44 sm:flex-none">
-            {rangeLabel(view, dayIso, days)}
-          </span>
-          <Button
-            aria-label={t('domain:calendar.next')}
-            onClick={() => go(view, shiftDay(view, dayIso, 1))}
-            icon={<ChevronRightRegular />}
-          />
-          <Button onClick={() => go(view, todayIso)}>{t('domain:calendar.today')}</Button>
-          <CalendarSettingsPopover
-            settings={settings}
-            onColorChange={setColor}
-            onShowChange={setShow}
-          />
+      {/* Werkzeugleiste und Raster enger zusammen, damit die Woche auch mit
+          Ganztägig-Zeile ohne Scrollen ins Bild passt (Raster so hoch wie in
+          der Einsatzplanung). */}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <TabList
+            size="small"
+            selectedValue={view}
+            onTabSelect={(_, data) => go(data.value as View, dayIso)}
+            aria-label={t('domain:calendar.viewLabel')}
+          >
+            {VIEWS.map((value) => (
+              <Tab key={value} value={value}>
+                {t(`domain:calendar.views.${value}`)}
+              </Tab>
+            ))}
+          </TabList>
+          <div className="flex w-full items-center gap-2 sm:w-auto">
+            <Button
+              aria-label={t('domain:calendar.previous')}
+              onClick={() => go(view, shiftDay(view, dayIso, -1))}
+              icon={<ChevronLeftRegular />}
+            />
+            <span className="min-w-0 flex-1 truncate text-center text-sm font-medium capitalize sm:min-w-44 sm:flex-none">
+              {rangeLabel(view, dayIso, days)}
+            </span>
+            <Button
+              aria-label={t('domain:calendar.next')}
+              onClick={() => go(view, shiftDay(view, dayIso, 1))}
+              icon={<ChevronRightRegular />}
+            />
+            <Button onClick={() => go(view, todayIso)}>{t('domain:calendar.today')}</Button>
+            <CalendarSettingsPopover
+              settings={settings}
+              onColorChange={setColor}
+              onShowChange={setShow}
+            />
+          </div>
         </div>
+
+        {events.isError ? (
+          <MessageBar intent="error">{t('domain:calendar.loadError')}</MessageBar>
+        ) : null}
+
+        <ToneColorsContext value={settings.colors}>
+          {isLoading ? (
+            <PageSpinner />
+          ) : view === 'jahr' ? (
+            <YearView
+              year={parseIsoDay(dayIso).getFullYear()}
+              todayIso={todayIso}
+              entries={entries}
+              onOpenDay={(iso) => go('tag', iso)}
+              onOpenMonth={(month) =>
+                go('monat', localIsoDay(new Date(parseIsoDay(dayIso).getFullYear(), month, 1)))
+              }
+            />
+          ) : view === 'monat' ? (
+            <MonthView
+              days={days}
+              month={parseIsoDay(dayIso).getMonth()}
+              todayIso={todayIso}
+              entries={entries}
+              onOpenEvent={openEvent}
+              onCreate={(iso) => setDraft(emptyEventDraft(iso))}
+              onOpenDay={(iso) => go('tag', iso)}
+            />
+          ) : (
+            <TimeGridView
+              key={`${view}-${days[0]}`}
+              days={days}
+              todayIso={todayIso}
+              now={now}
+              entries={entries}
+              onOpenEvent={openEvent}
+              onCreate={(iso, hour) => setDraft(emptyEventDraft(iso, hour))}
+              onOpenDay={(iso) => go('tag', iso)}
+            />
+          )}
+        </ToneColorsContext>
       </div>
-
-      {events.isError ? (
-        <MessageBar intent="error">{t('domain:calendar.loadError')}</MessageBar>
-      ) : null}
-
-      <ToneColorsContext value={settings.colors}>
-        {isLoading ? (
-          <PageSpinner />
-        ) : view === 'jahr' ? (
-          <YearView
-            year={parseIsoDay(dayIso).getFullYear()}
-            todayIso={todayIso}
-            entries={entries}
-            onOpenDay={(iso) => go('tag', iso)}
-            onOpenMonth={(month) =>
-              go('monat', localIsoDay(new Date(parseIsoDay(dayIso).getFullYear(), month, 1)))
-            }
-          />
-        ) : view === 'monat' ? (
-          <MonthView
-            days={days}
-            month={parseIsoDay(dayIso).getMonth()}
-            todayIso={todayIso}
-            entries={entries}
-            onOpenEvent={openEvent}
-            onCreate={(iso) => setDraft(emptyEventDraft(iso))}
-            onOpenDay={(iso) => go('tag', iso)}
-          />
-        ) : (
-          <TimeGridView
-            key={`${view}-${days[0]}`}
-            days={days}
-            todayIso={todayIso}
-            now={now}
-            entries={entries}
-            onOpenEvent={openEvent}
-            onCreate={(iso, hour) => setDraft(emptyEventDraft(iso, hour))}
-            onOpenDay={(iso) => go('tag', iso)}
-          />
-        )}
-      </ToneColorsContext>
 
       <CalendarEventSheet
         draft={draft}

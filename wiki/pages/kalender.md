@@ -41,10 +41,10 @@ Parameter; `?datum=YYYY-MM-DD`, heute ohne Parameter).
   Block sichtbar ist (`sticky` im Block, Block mit `overflow-clip`, Termin-
   `<button>` mit `flex` — sonst zentriert der Button und nichts klebt).
   Standardansicht seit 2026-10-11 (vorher Monat).
-  Das Raster reicht bis zum Fensterrand (`TimeGridBody fill`, misst die eigene
-  Oberkante), damit die Woche ohne Seiten-Scroll ins Bild passt; mindestens
-  320 px. Die Einsatzplanung nutzt dasselbe Raster ohne `fill` (feste
-  zwölf Stunden).
+  Das Raster ist fest zwölf Stunden hoch, genau wie in der Einsatzplanung
+  (dasselbe `TimeGridBody`). Damit die Woche auch mit Ganztägig-Zeile bei
+  900 px Fensterhöhe ohne Scrollen passt, stehen Werkzeugleiste und Raster
+  enger (`gap-3`) und die Ansicht-Tabs sind `size="small"`.
 - **Jahr:** zwölf kleine Monate, Punkt an Tagen mit Einträgen.
 
 ## Termin anlegen, ändern, löschen

@@ -862,6 +862,7 @@
   },
   "calendar": {
     "title": "Kalender",
+    "description": "Termine, Einsätze und eigene Abwesenheiten.",
     "previous": "Zurück",
     "next": "Weiter",
     "today": "Heute",
