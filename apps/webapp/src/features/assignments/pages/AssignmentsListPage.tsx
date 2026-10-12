@@ -119,31 +119,30 @@ export function AssignmentsListPage() {
     <div className="flex flex-col gap-6">
       {header}
 
-      {/* Wie im Kalender: Woche links, Knöpfe rechts, Werkzeugleiste eng am Raster. */}
+      {/* Werkzeugleiste rechtsbündig (von rechts: „Diese Woche“, Pfeile, Woche),
+          eng am Raster wie im Kalender. */}
       <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-foreground text-base font-semibold sm:text-lg">
+        <div
+          className="flex flex-wrap items-center justify-end gap-2"
+          role="group"
+          aria-label={t('domain:assignments.week.label')}
+        >
+          <h2 className="text-foreground mr-1 text-base font-semibold sm:text-lg">
             {weekLabel(monday)}
           </h2>
-          <div
-            className="flex items-center gap-2"
-            role="group"
-            aria-label={t('domain:assignments.week.label')}
-          >
-            <Button
-              aria-label={t('domain:assignments.week.previous')}
-              onClick={() => goToWeek(addDays(monday, -7))}
-              icon={<ChevronLeftRegular />}
-            />
-            <Button
-              aria-label={t('domain:assignments.week.next')}
-              onClick={() => goToWeek(addDays(monday, 7))}
-              icon={<ChevronRightRegular />}
-            />
-            <Button onClick={() => goToWeek(startOfWeek(todayIso))} disabled={isThisWeek}>
-              {t('domain:assignments.week.thisWeek')}
-            </Button>
-          </div>
+          <Button
+            aria-label={t('domain:assignments.week.previous')}
+            onClick={() => goToWeek(addDays(monday, -7))}
+            icon={<ChevronLeftRegular />}
+          />
+          <Button
+            aria-label={t('domain:assignments.week.next')}
+            onClick={() => goToWeek(addDays(monday, 7))}
+            icon={<ChevronRightRegular />}
+          />
+          <Button onClick={() => goToWeek(startOfWeek(todayIso))} disabled={isThisWeek}>
+            {t('domain:assignments.week.thisWeek')}
+          </Button>
         </div>
 
         {isLoading ? (
