@@ -6,10 +6,15 @@
   `public/login-background.webp` als Hintergrund: unscharf (`blur-md`) und mit
   45 % Schwarz abgedunkelt. Das Bild ist aus `login_background.png` im
   Projektordner erzeugt (dunkelblaue Wellen, 1600 px, WebP, rund 18 KB).
-- Der Schriftzug über der Karte und Impressum/Datenschutz/AGB sind hell
-  (`LegalLinks onImage`).
-- Der Fußtext („Sie haben bereits ein Konto? Anmelden“) steht jetzt in der
-  Karte, weil ein Link in Markenblau auf dem dunklen Bild kaum lesbar wäre.
+- Die Anmeldeseiten sind **immer dunkel**, egal was unter „Darstellung“
+  gewählt ist: `AuthCard` hat einen eigenen `FluentProvider` mit
+  `darkTheme`. Die Tailwind-Farben zeigen auf die Fluent-Variablen und werden
+  dadurch mit dunkel.
+- Helm und Schriftzug stehen zentriert oben **in** der Karte, darunter
+  linksbündig Titel und Untertitel. Auch der Fußtext („Sie haben bereits ein
+  Konto? Anmelden“) steht in der Karte.
+- Kräftiger Schatten um die Karte (Fluents eigener ist ungelayert, daher
+  `shadow-[…]!`).
 
 ## Warum
 

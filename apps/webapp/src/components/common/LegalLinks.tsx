@@ -10,23 +10,17 @@ import { LEGAL_PAGES, legalUrl } from '@/lib/legal';
  *
  * Öffnet in einem neuen Tab, damit ein halb ausgefülltes Formular nicht
  * verloren geht. Der Hinweis darauf steht für Screenreader im Link.
- * `onImage`: hell auf dem abgedunkelten Hintergrundbild der Anmeldeseiten.
  */
-export function LegalLinks({ className, onImage }: { className?: string; onImage?: boolean }) {
+export function LegalLinks({ className }: { className?: string }) {
   const { t } = useTranslation();
 
   return (
     <nav aria-label={t('common:legal.label')} className={cn('text-xs', className)}>
-      <ul
-        className={cn(
-          'flex flex-wrap items-center justify-center gap-x-2 gap-y-1',
-          onImage ? 'text-white/80' : 'text-muted-foreground',
-        )}
-      >
+      <ul className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
         {LEGAL_PAGES.map((page, index) => (
           <Fragment key={page}>
             {index > 0 ? (
-              <li aria-hidden="true" className={onImage ? undefined : 'text-text-subtle'}>
+              <li aria-hidden="true" className="text-text-subtle">
                 ·
               </li>
             ) : null}
@@ -36,8 +30,6 @@ export function LegalLinks({ className, onImage }: { className?: string; onImage
                 target="_blank"
                 rel="noopener noreferrer"
                 appearance="subtle"
-                // Fluents Linkfarbe ist ungelayert und schlägt Tailwind ohne `!`.
-                className={onImage ? 'text-white/80! hover:text-white!' : undefined}
               >
                 {t(`common:legal.${page}`)}
                 <span className="sr-only"> {t('common:legal.newTab')}</span>
