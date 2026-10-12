@@ -5,7 +5,7 @@
 - `AuthCard` (Anmelden, Registrieren, Passwort vergessen/zurücksetzen) zeigt
   `public/login-background.webp` als Hintergrund: unscharf (`blur-md`) und mit
   45 % Schwarz abgedunkelt. Das Bild ist aus `login_background.png` im
-  Projektordner erzeugt (1600 px, WebP, rund 290 KB statt 3,5 MB).
+  Projektordner erzeugt (dunkelblaue Wellen, 1600 px, WebP, rund 18 KB).
 - Der Schriftzug über der Karte und Impressum/Datenschutz/AGB sind hell
   (`LegalLinks onImage`).
 - Der Fußtext („Sie haben bereits ein Konto? Anmelden“) steht jetzt in der
