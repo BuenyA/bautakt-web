@@ -22,7 +22,10 @@ baut die Leiste aus Fluents `NavDrawer`:
   wie in anderen Apps, und am Symbol soll man sehen, dass hier etwas einklappt.
 - **Body:** die `NavItem`s mit 20px-Icons (`bundleIcon`, aktiv gefüllt).
 - **Footer:** Einstellungen, `NavDivider`, Benutzermenü als Fluent-`Persona`
-  (Firma, E-Mail, Avatar).
+  (Firma, E-Mail, Avatar). Der Avatar zeigt das eigene Profilbild
+  (`useMyProfile` + `useProfileImageUrls`), sonst die Initialen des Namens,
+  ohne Namen die ersten zwei Buchstaben der E-Mail. Bis 2026-10-12 waren es
+  immer die E-Mail-Buchstaben, das Bild wurde nie geladen.
 
 Farben, Abstände und Auswahl (neutrale Fläche plus Brand-Indikator) sind
 Fluents Standard. Eigene Regeln gibt es für den Kopf, das Footer-Polster und

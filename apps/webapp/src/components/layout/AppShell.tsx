@@ -39,7 +39,9 @@ import { useTheme } from '@/app/useTheme';
 import { BautaktSignet } from '@/components/brand/BautaktSignet';
 import { useRouterLink } from '@/components/common/useRouterLink';
 import { useAuth } from '@/features/auth/useAuth';
+import { useMyProfile } from '@/features/auth/useMyProfile';
 import { useMembership } from '@/features/company/useMembership';
+import { useProfileImageUrls } from '@/features/team/useProfileImageUrls';
 import { LEGAL_PAGES, legalUrl } from '@/lib/legal';
 import { HOME_ROUTE } from '@/lib/routes';
 
@@ -149,20 +151,31 @@ function UserMenu({ collapsed }: { collapsed: boolean }) {
   const { data: membership } = useMembership();
   const { theme, setTheme } = useTheme();
 
+  const { data: profile } = useMyProfile();
+  const imagePath = profile?.imagePath ?? null;
+  const imageUrl = useProfileImageUrls([imagePath]).data?.[imagePath ?? ''];
+
   const email = user?.email ?? '';
   const company = membership?.companyName ?? '';
-  const initials = email.slice(0, 2).toUpperCase() || '??';
+  // Mit Namen bildet Fluent die Initialen selbst („Bünyamin Aydemir“ → BA);
+  // ohne Namen die ersten zwei Buchstaben der E-Mail.
+  const avatar = {
+    name: profile?.name || undefined,
+    initials: profile?.name ? undefined : email.slice(0, 2).toUpperCase() || '??',
+    image: imageUrl ? { src: imageUrl } : undefined,
+    color: 'brand' as const,
+  };
 
   const trigger = collapsed ? (
     <Button appearance="subtle" className={styles.railButton} aria-label={email}>
-      <Avatar initials={initials} color="brand" size={32} />
+      <Avatar {...avatar} size={32} />
     </Button>
   ) : (
     <Button appearance="subtle" className={styles.personaButton}>
       <Persona
         name={company || email}
         secondaryText={company ? email : undefined}
-        avatar={{ initials, color: 'brand' }}
+        avatar={avatar}
         size="medium"
         textAlignment="center"
         className="min-w-0 text-left"
