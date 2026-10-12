@@ -110,6 +110,7 @@ verlinkt, nie kopiert.
 | 2026-10-11 | [Abwesenheit sperrt Einsatzplanung](logs/2026-10-11-abwesenheit-sperrt-einsatz.md)                  |
 | 2026-10-12 | [Abwesenheiten ablehnen, bearbeiten, löschen](logs/2026-10-12-abwesenheiten-ablehnen-bearbeiten.md) |
 | 2026-10-12 | [Löschen nur noch als Mülleimer](logs/2026-10-12-loeschen-als-symbol.md)                            |
+| 2026-10-12 | [Hintergrundbild auf den Anmeldeseiten](logs/2026-10-12-login-hintergrund.md)                       |
 
 ## Die drei wichtigsten Sätze
 
