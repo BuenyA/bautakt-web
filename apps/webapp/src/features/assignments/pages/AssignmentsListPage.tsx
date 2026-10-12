@@ -119,42 +119,47 @@ export function AssignmentsListPage() {
     <div className="flex flex-col gap-6">
       {header}
 
-      <div
-        className="flex flex-wrap items-center gap-2"
-        role="group"
-        aria-label={t('domain:assignments.week.label')}
-      >
-        <Button
-          aria-label={t('domain:assignments.week.previous')}
-          onClick={() => goToWeek(addDays(monday, -7))}
-          icon={<ChevronLeftRegular />}
-        />
-        <Button
-          aria-label={t('domain:assignments.week.next')}
-          onClick={() => goToWeek(addDays(monday, 7))}
-          icon={<ChevronRightRegular />}
-        />
-        <Button onClick={() => goToWeek(startOfWeek(todayIso))} disabled={isThisWeek}>
-          {t('domain:assignments.week.thisWeek')}
-        </Button>
-        <h2 className="text-foreground ml-1 text-base font-semibold sm:text-lg">
-          {weekLabel(monday)}
-        </h2>
-      </div>
+      {/* Wie im Kalender: Woche links, Knöpfe rechts, Werkzeugleiste eng am Raster. */}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-foreground text-base font-semibold sm:text-lg">
+            {weekLabel(monday)}
+          </h2>
+          <div
+            className="flex items-center gap-2"
+            role="group"
+            aria-label={t('domain:assignments.week.label')}
+          >
+            <Button
+              aria-label={t('domain:assignments.week.previous')}
+              onClick={() => goToWeek(addDays(monday, -7))}
+              icon={<ChevronLeftRegular />}
+            />
+            <Button
+              aria-label={t('domain:assignments.week.next')}
+              onClick={() => goToWeek(addDays(monday, 7))}
+              icon={<ChevronRightRegular />}
+            />
+            <Button onClick={() => goToWeek(startOfWeek(todayIso))} disabled={isThisWeek}>
+              {t('domain:assignments.week.thisWeek')}
+            </Button>
+          </div>
+        </div>
 
-      {isLoading ? (
-        <PageSpinner />
-      ) : (
-        <AssignmentWeekView
-          key={monday}
-          days={days}
-          todayIso={todayIso}
-          now={now}
-          assignments={data ?? []}
-          urls={urls}
-          onCreate={canManage ? (dayIso, hour) => setSheet({ dayIso, hour }) : undefined}
-        />
-      )}
+        {isLoading ? (
+          <PageSpinner />
+        ) : (
+          <AssignmentWeekView
+            key={monday}
+            days={days}
+            todayIso={todayIso}
+            now={now}
+            assignments={data ?? []}
+            urls={urls}
+            onCreate={canManage ? (dayIso, hour) => setSheet({ dayIso, hour }) : undefined}
+          />
+        )}
+      </div>
 
       <AssignmentSheet
         open={sheet !== null}

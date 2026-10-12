@@ -13,6 +13,8 @@ Notizen. Einsätze lassen sich dort bearbeiten. Anlegen und Löschen:
   `timeGridLayout.ts`).
 - Die Woche steht in der URL: `?woche=2026-10-05` (Montag). Die aktuelle Woche
   hat keinen Parameter.
+- Werkzeugleiste wie im Kalender (seit 2026-10-12): Wochenangabe links,
+  Zurück/Weiter/„Diese Woche“ rechtsbündig, `gap-3` zum Raster.
 - Je Einsatz ein blauer Block mit Auftrag, Uhrzeit und den Gesichtern der
   Eingeteilten (Profilbild, sonst Initialen). Erst fällt bei kurzen Blöcken die
   Uhrzeit weg, dann die Gesichter. Ohne Mitarbeiter steht dort „Niemand
