@@ -62,6 +62,7 @@ der Übersicht (`overview/components/TodoPanel.tsx`). Alle Aktionen nur mit
 
 ## Bekannt
 
-- Die Handy-App kann ablehnen und stornieren, aber (noch) nicht bearbeiten
-  oder endgültig löschen. Gelöschtes verschwindet dort beim nächsten Abgleich,
-  weil `syncAbsencesFromSupabase` den Cache komplett ersetzt.
+- Die Handy-App kann seit bautakt-app `01b0344` auch bearbeiten und endgültig
+  löschen, aber nur online (nicht über die Outbox). Im Web Gelöschtes
+  verschwindet dort beim nächsten Abgleich, weil `syncAbsencesFromSupabase`
+  den Cache komplett ersetzt.
