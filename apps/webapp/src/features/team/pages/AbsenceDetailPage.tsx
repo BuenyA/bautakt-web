@@ -197,27 +197,8 @@ function AbsenceView({
 
         <div className="flex shrink-0 flex-wrap items-center gap-2">
           <LinkButton to={routes.absences}>{t('common:action.back')}</LinkButton>
-          {isPending ? (
-            <>
-              <Button
-                appearance="primary"
-                icon={<CheckmarkRegular />}
-                disabled={approve.isPending}
-                onClick={() => void onApprove()}
-              >
-                {t('domain:absences.approve')}
-              </Button>
-              <Button icon={<DismissRegular />} onClick={() => onAction('reject')}>
-                {t('domain:absences.reject')}
-              </Button>
-            </>
-          ) : null}
           {editable ? (
-            <Button
-              appearance={isPending ? 'secondary' : 'primary'}
-              icon={<EditRegular />}
-              onClick={onEdit}
-            >
+            <Button appearance="primary" icon={<EditRegular />} onClick={onEdit}>
               {t('domain:absences.edit')}
             </Button>
           ) : null}
@@ -288,6 +269,36 @@ function AbsenceView({
           </dl>
         </Section>
       </div>
+
+      {/* Die Entscheidung steht für sich, nicht zwischen Zurück, Bearbeiten
+          und Löschen (Owner-Wunsch). */}
+      {isPending ? (
+        <Card size="large">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-1">
+              <Text as="h2" size={400} weight="semibold">
+                {t('domain:absences.detail.decisionTitle')}
+              </Text>
+              <Text size={300} className="text-muted-foreground">
+                {t('domain:absences.detail.decisionHint')}
+              </Text>
+            </div>
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <Button icon={<DismissRegular />} onClick={() => onAction('reject')}>
+                {t('domain:absences.reject')}
+              </Button>
+              <Button
+                appearance="primary"
+                icon={<CheckmarkRegular />}
+                disabled={approve.isPending}
+                onClick={() => void onApprove()}
+              >
+                {t('domain:absences.approve')}
+              </Button>
+            </div>
+          </div>
+        </Card>
+      ) : null}
     </div>
   );
 }

@@ -38,8 +38,10 @@ der Übersicht (`overview/components/TodoPanel.tsx`). Alle Aktionen nur mit
 - Detailseite `/abwesenheiten/:id` (`AbsenceDetailPage.tsx`, Owner-Wunsch
   2026-10-12): Profilbild und Name vorn wie in der Einsatzplanung (mit
   `canManageEmployees` ein Link zum Mitarbeiter), darunter Status und
-  Zeitraum. Knöpfe je nach Status: Genehmigen/Ablehnen (offen), Bearbeiten
-  (offen, genehmigt), Stornieren (genehmigt), Endgültig löschen (immer).
+  Zeitraum. Oben rechts je nach Status Zurück, Bearbeiten (offen,
+  genehmigt), Stornieren (genehmigt), Endgültig löschen (immer).
+  Genehmigen/Ablehnen stehen bewusst getrennt davon in einer eigenen Karte
+  „Antrag entscheiden“ unter dem Inhalt (Owner-Wunsch).
   Bearbeiten geht auch **rückwirkend** (etwa Urlaub → Krankheit); die
   Datenbank begrenzt das Datum nicht.
 - Tabelle: die ganze Zeile öffnet die Detailseite, kein Menü „⋯“ mehr.
