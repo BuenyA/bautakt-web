@@ -882,13 +882,26 @@
     "openDayBusy": "{{date}} öffnen, mit Einträgen",
     "createOnDay": "Termin am {{date}} anlegen",
     "createAt": "Termin am {{date}} um {{hour}} Uhr anlegen",
-    "showAssignments": "Einsätze anzeigen",
     "loadError": "Termine konnten nicht geladen werden. Einsätze und Abwesenheiten werden trotzdem gezeigt.",
     "legend": {
       "me": "Privater Termin",
       "all": "Firmentermin",
       "assignment": "Einsatz",
       "absence": "Abwesenheit"
+    },
+    "settings": {
+      "title": "Kalender-Einstellungen",
+      "colorOf": "Farbe für {{name}}",
+      "colors": {
+        "blue": "Blau",
+        "purple": "Lila",
+        "red": "Rot",
+        "green": "Grün",
+        "yellow": "Gelb",
+        "teal": "Türkis",
+        "pink": "Pink",
+        "gray": "Grau"
+      }
     },
     "types": {
       "me": "Für mich",

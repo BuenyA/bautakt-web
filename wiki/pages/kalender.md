@@ -5,14 +5,30 @@ Terminen wie in der Handy-App. Vorher zeigte die Seite nur Einsätze im Monat.
 
 ## Was er zeigt
 
-- **Termine** aus `calendar_events`: privat (`event_type = 'me'`, blau) und
-  Firma (`'all'`, rot) — dieselben Farben wie in der App.
-- **Einsätze** (grün), Link auf `/einsatzplanung/:id`. Der Schalter
-  „Einsätze anzeigen“ blendet sie in allen Ansichten aus (samt Legendenpunkt).
-  Die Wahl steht im localStorage (`bautakt-calendar-assignments:<userId>`),
-  gilt also je Nutzer und Browser, nicht geräteübergreifend. Standard: an.
-- **Eigene Abwesenheiten** (gelb, offene gestrichelt), nur lesend, wie in der
-  App. Wer sonst fehlt, steht in „Abwesenheiten“ und auf der Übersicht.
+- **Termine** aus `calendar_events`: privat (`event_type = 'me'`, Standard
+  lila) und Firma (`'all'`, Standard rot).
+- **Einsätze** (Standard blau, exakt die Markenfarbe der Einsatzplanung), Link
+  auf `/einsatzplanung/:id`.
+- **Eigene Abwesenheiten** (Standard gelb, offene gestrichelt), nur lesend, wie
+  in der App. Wer sonst fehlt, steht in „Abwesenheiten“ und auf der Übersicht.
+
+### Kalender-Einstellungen (Zahnrad neben „Heute“)
+
+Seit 2026-10-12 je Art (privat, Firma, Einsatz, Abwesenheit) ein Schalter
+„anzeigen“ und eine Farbe aus acht (`CALENDAR_COLORS` in
+`components/entryStyles.ts`). Es gibt keine Legende mehr über dem Kalender;
+sie nahm Platz weg, die Farben stehen im Popover.
+
+- Gespeichert in `useCalendarSettings` im localStorage
+  (`bautakt-calendar-settings:<userId>`, JSON), also je Nutzer und Browser,
+  nicht geräteübergreifend. Kaputte oder fehlende Werte fallen einzeln auf
+  den Standard zurück. Der alte Schlüssel `bautakt-calendar-assignments:<id>`
+  (`'off'` = Einsätze aus) wird beim ersten Lesen übernommen.
+- Die Farbe kommt per `ToneColorsContext` in `useToneClass`/`ToneDot`, die
+  Ansichten selbst wissen nichts davon.
+- Hintergrund = Randfarbe per `color-mix` mit 22 % auf den Seitenhintergrund,
+  damit alle Farben gleich kräftig wirken (Fluents `Palette…Background2` sind
+  je Farbe sehr unterschiedlich stark). Blau nimmt `colorBrandBackground2`.
 
 Ansichten Jahr, Monat, Woche, Tag (`?ansicht=jahr|monat|tag`, Woche ohne
 Parameter; `?datum=YYYY-MM-DD`, heute ohne Parameter).
@@ -25,6 +41,10 @@ Parameter; `?datum=YYYY-MM-DD`, heute ohne Parameter).
   Block sichtbar ist (`sticky` im Block, Block mit `overflow-clip`, Termin-
   `<button>` mit `flex` — sonst zentriert der Button und nichts klebt).
   Standardansicht seit 2026-10-11 (vorher Monat).
+  Das Raster ist fest zwölf Stunden hoch, genau wie in der Einsatzplanung
+  (dasselbe `TimeGridBody`). Damit die Woche auch mit Ganztägig-Zeile bei
+  900 px Fensterhöhe ohne Scrollen passt, stehen Werkzeugleiste und Raster
+  enger (`gap-3`) und die Ansicht-Tabs sind `size="small"`.
 - **Jahr:** zwölf kleine Monate, Punkt an Tagen mit Einträgen.
 
 ## Termin anlegen, ändern, löschen
