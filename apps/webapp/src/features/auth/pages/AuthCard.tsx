@@ -27,7 +27,12 @@ export function AuthCard({
       <div className="flex w-full max-w-sm flex-col gap-6">
         {/* Über dem dunklen Bild immer hell, auch im hellen Modus. */}
         <BautaktLogo className="self-center text-white drop-shadow" />
-        <Card size="large">
+        {/* Kräftiger Schatten, damit die Karte vom Bild abhebt. Fluents eigener
+            Kartenschatten ist ungelayert und schlägt Tailwind ohne `!`. */}
+        <Card
+          size="large"
+          className="shadow-[0_8px_24px_rgba(0,0,0,0.45),0_32px_80px_rgba(0,0,0,0.7)]!"
+        >
           <CardHeader
             header={
               <Text as="h1" size={500} weight="semibold">
