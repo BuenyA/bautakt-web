@@ -57,8 +57,8 @@ export type NavItem = PermissionGate & {
 };
 
 /**
- * Flache Top-Navigation, zehn Punkte. Einstellungen steht im Fuss und zaehlt
- * mit. Keine Sektionsueberschriften.
+ * Flache Top-Navigation. Der Kalender steht im Fuss, die Einstellungen im
+ * Profilmenue. Keine Sektionsueberschriften.
  *
  * Auftraege und Zeiten sind ein Klick. Finanzen, Mitarbeiter und Material
  * oeffnen einen Hub; die Listen dahinter behalten ihre Pfade.
@@ -71,7 +71,6 @@ export const navItems: NavItem[] = [
   { to: routes.overview, labelKey: 'common:nav.overview', icon: Home },
   { to: routes.orders, labelKey: 'common:nav.orders', icon: Briefcase },
   { to: routes.assignments, labelKey: 'common:nav.assignments', icon: PeopleTeam },
-  { to: routes.calendar, labelKey: 'common:nav.calendar', icon: CalendarLtr },
   {
     to: routes.financeHub,
     labelKey: 'common:nav.finance',
@@ -98,7 +97,14 @@ export const navItems: NavItem[] = [
   },
 ];
 
-/** Unten in der Leiste, abgesetzt vom Rest. Zaehlt als zehnter Punkt. */
+/** Unten in der Leiste, abgesetzt vom Rest, direkt ueber dem Profil. */
+export const calendarNavItem: NavItem = {
+  to: routes.calendar,
+  labelKey: 'common:nav.calendar',
+  icon: CalendarLtr,
+};
+
+/** Im Profilmenue unten links, nicht in der Leiste. */
 export const settingsNavItem: NavItem = {
   to: routes.settings,
   labelKey: 'common:nav.settings',

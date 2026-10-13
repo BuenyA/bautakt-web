@@ -9,7 +9,7 @@ import { useMembership } from '@/features/company/useMembership';
 import { hubs, visibleHubCards } from '@/features/hubs/hubs';
 import { routes, withCreate } from '@/lib/routes';
 
-import { maySee, navItems, settingsNavItem } from './navItems';
+import { calendarNavItem, maySee, navItems, settingsNavItem } from './navItems';
 
 type Entry = { to: string; label: string; icon: FluentIcon };
 
@@ -26,7 +26,7 @@ function useEntries(): { pages: Entry[]; actions: Entry[] } {
   const can = (key: Parameters<typeof hasPermission>[1]) => hasPermission(permissions, key);
 
   const pages: Entry[] = [
-    ...navItems
+    ...[...navItems, calendarNavItem]
       .filter((item) => maySee(item, permissions))
       .map((item) => ({ to: item.to, label: t(item.labelKey), icon: item.icon })),
     ...hubs.flatMap((hub) =>

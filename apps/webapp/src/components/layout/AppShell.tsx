@@ -28,6 +28,7 @@ import {
   Document20Regular,
   PanelLeftContract20Regular,
   PanelLeftExpand20Regular,
+  Settings20Regular,
   SignOut20Regular,
 } from '@fluentui/react-icons';
 import { useState } from 'react';
@@ -45,7 +46,7 @@ import { useProfileImageUrls } from '@/features/team/useProfileImageUrls';
 import { LEGAL_PAGES, legalUrl } from '@/lib/legal';
 import { HOME_ROUTE } from '@/lib/routes';
 
-import { isNavActive, maySee, navItems, settingsNavItem } from './navItems';
+import { calendarNavItem, isNavActive, maySee, navItems, settingsNavItem } from './navItems';
 import { NotificationsBell } from './NotificationsBell';
 import { QuickSearch } from './QuickSearch';
 import { SidebarNavItem } from './SidebarNav';
@@ -119,7 +120,7 @@ const useStyles = makeStyles({
     minWidth: 0,
   },
   // Fluents Footer hat kein Polster; dieselben Einzüge wie der Body (10 / 4 px),
-  // damit „Einstellungen“ mit den übrigen Einträgen fluchtet, und Luft nach unten.
+  // damit „Kalender“ mit den übrigen Einträgen fluchtet, und Luft nach unten.
   footer: {
     paddingInlineStart: '10px',
     paddingInlineEnd: '4px',
@@ -144,10 +145,11 @@ const useStyles = makeStyles({
   },
 });
 
-function UserMenu({ collapsed }: { collapsed: boolean }) {
+function UserMenu({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: () => void }) {
   const { t } = useTranslation();
   const styles = useStyles();
   const { signOut, user } = useAuth();
+  const settingsLink = useRouterLink(settingsNavItem.to);
   const { data: membership } = useMembership();
   const { theme, setTheme } = useTheme();
 
@@ -205,6 +207,17 @@ function UserMenu({ collapsed }: { collapsed: boolean }) {
           <MenuGroup>
             <MenuGroupHeader>{email}</MenuGroupHeader>
           </MenuGroup>
+          <MenuDivider />
+          <MenuItemLink
+            icon={<Settings20Regular />}
+            href={settingsLink.href}
+            onClick={(event) => {
+              settingsLink.onClick(event);
+              onNavigate?.();
+            }}
+          >
+            {t(settingsNavItem.labelKey)}
+          </MenuItemLink>
           <MenuDivider />
           <MenuGroup>
             <MenuGroupHeader>{t('common:theme.label')}</MenuGroupHeader>
@@ -300,7 +313,7 @@ export function AppShell() {
 
   const collapsed = !isMobile && !expanded;
   const visible = navItems.filter((item) => maySee(item, membership?.permissions));
-  const selected = [...visible, settingsNavItem].find((item) => isNavActive(pathname, item))?.to;
+  const selected = [...visible, calendarNavItem].find((item) => isNavActive(pathname, item))?.to;
   const closeMobile = isMobile ? () => setMobileOpen(false) : undefined;
   const toggleLabel = t('common:nav.toggleSidebar');
   const collapseLabel = collapsed ? t('common:nav.expandSidebar') : t('common:nav.collapseSidebar');
@@ -354,13 +367,13 @@ export function AppShell() {
 
       <NavDrawerFooter className={mergeClasses(styles.footer, collapsed && styles.railItems)}>
         <SidebarNavItem
-          item={settingsNavItem}
+          item={calendarNavItem}
           collapsed={collapsed}
           onNavigate={closeMobile}
           className={collapsed ? styles.railItem : undefined}
         />
         <NavDivider />
-        <UserMenu collapsed={collapsed} />
+        <UserMenu collapsed={collapsed} onNavigate={closeMobile} />
       </NavDrawerFooter>
     </NavDrawer>
   );
