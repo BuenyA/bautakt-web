@@ -30,7 +30,7 @@ describe('monthlyRevenue', () => {
     const points = monthlyRevenue([beleg({ id: 'a', issue_date: '2026-03-04' })], months);
 
     expect(points.map((point) => point.month)).toEqual(['2026-01', '2026-02', '2026-03']);
-    expect(points.map((point) => point.minor)).toEqual([0, 0, 10_000]);
+    expect(points.map((point) => point.minor)).toEqual([0, 0, 8_403]);
   });
 
   it('laesst Entwuerfe und Angebote aussen vor', () => {
@@ -44,7 +44,7 @@ describe('monthlyRevenue', () => {
       months,
     );
 
-    expect(points[0]).toEqual({ month: '2026-03', minor: 10_000, count: 1 });
+    expect(points[0]).toEqual({ month: '2026-03', minor: 8_403, count: 1 });
   });
 
   it('ignoriert Belege ausserhalb des Zeitraums', () => {

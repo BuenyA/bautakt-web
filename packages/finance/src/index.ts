@@ -16,7 +16,6 @@ export {
   type IncomingDesk,
   type IncomingGroupKey,
   type MonthComparison,
-  monthlyNetRevenue,
   netRevenueMonth,
   OUTGOING_GROUP_ORDER,
   type OutgoingDesk,

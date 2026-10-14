@@ -626,7 +626,7 @@
   },
   "reports": {
     "title": "Auswertungen",
-    "description": "Umsatz und Ausgaben im Zeitverlauf.",
+    "description": "Umsatz und Ausgaben im Zeitverlauf, netto.",
     "lastMonths": "Letzte {{count}} Monate",
     "revenueTitle": "Umsatz je Monat",
     "expenseTitle": "Ausgaben je Monat",

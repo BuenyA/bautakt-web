@@ -20,7 +20,11 @@ export function monthRange(endMonth: string, count: number): string[] {
 }
 
 /**
- * Brutto-Umsatz je Monat aus ausgestellten Rechnungen.
+ * Netto-Umsatz je Monat aus ausgestellten Rechnungen.
+ *
+ * Netto wie `computeYearResult`: Die Umsatzsteuer ist durchlaufendes Geld, und
+ * eine Brutto-Reihe neben einem Netto-Ergebnis passte nicht zusammen (bis
+ * 2026-10-14 rechnete diese Funktion brutto).
  *
  * Monate ohne Umsatz bleiben mit 0 in der Reihe. Sie wegzulassen waere die
  * haeufigste Luege einer Zeitreihe: die Kurve sieht dann gleichmaessig aus,
@@ -39,7 +43,7 @@ export function monthlyRevenue(
     const month = document.issue_date?.slice(0, 7);
     const point = month ? byMonth.get(month) : undefined;
     if (!point) continue;
-    point.minor += eurosToMinor(document.gross_total);
+    point.minor += eurosToMinor(document.net_total);
     point.count += 1;
   }
 

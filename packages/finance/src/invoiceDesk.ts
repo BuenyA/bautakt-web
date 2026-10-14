@@ -1,18 +1,17 @@
 import { daysBetween } from './dates';
 import { previousMonth } from './kpis';
 import { eurosToMinor } from './money';
-import { type MonthlyPoint, monthlyTotals } from './monthly';
+import { monthlyRevenue } from './monthly';
 import {
   buildReceivables,
   INVOICE_TYPES,
-  ISSUED_STATUSES,
   type PaymentRow,
   type ReceivableItem,
   type SalesDocumentRow,
 } from './receivables';
 
 /**
- * Die Rechnungs-Übersicht der Webapp (`/finanzen`): Ausgangs- und
+ * Die Rechnungs-Übersicht der Webapp (`/rechnungen`): Ausgangs- und
  * Eingangsrechnungen in Gruppen, die man in der Karte umschaltet, dazu ein
  * paar Zahlen.
  *
@@ -150,29 +149,6 @@ export function firstFilledGroup<K extends string>(
   return order.find((key) => groups[key].items.length > 0) ?? order[0];
 }
 
-/**
- * Netto-Umsatz je Monat aus ausgestellten Rechnungen.
- *
- * Netto wie `computeYearResult` — `monthlyRevenue` rechnet brutto und passte
- * neben der Ergebniszahl nicht zusammen.
- */
-export function monthlyNetRevenue(
-  documents: readonly SalesDocumentRow[],
-  months: readonly string[],
-): MonthlyPoint[] {
-  return monthlyTotals(
-    documents
-      .filter(
-        (document) =>
-          INVOICE_TYPES.has(document.type) &&
-          ISSUED_STATUSES.has(document.status) &&
-          Boolean(document.issue_date),
-      )
-      .map((document) => ({ dateIso: document.issue_date!, amount: document.net_total })),
-    months,
-  );
-}
-
 export type MonthComparison = {
   month: string;
   minor: number;
@@ -187,7 +163,7 @@ export function netRevenueMonth(
   month: string,
 ): MonthComparison {
   const previous = previousMonth(month);
-  const [before, current] = monthlyNetRevenue(documents, [previous, month]);
+  const [before, current] = monthlyRevenue(documents, [previous, month]);
   return {
     month,
     minor: current.minor,

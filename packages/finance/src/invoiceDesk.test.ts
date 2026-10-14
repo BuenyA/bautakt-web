@@ -6,10 +6,10 @@ import {
   type DeskIncomingRow,
   firstFilledGroup,
   INCOMING_GROUP_ORDER,
-  monthlyNetRevenue,
   netRevenueMonth,
   OUTGOING_GROUP_ORDER,
 } from './invoiceDesk';
+import { monthlyRevenue } from './monthly';
 import type { SalesDocumentRow } from './receivables';
 
 const HEUTE = '2026-10-14';
@@ -101,7 +101,7 @@ describe('Netto-Umsatz', () => {
   ];
 
   it('rechnet je Monat netto und nur ausgestellte Rechnungen', () => {
-    expect(monthlyNetRevenue(docs, ['2026-09', '2026-10']).map((p) => p.minor)).toEqual([
+    expect(monthlyRevenue(docs, ['2026-09', '2026-10']).map((p) => p.minor)).toEqual([
       20000, 30000,
     ]);
   });

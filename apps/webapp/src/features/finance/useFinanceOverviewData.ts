@@ -3,7 +3,7 @@ import {
   buildOutgoingDesk,
   buildReceivables,
   computeYearResult,
-  monthlyNetRevenue,
+  monthlyRevenue,
   monthlyTotals,
   monthRange,
   netRevenueMonth,
@@ -81,7 +81,7 @@ export function useFinanceOverviewData() {
       receivablesMinor: totalOpenMinor(receivables),
       overdueMinor: totalOverdueMinor(receivables),
       payablesMinor: incomingDesk.open.minor,
-      revenueByMonth: monthlyNetRevenue(docs, months),
+      revenueByMonth: monthlyRevenue(docs, months),
       expensesByMonth: monthlyTotals(expenseEntries(expenses.data ?? [], incomingRows), months),
     };
   }, [

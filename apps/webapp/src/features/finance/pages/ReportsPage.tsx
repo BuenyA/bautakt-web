@@ -17,7 +17,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 
-import { useExpenses, useIncomingInvoiceList } from '../useExpenses';
+import { expenseEntries, useExpenses, useIncomingInvoiceList } from '../useExpenses';
 import { INVOICE_TYPE_LIST, useSalesDocuments } from '../useSalesDocuments';
 
 type CustomerTotal = { customer: string; minor: number; count: number };
@@ -50,23 +50,12 @@ export function ReportsPage() {
     [documents.data, range],
   );
 
-  const expensePoints = useMemo(() => {
-    const entries = [
-      ...(expenses.data ?? [])
-        // Kalkulatorische Kosten sind nie geflossen — in einer Ausgabenreihe
-        // waeren sie eine erfundene Zahlung.
-        .filter((expense) => !expense.is_calculatory)
-        .map((expense) => ({
-          dateIso: expense.invoice_date,
-          amount: expense.amount_net + expense.vat_amount,
-        })),
-      ...(incoming.data ?? []).map((invoice) => ({
-        dateIso: invoice.invoice_date,
-        amount: invoice.gross_total,
-      })),
-    ];
-    return monthlyTotals(entries, range);
-  }, [expenses.data, incoming.data, range]);
+  // Netto wie der Umsatz. Kalkulatorische Kosten sind nie geflossen und fehlen
+  // (`expenseEntries`).
+  const expensePoints = useMemo(
+    () => monthlyTotals(expenseEntries(expenses.data ?? [], incoming.data ?? []), range),
+    [expenses.data, incoming.data, range],
+  );
 
   const customerTotals = useMemo<CustomerTotal[]>(() => {
     const byCustomer = new Map<string, CustomerTotal>();
@@ -74,7 +63,7 @@ export function ReportsPage() {
       if (document.status === 'draft' || document.status === 'cancelled') continue;
       const key = document.customer_label || t('domain:invoices.noCustomer');
       const entry = byCustomer.get(key) ?? { customer: key, minor: 0, count: 0 };
-      entry.minor += eurosToMinor(document.gross_total);
+      entry.minor += eurosToMinor(document.net_total);
       entry.count += 1;
       byCustomer.set(key, entry);
     }
