@@ -52,7 +52,8 @@ export const routes = {
   invoiceEdit: (id: string) => `/rechnungen/${id}/bearbeiten`,
   invoicePrint: (id: string) => `/rechnungen/${id}/druck`,
   receivables: '/offene-posten',
-  expenses: '/ausgaben',
+  /** Eingangsrechnungen und sonstige Ausgaben (zwei Register). */
+  expenses: '/rechnungen/eingang',
   dunning: '/mahnwesen',
   reports: '/auswertungen',
 
@@ -81,6 +82,8 @@ export const routes = {
    * `/rechnungen` war die Liste der Ausgangsrechnungen.
    */
   legacyFinance: '/finanzen',
+  /** Bis 2026-10-14 lagen die Eingangsrechnungen unter `/ausgaben`. */
+  legacyExpenses: '/ausgaben',
   /** Bis 2026-10-11 hieß die Einsatzplanung „Einsätze“. */
   legacyAssignments: '/einsaetze',
   /**

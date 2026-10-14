@@ -17,6 +17,7 @@ import { RequirePermission } from '@/features/company/RequirePermission';
 import { CustomerDetailPage } from '@/features/customers/pages/CustomerDetailPage';
 import { CustomersListPage } from '@/features/customers/pages/CustomersListPage';
 import { FinanceLayout } from '@/features/finance/FinanceLayout';
+import { LegacyExpensesRedirect } from '@/features/finance/LegacyExpensesRedirect';
 import { DocumentEditorPage } from '@/features/finance/pages/DocumentEditorPage';
 import { DunningPage } from '@/features/finance/pages/DunningPage';
 import { ExpensesPage } from '@/features/finance/pages/ExpensesPage';
@@ -262,6 +263,7 @@ export const router = createBrowserRouter([
 
               // Alte Pfade umleiten, damit Bookmarks nicht leer laufen.
               { path: routes.legacyFinance, element: <Navigate to={routes.financeHub} replace /> },
+              { path: routes.legacyExpenses, element: <LegacyExpensesRedirect /> },
               { path: routes.legacyNotifications, element: <Navigate to={HOME_ROUTE} replace /> },
               {
                 path: routes.legacyAssignments,
