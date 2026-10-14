@@ -16,14 +16,7 @@ import { PageSpinner } from '@/components/common/PageSpinner';
 import { useRouterLink } from '@/components/common/useRouterLink';
 import { useMembership } from '@/features/company/useMembership';
 
-import {
-  financeHub,
-  type Hub,
-  type HubCard,
-  materialHub,
-  personalHub,
-  visibleHubCards,
-} from './hubs';
+import { type Hub, type HubCard, materialHub, personalHub, visibleHubCards } from './hubs';
 
 /**
  * Landing eines Hubs: Titel und Karten auf bestehende Routen.
@@ -102,16 +95,14 @@ function HubCardLink({ card }: { card: HubCard }) {
           </FluentLink>
         }
         description={
-          <Caption1 className="text-muted-foreground">{t(card.descriptionKey)}</Caption1>
+          card.descriptionKey ? (
+            <Caption1 className="text-muted-foreground">{t(card.descriptionKey)}</Caption1>
+          ) : undefined
         }
         action={<ChevronRight20Regular className="text-muted-foreground" aria-hidden />}
       />
     </Card>
   );
-}
-
-export function FinanceHubPage() {
-  return <HubPage hub={financeHub} />;
 }
 
 export function PersonalHubPage() {

@@ -6,6 +6,8 @@ import {
   bundleIcon,
   CalendarLtr20Filled,
   CalendarLtr20Regular,
+  DocumentText20Filled,
+  DocumentText20Regular,
   type FluentIcon,
   Home20Filled,
   Home20Regular,
@@ -17,11 +19,10 @@ import {
   Person20Regular,
   Settings20Filled,
   Settings20Regular,
-  Wallet20Filled,
-  Wallet20Regular,
 } from '@fluentui/react-icons';
 
 import {
+  cardMatches,
   hubById,
   type HubId,
   passesGate,
@@ -34,7 +35,7 @@ const Home = bundleIcon(Home20Filled, Home20Regular);
 const Briefcase = bundleIcon(Briefcase20Filled, Briefcase20Regular);
 const PeopleTeam = bundleIcon(PeopleTeam20Filled, PeopleTeam20Regular);
 const CalendarLtr = bundleIcon(CalendarLtr20Filled, CalendarLtr20Regular);
-const Wallet = bundleIcon(Wallet20Filled, Wallet20Regular);
+const DocumentText = bundleIcon(DocumentText20Filled, DocumentText20Regular);
 const Person = bundleIcon(Person20Filled, Person20Regular);
 const People = bundleIcon(People20Filled, People20Regular);
 const Box = bundleIcon(Box20Filled, Box20Regular);
@@ -60,7 +61,7 @@ export type NavItem = PermissionGate & {
  * Flache Top-Navigation. Der Kalender steht im Fuss, die Einstellungen im
  * Profilmenue. Keine Sektionsueberschriften.
  *
- * Auftraege und Zeiten sind ein Klick. Finanzen, Mitarbeiter und Material
+ * Auftraege und Zeiten sind ein Klick. Rechnungen, Mitarbeiter und Material
  * oeffnen einen Hub; die Listen dahinter behalten ihre Pfade.
  *
  * ⚠️ Das Ausblenden ist Fuehrung, keine Kontrolle. Wer die Adresse kennt,
@@ -74,7 +75,7 @@ export const navItems: NavItem[] = [
   {
     to: routes.financeHub,
     labelKey: 'common:nav.finance',
-    icon: Wallet,
+    icon: DocumentText,
     hubId: 'finance',
   },
   {
@@ -122,5 +123,5 @@ export function maySee(item: NavItem, permissions: Parameters<typeof passesGate>
 export function isNavActive(pathname: string, item: NavItem): boolean {
   if (pathMatches(pathname, item.to)) return true;
   if (!item.hubId) return false;
-  return hubById(item.hubId).cards.some((card) => pathMatches(pathname, card.to));
+  return hubById(item.hubId).cards.some((card) => cardMatches(pathname, card));
 }

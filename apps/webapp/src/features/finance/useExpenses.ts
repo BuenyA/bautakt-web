@@ -1,3 +1,4 @@
+import type { DatedAmount } from '@bautakt/finance';
 import { useQuery } from '@tanstack/react-query';
 
 import { useMembership } from '@/features/company/useMembership';
@@ -88,4 +89,21 @@ export function useIncomingInvoiceList() {
       return data ?? [];
     },
   });
+}
+
+/**
+ * Tatsächliche Aufwände als datierte Netto-Beträge: Ausgaben ohne
+ * kalkulatorische und alle Eingangsrechnungen. Grundlage der Monatsreihe
+ * „Ausgaben“ auf Übersicht und Rechnungs-Übersicht.
+ */
+export function expenseEntries(
+  expenses: readonly ExpenseRow[],
+  incoming: readonly IncomingInvoiceListRow[],
+): DatedAmount[] {
+  return [
+    ...expenses
+      .filter((expense) => !expense.is_calculatory)
+      .map((expense) => ({ dateIso: expense.invoice_date, amount: expense.amount_net })),
+    ...incoming.map((invoice) => ({ dateIso: invoice.invoice_date, amount: invoice.net_total })),
+  ];
 }

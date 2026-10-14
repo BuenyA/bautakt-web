@@ -29,6 +29,8 @@ Ziel: der ganze Betrieb auf einen Blick.
      Einsatzplan. Am Handy eine Liste, solange es Einträge gibt.
 3. **Zahlen des Jahres** (`YearKpiRow`): Umsatz, Aufwände, Ergebnis, offene
    Forderungen — netto, 01.01. bis heute.
+   Die ausführlichere Sicht für das Büro ist die Rechnungs-Übersicht, siehe
+   [rechnungsbereich.md](rechnungsbereich.md).
 
 **Warum diese Reihenfolge** (vom Owner festgelegt): links „wer ist wo“, in der Mitte
 gleich breit „was ist zu tun“, rechts schmal der Kalender — er zeigt ohnehin nur den

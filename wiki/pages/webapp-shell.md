@@ -74,8 +74,9 @@ Die Begriffe bleiben die der Handy-App. Aufträge und Zeiten sind ein Klick.
 Der Stand bis dahin war das Gegenteil: gruppiert unter Arbeit / Finanzen /
 Team / Stammdaten, weil ein Hub am Rechner ein zusätzlicher Klick vor jeder
 Rechnung gewesen wäre. Der Owner hat das am 01.10.2026 umgedreht. Die Sidebar
-bleibt bei zehn Punkten; Rechnungen ist bewusst der zweite Klick, über die
-erste Karte im Finanzen-Hub.
+bleibt bei zehn Punkten. Seit 2026-10-14 heißt „Finanzen“ „Rechnungen“ und ist kein
+Kachel-Hub mehr, sondern eine Übersicht mit Reitern, siehe
+[rechnungsbereich.md](rechnungsbereich.md).
 
 | #   | Eintrag        | Ziel                                           | Art                    |
 | --- | -------------- | ---------------------------------------------- | ---------------------- |
@@ -83,7 +84,7 @@ erste Karte im Finanzen-Hub.
 | 2   | Aufträge       | `/auftraege`                                   | Direkt                 |
 | 3   | Einsatzplanung | `/einsatzplanung` (alt `/einsaetze` leitet um) | Direkt                 |
 | 5   | Kalender       | `/kalender`                                    | Direkt                 |
-| 6   | Finanzen       | `/finanzen`                                    | Hub                    |
+| 6   | Rechnungen     | `/finanzen`                                    | Übersicht mit Reitern  |
 | 7   | Mitarbeiter    | `/personal`                                    | Hub                    |
 | 8   | Kunden         | `/kunden`                                      | Direkt                 |
 | 9   | Material       | `/material`                                    | Hub                    |
@@ -93,8 +94,9 @@ Definiert in `components/layout/navItems.ts`, die Karten in
 `features/hubs/hubs.ts`. Ein Hub-Punkt fehlt, wenn **keine** seiner Karten
 sichtbar ist. Die Karten filtern einzeln, mit denselben Rechten wie die
 frühere flache Zeile. Listen- und Detail-URLs sind nicht umgezogen
-(`/rechnungen`, `/mitarbeiter`, `/katalog`, …). `/finanzen` ist die Hub-Seite;
-der Redirect auf Rechnungen ist weg.
+(`/rechnungen`, `/mitarbeiter`, `/katalog`, …). `/finanzen` ist die
+Rechnungs-Übersicht; der Redirect auf Rechnungen ist weg. Beim Rechnungsbereich sind
+die „Karten“ die Reiter (`FinanceLayout`).
 
 Einstellungen bleibt im Fuß, abgesetzt, und zählt als zehnter Punkt.
 Benachrichtigungen sind die Topbar-Glocke, kein Nav-Eintrag.

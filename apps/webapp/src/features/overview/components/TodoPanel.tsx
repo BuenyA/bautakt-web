@@ -233,7 +233,7 @@ function Section({
   );
 }
 
-function Row({
+export function Row({
   to,
   title,
   subtitle,
