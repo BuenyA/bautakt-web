@@ -4,6 +4,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMembership } from '@/features/company/useMembership';
 import { supabase } from '@/lib/supabase';
 
+import {
+  SALES_DOCUMENT_BUYER_SELECT,
+  type SalesDocumentBuyerFields,
+  salesDocumentBuyerLabel,
+} from './salesDocumentBuyer';
+
 export type DocumentLine = {
   id: string;
   title: string;
@@ -110,7 +116,7 @@ export function useSalesDocument(id: string | undefined) {
           `id, type, status, document_number, issue_date, due_date, service_date, currency,
            net_total, vat_total, gross_total, intro_text, footer_text, notes, buyer_reference,
            payment_term_days, skonto_days, skonto_percent, tax_mode, customer_id,
-           customers(company_name, first_name, last_name),
+           ${SALES_DOCUMENT_BUYER_SELECT},
            sales_document_lines(id, title, description, kind, quantity, unit, unit_price,
              discount_percent, net_amount, tax_rate_percent, sort_order),
            payments(id, amount, skonto_amount, paid_at, method, note),
@@ -123,24 +129,14 @@ export function useSalesDocument(id: string | undefined) {
       if (error) throw error;
       if (!data) return null;
 
-      const row = data as unknown as Record<string, unknown> & {
-        customers: {
-          company_name: string | null;
-          first_name: string | null;
-          last_name: string | null;
-        } | null;
-        sales_document_lines: DocumentLine[];
-        payments: DocumentPayment[];
-        dunning_notices: DunningNotice[];
-      };
+      const row = data as unknown as Record<string, unknown> &
+        SalesDocumentBuyerFields & {
+          sales_document_lines: DocumentLine[];
+          payments: DocumentPayment[];
+          dunning_notices: DunningNotice[];
+        };
 
-      const customer = row.customers;
-      const label =
-        customer?.company_name?.trim() ||
-        [customer?.first_name, customer?.last_name]
-          .map((part) => part?.trim())
-          .filter(Boolean)
-          .join(' ');
+      const label = salesDocumentBuyerLabel(row);
 
       return {
         ...(row as unknown as SalesDocumentDetail),

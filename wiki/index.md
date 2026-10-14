@@ -28,6 +28,7 @@ verlinkt, nie kopiert.
 | [fluent-ui.md](pages/fluent-ui.md)                         | Fluent UI 2: Themes, Provider, Tailwind-Regel, Bausteine.                 |
 | [uebersicht.md](pages/uebersicht.md)                       | Startseite: Tagesplan, Zu erledigen, Jahresergebnis.                      |
 | [rechnungsbereich.md](pages/rechnungsbereich.md)           | Bereich „Rechnungen“: Reiter, Übersicht mit Ausgang, Eingang, Zahlen.     |
+| [kontakte.md](pages/kontakte.md)                           | Kontakte: ein Geschäftspartner mit Rollen, Auswahl in Belegen.            |
 | [auftragsfotos.md](pages/auftragsfotos.md)                 | Fotos am Auftrag anzeigen, hochladen und löschen.                         |
 | [auftragsnotizen.md](pages/auftragsnotizen.md)             | Notizen am Auftrag lesen, anlegen, bearbeiten, löschen.                   |
 | [kalender.md](pages/kalender.md)                           | Kalender mit Terminen, Einsätzen, Abwesenheiten; Termine anlegen, Serien. |

@@ -43,6 +43,8 @@ export type EmployeePermissions = {
   canManageOverheadCosts: boolean;
   canViewCompanyFinance: boolean;
   canManageCustomers: boolean;
+  /** Lieferanten, Subunternehmer, §48b-Bescheinigungen (seit 2026-10-14). */
+  canManageSuppliers: boolean;
   canManageCostCenters: boolean;
   canManageEmployees: boolean;
   canManageAbsences: boolean;
@@ -82,6 +84,7 @@ export const DEFAULT_PERMISSIONS: EmployeePermissions = {
   canManageOverheadCosts: false,
   canViewCompanyFinance: false,
   canManageCustomers: false,
+  canManageSuppliers: false,
   canManageCostCenters: false,
   canManageEmployees: false,
   canManageAbsences: false,

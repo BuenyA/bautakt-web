@@ -43,9 +43,18 @@ function useEntries(): { pages: Entry[]; actions: Entry[] } {
       to: withCreate(routes.assignments),
       key: 'domain:assignments.create.action',
     },
+    // Neuer Kontakt mit der Rolle des Reiters (die Liste liest `rolle`).
     can('canManageCustomers') && {
-      to: withCreate(routes.customers),
-      key: 'domain:customerForm.newTitle',
+      to: withCreate(`${routes.contacts}?rolle=kunden`),
+      key: 'domain:contacts.newCustomer',
+    },
+    can('canManageSuppliers') && {
+      to: withCreate(`${routes.contacts}?rolle=lieferanten`),
+      key: 'domain:contacts.newSupplier',
+    },
+    can('canManageSuppliers') && {
+      to: withCreate(`${routes.contacts}?rolle=subunternehmer`),
+      key: 'domain:contacts.newSubcontractor',
     },
     can('canManageEmployees') && {
       to: withCreate(routes.employees),

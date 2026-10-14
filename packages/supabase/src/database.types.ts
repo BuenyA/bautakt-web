@@ -2,7 +2,7 @@
  * GENERIERT — nicht von Hand bearbeiten.
  *
  * Quelle:  Supabase-Projekt "Bautakt" (bxivzvmlcnaxqlytumvz, eu-central-1)
- * Stand:   2026-08-26
+ * Stand:   2026-10-14
  *
  * Neu erzeugen:
  *   npx supabase gen types typescript --project-id bxivzvmlcnaxqlytumvz \
@@ -26,7 +26,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.17"
+    PostgrestVersion: "14.1"
   }
   public: {
     Tables: {
@@ -127,6 +127,7 @@ export type Database = {
           stock_quantity: number | null
           storage_location: string | null
           supplier_article_number: string | null
+          supplier_id: string | null
           title: string
           unit: string
           usage_count: number
@@ -147,6 +148,7 @@ export type Database = {
           stock_quantity?: number | null
           storage_location?: string | null
           supplier_article_number?: string | null
+          supplier_id?: string | null
           title: string
           unit?: string
           usage_count?: number
@@ -167,6 +169,7 @@ export type Database = {
           stock_quantity?: number | null
           storage_location?: string | null
           supplier_article_number?: string | null
+          supplier_id?: string | null
           title?: string
           unit?: string
           usage_count?: number
@@ -178,6 +181,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articles_supplier_fkey"
+            columns: ["supplier_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_profiles"
+            referencedColumns: ["contact_id", "company_id"]
           },
         ]
       }
@@ -630,6 +640,241 @@ export type Database = {
           },
         ]
       }
+      contact_bank_accounts: {
+        Row: {
+          account_holder: string
+          bank_name: string
+          bic: string
+          company_id: string
+          contact_id: string
+          created_at: string
+          iban: string
+          id: string
+          is_default: boolean
+          modified_at: string | null
+          modified_by: string | null
+        }
+        Insert: {
+          account_holder?: string
+          bank_name?: string
+          bic?: string
+          company_id: string
+          contact_id: string
+          created_at?: string
+          iban: string
+          id: string
+          is_default?: boolean
+          modified_at?: string | null
+          modified_by?: string | null
+        }
+        Update: {
+          account_holder?: string
+          bank_name?: string
+          bic?: string
+          company_id?: string
+          contact_id?: string
+          created_at?: string
+          iban?: string
+          id?: string
+          is_default?: boolean
+          modified_at?: string | null
+          modified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_bank_accounts_contact_id_company_id_fkey"
+            columns: ["contact_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id", "company_id"]
+          },
+          {
+            foreignKeyName: "contact_bank_accounts_modified_by_fkey"
+            columns: ["modified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contact_number_sequences: {
+        Row: {
+          company_id: string
+          kind: string
+          next_number: number
+        }
+        Insert: {
+          company_id: string
+          kind: string
+          next_number: number
+        }
+        Update: {
+          company_id?: string
+          kind?: string
+          next_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_number_sequences_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contact_persons: {
+        Row: {
+          company_id: string
+          contact_id: string
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          is_primary: boolean
+          last_name: string
+          mobile: string
+          modified_at: string | null
+          notes: string
+          phone: string
+          position: string
+          salutation: string
+          sort_order: number
+        }
+        Insert: {
+          company_id: string
+          contact_id: string
+          created_at?: string
+          email?: string
+          first_name?: string
+          id: string
+          is_primary?: boolean
+          last_name?: string
+          mobile?: string
+          modified_at?: string | null
+          notes?: string
+          phone?: string
+          position?: string
+          salutation?: string
+          sort_order?: number
+        }
+        Update: {
+          company_id?: string
+          contact_id?: string
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          is_primary?: boolean
+          last_name?: string
+          mobile?: string
+          modified_at?: string | null
+          notes?: string
+          phone?: string
+          position?: string
+          salutation?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_persons_contact_id_company_id_fkey"
+            columns: ["contact_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id", "company_id"]
+          },
+        ]
+      }
+      contacts: {
+        Row: {
+          archived_at: string | null
+          city: string
+          company_id: string
+          company_name: string
+          country: string
+          created_at: string
+          created_by: string | null
+          email: string
+          first_name: string
+          id: string
+          kind: string
+          last_name: string
+          mobile: string
+          modified_at: string | null
+          notes: string
+          phone: string
+          postal_code: string
+          salutation: string
+          street_address: string
+          tax_number: string
+          vat_id: string
+          website: string
+        }
+        Insert: {
+          archived_at?: string | null
+          city?: string
+          company_id: string
+          company_name?: string
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          email?: string
+          first_name?: string
+          id: string
+          kind?: string
+          last_name?: string
+          mobile?: string
+          modified_at?: string | null
+          notes?: string
+          phone?: string
+          postal_code?: string
+          salutation?: string
+          street_address?: string
+          tax_number?: string
+          vat_id?: string
+          website?: string
+        }
+        Update: {
+          archived_at?: string | null
+          city?: string
+          company_id?: string
+          company_name?: string
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          email?: string
+          first_name?: string
+          id?: string
+          kind?: string
+          last_name?: string
+          mobile?: string
+          modified_at?: string | null
+          notes?: string
+          phone?: string
+          postal_code?: string
+          salutation?: string
+          street_address?: string
+          tax_number?: string
+          vat_id?: string
+          website?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cost_categories: {
         Row: {
           company_id: string
@@ -725,101 +970,68 @@ export type Database = {
           },
         ]
       }
-      customers: {
+      customer_profiles: {
         Row: {
+          archived_at: string | null
           billing_city: string
           billing_country: string
           billing_postal_code: string
           billing_street: string
           buyer_reference: string
-          city: string
           company_id: string
-          company_name: string
-          country: string
+          contact_id: string
           created_at: string
-          customer_number: string | null
-          customer_type: string
+          customer_number: string
           discount_days: number | null
           discount_percent: number | null
-          email: string
-          first_name: string
-          id: string
           is_construction_business: boolean
-          last_name: string
           modified_at: string | null
-          notes: string
           payment_term_days: number | null
-          phone: string
-          postal_code: string
-          street_address: string
           tax_exemption_valid_until: string | null
-          vat_id: string
         }
         Insert: {
+          archived_at?: string | null
           billing_city?: string
           billing_country?: string
           billing_postal_code?: string
           billing_street?: string
           buyer_reference?: string
-          city?: string
           company_id: string
-          company_name?: string
-          country?: string
+          contact_id: string
           created_at?: string
-          customer_number?: string | null
-          customer_type?: string
+          customer_number?: string
           discount_days?: number | null
           discount_percent?: number | null
-          email?: string
-          first_name?: string
-          id: string
           is_construction_business?: boolean
-          last_name?: string
           modified_at?: string | null
-          notes?: string
           payment_term_days?: number | null
-          phone?: string
-          postal_code?: string
-          street_address?: string
           tax_exemption_valid_until?: string | null
-          vat_id?: string
         }
         Update: {
+          archived_at?: string | null
           billing_city?: string
           billing_country?: string
           billing_postal_code?: string
           billing_street?: string
           buyer_reference?: string
-          city?: string
           company_id?: string
-          company_name?: string
-          country?: string
+          contact_id?: string
           created_at?: string
-          customer_number?: string | null
-          customer_type?: string
+          customer_number?: string
           discount_days?: number | null
           discount_percent?: number | null
-          email?: string
-          first_name?: string
-          id?: string
           is_construction_business?: boolean
-          last_name?: string
           modified_at?: string | null
-          notes?: string
           payment_term_days?: number | null
-          phone?: string
-          postal_code?: string
-          street_address?: string
           tax_exemption_valid_until?: string | null
-          vat_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "customers_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
+            foreignKeyName: "customer_profiles_contact_id_company_id_fkey"
+            columns: ["contact_id", "company_id"]
+            isOneToOne: true
+            referencedRelation: "contacts"
+            referencedColumns: ["id", "company_id"]
           },
         ]
       }
@@ -1222,6 +1434,63 @@ export type Database = {
           },
         ]
       }
+      exemption_certificates: {
+        Row: {
+          certificate_number: string
+          company_id: string
+          contact_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          modified_at: string | null
+          storage_path: string | null
+          tax_office: string
+          valid_from: string
+          valid_until: string
+        }
+        Insert: {
+          certificate_number?: string
+          company_id: string
+          contact_id: string
+          created_at?: string
+          created_by?: string | null
+          id: string
+          modified_at?: string | null
+          storage_path?: string | null
+          tax_office?: string
+          valid_from: string
+          valid_until: string
+        }
+        Update: {
+          certificate_number?: string
+          company_id?: string
+          contact_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          modified_at?: string | null
+          storage_path?: string | null
+          tax_office?: string
+          valid_from?: string
+          valid_until?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exemption_certificates_contact_id_company_id_fkey"
+            columns: ["contact_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "subcontractor_profiles"
+            referencedColumns: ["contact_id", "company_id"]
+          },
+          {
+            foreignKeyName: "exemption_certificates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expenses: {
         Row: {
           amount_net: number
@@ -1237,6 +1506,7 @@ export type Database = {
           order_id: string | null
           recurring_interval: string | null
           storage_path: string | null
+          supplier_id: string | null
           title: string
           vat_amount: number
           vat_rate: number
@@ -1256,6 +1526,7 @@ export type Database = {
           order_id?: string | null
           recurring_interval?: string | null
           storage_path?: string | null
+          supplier_id?: string | null
           title: string
           vat_amount?: number
           vat_rate?: number
@@ -1275,6 +1546,7 @@ export type Database = {
           order_id?: string | null
           recurring_interval?: string | null
           storage_path?: string | null
+          supplier_id?: string | null
           title?: string
           vat_amount?: number
           vat_rate?: number
@@ -1308,6 +1580,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_supplier_fkey"
+            columns: ["supplier_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_profiles"
+            referencedColumns: ["contact_id", "company_id"]
           },
         ]
       }
@@ -1589,7 +1868,9 @@ export type Database = {
           source_format: string
           status: string
           storage_path: string | null
+          supplier_id: string | null
           vat_total: number
+          vendor_iban: string
           vendor_name: string
           vendor_vat_id: string
         }
@@ -1613,7 +1894,9 @@ export type Database = {
           source_format?: string
           status?: string
           storage_path?: string | null
+          supplier_id?: string | null
           vat_total?: number
+          vendor_iban?: string
           vendor_name?: string
           vendor_vat_id?: string
         }
@@ -1637,7 +1920,9 @@ export type Database = {
           source_format?: string
           status?: string
           storage_path?: string | null
+          supplier_id?: string | null
           vat_total?: number
+          vendor_iban?: string
           vendor_name?: string
           vendor_vat_id?: string
         }
@@ -1669,6 +1954,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incoming_invoices_supplier_fkey"
+            columns: ["supplier_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_profiles"
+            referencedColumns: ["contact_id", "company_id"]
           },
         ]
       }
@@ -1898,6 +2190,67 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_contacts: {
+        Row: {
+          company_id: string
+          contact_id: string
+          contact_person_id: string | null
+          created_at: string
+          id: string
+          modified_at: string | null
+          note: string
+          order_id: string
+          role: string
+          sort_order: number
+        }
+        Insert: {
+          company_id: string
+          contact_id: string
+          contact_person_id?: string | null
+          created_at?: string
+          id: string
+          modified_at?: string | null
+          note?: string
+          order_id: string
+          role: string
+          sort_order?: number
+        }
+        Update: {
+          company_id?: string
+          contact_id?: string
+          contact_person_id?: string | null
+          created_at?: string
+          id?: string
+          modified_at?: string | null
+          note?: string
+          order_id?: string
+          role?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_contacts_contact_id_company_id_fkey"
+            columns: ["contact_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id", "company_id"]
+          },
+          {
+            foreignKeyName: "order_contacts_contact_person_id_contact_id_fkey"
+            columns: ["contact_person_id", "contact_id"]
+            isOneToOne: false
+            referencedRelation: "contact_persons"
+            referencedColumns: ["id", "contact_id"]
+          },
+          {
+            foreignKeyName: "order_contacts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
             referencedColumns: ["id"]
           },
         ]
@@ -2469,11 +2822,46 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "orders_customer_id_fkey"
-            columns: ["customer_id"]
+            foreignKeyName: "orders_customer_fkey"
+            columns: ["customer_id", "company_id"]
             isOneToOne: false
-            referencedRelation: "customers"
-            referencedColumns: ["id"]
+            referencedRelation: "customer_profiles"
+            referencedColumns: ["contact_id", "company_id"]
+          },
+        ]
+      }
+      other_profiles: {
+        Row: {
+          archived_at: string | null
+          company_id: string
+          contact_id: string
+          created_at: string
+          function: string
+          modified_at: string | null
+        }
+        Insert: {
+          archived_at?: string | null
+          company_id: string
+          contact_id: string
+          created_at?: string
+          function?: string
+          modified_at?: string | null
+        }
+        Update: {
+          archived_at?: string | null
+          company_id?: string
+          contact_id?: string
+          created_at?: string
+          function?: string
+          modified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "other_profiles_contact_id_company_id_fkey"
+            columns: ["contact_id", "company_id"]
+            isOneToOne: true
+            referencedRelation: "contacts"
+            referencedColumns: ["id", "company_id"]
           },
         ]
       }
@@ -2716,11 +3104,11 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "recurring_document_templates_customer_id_fkey"
-            columns: ["customer_id"]
+            foreignKeyName: "recurring_document_templates_customer_fkey"
+            columns: ["customer_id", "company_id"]
             isOneToOne: false
-            referencedRelation: "customers"
-            referencedColumns: ["id"]
+            referencedRelation: "customer_profiles"
+            referencedColumns: ["contact_id", "company_id"]
           },
         ]
       }
@@ -2814,7 +3202,15 @@ export type Database = {
       }
       sales_documents: {
         Row: {
+          buyer_city: string
+          buyer_country: string
+          buyer_customer_number: string
+          buyer_email: string
+          buyer_name: string
+          buyer_postal_code: string
           buyer_reference: string
+          buyer_street: string
+          buyer_vat_id: string
           company_id: string
           content_hash: string | null
           created_at: string
@@ -2846,7 +3242,15 @@ export type Database = {
           vat_total: number
         }
         Insert: {
+          buyer_city?: string
+          buyer_country?: string
+          buyer_customer_number?: string
+          buyer_email?: string
+          buyer_name?: string
+          buyer_postal_code?: string
           buyer_reference?: string
+          buyer_street?: string
+          buyer_vat_id?: string
           company_id: string
           content_hash?: string | null
           created_at?: string
@@ -2878,7 +3282,15 @@ export type Database = {
           vat_total?: number
         }
         Update: {
+          buyer_city?: string
+          buyer_country?: string
+          buyer_customer_number?: string
+          buyer_email?: string
+          buyer_name?: string
+          buyer_postal_code?: string
           buyer_reference?: string
+          buyer_street?: string
+          buyer_vat_id?: string
           company_id?: string
           content_hash?: string | null
           created_at?: string
@@ -2918,17 +3330,112 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "sales_documents_customer_id_fkey"
-            columns: ["customer_id"]
+            foreignKeyName: "sales_documents_customer_fkey"
+            columns: ["customer_id", "company_id"]
             isOneToOne: false
-            referencedRelation: "customers"
-            referencedColumns: ["id"]
+            referencedRelation: "customer_profiles"
+            referencedColumns: ["contact_id", "company_id"]
           },
           {
             foreignKeyName: "sales_documents_parent_document_id_fkey"
             columns: ["parent_document_id"]
             isOneToOne: false
             referencedRelation: "sales_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subcontractor_profiles: {
+        Row: {
+          archived_at: string | null
+          company_id: string
+          contact_id: string
+          created_at: string
+          modified_at: string | null
+          reverse_charge_13b: boolean
+          trade: string
+        }
+        Insert: {
+          archived_at?: string | null
+          company_id: string
+          contact_id: string
+          created_at?: string
+          modified_at?: string | null
+          reverse_charge_13b?: boolean
+          trade?: string
+        }
+        Update: {
+          archived_at?: string | null
+          company_id?: string
+          contact_id?: string
+          created_at?: string
+          modified_at?: string | null
+          reverse_charge_13b?: boolean
+          trade?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subcontractor_profiles_contact_id_company_id_fkey"
+            columns: ["contact_id", "company_id"]
+            isOneToOne: true
+            referencedRelation: "supplier_profiles"
+            referencedColumns: ["contact_id", "company_id"]
+          },
+        ]
+      }
+      supplier_profiles: {
+        Row: {
+          archived_at: string | null
+          company_id: string
+          contact_id: string
+          created_at: string
+          default_cost_category_id: string | null
+          discount_days: number | null
+          discount_percent: number | null
+          modified_at: string | null
+          our_customer_number: string
+          payment_term_days: number | null
+          supplier_number: string
+        }
+        Insert: {
+          archived_at?: string | null
+          company_id: string
+          contact_id: string
+          created_at?: string
+          default_cost_category_id?: string | null
+          discount_days?: number | null
+          discount_percent?: number | null
+          modified_at?: string | null
+          our_customer_number?: string
+          payment_term_days?: number | null
+          supplier_number?: string
+        }
+        Update: {
+          archived_at?: string | null
+          company_id?: string
+          contact_id?: string
+          created_at?: string
+          default_cost_category_id?: string | null
+          discount_days?: number | null
+          discount_percent?: number | null
+          modified_at?: string | null
+          our_customer_number?: string
+          payment_term_days?: number | null
+          supplier_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_profiles_contact_id_company_id_fkey"
+            columns: ["contact_id", "company_id"]
+            isOneToOne: true
+            referencedRelation: "contacts"
+            referencedColumns: ["id", "company_id"]
+          },
+          {
+            foreignKeyName: "supplier_profiles_default_cost_category_id_fkey"
+            columns: ["default_cost_category_id"]
+            isOneToOne: false
+            referencedRelation: "cost_categories"
             referencedColumns: ["id"]
           },
         ]
@@ -3334,7 +3841,15 @@ export type Database = {
       finalize_sales_document: {
         Args: { p_document_id: string }
         Returns: {
+          buyer_city: string
+          buyer_country: string
+          buyer_customer_number: string
+          buyer_email: string
+          buyer_name: string
+          buyer_postal_code: string
           buyer_reference: string
+          buyer_street: string
+          buyer_vat_id: string
           company_id: string
           content_hash: string | null
           created_at: string
@@ -3379,6 +3894,10 @@ export type Database = {
         Args: { p_company_id: string; p_permission: string }
         Returns: boolean
       }
+      has_valid_exemption: {
+        Args: { p_contact_id: string; p_on: string }
+        Returns: boolean
+      }
       is_company_chef: { Args: { p_company_id: string }; Returns: boolean }
       is_company_member: { Args: { p_company_id: string }; Returns: boolean }
       is_company_owner: { Args: { p_company_id: string }; Returns: boolean }
@@ -3408,6 +3927,10 @@ export type Database = {
           p_metadata?: Json
           p_target_user_id?: string
         }
+        Returns: undefined
+      }
+      merge_contacts: {
+        Args: { p_drop: string; p_keep: string }
         Returns: undefined
       }
       my_morning_briefing: {
@@ -3447,6 +3970,19 @@ export type Database = {
         Args: { p_invitation_id: string }
         Returns: undefined
       }
+      sales_document_buyer_snapshot: {
+        Args: { p_customer_id: string }
+        Returns: {
+          buyer_city: string
+          buyer_country: string
+          buyer_customer_number: string
+          buyer_email: string
+          buyer_name: string
+          buyer_postal_code: string
+          buyer_street: string
+          buyer_vat_id: string
+        }[]
+      }
       seed_company_labor_rate: {
         Args: { p_company_id: string }
         Returns: undefined
@@ -3480,6 +4016,10 @@ export type Database = {
       }
       set_company_labor_rate: {
         Args: { p_billing: number; p_company_id: string; p_cost: number }
+        Returns: undefined
+      }
+      set_contact_number_start: {
+        Args: { p_company_id: string; p_kind: string; p_next: number }
         Returns: undefined
       }
       set_document_number_start: {
@@ -3538,12 +4078,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3567,11 +4107,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3592,11 +4132,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3617,11 +4157,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3634,11 +4174,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

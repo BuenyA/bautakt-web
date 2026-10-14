@@ -155,7 +155,7 @@ function EmployeeForm({ initial, onDone }: { initial: EmployeeDraft; onDone: () 
       <DrawerBody className="flex flex-col gap-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="grid gap-2">
-            <Label htmlFor={ids.first}>{t('domain:customerForm.firstName')}</Label>
+            <Label htmlFor={ids.first}>{t('domain:contactForm.firstName')}</Label>
             <Input
               id={ids.first}
               value={draft.firstName}
@@ -163,7 +163,7 @@ function EmployeeForm({ initial, onDone }: { initial: EmployeeDraft; onDone: () 
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor={ids.last}>{t('domain:customerForm.lastName')}</Label>
+            <Label htmlFor={ids.last}>{t('domain:contactForm.lastName')}</Label>
             <Input
               id={ids.last}
               value={draft.lastName}

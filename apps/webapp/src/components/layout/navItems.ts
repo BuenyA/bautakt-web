@@ -84,12 +84,9 @@ export const navItems: NavItem[] = [
     icon: Person,
     hubId: 'personal',
   },
-  {
-    to: routes.customers,
-    labelKey: 'common:nav.customers',
-    icon: People,
-    permission: 'canManageCustomers',
-  },
+  // Kontakte sieht jedes Mitglied: der Monteur braucht die Nummer des
+  // Bauherrn. Anlegen und Ändern hängen an den Rollenrechten.
+  { to: routes.contacts, labelKey: 'common:nav.contacts', icon: People },
   {
     to: routes.materialHub,
     labelKey: 'common:nav.material',

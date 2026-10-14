@@ -23,7 +23,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { DatePicker } from '@/components/form/dateTime';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
-import { customerDisplayName, useCustomers } from '@/features/customers/useCustomers';
+import { ContactPicker } from '@/features/contacts/ContactPicker';
 import { readableDbError } from '@/lib/dbErrors';
 import { routes } from '@/lib/routes';
 
@@ -38,8 +38,6 @@ import {
   useSaveDraft,
 } from '../useDocumentEditor';
 import { useSalesDocument } from '../useSalesDocument';
-
-const NO_CUSTOMER = '__none__';
 
 function initialState(type: EditableDocumentType): EditorState {
   return {
@@ -78,7 +76,6 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const dueAlertId = useId();
 
   const existing = useSalesDocument(id);
-  const customers = useCustomers();
   const save = useSaveDraft(id);
   const existingLoading = useCompanyListLoading(existing);
 
@@ -234,20 +231,14 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
           ) : null}
           <div className="grid gap-2">
             <Label htmlFor={customerFieldId}>{t('domain:invoices.columns.customer')}</Label>
-            <Select
+            <ContactPicker
               id={customerFieldId}
-              value={state.customerId ?? NO_CUSTOMER}
-              onChange={(_, { value }) =>
-                update({ customerId: value === NO_CUSTOMER ? null : value })
-              }
-            >
-              <option value={NO_CUSTOMER}>{t('domain:invoices.noCustomer')}</option>
-              {(customers.data ?? []).map((customer) => (
-                <option key={customer.id} value={customer.id}>
-                  {customerDisplayName(customer) || t('domain:customers.unnamed')}
-                </option>
-              ))}
-            </Select>
+              contactRole="customer"
+              value={state.customerId}
+              onChange={(contact) => update({ customerId: contact?.id ?? null })}
+              allowNone
+              noneLabel={t('domain:invoices.noCustomer')}
+            />
           </div>
 
           <DateField

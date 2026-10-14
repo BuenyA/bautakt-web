@@ -7,15 +7,15 @@
  */
 
 /**
- * Query, der auf einer Listenseite das Anlege-Panel öffnet (`/kunden?neu=1`).
- * Die Schnellsuche in der Kopfzeile springt so direkt in „Neuer Kunde“. Die
+ * Query, der auf einer Listenseite das Anlege-Panel öffnet (`/kontakte?neu=1`).
+ * Die Schnellsuche in der Kopfzeile springt so direkt in „Neuer Kontakt“. Die
  * Seite liest ihn über `useCreateFromUrl` und entfernt ihn danach.
  */
 export const createParam = 'neu';
 
 /** Listenpfad mit geöffnetem Anlege-Panel. */
 export function withCreate(path: string): string {
-  return `${path}?${createParam}=1`;
+  return `${path}${path.includes('?') ? '&' : '?'}${createParam}=1`;
 }
 
 /** Query der alten Zeitenliste `/zeiten?order=…`; die Umleitung liest ihn noch. */
@@ -65,9 +65,10 @@ export const routes = {
   absence: (id: string) => `/abwesenheiten/${id}`,
   payroll: '/lohn',
 
-  // Kunden direkt, Material als Hub. Katalog und Kostenstellen bleiben.
-  customers: '/kunden',
-  customer: (id: string) => `/kunden/${id}`,
+  // Kontakte direkt (Kunden, Lieferanten, Subunternehmer, Sonstige als
+  // Reiter), Material als Hub. Katalog und Kostenstellen bleiben.
+  contacts: '/kontakte',
+  contact: (id: string) => `/kontakte/${id}`,
   materialHub: '/material',
   catalog: '/katalog',
   costCenters: '/kostenstellen',
@@ -84,6 +85,8 @@ export const routes = {
   legacyFinance: '/finanzen',
   /** Bis 2026-10-14 lagen die Eingangsrechnungen unter `/ausgaben`. */
   legacyExpenses: '/ausgaben',
+  /** Bis 2026-10-14 gab es nur Kunden unter `/kunden`; jetzt Kontakte. */
+  legacyCustomers: '/kunden',
   /** Bis 2026-10-11 hieß die Einsatzplanung „Einsätze“. */
   legacyAssignments: '/einsaetze',
   /**

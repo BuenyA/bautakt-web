@@ -18,40 +18,27 @@ import {
   DrawerHeader,
   Input,
   Label,
+  MessageBar,
+  MessageBarBody,
   Select,
   Textarea,
 } from '@fluentui/react-components';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DatePicker } from '@/components/form/dateTime';
 import { useMembership } from '@/features/company/useMembership';
+import { constructionWithholdingCents, exemptionState } from '@/features/contacts/contactModel';
+import { ContactPicker } from '@/features/contacts/ContactPicker';
+import { useExemptionCertificates } from '@/features/contacts/useContact';
+import type { ContactListRow } from '@/features/contacts/useContacts';
 import { readableDbError } from '@/lib/dbErrors';
 import { supabase } from '@/lib/supabase';
 
+import { useCostCategories } from './useCostCategories';
+
 const VAT_RATES = ['19', '7', '0'] as const;
-
-/** Kostenkategorien des Betriebs — Pflichtfeld einer Ausgabe. */
-function useCostCategories() {
-  const { data: membership } = useMembership();
-  const companyId = membership?.companyId;
-
-  return useQuery({
-    queryKey: ['cost-categories', companyId],
-    enabled: Boolean(companyId),
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('cost_categories')
-        .select('id, name, kind')
-        .eq('company_id', companyId!)
-        .order('sort_order', { ascending: true });
-
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-}
 
 function useCreateExpense() {
   const queryClient = useQueryClient();
@@ -62,6 +49,7 @@ function useCreateExpense() {
     mutationFn: async (draft: {
       title: string;
       vendor: string;
+      supplierId: string | null;
       categoryId: string;
       invoiceDate: string;
       netMinor: number;
@@ -72,7 +60,10 @@ function useCreateExpense() {
       const { error } = await supabase.from('expenses').insert({
         company_id: companyId!,
         title: draft.title.trim(),
+        // `vendor` ist, was auf dem Beleg steht; `supplier_id` die Zuordnung
+        // zum Lieferanten (Auswertung je Lieferant, Kreditor im Export).
         vendor: draft.vendor.trim(),
+        supplier_id: draft.supplierId,
         cost_category_id: draft.categoryId,
         invoice_date: draft.invoiceDate,
         amount_net: fromMinorUnits(draft.netMinor),
@@ -113,10 +104,18 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
   const { t } = useTranslation();
   const create = useCreateExpense();
   const categories = useCostCategories();
-  const ids = { title: useId(), vendor: useId(), date: useId(), net: useId(), notes: useId() };
+  const ids = {
+    title: useId(),
+    supplier: useId(),
+    vendor: useId(),
+    date: useId(),
+    net: useId(),
+    notes: useId(),
+  };
 
   const [title, setTitle] = useState('');
   const [vendor, setVendor] = useState('');
+  const [supplier, setSupplier] = useState<ContactListRow | null>(null);
   const [categoryId, setCategoryId] = useState('');
   const [invoiceDate, setInvoiceDate] = useState(todayIso);
   const [net, setNet] = useState('');
@@ -126,6 +125,30 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
 
   const netMinor = parseMoneyInput(net) ?? 0;
   const vatMinor = percentOf(netMinor, Number(vatRate));
+
+  // §48b: Subunternehmer ohne gültige Freistellung am Rechnungstag → 15 %
+  // Bauabzugsteuer einbehalten. Hier nur der Hinweis mit Betrag; die Buchung
+  // macht der Steuerberater.
+  const isSubcontractor = Boolean(supplier?.roles.includes('subcontractor'));
+  const exemptions = useExemptionCertificates(supplier?.id, isSubcontractor);
+  const exemption =
+    isSubcontractor && exemptions.data ? exemptionState(exemptions.data, invoiceDate) : null;
+  const withholdingMinor =
+    exemption === 'missing' || exemption === 'expired'
+      ? constructionWithholdingCents(netMinor + vatMinor)
+      : 0;
+
+  function onSupplier(contact: ContactListRow | null) {
+    setSupplier(contact);
+    if (!contact) return;
+    // Der Name des Lieferanten ist, was auf dem Beleg steht — überschreibbar.
+    setVendor(contact.name);
+    if (!categoryId && contact.default_cost_category_id) {
+      setCategoryId(contact.default_cost_category_id);
+    }
+    // §13b: Subunternehmer stellt ohne Umsatzsteuer in Rechnung.
+    if (contact.roles.includes('subcontractor') && contact.reverse_charge_13b) setVatRate('0');
+  }
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -147,6 +170,7 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
       await create.mutateAsync({
         title,
         vendor,
+        supplierId: supplier?.id ?? null,
         categoryId,
         invoiceDate,
         netMinor,
@@ -180,7 +204,19 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor={ids.vendor}>{t('domain:expenses.columns.vendor')}</Label>
+          <Label htmlFor={ids.supplier}>{t('domain:expenses.columns.vendor')}</Label>
+          <ContactPicker
+            id={ids.supplier}
+            contactRole="supplier"
+            value={supplier?.id ?? null}
+            onChange={onSupplier}
+            allowNone
+            noneLabel={t('domain:expenseForm.noSupplier')}
+          />
+        </div>
+
+        <div className="grid gap-2">
+          <Label htmlFor={ids.vendor}>{t('domain:expenseForm.vendorOnReceipt')}</Label>
           <Input
             id={ids.vendor}
             value={vendor}
@@ -255,8 +291,23 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
           </div>
         </dl>
 
+        {isSubcontractor && supplier?.reverse_charge_13b ? (
+          <MessageBar intent="info" layout="multiline">
+            <MessageBarBody>{t('domain:expenseForm.reverseChargeHint')}</MessageBarBody>
+          </MessageBar>
+        ) : null}
+        {withholdingMinor > 0 ? (
+          <MessageBar intent="warning" layout="multiline">
+            <MessageBarBody>
+              {t('domain:expenseForm.withholdingWarning', {
+                amount: formatMoney(withholdingMinor),
+              })}
+            </MessageBarBody>
+          </MessageBar>
+        ) : null}
+
         <div className="grid gap-2">
-          <Label htmlFor={ids.notes}>{t('domain:customerForm.notes')}</Label>
+          <Label htmlFor={ids.notes}>{t('domain:contactForm.notes')}</Label>
           <Textarea
             id={ids.notes}
             rows={3}

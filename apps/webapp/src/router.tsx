@@ -14,8 +14,9 @@ import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { PublicOnlyRoute } from '@/features/auth/PublicOnlyRoute';
 import { CalendarPage } from '@/features/calendar/pages/CalendarPage';
 import { RequirePermission } from '@/features/company/RequirePermission';
-import { CustomerDetailPage } from '@/features/customers/pages/CustomerDetailPage';
-import { CustomersListPage } from '@/features/customers/pages/CustomersListPage';
+import { ContactDetailPage } from '@/features/contacts/pages/ContactDetailPage';
+import { ContactsListPage } from '@/features/contacts/pages/ContactsListPage';
+import { LegacyCustomerRedirect } from '@/features/contacts/pages/LegacyCustomerRedirect';
 import { FinanceLayout } from '@/features/finance/FinanceLayout';
 import { LegacyExpensesRedirect } from '@/features/finance/LegacyExpensesRedirect';
 import { DocumentEditorPage } from '@/features/finance/pages/DocumentEditorPage';
@@ -238,10 +239,12 @@ export const router = createBrowserRouter([
                 ),
               },
 
-              // --- Kunden direkt, Material als Hub ---
+              // --- Kontakte direkt, Material als Hub ---
+              // Lesen dürfen alle Mitglieder (RLS); Anlegen und Ändern prüft
+              // die Seite über canManageCustomers / canManageSuppliers.
               { path: routes.materialHub, element: <MaterialHubPage /> },
-              { path: routes.customers, element: <CustomersListPage /> },
-              { path: `${routes.customers}/:id`, element: <CustomerDetailPage /> },
+              { path: routes.contacts, element: <ContactsListPage /> },
+              { path: `${routes.contacts}/:id`, element: <ContactDetailPage /> },
               {
                 path: routes.catalog,
                 element: (
@@ -271,6 +274,8 @@ export const router = createBrowserRouter([
               },
               { path: `${routes.legacyAssignments}/:id`, element: <LegacyAssignmentRedirect /> },
               { path: routes.legacyTimes, element: <LegacyTimesRedirect /> },
+              { path: routes.legacyCustomers, element: <LegacyCustomerRedirect /> },
+              { path: `${routes.legacyCustomers}/:id`, element: <LegacyCustomerRedirect /> },
             ],
           },
         ],

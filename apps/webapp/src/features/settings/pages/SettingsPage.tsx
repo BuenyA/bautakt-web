@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useMembership } from '@/features/company/useMembership';
+import { ContactNumberSettingsCard } from '@/features/contacts/ContactNumberSettingsCard';
 import { supabase } from '@/lib/supabase';
 
 /** Stammdaten des Betriebs und die Rollen, die es hier gibt. */
@@ -113,6 +114,8 @@ export function SettingsPage() {
             <DetailRow label="IBAN" value={company?.iban ?? ''} />
             <DetailRow label={t('domain:settings.bank')} value={company?.bank_name ?? ''} />
           </DetailCard>
+
+          <ContactNumberSettingsCard />
 
           <Card size="large" className="xl:col-span-2">
             <CardHeader

@@ -209,7 +209,7 @@ function AbsenceForm({ absence, onDone }: { absence?: AbsenceRow; onDone: () => 
         />
 
         <div className="grid gap-2">
-          <Label htmlFor={ids.note}>{t('domain:customerForm.notes')}</Label>
+          <Label htmlFor={ids.note}>{t('domain:contactForm.notes')}</Label>
           <Textarea
             id={ids.note}
             rows={3}

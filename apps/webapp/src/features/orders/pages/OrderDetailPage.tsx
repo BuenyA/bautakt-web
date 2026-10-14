@@ -9,12 +9,14 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { LinkButton } from '@/components/common/LinkButton';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { RouterLink } from '@/components/common/RouterLink';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
 import { OrderChecklist } from '../OrderChecklist';
+import { OrderContacts } from '../OrderContacts';
 import { OrderDailyReports } from '../OrderDailyReports';
 import { OrderMaterials } from '../OrderMaterials';
 import { OrderNotes } from '../OrderNotes';
@@ -109,7 +111,15 @@ export function OrderDetailPage() {
       <DetailCard className="max-w-3xl">
         <DetailRow
           label={t('domain:orders.fields.customer')}
-          value={data.customer_label || t('domain:orders.noCustomer')}
+          value={
+            data.customer_id ? (
+              <RouterLink to={routes.contact(data.customer_id)}>
+                {data.customer_label || t('domain:orders.noCustomer')}
+              </RouterLink>
+            ) : (
+              data.customer_label || t('domain:orders.noCustomer')
+            )
+          }
         />
         <DetailRow label={t('domain:orders.fields.address')} value={address} />
         <DetailRow label={t('domain:orders.fields.country')} value={data.country.trim()} />
@@ -122,6 +132,8 @@ export function OrderDetailPage() {
         <DetailRow label={t('domain:orders.fields.costCenter')} value={data.cost_center_label} />
         <DetailRow label={t('domain:orders.fields.created')} value={formatDate(data.created_at)} />
       </DetailCard>
+
+      <OrderContacts orderId={data.id} />
 
       <OrderSheet mode="edit" order={data} open={editing} onOpenChange={setEditing} />
 

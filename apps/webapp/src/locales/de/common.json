@@ -12,7 +12,9 @@
     "export": "CSV-Export",
     "columns": "Spalten",
     "edit": "Bearbeiten",
-    "close": "Schließen"
+    "close": "Schließen",
+    "delete": "Löschen",
+    "more": "Weitere Aktionen"
   },
   "state": {
     "loading": "Wird geladen …",
@@ -66,7 +68,7 @@
     "reports": "Auswertungen",
     "employees": "Mitarbeiter",
     "absences": "Abwesenheiten",
-    "customers": "Kunden",
+    "contacts": "Kontakte",
     "catalog": "Katalog",
     "costCenters": "Kostenstellen",
     "settings": "Einstellungen",
@@ -116,5 +118,9 @@
     "title": "Seite nicht gefunden",
     "description": "Diese Adresse gibt es nicht.",
     "action": "Zur Übersicht"
+  },
+  "answer": {
+    "yes": "Ja",
+    "no": "Nein"
   }
 }

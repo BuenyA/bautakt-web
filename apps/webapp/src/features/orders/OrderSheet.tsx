@@ -23,7 +23,8 @@ import { useNavigate } from 'react-router';
 
 import { DateRangePicker } from '@/components/form/dateTime';
 import { useMembership } from '@/features/company/useMembership';
-import { customerDisplayName, useCustomers } from '@/features/customers/useCustomers';
+import { ContactPicker } from '@/features/contacts/ContactPicker';
+import type { ContactListRow } from '@/features/contacts/useContacts';
 import { useCostCenters } from '@/features/masterdata/useMasterData';
 import { readableDbError } from '@/lib/dbErrors';
 import { routes } from '@/lib/routes';
@@ -230,7 +231,6 @@ function OrderForm({ onDone }: { onDone: () => void }) {
 function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () => void }) {
   const { t } = useTranslation();
   const update = useUpdateOrder();
-  const customers = useCustomers();
   const costCenters = useCostCenters();
   const documents = useOrderHasSalesDocuments(order.id);
   const [draft, setDraft] = useState<OrderEditDraft>(() => draftFromOrder(order));
@@ -266,12 +266,11 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
     }
   }
 
-  function onCustomer(id: string) {
-    const customer = (customers.data ?? []).find((row) => row.id === id);
-    const label = customer
-      ? customerDisplayName(customer) || t('domain:customers.unnamed')
-      : draft.customer_label;
-    set({ customer_id: id, customer_label: label });
+  // Kunden-Id und Bezeichnung wandern immer zusammen (orderEdit.ts): die
+  // Bezeichnung ist, was Liste und Belege zeigen.
+  function onCustomer(contact: ContactListRow | null) {
+    if (!contact) return;
+    set({ customer_id: contact.id, customer_label: contact.name });
   }
 
   function onCostCenter(id: string) {
@@ -316,10 +315,6 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
     }
   }
 
-  const customerRows = [...(customers.data ?? [])].sort((a, b) =>
-    customerDisplayName(a).localeCompare(customerDisplayName(b), 'de'),
-  );
-  const customerKnown = customerRows.some((row) => row.id === draft.customer_id);
   const costCenterRows = costCenters.data ?? [];
   const costCenterKnown = costCenterRows.some((row) => row.id === draft.cost_center_id);
   const customerChanged = (draft.customer_id ?? null) !== (order.customer_id ?? null);
@@ -365,30 +360,12 @@ function OrderEditForm({ order, onDone }: { order: OrderEditSource; onDone: () =
               </p>
             </>
           )}
-          <Select
+          <ContactPicker
             id={ids.customer}
-            value={draft.customer_id ?? ''}
-            onChange={(_, { value }) => onCustomer(value)}
-          >
-            <option value="" disabled>
-              {t('domain:orders.edit.chooseCustomer')}
-            </option>
-            {draft.customer_id && !customerKnown ? (
-              <option value={draft.customer_id}>
-                {draft.customer_label.trim() || t('domain:customers.unnamed')}
-              </option>
-            ) : null}
-            {customerRows.map((customer) => (
-              <option key={customer.id} value={customer.id}>
-                {customerDisplayName(customer) || t('domain:customers.unnamed')}
-              </option>
-            ))}
-          </Select>
-          {customers.isError ? (
-            <p className="text-destructive text-sm">{t('domain:orders.edit.customersError')}</p>
-          ) : !customers.isPending && customerRows.length === 0 && !draft.customer_id ? (
-            <p className="text-muted-foreground text-sm">{t('domain:orders.edit.noCustomers')}</p>
-          ) : null}
+            contactRole="customer"
+            value={draft.customer_id ?? null}
+            onChange={onCustomer}
+          />
           {showDocumentWarning ? (
             <MessageBar intent="warning" layout="multiline">
               <MessageBarBody>{t('domain:orders.edit.documentWarning')}</MessageBarBody>

@@ -4,6 +4,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useMembership } from '@/features/company/useMembership';
 import { supabase } from '@/lib/supabase';
 
+import {
+  SALES_DOCUMENT_BUYER_SELECT,
+  type SalesDocumentBuyerFields,
+  salesDocumentBuyerLabel,
+} from './salesDocumentBuyer';
+
 /** Belegarten, die als Rechnung gelten — Angebote liegen auf einer eigenen Seite. */
 export const INVOICE_TYPE_LIST = ['invoice', 'partial_invoice', 'final_invoice'] as const;
 
@@ -28,27 +34,9 @@ export type SalesDocumentListRow = SalesDocumentRow & {
   created_at: string;
 };
 
-type QueryRow = Omit<SalesDocumentListRow, 'customer_label'> & {
-  customers: {
-    company_name: string | null;
-    first_name: string | null;
-    last_name: string | null;
-  } | null;
-};
+type QueryRow = Omit<SalesDocumentListRow, 'customer_label'> & SalesDocumentBuyerFields;
 
-const SELECT =
-  'id, type, status, document_number, issue_date, due_date, gross_total, net_total, vat_total, customer_id, currency, payment_term_days, created_at, customers(company_name, first_name, last_name)';
-
-function customerLabel(row: QueryRow): string {
-  const customer = row.customers;
-  if (!customer) return '';
-  const company = customer.company_name?.trim();
-  if (company) return company;
-  return [customer.first_name, customer.last_name]
-    .map((part) => part?.trim())
-    .filter(Boolean)
-    .join(' ');
-}
+const SELECT = `id, type, status, document_number, issue_date, due_date, gross_total, net_total, vat_total, customer_id, currency, payment_term_days, created_at, ${SALES_DOCUMENT_BUYER_SELECT}`;
 
 /**
  * Verkaufsbelege des aktiven Betriebs.
@@ -77,10 +65,9 @@ export function useSalesDocuments(types: readonly string[]) {
 
       if (error) throw error;
 
-      return ((data ?? []) as unknown as QueryRow[]).map((row) => ({
+      return ((data ?? []) as unknown as QueryRow[]).map(({ customer, buyer_name, ...row }) => ({
         ...row,
-        customers: undefined,
-        customer_label: customerLabel(row),
+        customer_label: salesDocumentBuyerLabel({ status: row.status, buyer_name, customer }),
       })) as SalesDocumentListRow[];
     },
   });

@@ -50,4 +50,5 @@ Der Service-Role-Key gehört **nicht** in eine `.env` dieses Repos — beim Aufr
 oder in CI aus einem Secret ziehen.
 
 _Stand 2026-08-26: 33 Keys in der Datenbank, 33 im Code, keine Abweichung in beide
-Richtungen._
+Richtungen._ _Seit 2026-10-14 34: `canManageSuppliers` (Lieferanten, Subunternehmer,
+§48b-Bescheinigungen), eingeführt mit den Kontakten — siehe [kontakte.md](kontakte.md)._
