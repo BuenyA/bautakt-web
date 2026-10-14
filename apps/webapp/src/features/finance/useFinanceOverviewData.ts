@@ -23,7 +23,7 @@ import { INVOICE_TYPE_LIST, usePayments, useSalesDocuments } from './useSalesDoc
 const TREND_MONTHS = 12;
 
 /**
- * Alles für die Rechnungs-Übersicht (`/finanzen`).
+ * Alles für die Rechnungs-Übersicht (`/rechnungen`).
  *
  * Dieselben Abfragen wie die Startseite — der Query-Cache teilt sie, ein
  * Wechsel zwischen beiden Seiten lädt nichts doppelt. Gerechnet wird in

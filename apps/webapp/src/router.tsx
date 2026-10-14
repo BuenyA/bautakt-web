@@ -79,7 +79,7 @@ export const router = createBrowserRouter([
           // Druckansicht bewusst ausserhalb der Shell: auf Papier gehoert kein
           // Menue. Der Schutz durch ProtectedRoute bleibt.
           {
-            path: `${routes.invoices}/:id/druck`,
+            path: `${routes.financeHub}/:id/druck`,
             element: (
               <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
                 <InvoicePrintPage />
@@ -178,7 +178,7 @@ export const router = createBrowserRouter([
                 ),
               },
               {
-                path: `${routes.invoices}/:id/bearbeiten`,
+                path: `${routes.financeHub}/:id/bearbeiten`,
                 element: (
                   <RequirePermission anyOf={['canUseBillingModule']}>
                     <DocumentEditorPage type="invoice" />
@@ -186,7 +186,7 @@ export const router = createBrowserRouter([
                 ),
               },
               {
-                path: `${routes.invoices}/:id`,
+                path: `${routes.financeHub}/:id`,
                 element: (
                   <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
                     <InvoiceDetailPage />
@@ -261,7 +261,7 @@ export const router = createBrowserRouter([
               { path: routes.settings, element: <SettingsPage /> },
 
               // Alte Pfade umleiten, damit Bookmarks nicht leer laufen.
-              // `/finanzen` ist die Rechnungs-Übersicht, kein Redirect.
+              { path: routes.legacyFinance, element: <Navigate to={routes.financeHub} replace /> },
               { path: routes.legacyNotifications, element: <Navigate to={HOME_ROUTE} replace /> },
               {
                 path: routes.legacyAssignments,

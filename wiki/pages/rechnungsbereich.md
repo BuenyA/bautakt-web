@@ -1,4 +1,4 @@
-# Rechnungsbereich (`/finanzen`)
+# Rechnungsbereich (`/rechnungen`)
 
 Der Leistenpunkt „Rechnungen“ (früher „Finanzen“) ist der Arbeitsplatz des Büros:
 Ausgangsrechnungen schreiben, Eingangsrechnungen abarbeiten. Code in
@@ -9,13 +9,17 @@ Ausgangsrechnungen schreiben, Eingangsrechnungen abarbeiten. Code in
 Owner-Entscheidung vom 2026-10-14. Im Handwerksbetrieb schreibt das Sekretariat hier
 Rechnungen und nimmt Eingangsrechnungen an (E-Rechnung). Buchungen, Konten, UStVA und
 Löhne laufen über DATEV bzw. den Steuerberater. „Buchhaltung“ würde genau das versprechen.
-„Finanzen“ war zu unbestimmt. Der Pfad bleibt `/finanzen` (Lesezeichen), nur das Label
-hat sich geändert.
+„Finanzen“ war zu unbestimmt.
+
+Pfade seit 2026-10-14 (Owner-Wunsch, Pfad wie Label): Übersicht `/rechnungen`, Liste der
+Ausgangsrechnungen `/rechnungen/ausgang`, Belege weiter `/rechnungen/:id`. `/finanzen`
+leitet auf die Übersicht um (`routes.legacyFinance`). Alte Lesezeichen auf die Liste
+(`/rechnungen?status=…`) landen jetzt auf der Übersicht, ihr Filter geht verloren.
 
 ## Aufbau
 
 - **Reiter statt Hub-Kacheln** (`FinanceLayout.tsx`): Übersicht · Ausgangsrechnungen
-  (`/rechnungen`) · Eingangsrechnungen (`/ausgaben`) · Angebote · Mahnwesen · Auswertungen.
+  (`/rechnungen/ausgang`) · Eingangsrechnungen (`/ausgaben`) · Angebote · Mahnwesen · Auswertungen.
   Die Reiter sind `financeHub.cards` in `features/hubs/hubs.ts`; die Übersicht steht nicht
   in der Liste, damit sie allein den Leistenpunkt nicht sichtbar macht.
   - „Offene Posten“ (`/offene-posten`) hat keinen eigenen Reiter. Über `alsoMatches`

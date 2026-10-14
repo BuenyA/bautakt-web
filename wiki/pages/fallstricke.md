@@ -331,7 +331,7 @@ danach Fehler oder „Beleg nicht gefunden“.
 
 **Lösung:** Spinner nur, solange eine Id da ist und die Abfrage noch pending
 ist. Danach dieselben Texte wie `InvoiceDetailPage`, mit Rückweg auf
-`/rechnungen`. Die Briefkopf-Abfrage bleibt parallel und hält die Seite nicht
+der Liste (`routes.invoices`). Die Briefkopf-Abfrage bleibt parallel und hält die Seite nicht
 fest.
 
 ## Einsatz löschen nimmt die Zeiten mit

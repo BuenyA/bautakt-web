@@ -30,7 +30,7 @@ import type { IncomingInvoiceListRow } from '../useExpenses';
 import { useFinanceOverviewData } from '../useFinanceOverviewData';
 
 /**
- * `/finanzen` — der Arbeitsplatz des Büros.
+ * `/rechnungen` — der Arbeitsplatz des Büros.
  *
  * Aufgebaut wie die Startseite: oben eine Reihe aus drei Karten, links und in
  * der Mitte gleich breit Ausgangs- und Eingangsrechnungen (darum geht es hier

@@ -84,7 +84,7 @@ Kachel-Hub mehr, sondern eine Übersicht mit Reitern, siehe
 | 2   | Aufträge       | `/auftraege`                                   | Direkt                 |
 | 3   | Einsatzplanung | `/einsatzplanung` (alt `/einsaetze` leitet um) | Direkt                 |
 | 5   | Kalender       | `/kalender`                                    | Direkt                 |
-| 6   | Rechnungen     | `/finanzen`                                    | Übersicht mit Reitern  |
+| 6   | Rechnungen     | `/rechnungen` (alt `/finanzen` leitet um)      | Übersicht mit Reitern  |
 | 7   | Mitarbeiter    | `/personal`                                    | Hub                    |
 | 8   | Kunden         | `/kunden`                                      | Direkt                 |
 | 9   | Material       | `/material`                                    | Hub                    |
@@ -94,20 +94,21 @@ Definiert in `components/layout/navItems.ts`, die Karten in
 `features/hubs/hubs.ts`. Ein Hub-Punkt fehlt, wenn **keine** seiner Karten
 sichtbar ist. Die Karten filtern einzeln, mit denselben Rechten wie die
 frühere flache Zeile. Listen- und Detail-URLs sind nicht umgezogen
-(`/rechnungen`, `/mitarbeiter`, `/katalog`, …). `/finanzen` ist die
-Rechnungs-Übersicht; der Redirect auf Rechnungen ist weg. Beim Rechnungsbereich sind
-die „Karten“ die Reiter (`FinanceLayout`).
+(`/mitarbeiter`, `/katalog`, …). Ausnahme seit 2026-10-14: Die Rechnungs-Übersicht
+liegt unter `/rechnungen`, die Liste der Ausgangsrechnungen unter `/rechnungen/ausgang`;
+Belege bleiben `/rechnungen/:id`. Beim Rechnungsbereich sind die „Karten“ die Reiter
+(`FinanceLayout`), siehe [rechnungsbereich.md](rechnungsbereich.md).
 
 Einstellungen bleibt im Fuß, abgesetzt, und zählt als zehnter Punkt.
 Benachrichtigungen sind die Topbar-Glocke, kein Nav-Eintrag.
 
 Die Auswahl in der Leiste gilt auch für den Hub, solange eine seiner Zielrouten
-offen ist: `/rechnungen` hält „Finanzen“ markiert, `/mitarbeiter` hält
+offen ist: `/offene-posten` hält „Rechnungen“ markiert, `/mitarbeiter` hält
 „Mitarbeiter“.
 
 ## Hub-Seiten
 
-`/finanzen`, `/personal` und `/material` sind Landings (`HubPage`): `PageHeader`
+`/personal` und `/material` sind Landings (`HubPage`): `PageHeader`
 und ein Kartenraster. Breite bis 1120px, links ausgerichtet. Das Padding kommt
 von der Shell (`p-4 sm:p-6`), die Seite legt keins dazu. Raster: eine Spalte,
 ab `sm` zwei, ab `lg` drei, `gap-4`.
@@ -119,21 +120,12 @@ Die Karte ist ein Router-Link über die ganze Fläche: `rounded-xl` (24px),
 Light `bg-surface`, Dark `bg-card-raised`, 150ms. Fokus: `ring-2 ring-ring`,
 Offset 2. Gedrückt: Deckkraft 0.95. Kein Primary-Fill.
 
-Rechnungen ist die einzige Featured-Karte: erste Zelle, `ring-1 ring-primary/30`
-und `sm:col-span-2`.
-
-| Hub         | Karte                  | Ziel             | Recht wie bisher                  |
-| ----------- | ---------------------- | ---------------- | --------------------------------- |
-| Finanzen    | Rechnungen (Featured)  | `/rechnungen`    | Abrechnung oder GF-Rechnungssicht |
-| Finanzen    | Angebote               | `/angebote`      | dasselbe                          |
-| Finanzen    | Offene Posten          | `/offene-posten` | `canViewCompanyFinance`           |
-| Finanzen    | Ausgaben               | `/ausgaben`      | Finanzen oder Gemeinkosten        |
-| Finanzen    | Mahnwesen              | `/mahnwesen`     | Abrechnung oder Finanzen          |
-| Finanzen    | Auswertungen           | `/auswertungen`  | `canViewCompanyFinance`           |
-| Mitarbeiter | Mitarbeiterverzeichnis | `/mitarbeiter`   | `canManageEmployees`              |
-| Mitarbeiter | Abwesenheiten          | `/abwesenheiten` | `canManageAbsences`               |
-| Material    | Katalog                | `/katalog`       | `canManageCatalog`                |
-| Material    | Kostenstellen          | `/kostenstellen` | `canManageCostCenters`            |
+| Hub         | Karte                  | Ziel             | Recht wie bisher       |
+| ----------- | ---------------------- | ---------------- | ---------------------- |
+| Mitarbeiter | Mitarbeiterverzeichnis | `/mitarbeiter`   | `canManageEmployees`   |
+| Mitarbeiter | Abwesenheiten          | `/abwesenheiten` | `canManageAbsences`    |
+| Material    | Katalog                | `/katalog`       | `canManageCatalog`     |
+| Material    | Kostenstellen          | `/kostenstellen` | `canManageCostCenters` |
 
 Seit 2026-10-11 (Owner) hat der Mitarbeiter-Hub nur noch Verzeichnis und
 Abwesenheiten. „Mitarbeiter hinzufügen“ führte auf dieselbe Liste und ist weg;
@@ -224,7 +216,7 @@ lässt der Check nicht zu. CSV, Spalten und die DataTable-Suche bleiben.
 
 ## Rechnungsliste
 
-Stand 2026-10-01. `/rechnungen` filtert die Belegart mit denselben Chips,
+Stand 2026-10-14. `/rechnungen/ausgang` filtert die Belegart mit denselben Chips,
 `nowrap`, weil die Labels lang sind. Default ist **Rechnungen**
 (`invoice`). Ohne `filter` oder bei unbekanntem Wert gilt das. Chips:
 Rechnungen · Auftragsbestätigungen · Lieferscheine · Alle. Schlüssel:

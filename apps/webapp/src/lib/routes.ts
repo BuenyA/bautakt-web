@@ -39,12 +39,14 @@ export const routes = {
   assignment: (id: string) => `/einsatzplanung/${id}`,
   calendar: '/kalender',
 
-  // Finanzen — `/finanzen` ist der Hub, die Listen bleiben wo sie sind.
-  financeHub: '/finanzen',
+  // Rechnungen — `/rechnungen` ist die Übersicht des Bereichs, die Liste der
+  // Ausgangsrechnungen liegt darunter. Belege bleiben `/rechnungen/:id`
+  // (statische Segmente wie `ausgang` und `neu` gewinnen gegen `:id`).
+  financeHub: '/rechnungen',
   quotes: '/angebote',
   quote: (id: string) => `/angebote/${id}`,
   quoteNew: '/angebote/neu',
-  invoices: '/rechnungen',
+  invoices: '/rechnungen/ausgang',
   invoice: (id: string) => `/rechnungen/${id}`,
   invoiceNew: '/rechnungen/neu',
   invoiceEdit: (id: string) => `/rechnungen/${id}/bearbeiten`,
@@ -72,9 +74,13 @@ export const routes = {
   settings: '/einstellungen',
 
   // Alte Pfade: Redirects bleiben, bis Bookmarks und Mails umgezogen sind.
-  // `/mitarbeiter`, `/finanzen` und `/kalender` sind echte Seiten. `/finanzen`
-  // ist der Hub, kein Redirect mehr auf Rechnungen.
+  // `/mitarbeiter` und `/kalender` sind echte Seiten.
   legacyNotifications: '/benachrichtigungen',
+  /**
+   * Bis 2026-10-14 lag die Rechnungs-Übersicht unter `/finanzen`, und
+   * `/rechnungen` war die Liste der Ausgangsrechnungen.
+   */
+  legacyFinance: '/finanzen',
   /** Bis 2026-10-11 hieß die Einsatzplanung „Einsätze“. */
   legacyAssignments: '/einsaetze',
   /**
