@@ -33,8 +33,9 @@ leitet auf die Übersicht um (`routes.legacyFinance`), `/ausgaben` mit Query auf
   - **Zahlen**: Monatsumsatz mit Vormonat, Umsatz und Ergebnis des Jahres, offene
     Forderungen und offene Eingangsrechnungen. Unter 1280 px über die volle Breite und
     nebeneinander.
-  - **Letzte 12 Monate**: `MonthlyBarChart`, umschaltbar Umsatz/Ausgaben, eine Reihe zur
-    Zeit wie in den Auswertungen.
+  - Kein Diagramm: Die 12-Monats-Karte ist am 2026-10-14 auf Owner-Wunsch wieder
+    rausgeflogen. Die Seite soll ohne Scrollen auskommen, Verläufe stehen nur unter
+    „Auswertungen“.
 - Die **Chips filtern in der Karte** (`overview/DeskCard.tsx`), ohne Seitenwechsel.
   Vorausgewählt ist die erste Gruppe mit Inhalt in der Reihenfolge der Karte, bis jemand
   klickt. Gruppen sind Teilmengen: „Überfällig“ steckt auch in „Offen“.
@@ -43,7 +44,7 @@ leitet auf die Übersicht um (`routes.legacyFinance`), `/ausgaben` mit Query auf
 
 - **Rechte je Karte**, wie auf der Startseite. Ohne Recht fehlt die Karte, keine Nullen.
   Ausgangsrechnungen brauchen `canReadSalesDocuments`, Eingangsrechnungen
-  `canViewExpenses`, Zahlen und Diagramm `canViewCompanyFinance` (`useFinanceAccess`).
+  `canViewExpenses`, Zahlen `canViewCompanyFinance` (`useFinanceAccess`).
 - **Netto** für Umsatz, Ergebnis und Diagramme, im ganzen Bereich, auf der Startseite und
   in den Auswertungen (`monthlyRevenue`, `computeYearResult`, `expenseEntries`).
   Brutto nur bei offenen Forderungen und offenen Eingangsrechnungen, weil das Geld ist,
@@ -53,9 +54,9 @@ leitet auf die Übersicht um (`routes.legacyFinance`), `/ausgaben` mit Query auf
 - **Eingangsrechnungen**: offen ist alles außer `paid`. Teilbezahlte zählen mit vollem
   Brutto, weil Bautakt Zahlungen auf Eingangsrechnungen noch nicht erfasst. „Neu“ heißt
   wie auf der Startseite: seit Beginn des letzten Arbeitstags (`newSince`).
-- Das Diagramm „Ausgaben“ zeigt Ausgaben und Eingangsrechnungen, **ohne Lohn**. Das
-  Ergebnis rechnet Lohn mit (`canViewWageCosts`). Ein negatives Ergebnis bei leerem
-  Ausgaben-Diagramm ist deshalb möglich.
+- Das Ausgaben-Diagramm der Auswertungen zeigt Ausgaben und Eingangsrechnungen, **ohne
+  Lohn**. Das Ergebnis rechnet Lohn mit (`canViewWageCosts`). Ein negatives Ergebnis bei
+  leerem Ausgaben-Diagramm ist deshalb möglich.
 
 ## Fallstricke
 

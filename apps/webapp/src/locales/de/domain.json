@@ -1324,14 +1324,6 @@
       "payablesNote": "brutto, noch zu zahlen",
       "loadError": "Die Zahlen konnten nicht geladen werden."
     },
-    "trend": {
-      "title": "Letzte 12 Monate",
-      "revenue": "Umsatz",
-      "expenses": "Ausgaben",
-      "seriesLabel": "Reihe wählen",
-      "empty": "In den letzten 12 Monaten gab es hier nichts.",
-      "toReports": "Zu den Auswertungen"
-    },
     "loadError": "Die Rechnungen konnten nicht geladen werden.",
     "nothingVisible": "Für dieses Konto ist in diesem Bereich nichts freigeschaltet."
   }

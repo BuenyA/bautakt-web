@@ -25,7 +25,6 @@ import { routes, withCreate } from '@/lib/routes';
 
 import { DeskCard, type DeskGroupView } from '../overview/DeskCard';
 import { FinanceNumbersCard } from '../overview/FinanceNumbersCard';
-import { TrendCard } from '../overview/TrendCard';
 import type { IncomingInvoiceListRow } from '../useExpenses';
 import { useFinanceOverviewData } from '../useFinanceOverviewData';
 
@@ -34,7 +33,8 @@ import { useFinanceOverviewData } from '../useFinanceOverviewData';
  *
  * Aufgebaut wie die Startseite: oben eine Reihe aus drei Karten, links und in
  * der Mitte gleich breit Ausgangs- und Eingangsrechnungen (darum geht es hier
- * jeden Tag), rechts schmal die Zahlen. Darunter die letzten zwölf Monate.
+ * jeden Tag), rechts schmal die Zahlen. Verläufe stehen in den Auswertungen,
+ * damit die Seite ohne Scrollen auskommt.
  *
  * ⚠️ Ohne Recht fehlt eine Karte ganz — keine Nullen, die wie „nichts offen“
  * aussähen. Führung, keine Kontrolle: die Grenze bleibt RLS.
@@ -103,14 +103,6 @@ export function FinanceOverviewPage() {
           ) : null}
         </div>
       )}
-
-      {numbers ? (
-        <TrendCard
-          revenue={numbers.revenueByMonth}
-          expenses={numbers.expensesByMonth}
-          isLoading={numbers.isLoading}
-        />
-      ) : null}
     </div>
   );
 }

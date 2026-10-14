@@ -3,9 +3,6 @@ import {
   buildOutgoingDesk,
   buildReceivables,
   computeYearResult,
-  monthlyRevenue,
-  monthlyTotals,
-  monthRange,
   netRevenueMonth,
   totalOpenMinor,
   totalOverdueMinor,
@@ -16,11 +13,9 @@ import { usePermission } from '@/features/company/usePermission';
 import { localIsoDate, newSince, parseLocalIso } from '@/features/overview/today';
 import { useLaborInputs } from '@/features/overview/useTodayData';
 
-import { expenseEntries, useExpenses, useIncomingInvoiceList } from './useExpenses';
+import { useExpenses, useIncomingInvoiceList } from './useExpenses';
 import { useFinanceAccess } from './useFinanceAccess';
 import { INVOICE_TYPE_LIST, usePayments, useSalesDocuments } from './useSalesDocuments';
-
-const TREND_MONTHS = 12;
 
 /**
  * Alles für die Rechnungs-Übersicht (`/rechnungen`).
@@ -66,7 +61,6 @@ export function useFinanceOverviewData() {
   const numbers = useMemo(() => {
     const docs = documents.data ?? [];
     const incomingRows = incoming.data ?? [];
-    const months = monthRange(month, TREND_MONTHS);
     const receivables = buildReceivables(docs, payments.data ?? [], todayIso);
 
     return {
@@ -81,8 +75,6 @@ export function useFinanceOverviewData() {
       receivablesMinor: totalOpenMinor(receivables),
       overdueMinor: totalOverdueMinor(receivables),
       payablesMinor: incomingDesk.open.minor,
-      revenueByMonth: monthlyRevenue(docs, months),
-      expensesByMonth: monthlyTotals(expenseEntries(expenses.data ?? [], incomingRows), months),
     };
   }, [
     documents.data,
