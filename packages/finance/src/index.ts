@@ -7,6 +7,23 @@ export {
   toIsoDate,
 } from './dates';
 export {
+  buildIncomingDesk,
+  buildOutgoingDesk,
+  type DeskGroup,
+  type DeskIncomingRow,
+  firstFilledGroup,
+  INCOMING_GROUP_ORDER,
+  type IncomingDesk,
+  type IncomingGroupKey,
+  type MonthComparison,
+  monthlyNetRevenue,
+  netRevenueMonth,
+  OUTGOING_GROUP_ORDER,
+  type OutgoingDesk,
+  type OutgoingDeskItem,
+  type OutgoingGroupKey,
+} from './invoiceDesk';
+export {
   computeOpenTasks,
   computeOverviewKpis,
   type IncomingInvoiceRow,

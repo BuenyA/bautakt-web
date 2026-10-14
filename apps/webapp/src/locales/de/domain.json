@@ -350,7 +350,7 @@
     "90_plus": "Über 90 Tage"
   },
   "invoices": {
-    "listTitle": "Rechnungen",
+    "listTitle": "Ausgangsrechnungen",
     "listDescription": "Ausgangsrechnungen Ihres Betriebs.",
     "filtersLabel": "Belegfilter",
     "filterInvoices": "Rechnungen",
@@ -583,7 +583,7 @@
     "dunningLevel": "Mahnstufe {{level}} versendet."
   },
   "expenses": {
-    "title": "Ausgaben",
+    "title": "Eingangsrechnungen",
     "description": "Eingangsrechnungen und sonstige Kosten des Betriebs.",
     "tabIncoming": "Eingangsrechnungen",
     "tabExpenses": "Sonstige Ausgaben",
@@ -1262,5 +1262,77 @@
     "inviteHint": "Wird ohne Benutzerkonto angelegt. Die Einladung in die App läuft separat über die Handy-App.",
     "saved": "Mitarbeiter gespeichert.",
     "saveError": "Mitarbeiter konnte nicht gespeichert werden."
+  },
+  "invoiceDesk": {
+    "title": "Rechnungen",
+    "description": "Was rausgeht, was reinkommt, und wo der Betrieb steht.",
+    "newInvoice": "Neue Rechnung",
+    "newQuote": "Neues Angebot",
+    "showAll": "Alle anzeigen",
+    "groupsLabel": "Ansicht wählen",
+    "outgoing": {
+      "title": "Ausgangsrechnungen",
+      "groups": {
+        "overdue": "Überfällig",
+        "open": "Offen",
+        "draft": "Entwürfe"
+      },
+      "empty": {
+        "overdue": "Nichts überfällig.",
+        "open": "Keine offenen Rechnungen.",
+        "draft": "Keine Entwürfe."
+      },
+      "noNumber": "Entwurf ohne Nummer",
+      "unknownCustomer": "Ohne Kunde",
+      "daysOverdue_one": "{{count}} Tag überfällig",
+      "daysOverdue_other": "{{count}} Tage überfällig",
+      "due": "fällig {{date}}",
+      "noDue": "ohne Fälligkeit",
+      "created": "angelegt {{date}}"
+    },
+    "incoming": {
+      "title": "Eingangsrechnungen",
+      "groups": {
+        "new": "Neu",
+        "overdue": "Überfällig",
+        "dueSoon": "Fällig in 7 Tagen",
+        "open": "Offen"
+      },
+      "empty": {
+        "new": "Seit dem letzten Arbeitstag ist nichts eingegangen.",
+        "overdue": "Nichts überfällig.",
+        "dueSoon": "In den nächsten 7 Tagen wird nichts fällig.",
+        "open": "Alles bezahlt."
+      },
+      "noVendor": "Unbekannter Lieferant"
+    },
+    "kpis": {
+      "title": "Zahlen",
+      "subtitle": "netto",
+      "revenueMonth": "Umsatz {{month}}",
+      "versusPreviousMonth": "{{value}} zum Vormonat",
+      "noPreviousMonth": "Kein Umsatz im Vormonat",
+      "revenueYear": "Umsatz {{year}}",
+      "resultYear": "Ergebnis {{year}}",
+      "margin": "{{value}} % Marge",
+      "noMargin": "Noch kein Umsatz",
+      "withoutLabor": "ohne Lohnkosten",
+      "receivables": "Offene Forderungen",
+      "overdueShare": "davon {{amount}} überfällig",
+      "noneOverdue": "nichts überfällig",
+      "payables": "Offene Eingangsrechnungen",
+      "payablesNote": "brutto, noch zu zahlen",
+      "loadError": "Die Zahlen konnten nicht geladen werden."
+    },
+    "trend": {
+      "title": "Letzte 12 Monate",
+      "revenue": "Umsatz",
+      "expenses": "Ausgaben",
+      "seriesLabel": "Reihe wählen",
+      "empty": "In den letzten 12 Monaten gab es hier nichts.",
+      "toReports": "Zu den Auswertungen"
+    },
+    "loadError": "Die Rechnungen konnten nicht geladen werden.",
+    "nothingVisible": "Für dieses Konto ist in diesem Bereich nichts freigeschaltet."
   }
 }

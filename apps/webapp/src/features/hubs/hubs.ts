@@ -9,10 +9,8 @@ import {
   type FluentIcon,
   LayerRegular,
   MegaphoneRegular,
-  MoneyRegular,
   PersonRegular,
   ReceiptRegular,
-  WalletRegular,
 } from '@fluentui/react-icons';
 
 import { routes } from '@/lib/routes';
@@ -27,9 +25,12 @@ export type PermissionGate = {
 
 export type HubCard = PermissionGate & {
   titleKey: string;
-  descriptionKey: string;
+  /** Untertitel der Kachel; Reiter (Rechnungen) brauchen keinen. */
+  descriptionKey?: string;
   to: string;
   icon: FluentIcon;
+  /** Weitere Pfade, die diesen Eintrag aktiv markieren. */
+  alsoMatches?: string[];
   /** Erste Zelle, Primary-Ring, zwei Spalten ab `sm`. Nur Rechnungen. */
   featured?: boolean;
   /**
@@ -78,47 +79,40 @@ export const financeHub: Hub = {
   to: routes.financeHub,
   titleKey: 'common:nav.finance',
   descriptionKey: 'common:hub.finance.description',
-  icon: WalletRegular,
+  icon: DocumentTextRegular,
+  // Kein Kachel-Hub mehr: `/finanzen` ist die Rechnungs-Übersicht, und diese
+  // Liste sind ihre Reiter (`FinanceTabs`). Die Übersicht selbst steht dort
+  // vorn und zählt hier nicht — sie allein soll den Leistenpunkt nicht zeigen.
   cards: [
     {
-      titleKey: 'common:nav.invoices',
-      descriptionKey: 'common:hub.finance.invoicesDescription',
+      titleKey: 'common:hub.finance.tabs.outgoing',
       to: routes.invoices,
       icon: DocumentTextRegular,
       anyPermission: ['canUseBillingModule', 'canViewManagementInvoices'],
-      featured: true,
+      // Offene Posten ist kein eigener Reiter mehr; die Seite bleibt und
+      // gehört zu den Ausgangsrechnungen.
+      alsoMatches: [routes.receivables],
     },
     {
-      titleKey: 'common:nav.quotes',
-      descriptionKey: 'common:hub.finance.quotesDescription',
-      to: routes.quotes,
-      icon: DocumentEditRegular,
-      anyPermission: ['canUseBillingModule', 'canViewManagementInvoices'],
-    },
-    {
-      titleKey: 'common:nav.receivables',
-      descriptionKey: 'common:hub.finance.receivablesDescription',
-      to: routes.receivables,
-      icon: MoneyRegular,
-      permission: 'canViewCompanyFinance',
-    },
-    {
-      titleKey: 'common:nav.expenses',
-      descriptionKey: 'common:hub.finance.expensesDescription',
+      titleKey: 'common:hub.finance.tabs.incoming',
       to: routes.expenses,
       icon: ReceiptRegular,
       anyPermission: ['canViewCompanyFinance', 'canManageOverheadCosts'],
     },
     {
-      titleKey: 'common:nav.dunning',
-      descriptionKey: 'common:hub.finance.dunningDescription',
+      titleKey: 'common:hub.finance.tabs.quotes',
+      to: routes.quotes,
+      icon: DocumentEditRegular,
+      anyPermission: ['canUseBillingModule', 'canViewManagementInvoices'],
+    },
+    {
+      titleKey: 'common:hub.finance.tabs.dunning',
       to: routes.dunning,
       icon: MegaphoneRegular,
       anyPermission: ['canUseBillingModule', 'canViewCompanyFinance'],
     },
     {
-      titleKey: 'common:nav.reports',
-      descriptionKey: 'common:hub.finance.reportsDescription',
+      titleKey: 'common:hub.finance.tabs.reports',
       to: routes.reports,
       icon: DataHistogramRegular,
       permission: 'canViewCompanyFinance',
@@ -196,4 +190,9 @@ export function visibleHubCards(
   permissions: Parameters<typeof hasPermission>[0],
 ): HubCard[] {
   return hub.cards.filter((card) => passesGate(card, permissions));
+}
+
+/** Pfad gehört zu diesem Eintrag — selbst oder über `alsoMatches`. */
+export function cardMatches(pathname: string, card: HubCard): boolean {
+  return [card.to, ...(card.alsoMatches ?? [])].some((to) => pathMatches(pathname, to));
 }

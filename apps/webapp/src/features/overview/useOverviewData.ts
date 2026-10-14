@@ -13,7 +13,11 @@ import { useMemo } from 'react';
 
 import { useMembership } from '@/features/company/useMembership';
 import { usePermission } from '@/features/company/usePermission';
-import { useExpenses, useIncomingInvoiceList } from '@/features/finance/useExpenses';
+import {
+  expenseEntries,
+  useExpenses,
+  useIncomingInvoiceList,
+} from '@/features/finance/useExpenses';
 import { useFinanceAccess } from '@/features/finance/useFinanceAccess';
 import {
   INVOICE_TYPE_LIST,
@@ -117,18 +121,7 @@ export function useOverviewData() {
         referenceIso: todayIso,
       }),
       revenueByMonth: monthlyRevenue(docs, months),
-      expensesByMonth: monthlyTotals(
-        [
-          ...(expenses.data ?? [])
-            .filter((expense) => !expense.is_calculatory)
-            .map((expense) => ({ dateIso: expense.invoice_date, amount: expense.amount_net })),
-          ...incomingRows.map((invoice) => ({
-            dateIso: invoice.invoice_date,
-            amount: invoice.net_total,
-          })),
-        ],
-        months,
-      ),
+      expensesByMonth: monthlyTotals(expenseEntries(expenses.data ?? [], incomingRows), months),
       overdue: receivables
         .filter((item) => item.daysOverdue > 0)
         .sort((a, b) => b.daysOverdue - a.daysOverdue),

@@ -16,16 +16,18 @@ import { CalendarPage } from '@/features/calendar/pages/CalendarPage';
 import { RequirePermission } from '@/features/company/RequirePermission';
 import { CustomerDetailPage } from '@/features/customers/pages/CustomerDetailPage';
 import { CustomersListPage } from '@/features/customers/pages/CustomersListPage';
+import { FinanceLayout } from '@/features/finance/FinanceLayout';
 import { DocumentEditorPage } from '@/features/finance/pages/DocumentEditorPage';
 import { DunningPage } from '@/features/finance/pages/DunningPage';
 import { ExpensesPage } from '@/features/finance/pages/ExpensesPage';
+import { FinanceOverviewPage } from '@/features/finance/pages/FinanceOverviewPage';
 import { InvoiceDetailPage } from '@/features/finance/pages/InvoiceDetailPage';
 import { InvoicePrintPage } from '@/features/finance/pages/InvoicePrintPage';
 import { InvoicesListPage } from '@/features/finance/pages/InvoicesListPage';
 import { QuotesListPage } from '@/features/finance/pages/QuotesListPage';
 import { ReceivablesPage } from '@/features/finance/pages/ReceivablesPage';
 import { ReportsPage } from '@/features/finance/pages/ReportsPage';
-import { FinanceHubPage, MaterialHubPage, PersonalHubPage } from '@/features/hubs/HubPage';
+import { MaterialHubPage, PersonalHubPage } from '@/features/hubs/HubPage';
 import { CatalogPage } from '@/features/masterdata/pages/CatalogPage';
 import { CostCentersPage } from '@/features/masterdata/pages/CostCentersPage';
 import { OrderDetailPage } from '@/features/orders/pages/OrderDetailPage';
@@ -97,23 +99,67 @@ export const router = createBrowserRouter([
               { path: `${routes.assignments}/:id`, element: <AssignmentDetailPage /> },
               { path: routes.calendar, element: <CalendarPage /> },
 
-              // --- Finanzen: Hub ist kanonisch, Listen bleiben ---
-              { path: routes.financeHub, element: <FinanceHubPage /> },
+              // --- Rechnungen: Übersicht und Listen unter einer Reiterleiste.
+              // Editor, Beleg und Druck stehen bewusst außerhalb. ---
               {
-                path: routes.quotes,
-                element: (
-                  <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
-                    <QuotesListPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.invoices,
-                element: (
-                  <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
-                    <InvoicesListPage />
-                  </RequirePermission>
-                ),
+                element: <FinanceLayout />,
+                children: [
+                  { path: routes.financeHub, element: <FinanceOverviewPage /> },
+                  {
+                    path: routes.quotes,
+                    element: (
+                      <RequirePermission
+                        anyOf={['canUseBillingModule', 'canViewManagementInvoices']}
+                      >
+                        <QuotesListPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.invoices,
+                    element: (
+                      <RequirePermission
+                        anyOf={['canUseBillingModule', 'canViewManagementInvoices']}
+                      >
+                        <InvoicesListPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.receivables,
+                    element: (
+                      <RequirePermission anyOf={['canViewCompanyFinance']}>
+                        <ReceivablesPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.expenses,
+                    element: (
+                      <RequirePermission
+                        anyOf={['canViewCompanyFinance', 'canManageOverheadCosts']}
+                      >
+                        <ExpensesPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.dunning,
+                    element: (
+                      <RequirePermission anyOf={['canUseBillingModule', 'canViewCompanyFinance']}>
+                        <DunningPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.reports,
+                    element: (
+                      <RequirePermission anyOf={['canViewCompanyFinance']}>
+                        <ReportsPage />
+                      </RequirePermission>
+                    ),
+                  },
+                ],
               },
               {
                 path: routes.invoiceNew,
@@ -144,38 +190,6 @@ export const router = createBrowserRouter([
                 element: (
                   <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
                     <InvoiceDetailPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.receivables,
-                element: (
-                  <RequirePermission anyOf={['canViewCompanyFinance']}>
-                    <ReceivablesPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.expenses,
-                element: (
-                  <RequirePermission anyOf={['canViewCompanyFinance', 'canManageOverheadCosts']}>
-                    <ExpensesPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.dunning,
-                element: (
-                  <RequirePermission anyOf={['canUseBillingModule', 'canViewCompanyFinance']}>
-                    <DunningPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.reports,
-                element: (
-                  <RequirePermission anyOf={['canViewCompanyFinance']}>
-                    <ReportsPage />
                   </RequirePermission>
                 ),
               },
@@ -247,7 +261,7 @@ export const router = createBrowserRouter([
               { path: routes.settings, element: <SettingsPage /> },
 
               // Alte Pfade umleiten, damit Bookmarks nicht leer laufen.
-              // `/finanzen` ist der Hub, kein Redirect auf Rechnungen.
+              // `/finanzen` ist die Rechnungs-Übersicht, kein Redirect.
               { path: routes.legacyNotifications, element: <Navigate to={HOME_ROUTE} replace /> },
               {
                 path: routes.legacyAssignments,

@@ -53,7 +53,7 @@
     "collapseSidebar": "Seitenleiste einklappen",
     "expandSidebar": "Seitenleiste ausklappen",
     "overview": "Übersicht",
-    "finance": "Finanzen",
+    "finance": "Rechnungen",
     "material": "Material",
     "orders": "Aufträge",
     "assignments": "Einsatzplanung",
@@ -83,13 +83,15 @@
     "emptyTitle": "Keine Bereiche freigeschaltet",
     "emptyDescription": "Für dieses Konto ist hier kein Bereich sichtbar.",
     "finance": {
-      "description": "Belege, Forderungen und Auswertungen.",
-      "invoicesDescription": "Liste & Detail",
-      "quotesDescription": "Angebote verwalten",
-      "receivablesDescription": "Forderungen",
-      "expensesDescription": "Betriebskosten",
-      "dunningDescription": "Mahnungen",
-      "reportsDescription": "Reports"
+      "description": "Ausgangs- und Eingangsrechnungen, Angebote und Zahlen.",
+      "tabs": {
+        "overview": "Übersicht",
+        "outgoing": "Ausgangsrechnungen",
+        "incoming": "Eingangsrechnungen",
+        "quotes": "Angebote",
+        "dunning": "Mahnwesen",
+        "reports": "Auswertungen"
+      }
     },
     "personal": {
       "description": "Verzeichnis und Abwesenheiten.",
