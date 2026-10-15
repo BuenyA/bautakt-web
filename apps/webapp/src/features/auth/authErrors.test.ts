@@ -79,7 +79,7 @@ describe('andere Auth-Fehler', () => {
           message: 'Email not confirmed',
         }),
         key: 'errors:auth.emailNotConfirmed',
-        text: 'Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse.',
+        text: 'Bitte bestätige zuerst deine E-Mail-Adresse.',
       },
       {
         error: asAuthError({
@@ -115,7 +115,7 @@ describe('andere Auth-Fehler', () => {
           message: 'Request rate limit reached',
         }),
         key: 'errors:auth.rateLimited',
-        text: 'Zu viele Versuche. Bitte warten Sie einen Moment.',
+        text: 'Zu viele Versuche. Bitte warte einen Moment.',
       },
       {
         error: asAuthError({
@@ -124,7 +124,7 @@ describe('andere Auth-Fehler', () => {
           message: 'Email rate limit exceeded',
         }),
         key: 'errors:auth.rateLimited',
-        text: 'Zu viele Versuche. Bitte warten Sie einen Moment.',
+        text: 'Zu viele Versuche. Bitte warte einen Moment.',
       },
       {
         error: asAuthError({
@@ -138,12 +138,12 @@ describe('andere Auth-Fehler', () => {
       {
         error: asAuthError({ code: 'invite_not_found', status: 404, message: 'Invite not found' }),
         key: 'errors:generic',
-        text: 'Da ist etwas schiefgelaufen. Bitte versuchen Sie es erneut.',
+        text: 'Da ist etwas schiefgelaufen. Bitte versuche es erneut.',
       },
       {
         error: asAuthError({ code: 'unexpected_failure', status: 500, message: 'Unexpected' }),
         key: 'errors:generic',
-        text: 'Da ist etwas schiefgelaufen. Bitte versuchen Sie es erneut.',
+        text: 'Da ist etwas schiefgelaufen. Bitte versuche es erneut.',
       },
     ];
 

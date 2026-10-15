@@ -140,6 +140,24 @@ This is the owner's motto for the whole product, web app and mobile app alike.
 - When adding a field, decide explicitly: always visible, or behind "optional"?
   When in doubt, optional.
 
+### Tone of voice: „du“ and „mein“
+
+All German UI text addresses the user informally — never „Sie/Ihr/Ihnen“.
+
+- **Headings, page/section descriptions, subtitles and menu entries speak from the
+  user's own perspective with „mein“:** „Mein Kalender“, „Aufträge meines Betriebs“,
+  „Ausgangsrechnungen meines Betriebs“, „Gemeldete Mängel auf meinen Baustellen“.
+  Not „des Betriebs“, „deines Betriebs“ or „Ihres Betriebs“.
+- **Full sentences that talk to the user** (hints, questions, error messages,
+  confirmations, requests) use „du“: „Bitte prüfe die Verbindung und versuche es
+  erneut.“, „Wie heißt dein Betrieb?“, „Möchtest du … entfernen?“
+- Do not use „Meine …“ where it would wrongly suggest „only mine": a list of all
+  company orders is „Aufträge“ with the description „Aufträge meines Betriebs“,
+  not „Meine Aufträge“.
+- **Exception:** text the business sends to _its_ customers (invoice/quote texts,
+  customer e-mails, the public order link, the marketing site and legal pages)
+  stays formal („Sie“).
+
 ## Architecture
 
 Turborepo over npm workspaces. Not pnpm: its non-hoisted `node_modules` regularly trips

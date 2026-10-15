@@ -114,6 +114,7 @@ verlinkt, nie kopiert.
 | 2026-10-12 | [Löschen nur noch als Mülleimer](logs/2026-10-12-loeschen-als-symbol.md)                               |
 | 2026-10-12 | [Hintergrundbild auf den Anmeldeseiten](logs/2026-10-12-login-hintergrund.md)                          |
 | 2026-10-12 | [Kalender: Einstellungen hinter dem Zahnrad, Einsätze blau](logs/2026-10-12-kalender-einstellungen.md) |
+| 2026-10-16 | [Ansprache: „du“ und „mein“](logs/2026-10-16-ansprache-du-mein.md)                                     |
 
 ## Die drei wichtigsten Sätze
 

@@ -23,7 +23,7 @@
   },
   "orders": {
     "listTitle": "Aufträge",
-    "listDescription": "Aufträge und Angebote Ihres Betriebs.",
+    "listDescription": "Aufträge und Angebote meines Betriebs.",
     "detailTitle": "Auftrag",
     "detailDescription": "Stammdaten und Status.",
     "filtersLabel": "Auftragsart",
@@ -59,16 +59,16 @@
     "emptyQuotesTitle": "Noch keine Angebote",
     "emptyQuotesDescription": "Angebote und abgelehnte Angebote erscheinen in dieser Ansicht.",
     "loadErrorTitle": "Aufträge konnten nicht geladen werden",
-    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+    "loadErrorDescription": "Bitte prüfe die Verbindung und versuche es erneut.",
     "notFoundTitle": "Auftrag nicht gefunden",
-    "notFoundDescription": "Dieser Auftrag existiert nicht oder ist für Sie nicht sichtbar.",
+    "notFoundDescription": "Dieser Auftrag existiert nicht oder ist für dich nicht sichtbar.",
     "photos": {
       "title": "Fotos",
       "emptyTitle": "Noch keine Fotos",
       "emptyDescription": "Fotos aus der Handy-App erscheinen hier, sobald sie synchronisiert sind.",
       "emptyDescriptionWrite": "Hier lassen sich Fotos hochladen. Sie erscheinen danach auch in der Handy-App.",
       "loadErrorTitle": "Fotos konnten nicht geladen werden",
-      "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+      "loadErrorDescription": "Bitte prüfe die Verbindung und versuche es erneut.",
       "openLabel": "Foto vom {{date}} öffnen",
       "openLabelUndated": "Foto öffnen",
       "lightboxTitle": "Foto",
@@ -80,7 +80,7 @@
       "emptyDescription": "Notizen aus der Handy-App erscheinen hier, sobald sie synchronisiert sind.",
       "emptyDescriptionWrite": "Hier lässt sich die erste Notiz anlegen. Sie erscheint danach auch in der Handy-App.",
       "loadErrorTitle": "Notizen konnten nicht geladen werden",
-      "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+      "loadErrorDescription": "Bitte prüfe die Verbindung und versuche es erneut.",
       "editedAt": "Geändert {{date}}"
     },
     "times": {
@@ -92,7 +92,7 @@
       "emptyTitle": "Noch keine Zeiten",
       "emptyDescription": "Erfasste Zeiten zu diesem Auftrag erscheinen hier.",
       "loadErrorTitle": "Zeiten konnten nicht geladen werden",
-      "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
+      "loadErrorDescription": "Bitte prüfe die Verbindung und versuche es erneut."
     },
     "materials": {
       "title": "Material",
@@ -100,7 +100,7 @@
       "emptyDescription": "Erfasstes Material zu diesem Auftrag erscheint hier.",
       "emptyDescriptionWrite": "Hier lässt sich Material erfassen. Es erscheint danach auch in der Handy-App.",
       "loadErrorTitle": "Material konnte nicht geladen werden",
-      "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+      "loadErrorDescription": "Bitte prüfe die Verbindung und versuche es erneut.",
       "billed": "Abgerechnet",
       "noTitle": "Ohne Bezeichnung",
       "cost": "EK {{price}}",
@@ -112,7 +112,7 @@
       "emptyDescription": "Punkte aus der Handy-App erscheinen hier, sobald sie synchronisiert sind.",
       "emptyDescriptionWrite": "Hier lässt sich der erste Punkt anlegen. Er erscheint danach auch in der Handy-App.",
       "loadErrorTitle": "Checkliste konnte nicht geladen werden",
-      "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+      "loadErrorDescription": "Bitte prüfe die Verbindung und versuche es erneut.",
       "progress": "{{done}} von {{total}} erledigt",
       "due": "Fällig {{date}}",
       "untitled": "Ohne Titel",
@@ -124,7 +124,7 @@
       "emptyDescription": "Berichte aus der Handy-App erscheinen hier, sobald sie synchronisiert sind.",
       "emptyDescriptionWrite": "Hier lässt sich der erste Bericht anlegen. Er erscheint danach auch in der Handy-App.",
       "loadErrorTitle": "Bautagebuch konnte nicht geladen werden",
-      "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+      "loadErrorDescription": "Bitte prüfe die Verbindung und versuche es erneut.",
       "weather": "Morgens {{morning}}, nachmittags {{afternoon}}",
       "weatherMorningOnly": "Morgens {{morning}}",
       "weatherAfternoonOnly": "Nachmittags {{afternoon}}",
@@ -421,9 +421,9 @@
     "noNote": "Keine Notiz",
     "unnamedEmployee": "Ohne Namen",
     "loadErrorTitle": "Einsätze konnten nicht geladen werden",
-    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+    "loadErrorDescription": "Bitte prüfe die Verbindung und versuche es erneut.",
     "notFoundTitle": "Einsatz nicht gefunden",
-    "notFoundDescription": "Dieser Einsatz existiert nicht oder ist für Sie nicht sichtbar.",
+    "notFoundDescription": "Dieser Einsatz existiert nicht oder ist für dich nicht sichtbar.",
     "create": {
       "action": "Einsatz anlegen",
       "title": "Einsatz anlegen",
@@ -440,7 +440,7 @@
       "periodRequired": "Bitte Beginn und Ende angeben.",
       "endBeforeStart": "Das Ende liegt vor dem Beginn.",
       "ordersError": "Aufträge konnten nicht geladen werden.",
-      "noOrders": "Es gibt noch keinen Auftrag. Legen Sie zuerst einen Auftrag an.",
+      "noOrders": "Es gibt noch keinen Auftrag. Leg zuerst einen Auftrag an.",
       "employeesError": "Mitarbeiter konnten nicht geladen werden.",
       "saved": "Einsatz angelegt.",
       "saveError": "Einsatz konnte nicht gespeichert werden."
@@ -525,7 +525,7 @@
     "breakHoursMinutes": "{{hours}} Std. {{minutes}} Min.",
     "breakLabel": "Pause {{duration}}",
     "loadErrorTitle": "Zeiten konnten nicht geladen werden",
-    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut."
+    "loadErrorDescription": "Bitte prüfe die Verbindung und versuche es erneut."
   },
   "documentStatus": {
     "draft": "Entwurf",
@@ -545,7 +545,7 @@
   },
   "invoices": {
     "listTitle": "Ausgangsrechnungen",
-    "listDescription": "Ausgangsrechnungen Ihres Betriebs.",
+    "listDescription": "Ausgangsrechnungen meines Betriebs.",
     "filtersLabel": "Belegfilter",
     "filterInvoices": "Rechnungen",
     "filterOrderConfirmations": "Auftragsbestätigungen",
@@ -567,7 +567,7 @@
     "emptyTitle": "Noch keine Rechnungen",
     "emptyDescription": "Sobald Rechnungen ausgestellt sind, erscheinen sie hier.",
     "loadErrorTitle": "Belege konnten nicht geladen werden",
-    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+    "loadErrorDescription": "Bitte prüfe die Verbindung und versuche es erneut.",
     "detailTitle": "Rechnung",
     "draftTitle": "Entwurf",
     "details": "Angaben",
@@ -605,7 +605,7 @@
     "finalizeSuccess": "Beleg festgeschrieben und nummeriert.",
     "finalizeError": "Festschreiben nicht möglich",
     "notFoundTitle": "Beleg nicht gefunden",
-    "notFoundDescription": "Dieser Beleg existiert nicht oder ist für Sie nicht sichtbar.",
+    "notFoundDescription": "Dieser Beleg existiert nicht oder ist für dich nicht sichtbar.",
     "new": "Neue Rechnung",
     "blockersTitle": "Vor dem Festschreiben fehlt noch etwas",
     "blockers": {
@@ -616,7 +616,7 @@
   },
   "quotes": {
     "listTitle": "Angebote",
-    "listDescription": "Angebote Ihres Betriebs.",
+    "listDescription": "Angebote meines Betriebs.",
     "columns": {
       "number": "Nummer",
       "customer": "Kunde",
@@ -631,7 +631,7 @@
   },
   "receivables": {
     "title": "Offene Posten",
-    "description": "Was der Betrieb noch zu bekommen hat, nach Alter der Forderung.",
+    "description": "Was mein Betrieb noch zu bekommen hat, nach Alter der Forderung.",
     "bucketsLabel": "Altersklassen",
     "filterAll": "Alle",
     "totalOpen": "Offene Forderungen",
@@ -782,7 +782,7 @@
   },
   "expenses": {
     "title": "Eingangsrechnungen",
-    "description": "Eingangsrechnungen und sonstige Kosten des Betriebs.",
+    "description": "Eingangsrechnungen und sonstige Kosten meines Betriebs.",
     "tabIncoming": "Eingangsrechnungen",
     "tabExpenses": "Sonstige Ausgaben",
     "columns": {
@@ -839,7 +839,7 @@
   },
   "employees": {
     "title": "Mitarbeiter",
-    "description": "Beschäftigte des Betriebs.",
+    "description": "Beschäftigte meines Betriebs.",
     "filtersLabel": "Mitarbeiterfilter",
     "filterAll": "Alle",
     "filterActive": "Aktiv",
@@ -862,7 +862,7 @@
     "emptyResultsTitle": "Keine Ergebnisse",
     "emptyResultsDescription": "Für diesen Filter oder diese Suche gibt es keine Treffer.",
     "loadErrorTitle": "Mitarbeiter konnten nicht geladen werden",
-    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+    "loadErrorDescription": "Bitte prüfe die Verbindung und versuche es erneut.",
     "detail": {
       "title": "Mitarbeiter",
       "description": "Stammdaten und Arbeitszeiten.",
@@ -986,7 +986,7 @@
   },
   "catalog": {
     "title": "Katalog",
-    "description": "Artikel und Material des Betriebs.",
+    "description": "Artikel und Material meines Betriebs.",
     "columns": {
       "title": "Artikel",
       "unit": "Einheit",
@@ -1016,7 +1016,7 @@
     "emptyTitle": "Keine Kostenstellen",
     "emptyDescription": "Lege eine Kostenstelle an, um Aufträge danach zu gliedern.",
     "loadErrorTitle": "Kostenstellen konnten nicht geladen werden",
-    "loadErrorDescription": "Bitte prüfen Sie die Verbindung und versuchen Sie es erneut.",
+    "loadErrorDescription": "Bitte prüfe die Verbindung und versuche es erneut.",
     "form": {
       "action": "Kostenstelle anlegen",
       "title": "Kostenstelle anlegen",
@@ -1041,7 +1041,7 @@
   },
   "settings": {
     "title": "Einrichtung",
-    "description": "Stammdaten des Betriebs und seine Rollen.",
+    "description": "Stammdaten meines Betriebs und seine Rollen.",
     "company": "Betrieb",
     "tax": "Steuer",
     "invoicing": "Rechnungsstellung",
@@ -1061,7 +1061,7 @@
     "editHint": "Diese Angaben stehen auf jedem Beleg und sind nach dem Festschreiben unveränderlich. Bearbeitet werden sie bis auf Weiteres in der Handy-App, wo die Prüfungen dafür bereits sitzen."
   },
   "calendar": {
-    "title": "Kalender",
+    "title": "Mein Kalender",
     "description": "Termine, Einsätze und eigene Abwesenheiten.",
     "previous": "Zurück",
     "next": "Weiter",
@@ -1392,7 +1392,7 @@
     "editEmployeeHint": "Die Änderung gilt nur für diesen Eintrag.",
     "ownEmployeeHint": "Der Eintrag gilt für dich.",
     "unnamedOrder": "Ohne Bezeichnung",
-    "noOrders": "Es gibt noch keinen Auftrag. Legen Sie zuerst einen Auftrag an.",
+    "noOrders": "Es gibt noch keinen Auftrag. Leg zuerst einen Auftrag an.",
     "noEmployees": "Keine aktiven Mitarbeiter.",
     "ordersError": "Aufträge konnten nicht geladen werden.",
     "employeesError": "Mitarbeiter konnten nicht geladen werden.",
@@ -1456,7 +1456,7 @@
   },
   "invoiceDesk": {
     "title": "Rechnungen",
-    "description": "Was rausgeht, was reinkommt, und wo der Betrieb steht.",
+    "description": "Was rausgeht, was reinkommt, und wo mein Betrieb steht.",
     "newInvoice": "Neue Rechnung",
     "newQuote": "Neues Angebot",
     "showAll": "Alle anzeigen",
