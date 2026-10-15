@@ -124,6 +124,7 @@ export function ContactDetailPage() {
         usage.data.salesDocuments +
         usage.data.incomingInvoices +
         usage.data.expenses +
+        usage.data.articles +
         usage.data.orderInvolvements.length >
       0
     : true;
@@ -572,7 +573,8 @@ function UsageCard({ contactId }: { contactId: string }) {
       data.orderInvolvements.length +
       data.salesDocuments +
       data.incomingInvoices +
-      data.expenses >
+      data.expenses +
+      data.articles >
     0;
 
   return (
@@ -632,6 +634,16 @@ function UsageCard({ contactId }: { contactId: string }) {
           <DetailRow
             label={t('domain:contacts.usageExpenses')}
             value={data.expenses > 0 ? String(data.expenses) : ''}
+          />
+          <DetailRow
+            label={t('domain:contacts.usageArticles')}
+            value={
+              data.articles > 0 ? (
+                <RouterLink to={routes.catalog}>{String(data.articles)}</RouterLink>
+              ) : (
+                ''
+              )
+            }
           />
         </dl>
       )}

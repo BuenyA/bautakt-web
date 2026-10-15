@@ -9,6 +9,7 @@ import {
 } from '@/features/assignments/crew';
 import { useAuth } from '@/features/auth/useAuth';
 import { useMembership } from '@/features/company/useMembership';
+import { contactDisplayName } from '@/features/contacts/contactModel';
 import { supabase } from '@/lib/supabase';
 
 import { localDayBounds, localIsoDate, recurrenceCoversDate } from './today';
@@ -256,6 +257,42 @@ export function useOverviewAbsences() {
         endDate: row.end_date,
         member: crewMember(row.employment_id, row.employments),
       }));
+    },
+  });
+}
+
+/**
+ * Aktive Subunternehmer mit den Laufzeiten ihrer §48b-Bescheinigungen. Welche
+ * davon auslaufen, rechnet `expiringExemptions` (today.ts). Der queryKey hängt
+ * unter `contacts`, damit eine neue Bescheinigung die Aufgabe sofort abräumt.
+ */
+export function useSubcontractorExemptions(enabled: boolean) {
+  const { data: membership } = useMembership();
+  const companyId = membership?.companyId;
+
+  return useQuery({
+    queryKey: ['contacts', companyId, 'exemptions-overview'],
+    enabled: enabled && Boolean(companyId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('subcontractor_profiles')
+        .select(
+          `contact_id,
+           certificates:exemption_certificates(valid_until),
+           supplier:supplier_profiles(
+             contact:contacts(kind, company_name, first_name, last_name, archived_at)
+           )`,
+        )
+        .eq('company_id', companyId!)
+        .is('archived_at', null);
+      if (error) throw error;
+      return (data ?? [])
+        .filter((row) => row.supplier?.contact && !row.supplier.contact.archived_at)
+        .map((row) => ({
+          contactId: row.contact_id,
+          name: contactDisplayName(row.supplier!.contact!),
+          validUntil: row.certificates.map((certificate) => certificate.valid_until),
+        }));
     },
   });
 }

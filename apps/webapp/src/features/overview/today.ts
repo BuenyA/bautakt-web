@@ -214,3 +214,37 @@ export function collectDeadlines(
 export function mapsSearchUrl(address: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address.trim())}`;
 }
+
+/** Gleiche Grenze wie die Benachrichtigung `exemption.expiringSoon`. */
+export const EXEMPTION_WARN_DAYS = 30;
+
+export type ExpiringExemption = {
+  contactId: string;
+  name: string;
+  validUntil: string;
+  /** Negativ = abgelaufen, 0 = läuft heute ab. */
+  daysLeft: number;
+};
+
+/**
+ * Subunternehmer, deren §48b-Freistellung in den nächsten 30 Tagen endet oder
+ * schon abgelaufen ist — ohne gültige Bescheinigung am Zahlungstag sind 15 %
+ * einzubehalten. Zählt je Subunternehmer nur die neueste Bescheinigung: eine
+ * Erneuerung ist eine neue Zeile, die alte bleibt als Historie stehen.
+ * Archivierte Subunternehmer haben die Liste schon verlassen (Abfrage).
+ */
+export function expiringExemptions(
+  rows: readonly { contactId: string; name: string; validUntil: readonly string[] }[],
+  todayIso: string,
+  warnDays = EXEMPTION_WARN_DAYS,
+): ExpiringExemption[] {
+  const result: ExpiringExemption[] = [];
+  for (const row of rows) {
+    if (row.validUntil.length === 0) continue;
+    const latest = row.validUntil.reduce((max, iso) => (iso > max ? iso : max)).slice(0, 10);
+    const daysLeft = daysFrom(todayIso, latest);
+    if (daysLeft > warnDays) continue;
+    result.push({ contactId: row.contactId, name: row.name, validUntil: latest, daysLeft });
+  }
+  return result.sort((a, b) => a.daysLeft - b.daysLeft || a.name.localeCompare(b.name));
+}

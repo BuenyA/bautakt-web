@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { useMembership } from '@/features/company/useMembership';
+import type { CustomerTerms } from '@/features/finance/customerTerms';
 import { supabase } from '@/lib/supabase';
 
 import { activeRoles, contactDisplayName, type ContactRole } from './contactModel';
@@ -26,13 +27,18 @@ export type ContactListRow = {
   /** Subunternehmer mit §13b-Kennzeichen (Vorbelegung bei Eingangsrechnungen). */
   reverse_charge_13b: boolean;
   payment_term_days: number | null;
+  /** Konditionen der Kundenrolle (Vorbelegung im Rechnungseditor). */
+  customer_terms: CustomerTerms | null;
 };
 
 export const contactsQueryKey = (companyId: string | undefined) => ['contacts', companyId] as const;
 
 const LIST_SELECT = `
   id, kind, company_name, first_name, last_name, city, email, phone, mobile, vat_id, archived_at,
-  customer:customer_profiles(customer_number, archived_at),
+  customer:customer_profiles(
+    customer_number, archived_at, buyer_reference, payment_term_days, discount_percent,
+    discount_days
+  ),
   supplier:supplier_profiles(
     supplier_number, archived_at, default_cost_category_id, payment_term_days,
     subcontractor:subcontractor_profiles(archived_at, reverse_charge_13b)
@@ -88,6 +94,14 @@ export function useContacts() {
             default_cost_category_id: row.supplier?.default_cost_category_id ?? null,
             reverse_charge_13b: Boolean(row.supplier?.subcontractor?.reverse_charge_13b),
             payment_term_days: row.supplier?.payment_term_days ?? null,
+            customer_terms: row.customer
+              ? {
+                  buyer_reference: row.customer.buyer_reference,
+                  payment_term_days: row.customer.payment_term_days,
+                  discount_percent: row.customer.discount_percent,
+                  discount_days: row.customer.discount_days,
+                }
+              : null,
           };
         })
         .sort((a, b) => a.name.localeCompare(b.name, 'de'));

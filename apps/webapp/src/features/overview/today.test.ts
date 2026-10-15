@@ -4,6 +4,7 @@ import { describe, it } from 'node:test';
 
 import {
   collectDeadlines,
+  expiringExemptions,
   layoutLanes,
   mapsSearchUrl,
   newSince,
@@ -124,6 +125,29 @@ describe('mapsSearchUrl', () => {
     assert.equal(
       mapsSearchUrl(' Hauptstr. 4, 70173 Stuttgart '),
       'https://www.google.com/maps/search/?api=1&query=Hauptstr.%204%2C%2070173%20Stuttgart',
+    );
+  });
+});
+
+describe('expiringExemptions', () => {
+  it('zaehlt je Subunternehmer nur die neueste Bescheinigung', () => {
+    const list = expiringExemptions(
+      [
+        // Erneuert: die alte laeuft bald ab, die neue gilt noch lange.
+        { contactId: 'a', name: 'Alt erneuert', validUntil: ['2026-10-20', '2027-12-31'] },
+        { contactId: 'b', name: 'Bald', validUntil: ['2026-11-10'] },
+        { contactId: 'c', name: 'Abgelaufen', validUntil: ['2026-10-01'] },
+        { contactId: 'd', name: 'Ohne', validUntil: [] },
+        { contactId: 'e', name: 'Spaeter', validUntil: ['2026-11-15'] },
+      ],
+      '2026-10-15',
+    );
+    assert.deepEqual(
+      list.map((item) => [item.contactId, item.daysLeft]),
+      [
+        ['c', -14],
+        ['b', 26],
+      ],
     );
   });
 });

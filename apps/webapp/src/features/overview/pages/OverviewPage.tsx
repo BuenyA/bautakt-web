@@ -62,6 +62,7 @@ export function OverviewPage() {
             pendingAbsences={todo.pendingAbsences}
             newIncoming={todo.newIncoming}
             deadlines={todo.deadlines}
+            exemptions={todo.exemptions}
             overdue={todo.overdue}
             tasks={todo.tasks}
             urls={urls}

@@ -158,6 +158,8 @@ export type ContactUsage = {
   salesDocuments: number;
   incomingInvoices: number;
   expenses: number;
+  /** Katalogartikel mit diesem Lieferanten. */
+  articles: number;
   orderInvolvements: { order_id: string; order_name: string; role: string }[];
 };
 
@@ -174,14 +176,17 @@ export function useContactUsage(contactId: string | undefined) {
     queryKey: ['contacts', companyId, 'usage', contactId],
     enabled: Boolean(companyId && contactId),
     queryFn: async (): Promise<ContactUsage> => {
-      const count = (table: 'sales_documents' | 'incoming_invoices' | 'expenses', column: string) =>
+      const count = (
+        table: 'sales_documents' | 'incoming_invoices' | 'expenses' | 'articles',
+        column: string,
+      ) =>
         supabase
           .from(table)
           .select('id', { count: 'exact', head: true })
           .eq('company_id', companyId!)
           .eq(column, contactId!);
 
-      const [orders, sales, incoming, expenses, involvements] = await Promise.all([
+      const [orders, sales, incoming, expenses, articles, involvements] = await Promise.all([
         supabase
           .from('orders')
           .select('id, name, status')
@@ -191,6 +196,7 @@ export function useContactUsage(contactId: string | undefined) {
         count('sales_documents', 'customer_id'),
         count('incoming_invoices', 'supplier_id'),
         count('expenses', 'supplier_id'),
+        count('articles', 'supplier_id'),
         supabase
           .from('order_contacts')
           .select('order_id, role, order:orders(name)')
@@ -207,6 +213,7 @@ export function useContactUsage(contactId: string | undefined) {
         salesDocuments: sales.count ?? 0,
         incomingInvoices: incoming.count ?? 0,
         expenses: expenses.count ?? 0,
+        articles: articles.count ?? 0,
         orderInvolvements: (involvements.data ?? []).map((row) => ({
           order_id: row.order_id,
           role: row.role,

@@ -258,6 +258,7 @@
     "usageSales": "Ausgangsbelege",
     "usageIncoming": "Eingangsrechnungen",
     "usageExpenses": "Ausgaben",
+    "usageArticles": "Katalogartikel",
     "andMore": "und {{count}} weitere",
     "emptyTitle": "Noch keine Kontakte",
     "emptyDescription": "Lege Kunden, Lieferanten und Partner an – oder sie entstehen beim Erfassen von Aufträgen und Rechnungen.",
@@ -707,7 +708,11 @@
       "taskDunnable_other": "{{count}} Belege sind mahnfähig",
       "taskDrafts_one": "{{count}} Entwurf ist nicht versendet",
       "taskDrafts_other": "{{count}} Entwürfe sind nicht versendet",
-      "more": "+ {{count}} weitere"
+      "more": "+ {{count}} weitere",
+      "exemptions": "Freistellungen §48b",
+      "exemptionsHint": "Ohne gültige Bescheinigung am Zahlungstag 15 % einbehalten",
+      "exemptionValidUntil": "gültig bis {{date}}",
+      "exemptionExpired": "abgelaufen am {{date}}"
     },
     "year": {
       "title": "Zahlen {{year}}",
@@ -986,8 +991,10 @@
       "purchase": "Einkauf",
       "sale": "Verkauf",
       "stock": "Bestand",
-      "location": "Lagerort"
+      "location": "Lagerort",
+      "supplier": "Lieferant"
     },
+    "supplierArticleNumber": "Art.-Nr. {{number}}",
     "inactive": "Inaktiv",
     "emptyTitle": "Kein Artikel im Katalog",
     "emptyDescription": "Angelegte Artikel erscheinen hier."
@@ -1189,7 +1196,13 @@
     },
     "dueDateLabel": "Fällig am",
     "issueDatePlaceholder": "Wird beim Ausstellen gesetzt",
-    "issueDateEmptyHint": "Noch nicht ausgestellt"
+    "issueDateEmptyHint": "Noch nicht ausgestellt",
+    "paymentTermDays": "Zahlungsziel (Tage)",
+    "skontoPercent": "Skonto %",
+    "skontoDays": "Skonto innerhalb (Tage)",
+    "dueFromTerm_one": "Leer: Rechnungsdatum plus {{count}} Tag",
+    "dueFromTerm_other": "Leer: Rechnungsdatum plus {{count}} Tage",
+    "termsInvalid": "Zahlungsziel und Skonto-Tage bitte als ganze Zahl, Skonto als Prozentsatz unter 100 angeben."
   },
   "photoForm": {
     "upload": "Fotos hochladen",

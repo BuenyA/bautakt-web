@@ -10,6 +10,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMembership } from '@/features/company/useMembership';
 import { supabase } from '@/lib/supabase';
 
+import type { TermFields } from './customerTerms';
+
 /** Belegarten, die der Editor anlegen kann. */
 export type EditableDocumentType = 'quote' | 'invoice';
 
@@ -31,7 +33,7 @@ export type EditorLine = {
   taxRatePercent: string;
 };
 
-export type EditorState = {
+export type EditorState = TermFields & {
   type: EditableDocumentType;
   customerId: string | null;
   issueDate: string;
@@ -51,6 +53,11 @@ export function parseNumber(value: string): number {
     normalized.includes(',') ? normalized.replace(/\./g, '').replace(',', '.') : normalized,
   );
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+/** Leeres Feld bleibt null — der Renderer faellt dann auf Kunde bzw. Betrieb zurueck. */
+function optionalNumber(value: string): number | null {
+  return value.trim() ? parseNumber(value) : null;
 }
 
 /**
@@ -130,6 +137,10 @@ export function useSaveDraft(documentId?: string) {
         intro_text: state.introText,
         footer_text: state.footerText,
         notes: state.notes,
+        buyer_reference: state.buyerReference.trim(),
+        payment_term_days: optionalNumber(state.paymentTermDays),
+        skonto_percent: optionalNumber(state.skontoPercent),
+        skonto_days: optionalNumber(state.skontoDays),
         net_total: minorToEuros(totals.netMinor),
         vat_total: minorToEuros(totals.vatMinor),
         gross_total: minorToEuros(totals.grossMinor),

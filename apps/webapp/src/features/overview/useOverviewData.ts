@@ -26,11 +26,19 @@ import {
 } from '@/features/finance/useSalesDocuments';
 import { supabase } from '@/lib/supabase';
 
-import { addDaysIso, collectDeadlines, localIsoDate, newSince, parseLocalIso } from './today';
+import {
+  addDaysIso,
+  collectDeadlines,
+  expiringExemptions,
+  localIsoDate,
+  newSince,
+  parseLocalIso,
+} from './today';
 import {
   useLaborInputs,
   useOrderEndDates,
   useOverviewAbsences,
+  useSubcontractorExemptions,
   useTodayAssignments,
   useTodayEvents,
 } from './useTodayData';
@@ -70,6 +78,7 @@ export function useOverviewData() {
   const canManageAbsences = usePermission('canManageAbsences');
   const canViewWageCosts = usePermission('canViewWageCosts');
   const canPlan = usePermission('canManageWorkAssignments');
+  const canManageSuppliers = usePermission('canManageSuppliers');
   const finance = access.canViewCompanyFinance;
 
   const todayIso = localIsoDate(new Date());
@@ -86,6 +95,7 @@ export function useOverviewData() {
   const incoming = useIncomingInvoiceList();
   const labor = useLaborInputs(finance && canViewWageCosts);
   const orderEnds = useOrderEndDates(canPlan || finance, horizonIso);
+  const subcontractors = useSubcontractorExemptions(canManageSuppliers);
 
   const absenceView = useMemo(() => {
     const rows = absences.data ?? [];
@@ -146,6 +156,11 @@ export function useOverviewData() {
       .sort((a, b) => b.created_at.localeCompare(a.created_at));
   }, [incoming.data, access.canViewExpenses, todayIso]);
 
+  const exemptions = useMemo(
+    () => (canManageSuppliers ? expiringExemptions(subcontractors.data ?? [], todayIso) : []),
+    [canManageSuppliers, subcontractors.data, todayIso],
+  );
+
   const deadlines = useMemo(
     () =>
       collectDeadlines(
@@ -187,6 +202,7 @@ export function useOverviewData() {
       pendingAbsences: absenceView.pending,
       newIncoming: incomingView,
       deadlines,
+      exemptions,
       overdue: finance ? financeView.overdue : [],
       tasks: finance ? financeView.tasks : null,
       isLoading: absences.isPending || incoming.isPending,

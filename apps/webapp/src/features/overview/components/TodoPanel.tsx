@@ -24,7 +24,7 @@ import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
-import type { Deadline } from '../today';
+import type { Deadline, ExpiringExemption } from '../today';
 import type { OverviewAbsence } from '../useTodayData';
 import { MemberAvatar } from './CrewAvatars';
 import { COLUMN_SCROLL } from './layout';
@@ -41,6 +41,7 @@ export function TodoPanel({
   pendingAbsences,
   newIncoming,
   deadlines,
+  exemptions,
   overdue,
   tasks,
   urls,
@@ -49,6 +50,7 @@ export function TodoPanel({
   pendingAbsences: readonly OverviewAbsence[];
   newIncoming: readonly IncomingInvoiceListRow[];
   deadlines: readonly Deadline[];
+  exemptions: readonly ExpiringExemption[];
   overdue: readonly ReceivableItem[];
   tasks: OpenTaskCounts | null;
   urls: Record<string, string>;
@@ -60,6 +62,7 @@ export function TodoPanel({
     pendingAbsences.length === 0 &&
     newIncoming.length === 0 &&
     deadlines.length === 0 &&
+    exemptions.length === 0 &&
     overdue.length === 0 &&
     !hasTasks;
 
@@ -133,6 +136,31 @@ export function TodoPanel({
                     title={deadline.label}
                     subtitle={t(`domain:overview.todo.deadlineKinds.${deadline.kind}`)}
                     trailing={<DueLabel daysLeft={deadline.daysLeft} />}
+                  />
+                ))}
+              </Section>
+            ) : null}
+
+            {exemptions.length > 0 ? (
+              <Section
+                id="freistellungen"
+                title={t('domain:overview.todo.exemptions')}
+                hint={t('domain:overview.todo.exemptionsHint')}
+                count={exemptions.length}
+                to={`${routes.contacts}?rolle=subunternehmer`}
+              >
+                {exemptions.slice(0, VISIBLE_ROWS).map((exemption) => (
+                  <Row
+                    key={exemption.contactId}
+                    to={routes.contact(exemption.contactId)}
+                    title={exemption.name}
+                    subtitle={t(
+                      exemption.daysLeft < 0
+                        ? 'domain:overview.todo.exemptionExpired'
+                        : 'domain:overview.todo.exemptionValidUntil',
+                      { date: formatDate(exemption.validUntil) },
+                    )}
+                    trailing={<DueLabel daysLeft={exemption.daysLeft} />}
                   />
                 ))}
               </Section>

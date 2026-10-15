@@ -24,9 +24,11 @@ import { PageSpinner } from '@/components/common/PageSpinner';
 import { DatePicker } from '@/components/form/dateTime';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { ContactPicker } from '@/features/contacts/ContactPicker';
+import { useContacts } from '@/features/contacts/useContacts';
 import { readableDbError } from '@/lib/dbErrors';
 import { routes } from '@/lib/routes';
 
+import { invalidTermFields, prefillCustomerTerms } from '../customerTerms';
 import {
   type EditableDocumentType,
   type EditorLine,
@@ -51,8 +53,16 @@ function initialState(type: EditableDocumentType): EditorState {
     introText: '',
     footerText: '',
     notes: '',
+    buyerReference: '',
+    paymentTermDays: '',
+    skontoPercent: '',
+    skontoDays: '',
     lines: [emptyLine()],
   };
+}
+
+function numberText(value: number | null): string {
+  return value == null ? '' : String(value).replace('.', ',');
 }
 
 /**
@@ -76,6 +86,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const dueAlertId = useId();
 
   const existing = useSalesDocument(id);
+  const contacts = useContacts();
   const save = useSaveDraft(id);
   const existingLoading = useCompanyListLoading(existing);
 
@@ -97,6 +108,10 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       introText: existing.data.intro_text,
       footerText: existing.data.footer_text,
       notes: existing.data.notes,
+      buyerReference: existing.data.buyer_reference,
+      paymentTermDays: numberText(existing.data.payment_term_days),
+      skontoPercent: numberText(existing.data.skonto_percent),
+      skontoDays: numberText(existing.data.skonto_days),
       lines: existing.data.lines.length
         ? existing.data.lines.map((line) => ({
             key: line.id,
@@ -140,6 +155,29 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     state.type === 'invoice' && state.issueDate && state.dueDate && state.dueDate < state.issueDate,
   );
 
+  const invalidTerms = state.type === 'invoice' ? invalidTermFields(state) : [];
+
+  function customerTerms(customerId: string | null) {
+    return (contacts.data ?? []).find((row) => row.id === customerId)?.customer_terms ?? null;
+  }
+
+  // Leitweg-ID, Zahlungsziel und Skonto kommen aus dem Kundenprofil — nur in
+  // leere bzw. noch vom vorherigen Kunden vorbelegte Felder (customerTerms.ts).
+  function selectCustomer(customerId: string | null) {
+    setState((current) =>
+      current
+        ? {
+            ...prefillCustomerTerms(
+              current,
+              customerTerms(customerId),
+              customerTerms(current.customerId),
+            ),
+            customerId,
+          }
+        : current,
+    );
+  }
+
   function update(patch: Partial<EditorState>) {
     setState((current) => (current ? { ...current, ...patch } : current));
   }
@@ -167,6 +205,10 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     }
     if (dueBeforeIssue) {
       setError(t('domain:editor.dueBeforeIssue'));
+      return;
+    }
+    if (invalidTerms.length > 0) {
+      setError(t('domain:editor.termsInvalid'));
       return;
     }
 
@@ -235,7 +277,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
               id={customerFieldId}
               contactRole="customer"
               value={state.customerId}
-              onChange={(contact) => update({ customerId: contact?.id ?? null })}
+              onChange={(contact) => selectCustomer(contact?.id ?? null)}
               allowNone
               noneLabel={t('domain:invoices.noCustomer')}
             />
@@ -266,6 +308,37 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                 onChange={(value) => update({ dueDate: value })}
                 describedBy={dueBeforeIssue ? dueAlertId : undefined}
                 invalid={dueBeforeIssue}
+                hint={
+                  !state.dueDate && state.paymentTermDays.trim()
+                    ? t('domain:editor.dueFromTerm', { count: Number(state.paymentTermDays) || 0 })
+                    : undefined
+                }
+              />
+              <Field
+                label={t('domain:invoices.buyerReference')}
+                value={state.buyerReference}
+                onChange={(value) => update({ buyerReference: value })}
+              />
+              <Field
+                label={t('domain:editor.paymentTermDays')}
+                value={state.paymentTermDays}
+                onChange={(value) => update({ paymentTermDays: value })}
+                numeric
+                invalid={invalidTerms.includes('paymentTermDays')}
+              />
+              <Field
+                label={t('domain:editor.skontoPercent')}
+                value={state.skontoPercent}
+                onChange={(value) => update({ skontoPercent: value })}
+                numeric
+                invalid={invalidTerms.includes('skontoPercent')}
+              />
+              <Field
+                label={t('domain:editor.skontoDays')}
+                value={state.skontoDays}
+                onChange={(value) => update({ skontoDays: value })}
+                numeric
+                invalid={invalidTerms.includes('skontoDays')}
               />
             </>
           ) : null}
@@ -414,11 +487,13 @@ function Field({
   value,
   onChange,
   numeric,
+  invalid,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   numeric?: boolean;
+  invalid?: boolean;
 }) {
   const fieldId = useId();
   return (
@@ -428,6 +503,7 @@ function Field({
         id={fieldId}
         input={numeric ? { className: 'text-right tabular-nums' } : undefined}
         inputMode={numeric ? 'decimal' : undefined}
+        aria-invalid={invalid || undefined}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />

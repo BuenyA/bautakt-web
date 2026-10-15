@@ -5,8 +5,10 @@ import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
+import { RouterLink } from '@/components/common/RouterLink';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
+import { routes } from '@/lib/routes';
 
 import { type ArticleRow, useArticles } from '../useMasterData';
 
@@ -33,6 +35,31 @@ export function CatalogPage() {
         ),
       },
       { accessorKey: 'unit', header: t('domain:catalog.columns.unit') },
+      {
+        accessorKey: 'supplier_name',
+        header: t('domain:catalog.columns.supplier'),
+        cell: ({ row }) =>
+          row.original.supplier_id ? (
+            <span className="flex flex-col">
+              <RouterLink
+                appearance="subtle"
+                to={routes.contact(row.original.supplier_id)}
+                stopPropagation
+              >
+                {row.original.supplier_name || t('domain:contacts.unnamed')}
+              </RouterLink>
+              {row.original.supplier_article_number ? (
+                <span className="text-muted-foreground text-sm">
+                  {t('domain:catalog.supplierArticleNumber', {
+                    number: row.original.supplier_article_number,
+                  })}
+                </span>
+              ) : null}
+            </span>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ),
+      },
       {
         accessorKey: 'purchase_price',
         header: t('domain:catalog.columns.purchase'),

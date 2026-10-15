@@ -4,7 +4,7 @@ Ein Geschäftspartner existiert genau einmal; Kunde, Lieferant, Subunternehmer
 und Sonstiger Kontakt sind Rollen. Das Schema, die RLS-Policies, die Nummernkreise
 und `merge_contacts` gehören bautakt-app (Migration
 `20261014204410_contacts.sql`, Issue BuenyA/bautakt-app#111) und werden hier nicht
-wiederholt. Diese Seite beschreibt, wie die Webapp damit umgeht. Stand 2026-10-14.
+wiederholt. Diese Seite beschreibt, wie die Webapp damit umgeht. Stand 2026-10-15.
 
 ## Warum Rollen statt Kunden-B2B/B2C
 
@@ -46,3 +46,18 @@ Datenbank lehnt einen Lieferanten als Auftraggeber ab.
   Kontakt (`features/finance/salesDocumentBuyer.ts`).
 - **Länder als ISO-Code** (`DE`, `AT`, `CH`), nicht „Deutschland“. Aufträge speichern
   ihr Land noch als Wort (`orderEdit.ts`).
+- **Konditionen im Rechnungseditor.** Wer einen Kunden wählt, bekommt Leitweg-ID,
+  Zahlungsziel und Skonto aus `customer_profiles` vorbelegt
+  (`features/finance/customerTerms.ts`). Gefüllt werden nur leere Felder und solche,
+  die noch den Wert des vorher gewählten Kunden tragen — sonst bliebe beim
+  Kundenwechsel die Leitweg-ID des falschen Kunden stehen. Bleibt „Fällig am“ leer,
+  rechnet der Renderer Rechnungsdatum plus Zahlungsziel.
+- **Lieferant am Artikel** steht im Katalog als Spalte (`articles.supplier_id`).
+  Gepflegt wird er in der Handy-App; die Webapp hat kein Artikelformular. Artikel
+  zählen bei „Verwendung“ mit, weil der Fremdschlüssel das Löschen sonst sperrt.
+- **§48b in der Übersicht.** „Freistellungen §48b“ unter „Zu erledigen“ zeigt
+  Subunternehmer, deren neueste Bescheinigung in 30 Tagen endet oder abgelaufen ist
+  (`expiringExemptions` in `features/overview/today.ts`, Recht
+  `canManageSuppliers`). Gleiche Grenze wie die Benachrichtigung
+  `exemption.expiringSoon`; die zeigt Abgelaufenes aber nur einen Tag lang, die
+  Aufgabe bleibt bis zur neuen Bescheinigung stehen.

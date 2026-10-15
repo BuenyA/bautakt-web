@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { useMembership } from '@/features/company/useMembership';
+import { contactDisplayName } from '@/features/contacts/contactModel';
 import { supabase } from '@/lib/supabase';
 
 import { aggregateCostCenterStats } from './costCenterStats';
@@ -16,6 +17,10 @@ export type ArticleRow = {
   min_stock: number | null;
   storage_location: string | null;
   is_active: boolean;
+  /** Kontakt-ID des Lieferanten (`articles.supplier_id` → `supplier_profiles`). */
+  supplier_id: string | null;
+  supplier_name: string;
+  supplier_article_number: string | null;
 };
 
 export type CostCenterRow = {
@@ -47,13 +52,18 @@ export function useArticles(options?: { enabled?: boolean }) {
       const { data, error } = await supabase
         .from('articles')
         .select(
-          'id, title, description, unit, purchase_price, sale_price, stock_quantity, min_stock, storage_location, is_active',
+          `id, title, description, unit, purchase_price, sale_price, stock_quantity, min_stock,
+           storage_location, is_active, supplier_id, supplier_article_number,
+           supplier:supplier_profiles(contact:contacts(kind, company_name, first_name, last_name))`,
         )
         .eq('company_id', companyId!)
         .order('title', { ascending: true });
 
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []).map(({ supplier, ...row }) => ({
+        ...row,
+        supplier_name: supplier?.contact ? contactDisplayName(supplier.contact) : '',
+      }));
     },
   });
 }
