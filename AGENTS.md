@@ -123,6 +123,23 @@ explicit namespace: `t('auth:signIn.title')`. Only the `de` catalog is maintaine
 that is a scope decision, not a licence to skip the keys. `bautakt-app` retrofitted i18n
 and its `i18n:scan` still reports leftovers.
 
+### Guiding principle: „So komplex wie nötig, so simpel wie möglich.“
+
+This is the owner's motto for the whole product, web app and mobile app alike.
+
+- **Model everything the domain really has.** The data model mirrors reality
+  completely and cleanly (roles, bank accounts, payment terms, certificates …) —
+  no shortcuts because a field "probably isn't needed".
+- **Show it only when it is needed.** What most users do not need right now stays
+  out of the way: optional details go into a collapsed section ("Weitere Angaben
+  (optional)"), a role's fields appear only once that role is chosen, rare actions
+  sit in a menu. Required and everyday fields stay visible.
+- **Hidden must never mean lost.** A collapsed section opens by itself when it
+  already holds values or when validation fails inside it, so nobody overwrites or
+  misses data they cannot see.
+- When adding a field, decide explicitly: always visible, or behind "optional"?
+  When in doubt, optional.
+
 ## Architecture
 
 Turborepo over npm workspaces. Not pnpm: its non-hoisted `node_modules` regularly trips
