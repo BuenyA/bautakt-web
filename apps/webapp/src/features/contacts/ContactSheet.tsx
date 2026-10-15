@@ -19,6 +19,7 @@ import {
   Text,
   Textarea,
 } from '@fluentui/react-components';
+import { ChevronDownRegular, ChevronUpRegular } from '@fluentui/react-icons';
 import { type FormEvent, type ReactNode, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -29,6 +30,7 @@ import { readableDbError } from '@/lib/dbErrors';
 
 import {
   type ContactDraft,
+  hasOptionalValues,
   parseOptionalDecimal,
   parseOptionalInt,
   withoutRole,
@@ -45,9 +47,11 @@ import { useSaveContact } from './useContactMutations';
 /**
  * Kontakt anlegen oder bearbeiten.
  *
- * Ein Formular für alle Rollen: oben, wer es ist (Firma/Person, Name,
- * Anschrift), dann die Rollen als Häkchen, darunter nur die Abschnitte der
- * gewählten Rollen. So bleibt ein reiner Privatkunde ein kurzes Formular.
+ * Ein Formular für alle Rollen. Offen stehen nur Name, Rollen, Anschrift,
+ * Telefon und E-Mail (beim Subunternehmer Gewerk und §13b, beim Sonstigen die
+ * Funktion). Alles Weitere — Ansprechpartner, Steuer, Nummern,
+ * Zahlungsbedingungen, Rechnungsadresse, Notizen — liegt zugeklappt unter
+ * „Weitere Angaben“: die meisten Kontakte brauchen es nie.
  */
 export function ContactSheet({
   draft,
@@ -90,6 +94,9 @@ function ContactForm({
   const costCategories = useCostCategories();
   const [draft, setDraft] = useState<ContactDraft>(initial);
   const [error, setError] = useState<string | null>(null);
+  // Offen stehen nur Name, Rolle, Anschrift und Telefon/E-Mail; der Rest ist
+  // für die meisten Kontakte überflüssig. Schon gefüllt → gleich offen.
+  const [showMore, setShowMore] = useState(() => hasOptionalValues(initial));
   const id = useId();
   const f = (name: string) => `${id}-${name}`;
 
@@ -152,6 +159,8 @@ function ContactForm({
     const problem = validate();
     if (problem) {
       setError(problem);
+      // Tage und Skonto stehen im zugeklappten Bereich: Fehler sichtbar machen.
+      setShowMore(true);
       return;
     }
     setError(null);
@@ -196,36 +205,22 @@ function ContactForm({
               value={draft.company_name}
               onChange={(value) => set({ company_name: value })}
             />
-          ) : null}
-
-          <div className="grid gap-4 sm:grid-cols-[7rem_1fr_1fr]">
-            <TextField
-              id={f('salutation')}
-              label={t('domain:contactForm.salutation')}
-              value={draft.salutation}
-              onChange={(value) => set({ salutation: value })}
-            />
-            <TextField
-              id={f('first')}
-              label={
-                isCompany
-                  ? t('domain:contactForm.contactFirstName')
-                  : t('domain:contactForm.firstName')
-              }
-              value={draft.first_name}
-              onChange={(value) => set({ first_name: value })}
-            />
-            <TextField
-              id={f('last')}
-              label={
-                isCompany
-                  ? t('domain:contactForm.contactLastName')
-                  : t('domain:contactForm.lastName')
-              }
-              value={draft.last_name}
-              onChange={(value) => set({ last_name: value })}
-            />
-          </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <TextField
+                id={f('first')}
+                label={t('domain:contactForm.firstName')}
+                value={draft.first_name}
+                onChange={(value) => set({ first_name: value })}
+              />
+              <TextField
+                id={f('last')}
+                label={t('domain:contactForm.lastName')}
+                value={draft.last_name}
+                onChange={(value) => set({ last_name: value })}
+              />
+            </div>
+          )}
         </Section>
 
         {/* --- Rollen ---------------------------------------------------- */}
@@ -251,7 +246,7 @@ function ContactForm({
           </div>
         </Section>
 
-        {/* --- Anschrift ------------------------------------------------- */}
+        {/* --- Anschrift und Erreichbarkeit ------------------------------ */}
         <Section title={t('domain:contactForm.sectionAddress')}>
           <TextField
             id={f('street')}
@@ -259,7 +254,7 @@ function ContactForm({
             value={draft.street_address}
             onChange={(value) => set({ street_address: value })}
           />
-          <div className="grid gap-4 sm:grid-cols-[8rem_1fr_8rem]">
+          <div className="grid gap-4 sm:grid-cols-[8rem_1fr]">
             <TextField
               id={f('zip')}
               label={t('domain:contactForm.postalCode')}
@@ -272,17 +267,7 @@ function ContactForm({
               value={draft.city}
               onChange={(value) => set({ city: value })}
             />
-            <CountrySelect
-              id={f('country')}
-              label={t('domain:contactForm.country')}
-              value={draft.country}
-              onChange={(value) => set({ country: value })}
-            />
           </div>
-        </Section>
-
-        {/* --- Erreichbarkeit -------------------------------------------- */}
-        <Section title={t('domain:contactForm.sectionReach')}>
           <div className="grid gap-4 sm:grid-cols-2">
             <TextField
               id={f('phone')}
@@ -292,219 +277,47 @@ function ContactForm({
               onChange={(value) => set({ phone: value })}
             />
             <TextField
-              id={f('mobile')}
-              type="tel"
-              label={t('domain:contactForm.mobile')}
-              value={draft.mobile}
-              onChange={(value) => set({ mobile: value })}
-            />
-            <TextField
               id={f('email')}
               type="email"
               label={t('domain:contactForm.email')}
               value={draft.email}
               onChange={(value) => set({ email: value })}
             />
-            <TextField
-              id={f('website')}
-              type="url"
-              label={t('domain:contactForm.website')}
-              value={draft.website}
-              onChange={(value) => set({ website: value })}
-            />
           </div>
         </Section>
 
-        {/* --- Steuer ---------------------------------------------------- */}
-        {isCompany || has('supplier') ? (
-          <Section title={t('domain:contactForm.sectionTax')}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <TextField
-                id={f('vat')}
-                label={t('domain:contactForm.vatId')}
-                value={draft.vat_id}
-                onChange={(value) => set({ vat_id: value })}
-              />
-              <TextField
-                id={f('taxnr')}
-                label={t('domain:contactForm.taxNumber')}
-                value={draft.tax_number}
-                onChange={(value) => set({ tax_number: value })}
-              />
-            </div>
-          </Section>
-        ) : null}
-
-        {/* --- Kunde ----------------------------------------------------- */}
-        {has('customer') ? (
-          <Section title={t('domain:contactRoles.customer')}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <TextField
-                id={f('custnr')}
-                label={t('domain:contactForm.customerNumber')}
-                placeholder={t('domain:contactForm.numberAuto')}
-                value={draft.customer.customer_number}
-                onChange={(value) => setCustomer({ customer_number: value })}
-                disabled={!canCustomers}
-              />
-              <TextField
-                id={f('leitweg')}
-                label={t('domain:contactForm.buyerReference')}
-                value={draft.customer.buyer_reference}
-                onChange={(value) => setCustomer({ buyer_reference: value })}
-                disabled={!canCustomers}
-              />
-            </div>
-            <PaymentTerms
-              idPrefix={f('cust')}
-              value={draft.customer}
-              onChange={(patch) => setCustomer(patch)}
-              disabled={!canCustomers}
-            />
-            <Checkbox
-              checked={draft.customer.is_construction_business}
-              disabled={!canCustomers}
-              onChange={(_, { checked }) =>
-                setCustomer({ is_construction_business: checked === true })
-              }
-              label={t('domain:contactForm.constructionBusiness')}
-            />
-            {draft.customer.is_construction_business ? (
-              <div className="grid gap-2 sm:max-w-xs">
-                <Label htmlFor={f('exemptuntil')}>
-                  {t('domain:contactForm.taxExemptionValidUntil')}
-                </Label>
-                <DatePicker
-                  id={f('exemptuntil')}
-                  aria-label={t('domain:contactForm.taxExemptionValidUntil')}
-                  value={draft.customer.tax_exemption_valid_until}
-                  onChange={(value) => setCustomer({ tax_exemption_valid_until: value })}
-                  disabled={!canCustomers}
-                />
-              </div>
-            ) : null}
-
-            <Text weight="semibold" size={200}>
-              {t('domain:contactForm.billingAddress')}
-            </Text>
+        {/* --- Subunternehmer: Gewerk und §13b bestimmen jede Rechnung ---- */}
+        {has('subcontractor') ? (
+          <Section title={t('domain:contactRoles.subcontractor')}>
             <TextField
-              id={f('bstreet')}
-              label={t('domain:contactForm.street')}
-              placeholder={t('domain:contactForm.billingSameAsMain')}
-              value={draft.customer.billing_street}
-              onChange={(value) => setCustomer({ billing_street: value })}
-              disabled={!canCustomers}
-            />
-            {draft.customer.billing_street.trim() ? (
-              <div className="grid gap-4 sm:grid-cols-[8rem_1fr_8rem]">
-                <TextField
-                  id={f('bzip')}
-                  label={t('domain:contactForm.postalCode')}
-                  value={draft.customer.billing_postal_code}
-                  onChange={(value) => setCustomer({ billing_postal_code: value })}
-                  disabled={!canCustomers}
-                />
-                <TextField
-                  id={f('bcity')}
-                  label={t('domain:contactForm.city')}
-                  value={draft.customer.billing_city}
-                  onChange={(value) => setCustomer({ billing_city: value })}
-                  disabled={!canCustomers}
-                />
-                <CountrySelect
-                  id={f('bcountry')}
-                  label={t('domain:contactForm.country')}
-                  value={draft.customer.billing_country || draft.country}
-                  onChange={(value) => setCustomer({ billing_country: value })}
-                  disabled={!canCustomers}
-                />
-              </div>
-            ) : null}
-          </Section>
-        ) : null}
-
-        {/* --- Lieferant / Subunternehmer -------------------------------- */}
-        {has('supplier') ? (
-          <Section
-            title={
-              has('subcontractor')
-                ? t('domain:contactRoles.subcontractor')
-                : t('domain:contactRoles.supplier')
-            }
-          >
-            <div className="grid gap-4 sm:grid-cols-2">
-              <TextField
-                id={f('supnr')}
-                label={t('domain:contactForm.supplierNumber')}
-                placeholder={t('domain:contactForm.numberAuto')}
-                value={draft.supplier.supplier_number}
-                onChange={(value) => setSupplier({ supplier_number: value })}
-                disabled={!canSuppliers}
-              />
-              <TextField
-                id={f('ourcust')}
-                label={t('domain:contactForm.ourCustomerNumber')}
-                value={draft.supplier.our_customer_number}
-                onChange={(value) => setSupplier({ our_customer_number: value })}
-                disabled={!canSuppliers}
-              />
-            </div>
-            <PaymentTerms
-              idPrefix={f('sup')}
-              value={draft.supplier}
-              onChange={(patch) => setSupplier(patch)}
+              id={f('trade')}
+              label={t('domain:contactForm.trade')}
+              value={draft.subcontractor.trade}
+              onChange={(value) =>
+                setDraft((current) => ({
+                  ...current,
+                  subcontractor: { ...current.subcontractor, trade: value },
+                }))
+              }
               disabled={!canSuppliers}
             />
-            <div className="grid gap-2">
-              <Label htmlFor={f('costcat')}>{t('domain:contactForm.defaultCostCategory')}</Label>
-              <Select
-                id={f('costcat')}
-                value={draft.supplier.default_cost_category_id}
-                disabled={!canSuppliers}
-                onChange={(_, { value }) => setSupplier({ default_cost_category_id: value })}
-              >
-                <option value="">{t('domain:contactForm.noDefaultCostCategory')}</option>
-                {(costCategories.data ?? []).map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </Select>
-            </div>
-
-            {has('subcontractor') ? (
-              <>
-                <TextField
-                  id={f('trade')}
-                  label={t('domain:contactForm.trade')}
-                  value={draft.subcontractor.trade}
-                  onChange={(value) =>
-                    setDraft((current) => ({
-                      ...current,
-                      subcontractor: { ...current.subcontractor, trade: value },
-                    }))
-                  }
-                  disabled={!canSuppliers}
-                />
-                <Checkbox
-                  checked={draft.subcontractor.reverse_charge_13b}
-                  disabled={!canSuppliers}
-                  onChange={(_, { checked }) =>
-                    setDraft((current) => ({
-                      ...current,
-                      subcontractor: {
-                        ...current.subcontractor,
-                        reverse_charge_13b: checked === true,
-                      },
-                    }))
-                  }
-                  label={t('domain:contactForm.reverseCharge13b')}
-                />
-                <Text size={200} className="text-muted-foreground">
-                  {t('domain:contactForm.exemptionHint')}
-                </Text>
-              </>
-            ) : null}
+            <Checkbox
+              checked={draft.subcontractor.reverse_charge_13b}
+              disabled={!canSuppliers}
+              onChange={(_, { checked }) =>
+                setDraft((current) => ({
+                  ...current,
+                  subcontractor: {
+                    ...current.subcontractor,
+                    reverse_charge_13b: checked === true,
+                  },
+                }))
+              }
+              label={t('domain:contactForm.reverseCharge13b')}
+            />
+            <Text size={200} className="text-muted-foreground">
+              {t('domain:contactForm.exemptionHint')}
+            </Text>
           </Section>
         ) : null}
 
@@ -530,14 +343,248 @@ function ContactForm({
           </Section>
         ) : null}
 
-        <div className="grid gap-2">
-          <Label htmlFor={f('notes')}>{t('domain:contactForm.notes')}</Label>
-          <Textarea
-            id={f('notes')}
-            rows={3}
-            value={draft.notes}
-            onChange={(event) => set({ notes: event.target.value })}
-          />
+        {/* --- Weitere Angaben (zugeklappt) ------------------------------- */}
+        <div className="border-border flex flex-col gap-6 border-t pt-4">
+          <Button
+            type="button"
+            appearance="subtle"
+            className="self-start"
+            icon={showMore ? <ChevronUpRegular /> : <ChevronDownRegular />}
+            iconPosition="after"
+            aria-expanded={showMore}
+            aria-controls={f('more')}
+            onClick={() => setShowMore((open) => !open)}
+          >
+            {t('domain:contactForm.moreDetails')}
+          </Button>
+
+          {showMore ? (
+            <div id={f('more')} className="flex flex-col gap-6">
+              <Section title={t('domain:contactForm.sectionMoreContact')}>
+                {isCompany ? (
+                  <div className="grid gap-4 sm:grid-cols-[7rem_1fr_1fr]">
+                    <TextField
+                      id={f('salutation')}
+                      label={t('domain:contactForm.salutation')}
+                      value={draft.salutation}
+                      onChange={(value) => set({ salutation: value })}
+                    />
+                    <TextField
+                      id={f('first')}
+                      label={t('domain:contactForm.contactFirstName')}
+                      value={draft.first_name}
+                      onChange={(value) => set({ first_name: value })}
+                    />
+                    <TextField
+                      id={f('last')}
+                      label={t('domain:contactForm.contactLastName')}
+                      value={draft.last_name}
+                      onChange={(value) => set({ last_name: value })}
+                    />
+                  </div>
+                ) : (
+                  <div className="grid gap-4 sm:max-w-xs">
+                    <TextField
+                      id={f('salutation')}
+                      label={t('domain:contactForm.salutation')}
+                      value={draft.salutation}
+                      onChange={(value) => set({ salutation: value })}
+                    />
+                  </div>
+                )}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <TextField
+                    id={f('mobile')}
+                    type="tel"
+                    label={t('domain:contactForm.mobile')}
+                    value={draft.mobile}
+                    onChange={(value) => set({ mobile: value })}
+                  />
+                  <TextField
+                    id={f('website')}
+                    type="url"
+                    label={t('domain:contactForm.website')}
+                    value={draft.website}
+                    onChange={(value) => set({ website: value })}
+                  />
+                </div>
+                <div className="sm:max-w-xs">
+                  <CountrySelect
+                    id={f('country')}
+                    label={t('domain:contactForm.country')}
+                    value={draft.country}
+                    onChange={(value) => set({ country: value })}
+                  />
+                </div>
+              </Section>
+
+              <Section title={t('domain:contactForm.sectionTax')}>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <TextField
+                    id={f('vat')}
+                    label={t('domain:contactForm.vatId')}
+                    value={draft.vat_id}
+                    onChange={(value) => set({ vat_id: value })}
+                  />
+                  <TextField
+                    id={f('taxnr')}
+                    label={t('domain:contactForm.taxNumber')}
+                    value={draft.tax_number}
+                    onChange={(value) => set({ tax_number: value })}
+                  />
+                </div>
+              </Section>
+
+              {has('customer') ? (
+                <Section title={t('domain:contactRoles.customer')}>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <TextField
+                      id={f('custnr')}
+                      label={t('domain:contactForm.customerNumber')}
+                      placeholder={t('domain:contactForm.numberAuto')}
+                      value={draft.customer.customer_number}
+                      onChange={(value) => setCustomer({ customer_number: value })}
+                      disabled={!canCustomers}
+                    />
+                    <TextField
+                      id={f('leitweg')}
+                      label={t('domain:contactForm.buyerReference')}
+                      value={draft.customer.buyer_reference}
+                      onChange={(value) => setCustomer({ buyer_reference: value })}
+                      disabled={!canCustomers}
+                    />
+                  </div>
+                  <PaymentTerms
+                    idPrefix={f('cust')}
+                    value={draft.customer}
+                    onChange={(patch) => setCustomer(patch)}
+                    disabled={!canCustomers}
+                  />
+                  <Checkbox
+                    checked={draft.customer.is_construction_business}
+                    disabled={!canCustomers}
+                    onChange={(_, { checked }) =>
+                      setCustomer({ is_construction_business: checked === true })
+                    }
+                    label={t('domain:contactForm.constructionBusiness')}
+                  />
+                  {draft.customer.is_construction_business ? (
+                    <div className="grid gap-2 sm:max-w-xs">
+                      <Label htmlFor={f('exemptuntil')}>
+                        {t('domain:contactForm.taxExemptionValidUntil')}
+                      </Label>
+                      <DatePicker
+                        id={f('exemptuntil')}
+                        aria-label={t('domain:contactForm.taxExemptionValidUntil')}
+                        value={draft.customer.tax_exemption_valid_until}
+                        onChange={(value) => setCustomer({ tax_exemption_valid_until: value })}
+                        disabled={!canCustomers}
+                      />
+                    </div>
+                  ) : null}
+
+                  <Text weight="semibold" size={200}>
+                    {t('domain:contactForm.billingAddress')}
+                  </Text>
+                  <TextField
+                    id={f('bstreet')}
+                    label={t('domain:contactForm.street')}
+                    placeholder={t('domain:contactForm.billingSameAsMain')}
+                    value={draft.customer.billing_street}
+                    onChange={(value) => setCustomer({ billing_street: value })}
+                    disabled={!canCustomers}
+                  />
+                  {draft.customer.billing_street.trim() ? (
+                    <div className="grid gap-4 sm:grid-cols-[8rem_1fr_8rem]">
+                      <TextField
+                        id={f('bzip')}
+                        label={t('domain:contactForm.postalCode')}
+                        value={draft.customer.billing_postal_code}
+                        onChange={(value) => setCustomer({ billing_postal_code: value })}
+                        disabled={!canCustomers}
+                      />
+                      <TextField
+                        id={f('bcity')}
+                        label={t('domain:contactForm.city')}
+                        value={draft.customer.billing_city}
+                        onChange={(value) => setCustomer({ billing_city: value })}
+                        disabled={!canCustomers}
+                      />
+                      <CountrySelect
+                        id={f('bcountry')}
+                        label={t('domain:contactForm.country')}
+                        value={draft.customer.billing_country || draft.country}
+                        onChange={(value) => setCustomer({ billing_country: value })}
+                        disabled={!canCustomers}
+                      />
+                    </div>
+                  ) : null}
+                </Section>
+              ) : null}
+
+              {has('supplier') ? (
+                <Section
+                  title={
+                    has('subcontractor')
+                      ? t('domain:contactRoles.subcontractor')
+                      : t('domain:contactRoles.supplier')
+                  }
+                >
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <TextField
+                      id={f('supnr')}
+                      label={t('domain:contactForm.supplierNumber')}
+                      placeholder={t('domain:contactForm.numberAuto')}
+                      value={draft.supplier.supplier_number}
+                      onChange={(value) => setSupplier({ supplier_number: value })}
+                      disabled={!canSuppliers}
+                    />
+                    <TextField
+                      id={f('ourcust')}
+                      label={t('domain:contactForm.ourCustomerNumber')}
+                      value={draft.supplier.our_customer_number}
+                      onChange={(value) => setSupplier({ our_customer_number: value })}
+                      disabled={!canSuppliers}
+                    />
+                  </div>
+                  <PaymentTerms
+                    idPrefix={f('sup')}
+                    value={draft.supplier}
+                    onChange={(patch) => setSupplier(patch)}
+                    disabled={!canSuppliers}
+                  />
+                  <div className="grid gap-2">
+                    <Label htmlFor={f('costcat')}>
+                      {t('domain:contactForm.defaultCostCategory')}
+                    </Label>
+                    <Select
+                      id={f('costcat')}
+                      value={draft.supplier.default_cost_category_id}
+                      disabled={!canSuppliers}
+                      onChange={(_, { value }) => setSupplier({ default_cost_category_id: value })}
+                    >
+                      <option value="">{t('domain:contactForm.noDefaultCostCategory')}</option>
+                      {(costCategories.data ?? []).map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+                </Section>
+              ) : null}
+
+              <div className="grid gap-2">
+                <Label htmlFor={f('notes')}>{t('domain:contactForm.notes')}</Label>
+                <Textarea
+                  id={f('notes')}
+                  rows={3}
+                  value={draft.notes}
+                  onChange={(event) => set({ notes: event.target.value })}
+                />
+              </div>
+            </div>
+          ) : null}
         </div>
 
         {error ? <p className="text-destructive text-sm">{error}</p> : null}

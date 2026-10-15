@@ -2,7 +2,13 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { changedFields, emptyContact, withoutRole, withRole } from './contactDraft.ts';
+import {
+  changedFields,
+  emptyContact,
+  hasOptionalValues,
+  withoutRole,
+  withRole,
+} from './contactDraft.ts';
 import {
   contactTabFromSearch,
   contactTabToSearch,
@@ -168,5 +174,35 @@ describe('formatContactAddress', () => {
       }),
       'Werkweg 5\n1010 Wien\nAT',
     );
+  });
+});
+
+describe('hasOptionalValues', () => {
+  it('neuer Kontakt: Bereich bleibt zu, auch mit vergebener Nummer', () => {
+    const draft = emptyContact('customer');
+    assert.equal(hasOptionalValues(draft), false);
+    assert.equal(
+      hasOptionalValues({ ...draft, customer: { ...draft.customer, customer_number: '10004' } }),
+      false,
+    );
+  });
+  it('Zahlungsziel beim Kunden oeffnet den Bereich', () => {
+    const draft = emptyContact('customer');
+    assert.equal(
+      hasOptionalValues({ ...draft, customer: { ...draft.customer, payment_term_days: '30' } }),
+      true,
+    );
+  });
+  it('Werte einer nicht gewaehlten Rolle zaehlen nicht', () => {
+    const draft = emptyContact('customer');
+    assert.equal(
+      hasOptionalValues({ ...draft, supplier: { ...draft.supplier, payment_term_days: '30' } }),
+      false,
+    );
+  });
+  it('Ansprechpartner-Name nur bei Firmen optional', () => {
+    const person = { ...emptyContact('customer'), kind: 'person' as const, last_name: 'Meier' };
+    assert.equal(hasOptionalValues(person), false);
+    assert.equal(hasOptionalValues({ ...person, kind: 'company' }), true);
   });
 });

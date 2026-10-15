@@ -274,3 +274,42 @@ export type ContactDetail = {
     archived_at: string | null;
   } | null;
 };
+
+/**
+ * Steht im zugeklappten Bereich „Weitere Angaben“ schon etwas? Dann öffnet das
+ * Formular ihn gleich — versteckte Werte, die man nicht sieht, ändert niemand
+ * bewusst. Kunden- und Lieferantennummer zählen nicht: die vergibt der
+ * Nummernkreis, sie stünden sonst bei jedem gespeicherten Kontakt.
+ */
+export function hasOptionalValues(draft: ContactDraft): boolean {
+  const filled = (...values: string[]) => values.some((value) => value.trim() !== '');
+  const has = (role: ContactRole) => draft.roles.includes(role);
+  if (
+    filled(draft.salutation, draft.mobile, draft.website, draft.vat_id, draft.tax_number) ||
+    filled(draft.notes) ||
+    (draft.kind === 'company' && filled(draft.first_name, draft.last_name)) ||
+    (draft.country !== '' && draft.country !== 'DE')
+  ) {
+    return true;
+  }
+  if (has('customer')) {
+    const c = draft.customer;
+    if (
+      c.is_construction_business ||
+      filled(c.buyer_reference, c.payment_term_days, c.discount_percent, c.discount_days) ||
+      filled(c.billing_street)
+    ) {
+      return true;
+    }
+  }
+  if (has('supplier')) {
+    const s = draft.supplier;
+    if (
+      filled(s.our_customer_number, s.payment_term_days, s.discount_percent, s.discount_days) ||
+      filled(s.default_cost_category_id)
+    ) {
+      return true;
+    }
+  }
+  return false;
+}

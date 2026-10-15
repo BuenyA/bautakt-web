@@ -61,3 +61,8 @@ Datenbank lehnt einen Lieferanten als Auftraggeber ab.
   `canManageSuppliers`). Gleiche Grenze wie die Benachrichtigung
   `exemption.expiringSoon`; die zeigt Abgelaufenes aber nur einen Tag lang, die
   Aufgabe bleibt bis zur neuen Bescheinigung stehen.
+- **Formular: nur das Nötige offen.** `ContactSheet` zeigt Name, Rollen, Anschrift,
+  Telefon und E-Mail (Subunternehmer: Gewerk, §13b; Sonstiger: Funktion). Alles
+  andere liegt unter „Weitere Angaben (optional)“ und öffnet sich von selbst, wenn
+  dort schon etwas steht (`hasOptionalValues` in `contactDraft.ts`, Nummern zählen
+  nicht) oder die Prüfung dort scheitert. Handy-App gleich.
