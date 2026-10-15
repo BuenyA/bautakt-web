@@ -6,6 +6,7 @@ import {
   changedFields,
   emptyContact,
   hasOptionalValues,
+  ibanPlacement,
   withoutRole,
   withRole,
 } from './contactDraft.ts';
@@ -204,5 +205,20 @@ describe('hasOptionalValues', () => {
     const person = { ...emptyContact('customer'), kind: 'person' as const, last_name: 'Meier' };
     assert.equal(hasOptionalValues(person), false);
     assert.equal(hasOptionalValues({ ...person, kind: 'company' }), true);
+  });
+});
+
+describe('ibanPlacement', () => {
+  it('Lieferant und Subunternehmer: sichtbar', () => {
+    assert.equal(ibanPlacement(['supplier']), 'visible');
+    assert.equal(ibanPlacement(['subcontractor', 'supplier']), 'visible');
+    assert.equal(ibanPlacement(['customer', 'supplier']), 'visible');
+  });
+  it('reiner Kunde: unter Weitere Angaben', () => {
+    assert.equal(ibanPlacement(['customer']), 'optional');
+  });
+  it('Sonstiger Kontakt: kein Feld', () => {
+    assert.equal(ibanPlacement(['other']), null);
+    assert.equal(ibanPlacement([]), null);
   });
 });

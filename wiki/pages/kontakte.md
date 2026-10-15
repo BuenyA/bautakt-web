@@ -66,3 +66,8 @@ Datenbank lehnt einen Lieferanten als Auftraggeber ab.
   andere liegt unter „Weitere Angaben (optional)“ und öffnet sich von selbst, wenn
   dort schon etwas steht (`hasOptionalValues` in `contactDraft.ts`, Nummern zählen
   nicht) oder die Prüfung dort scheitert. Handy-App gleich.
+- IBAN im Formular (`ibanPlacement`): sichtbar bei Lieferant/Subunternehmer,
+  beim reinen Kunden unter „Weitere Angaben“. Legt nur das erste Konto als
+  Standardkonto an (`insertFirstBankAccount` in `useContactMutations.ts`,
+  innerhalb des Rollback-Blocks beim Neuanlegen) und erscheint nur mit dem
+  Bank-Schreibrecht und solange noch kein Konto existiert.

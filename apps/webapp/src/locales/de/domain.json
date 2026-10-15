@@ -313,6 +313,7 @@
     "noDefaultCostCategory": "Keine",
     "trade": "Gewerk",
     "reverseCharge13b": "Rechnet nach §13b ab (Steuerschuld bei uns)",
+    "ibanHint": "Wird das Standardkonto. Weitere Konten pflegst du auf der Kontaktseite.",
     "exemptionHint": "Die §48b-Freistellungsbescheinigung hinterlegst du nach dem Speichern auf der Kontaktseite.",
     "function": "Funktion",
     "notes": "Notizen",

@@ -24,6 +24,7 @@ import { type FormEvent, type ReactNode, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DatePicker } from '@/components/form/dateTime';
+import { useMembership } from '@/features/company/useMembership';
 import { usePermission } from '@/features/company/usePermission';
 import { useCostCategories } from '@/features/finance/useCostCategories';
 import { readableDbError } from '@/lib/dbErrors';
@@ -31,6 +32,7 @@ import { readableDbError } from '@/lib/dbErrors';
 import {
   type ContactDraft,
   hasOptionalValues,
+  ibanPlacement,
   parseOptionalDecimal,
   parseOptionalInt,
   withoutRole,
@@ -40,8 +42,10 @@ import {
   CONTACT_COUNTRIES,
   CONTACT_ROLES,
   type ContactRole,
+  isValidIban,
   OTHER_FUNCTIONS,
 } from './contactModel';
+import { canViewBankAccounts, useContactBankAccounts } from './useContact';
 import { useSaveContact } from './useContactMutations';
 
 /**
@@ -91,8 +95,15 @@ function ContactForm({
   const save = useSaveContact();
   const canCustomers = usePermission('canManageCustomers');
   const canSuppliers = usePermission('canManageSuppliers');
+  const canViewFinance = usePermission('canViewCompanyFinance');
+  const canOverhead = usePermission('canManageOverheadCosts');
+  const canFinance = canViewFinance || canOverhead;
+  const canBilling = usePermission('canUseBillingModule');
+  const { data: membership } = useMembership();
+  const bankAccounts = useContactBankAccounts(initial.id);
   const costCategories = useCostCategories();
   const [draft, setDraft] = useState<ContactDraft>(initial);
+  const [iban, setIban] = useState('');
   const [error, setError] = useState<string | null>(null);
   // Offen stehen nur Name, Rolle, Anschrift und Telefon/E-Mail; der Rest ist
   // für die meisten Kontakte überflüssig. Schon gefüllt → gleich offen.
@@ -112,6 +123,32 @@ function ContactForm({
   function setSupplier(patch: Partial<ContactDraft['supplier']>) {
     setDraft((current) => ({ ...current, supplier: { ...current.supplier, ...patch } }));
   }
+
+  // IBAN nur fürs erste Konto: Gibt es schon eines, pflegt man die Konten auf
+  // der Detailseite (mehrere Konten, Standardkonto, Betrugswarnung).
+  const placement = ibanPlacement(draft.roles);
+  const mayEditBank =
+    placement === 'visible' ? canSuppliers && canFinance : canCustomers && canBilling;
+  const noAccountYet =
+    !initial.id ||
+    (canViewBankAccounts(membership?.permissions) &&
+      bankAccounts.isSuccess &&
+      bankAccounts.data.length === 0);
+  const ibanField =
+    placement && mayEditBank && noAccountYet ? (
+      <div className="grid gap-2 sm:max-w-sm">
+        <TextField
+          id={f('iban')}
+          label={t('domain:bankAccounts.iban')}
+          placeholder="DE00 0000 0000 0000 0000 00"
+          value={iban}
+          onChange={setIban}
+        />
+        <Text size={200} className="text-muted-foreground">
+          {t('domain:contactForm.ibanHint')}
+        </Text>
+      </div>
+    ) : null;
 
   function mayEditRole(role: ContactRole): boolean {
     if (role === 'customer') return canCustomers;
@@ -151,6 +188,9 @@ function ContactForm({
     ) {
       return t('domain:contactForm.percentInvalid');
     }
+    if (ibanField && iban.trim() && !isValidIban(iban)) {
+      return t('domain:bankAccounts.ibanInvalid');
+    }
     return null;
   }
 
@@ -159,13 +199,18 @@ function ContactForm({
     const problem = validate();
     if (problem) {
       setError(problem);
-      // Tage und Skonto stehen im zugeklappten Bereich: Fehler sichtbar machen.
+      // Tage, Skonto und die Kunden-IBAN stehen im zugeklappten Bereich:
+      // Fehler sichtbar machen.
       setShowMore(true);
       return;
     }
     setError(null);
     try {
-      const savedId = await save.mutateAsync({ initial, draft });
+      const savedId = await save.mutateAsync({
+        initial,
+        draft,
+        iban: ibanField ? iban : '',
+      });
       toast.success(t('domain:contactForm.saved'));
       onDone(savedId);
     } catch (caught) {
@@ -285,6 +330,11 @@ function ContactForm({
             />
           </div>
         </Section>
+
+        {/* --- Bankverbindung: Lieferanten und Subunternehmer bezahlt man -- */}
+        {placement === 'visible' && ibanField ? (
+          <Section title={t('domain:bankAccounts.title')}>{ibanField}</Section>
+        ) : null}
 
         {/* --- Subunternehmer: Gewerk und §13b bestimmen jede Rechnung ---- */}
         {has('subcontractor') ? (
@@ -482,6 +532,8 @@ function ContactForm({
                       />
                     </div>
                   ) : null}
+
+                  {placement === 'optional' ? ibanField : null}
 
                   <Text weight="semibold" size={200}>
                     {t('domain:contactForm.billingAddress')}

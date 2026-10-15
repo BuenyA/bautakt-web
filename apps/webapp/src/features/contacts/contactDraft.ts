@@ -313,3 +313,14 @@ export function hasOptionalValues(draft: ContactDraft): boolean {
   }
   return false;
 }
+
+/**
+ * Wo steht das IBAN-Feld? Lieferanten und Subunternehmer bezahlt man — dort
+ * gehört die IBAN in den sichtbaren Teil. Beim reinen Kunden braucht man sie
+ * selten (Erstattung, Lastschrift): dort liegt sie unter „Weitere Angaben“.
+ */
+export function ibanPlacement(roles: readonly ContactRole[]): 'visible' | 'optional' | null {
+  if (roles.includes('supplier') || roles.includes('subcontractor')) return 'visible';
+  if (roles.includes('customer')) return 'optional';
+  return null;
+}

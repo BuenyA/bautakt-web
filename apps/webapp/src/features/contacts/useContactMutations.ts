@@ -10,7 +10,7 @@ import {
   parseOptionalDecimal,
   parseOptionalInt,
 } from './contactDraft';
-import type { ContactRole } from './contactModel';
+import { contactDisplayName, type ContactRole, normalizeIban } from './contactModel';
 
 /** Alles neu laden, was an Kontakten hängt (Liste, Details, Auswahlfelder). */
 function useInvalidateContacts() {
@@ -104,9 +104,12 @@ export function useSaveContact() {
     mutationFn: async ({
       initial,
       draft,
+      iban = '',
     }: {
       initial: ContactDraft;
       draft: ContactDraft;
+      /** Erste Bankverbindung (wird Standardkonto); leer = keine. */
+      iban?: string;
     }): Promise<string> => {
       const isNew = !draft.id;
       const id = draft.id ?? crypto.randomUUID();
@@ -192,6 +195,9 @@ export function useSaveContact() {
             if (error) throw error;
           }
         }
+        if (iban.trim()) {
+          await insertFirstBankAccount({ ...scope, modified_by: user?.id ?? null }, draft, iban);
+        }
       } catch (caught) {
         if (isNew) await supabase.from('contacts').delete().eq('id', id);
         throw caught;
@@ -201,6 +207,32 @@ export function useSaveContact() {
     },
     onSuccess: () => invalidate(),
   });
+}
+
+/**
+ * Die IBAN aus dem Formular wird das Standardkonto. BIC und Bank schlägt
+ * `lookup-iban` nach — scheitert das, bleibt das Konto trotzdem gültig.
+ */
+async function insertFirstBankAccount(
+  scope: { contact_id: string; company_id: string; modified_by: string | null },
+  draft: ContactDraft,
+  iban: string,
+) {
+  const normalized = normalizeIban(iban);
+  const { data: bank } = await supabase.functions
+    .invoke<{ bic?: string; bankName?: string }>('lookup-iban', { body: { iban: normalized } })
+    .catch(() => ({ data: null }));
+  const { error } = await supabase.from('contact_bank_accounts').insert({
+    ...scope,
+    id: crypto.randomUUID(),
+    account_holder: contactDisplayName(draft),
+    iban: normalized,
+    bic: bank?.bic ?? '',
+    bank_name: bank?.bankName ?? '',
+    is_default: true,
+    modified_at: new Date().toISOString(),
+  });
+  if (error) throw error;
 }
 
 /** Tabelle einer Rolle. */
