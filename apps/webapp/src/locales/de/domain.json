@@ -604,6 +604,17 @@
     "finalize": "Festschreiben",
     "finalizeSuccess": "Beleg festgeschrieben und nummeriert.",
     "finalizeError": "Festschreiben nicht möglich",
+    "archive": {
+      "open": "Original-PDF",
+      "openError": "Das Original-PDF konnte nicht geöffnet werden.",
+      "missingTitle": "Original-PDF fehlt",
+      "missingDescription": "Für diesen Beleg wurde noch kein Archiv-Original (PDF mit E-Rechnung) erzeugt.",
+      "create": "Jetzt erzeugen",
+      "creating": "Wird erzeugt …",
+      "created": "Original-PDF erzeugt",
+      "createError": "Das Original-PDF konnte nicht erzeugt werden",
+      "finalizedWithoutArchive": "Beleg festgeschrieben, aber das Original-PDF fehlt noch. Erzeuge es auf der Belegseite."
+    },
     "deleteDraft": {
       "action": "Entwurf löschen",
       "title": "Entwurf löschen?",
