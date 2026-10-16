@@ -1,4 +1,12 @@
-import { formatMoney, formatMoneyInput, todayIso } from '@bautakt/finance';
+import {
+  formatMoney,
+  formatMoneyInput,
+  TAX_MODES,
+  type TaxMode,
+  taxModeNotice,
+  todayIso,
+  toTaxMode,
+} from '@bautakt/finance';
 import { DangerIconButton, toast } from '@bautakt/ui';
 import {
   Button,
@@ -8,14 +16,15 @@ import {
   Label,
   MessageBar,
   MessageBarBody,
+  MessageBarTitle,
   Select,
   Text,
   Textarea,
 } from '@fluentui/react-components';
-import { AddRegular, DeleteRegular } from '@fluentui/react-icons';
-import { useId, useMemo, useState } from 'react';
+import { AddRegular, ArrowDownloadRegular, DeleteRegular } from '@fluentui/react-icons';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { LinkButton } from '@/components/common/LinkButton';
@@ -23,10 +32,12 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { DatePicker } from '@/components/form/dateTime';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
+import { useMembership } from '@/features/company/useMembership';
 import { ContactPicker } from '@/features/contacts/ContactPicker';
 import { useContacts } from '@/features/contacts/useContacts';
+import { useOrders } from '@/features/orders/useOrders';
 import { readableDbError } from '@/lib/dbErrors';
-import { routes } from '@/lib/routes';
+import { invoiceFromOrderParam, routes } from '@/lib/routes';
 
 import { invalidTermFields, prefillCustomerTerms } from '../customerTerms';
 import {
@@ -35,16 +46,23 @@ import {
   type EditorState,
   editorTotals,
   emptyLine,
+  INVOICE_EDITOR_TYPES,
+  isBlankLine,
+  isInvoiceEditorType,
   LINE_KINDS,
   lineNetMinor,
+  loadOrderLines,
+  useCompanyTaxProfile,
   useSaveDraft,
 } from '../useDocumentEditor';
 import { useSalesDocument } from '../useSalesDocument';
 
-function initialState(type: EditableDocumentType): EditorState {
+function initialState(type: EditableDocumentType, taxMode: TaxMode): EditorState {
   return {
     type,
     customerId: null,
+    orderId: null,
+    taxMode,
     // Sichtbarer Vorschlag fuer einen neuen Beleg. Ein geladener Entwurf mit
     // leerem issue_date bleibt leer — sonst schreibt Speichern still heute.
     issueDate: todayIso(),
@@ -85,20 +103,58 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const { id } = useParams<{ id: string }>();
   const dueAlertId = useId();
 
+  const [searchParams] = useSearchParams();
+  const fromOrderId = id ? null : searchParams.get(invoiceFromOrderParam);
+  const orderFieldId = useId();
+  const typeFieldId = useId();
+  const taxModeFieldId = useId();
+
+  const { data: membership } = useMembership();
   const existing = useSalesDocument(id);
   const contacts = useContacts();
+  const orders = useOrders();
+  const taxProfile = useCompanyTaxProfile();
   const save = useSaveDraft(id);
   const existingLoading = useCompanyListLoading(existing);
 
-  const [state, setState] = useState<EditorState | null>(id ? null : initialState(type));
+  const [state, setState] = useState<EditorState | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [importingOrder, setImportingOrder] = useState(false);
+  // `?auftrag=` übernimmt die Positionen genau einmal, nicht bei jedem Rendern.
+  const pendingOrderImport = useRef<string | null>(null);
+
+  // Kleinunternehmer stellen nie mit Umsatzsteuer aus (§ 19 UStG); die
+  // Steuerart steht dann fest, wie in der App.
+  const isSmallBusiness = taxProfile.data?.isSmallBusiness ?? false;
+  const defaultTaxMode: TaxMode = isSmallBusiness ? 'small_business' : 'standard';
+
+  // Neuer Beleg: erst anlegen, wenn Betrieb und ggf. Auftrag bekannt sind —
+  // sonst stünde kurz `standard` statt § 19 im Formular, oder der Kunde fehlte.
+  const ordersReady = !fromOrderId || orders.isFetched;
+  if (!id && state === null && taxProfile.isFetched && ordersReady) {
+    const order = fromOrderId
+      ? (orders.data ?? []).find((row) => row.id === fromOrderId)
+      : undefined;
+    const fresh = initialState(type, defaultTaxMode);
+    if (order) {
+      pendingOrderImport.current = order.id;
+      setState({ ...fresh, orderId: order.id, customerId: order.customer_id });
+    } else {
+      setState(fresh);
+    }
+  }
 
   // Beim Bearbeiten: sobald der Beleg geladen ist, einmal in den Formularzustand
   // uebernehmen. Danach gehoert der Zustand dem Formular.
-  if (id && state === null && existing.data) {
+  if (id && state === null && existing.data && taxProfile.isFetched) {
     setState({
       type: (existing.data.type as EditableDocumentType) ?? type,
       customerId: existing.data.customer_id,
+      // Der Auftrag steht an den Positionen, nicht am Kopf. Der Editor schreibt
+      // ihn an alle; ein Entwurf aus der App kann gemischte haben, dann gilt
+      // der erste.
+      orderId: existing.data.lines.find((line) => line.order_id)?.order_id ?? null,
+      taxMode: isSmallBusiness ? 'small_business' : toTaxMode(existing.data.tax_mode),
       // NULL nicht durch heute ersetzen. Die Liste sagt dann „Nicht
       // ausgestellt“, und Speichern wuerde das Datum festschreiben.
       // Festschreiben setzt es selbst: coalesce(issue_date, CURRENT_DATE).
@@ -122,15 +178,66 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
               : 'other',
             quantity: String(line.quantity),
             unit: line.unit,
-            unitPrice: formatMoneyInput(line.unit_price),
+            // Ein Nachlass steht negativ in der Datenbank; im Feld ohne Minus.
+            unitPrice: formatMoneyInput(
+              line.kind === 'discount' ? Math.abs(line.unit_price) : line.unit_price,
+            ),
             discountPercent: String(line.discount_percent),
-            taxRatePercent: String(line.tax_rate_percent),
+            // Bei § 13b & Co. steht 0 % in der Zeile. Wechselt man zurück auf
+            // `standard`, soll der übliche Satz kommen, nicht 0 %.
+            taxRatePercent:
+              line.tax_rate_percent > 0 || existing.data?.tax_mode === 'standard'
+                ? String(line.tax_rate_percent)
+                : '19',
+            source:
+              line.source_type && line.source_id
+                ? { type: line.source_type, id: line.source_id }
+                : null,
           }))
         : [emptyLine()],
     });
   }
 
-  const totals = useMemo(() => (state ? editorTotals(state.lines) : null), [state]);
+  const totals = useMemo(() => (state ? editorTotals(state.lines, state.taxMode) : null), [state]);
+
+  async function importOrderLines(orderId: string) {
+    const companyId = membership?.companyId;
+    if (!companyId) return;
+    setImportingOrder(true);
+    try {
+      const imported = await loadOrderLines(companyId, orderId, '19');
+      // Schon übernommene Zeiten und Material nicht doppelt anhängen.
+      const known = new Set(
+        (state?.lines ?? []).flatMap((line) => (line.source ? [line.source.id] : [])),
+      );
+      const fresh = imported.filter((line) => !line.source || !known.has(line.source.id));
+      if (fresh.length === 0) {
+        toast.info(t('domain:editor.order.nothingToImport'));
+        return;
+      }
+      setState((current) =>
+        current
+          ? { ...current, lines: [...current.lines.filter((line) => !isBlankLine(line)), ...fresh] }
+          : current,
+      );
+      toast.success(t('domain:editor.order.imported', { count: fresh.length }));
+    } catch (error) {
+      toast.error(t('domain:editor.order.importError'), {
+        description: readableDbError(error) ?? undefined,
+      });
+    } finally {
+      setImportingOrder(false);
+    }
+  }
+
+  useEffect(() => {
+    const orderId = pendingOrderImport.current;
+    if (!orderId || !state) return;
+    pendingOrderImport.current = null;
+    void importOrderLines(orderId);
+    // Nur nach dem Anlegen aus `?auftrag=`; importOrderLines liest den Zustand selbst.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   if (id && existingLoading) return <PageSpinner />;
 
@@ -149,16 +256,37 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
   if (!state || !totals) return <PageSpinner />;
 
+  const isInvoice = isInvoiceEditorType(state.type);
+  // Beschriftungen unterscheiden nur Angebot und Rechnung, nicht die Rechnungsart.
+  const labelType = isInvoice ? 'invoice' : 'quote';
+
   // Nur bei Rechnungen: Bei Angeboten ist das Fällig-Feld ausgeblendet, ein
   // alter Wert darf das Speichern nicht über ein unsichtbares Feld sperren.
   const dueBeforeIssue = Boolean(
-    state.type === 'invoice' && state.issueDate && state.dueDate && state.dueDate < state.issueDate,
+    isInvoice && state.issueDate && state.dueDate && state.dueDate < state.issueDate,
   );
 
-  const invalidTerms = state.type === 'invoice' ? invalidTermFields(state) : [];
+  const invalidTerms = isInvoice ? invalidTermFields(state) : [];
+
+  const customer = (contacts.data ?? []).find((row) => row.id === state.customerId);
+  const notice = taxModeNotice(state.taxMode, taxProfile.data?.country);
+  // § 13b ohne USt-IdNr. ist nicht verboten (Bauleistung an einen Bauleister
+  // geht auch mit Steuernummer), aber meist ein Versehen. Gelesen wird der
+  // Kontakt, nicht die alte Kundentabelle.
+  const missingBuyerVatId =
+    state.taxMode === 'reverse_charge' && Boolean(customer) && !customer?.vat_id?.trim();
 
   function customerTerms(customerId: string | null) {
     return (contacts.data ?? []).find((row) => row.id === customerId)?.customer_terms ?? null;
+  }
+
+  // Auftrag wählen setzt den Kunden des Auftrags, wenn noch keiner gewählt ist.
+  // Positionen übernimmt erst der Knopf daneben — ein Wechsel des Auftrags soll
+  // nichts Getipptes überschreiben.
+  function selectOrder(orderId: string | null) {
+    const order = (orders.data ?? []).find((row) => row.id === orderId);
+    update({ orderId });
+    if (order?.customer_id && !state?.customerId) selectCustomer(order.customer_id);
   }
 
   // Leitweg-ID, Zahlungsziel und Skonto kommen aus dem Kundenprofil — nur in
@@ -199,7 +327,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     // ⚠️ Das Leistungsdatum ist bei Rechnungen Pflicht: ohne es lehnt
     // `finalize_sales_document` das Festschreiben ab. Lieber hier melden als
     // den Beleg fertig tippen lassen und erst am Ende scheitern.
-    if (state.type === 'invoice' && !state.serviceDate) {
+    if (isInvoice && !state.serviceDate) {
       setError(t('domain:editor.serviceDateRequired'));
       return;
     }
@@ -227,7 +355,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title={id ? t('domain:editor.editTitle') : t(`domain:editor.newTitle.${state.type}`)}
+        title={id ? t('domain:editor.editTitle') : t(`domain:editor.newTitle.${labelType}`)}
         description={t('domain:editor.draftHint')}
         actions={
           <div className="flex items-center gap-2">
@@ -271,6 +399,49 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
               {t('domain:editor.dueBeforeIssue')}
             </p>
           ) : null}
+          {isInvoice ? (
+            <div className="grid gap-2">
+              <Label htmlFor={typeFieldId}>{t('domain:editor.documentType')}</Label>
+              <Select
+                id={typeFieldId}
+                value={state.type}
+                onChange={(_, { value }) => update({ type: value as EditableDocumentType })}
+              >
+                {INVOICE_EDITOR_TYPES.map((value) => (
+                  <option key={value} value={value}>
+                    {t(`domain:editor.documentTypes.${value}`)}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          ) : null}
+          <div className="grid gap-2">
+            <Label htmlFor={orderFieldId}>{t('domain:editor.order.label')}</Label>
+            <div className="flex gap-2">
+              <Select
+                id={orderFieldId}
+                className="min-w-0 flex-1"
+                value={state.orderId ?? ''}
+                onChange={(_, { value }) => selectOrder(value || null)}
+              >
+                <option value="">{t('domain:editor.order.none')}</option>
+                {(orders.data ?? []).map((order) => (
+                  <option key={order.id} value={order.id}>
+                    {order.customer_label ? `${order.name} · ${order.customer_label}` : order.name}
+                  </option>
+                ))}
+              </Select>
+              {state.orderId ? (
+                <Button
+                  icon={<ArrowDownloadRegular />}
+                  disabled={importingOrder}
+                  onClick={() => state.orderId && void importOrderLines(state.orderId)}
+                >
+                  {t('domain:editor.order.import')}
+                </Button>
+              ) : null}
+            </div>
+          </div>
           <div className="grid gap-2">
             <Label htmlFor={customerFieldId}>{t('domain:invoices.columns.customer')}</Label>
             <ContactPicker
@@ -283,8 +454,29 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
             />
           </div>
 
+          <div className="grid gap-2">
+            <Label htmlFor={taxModeFieldId}>{t('domain:editor.taxMode.label')}</Label>
+            <Select
+              id={taxModeFieldId}
+              value={state.taxMode}
+              disabled={isSmallBusiness}
+              onChange={(_, { value }) => update({ taxMode: value as TaxMode })}
+            >
+              {TAX_MODES.map((mode) => (
+                <option key={mode} value={mode}>
+                  {t(`domain:editor.taxMode.modes.${mode}`)}
+                </option>
+              ))}
+            </Select>
+            {isSmallBusiness ? (
+              <p className="text-muted-foreground text-sm">
+                {t('domain:editor.taxMode.smallBusinessLocked')}
+              </p>
+            ) : null}
+          </div>
+
           <DateField
-            label={t(`domain:editor.issueDateLabel.${state.type}`)}
+            label={t(`domain:editor.issueDateLabel.${labelType}`)}
             value={state.issueDate}
             onChange={(value) => update({ issueDate: value })}
             placeholder={t('domain:editor.issueDatePlaceholder')}
@@ -295,7 +487,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
               PDF-Renderer immer als „Zahlbar bis“ — als „Gültig bis“
               beschriftet, stünde die Gültigkeit als Zahlungsziel im Angebot.
               Ein eigenes Gültigkeitsfeld braucht Schema und Renderer (#86). */}
-          {state.type === 'invoice' ? (
+          {isInvoice ? (
             <>
               <DateField
                 label={t('domain:editor.serviceDateRequiredLabel')}
@@ -343,6 +535,22 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
             </>
           ) : null}
         </div>
+        {notice ? (
+          <MessageBar intent="info">
+            <MessageBarBody>
+              <MessageBarTitle>{t('domain:editor.taxMode.noticeTitle')}</MessageBarTitle>
+              {notice}
+            </MessageBarBody>
+          </MessageBar>
+        ) : null}
+        {missingBuyerVatId ? (
+          <MessageBar intent="warning">
+            <MessageBarBody>
+              <MessageBarTitle>{t('domain:editor.taxMode.missingVatIdTitle')}</MessageBarTitle>
+              {t('domain:editor.taxMode.missingVatIdDescription')}
+            </MessageBarBody>
+          </MessageBar>
+        ) : null}
       </Card>
 
       <Card size="large">
@@ -432,13 +640,16 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
             <dl className="flex w-full max-w-xs flex-col gap-1 text-sm">
               <SumRow label={t('domain:invoices.net')} value={formatMoney(totals.netMinor)} />
-              {totals.byRate.map((group) => (
-                <SumRow
-                  key={group.rate}
-                  label={t('domain:invoices.vatAt', { rate: group.rate })}
-                  value={formatMoney(group.vatMinor)}
-                />
-              ))}
+              {/* Ohne Umsatzsteuer gibt es keine 0-%-Zeile: der Hinweis oben sagt warum. */}
+              {totals.byRate
+                .filter((group) => state.taxMode === 'standard' || group.vatMinor !== 0)
+                .map((group) => (
+                  <SumRow
+                    key={group.rate}
+                    label={t('domain:invoices.vatAt', { rate: group.rate })}
+                    value={formatMoney(group.vatMinor)}
+                  />
+                ))}
               <SumRow
                 label={t('domain:invoices.gross')}
                 value={formatMoney(totals.grossMinor)}

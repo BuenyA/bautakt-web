@@ -1,5 +1,5 @@
 import { Button, Link as FluentLink } from '@fluentui/react-components';
-import { EditRegular } from '@fluentui/react-icons';
+import { DocumentAddRegular, EditRegular } from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
@@ -12,6 +12,7 @@ import { PageSpinner } from '@/components/common/PageSpinner';
 import { RouterLink } from '@/components/common/RouterLink';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
+import { useFinanceAccess } from '@/features/finance/useFinanceAccess';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
@@ -30,6 +31,7 @@ export function OrderDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const canManage = usePermission('canManageOrders');
+  const { canWriteSalesDocuments } = useFinanceAccess();
   const [editing, setEditing] = useState(false);
   const order = useOrder(id);
   const { data, isError, refetch } = order;
@@ -86,6 +88,11 @@ export function OrderDetailPage() {
         actions={
           <div className="flex items-center gap-2">
             <LinkButton to={routes.orders}>{t('common:action.back')}</LinkButton>
+            {canWriteSalesDocuments ? (
+              <LinkButton to={routes.invoiceNewFromOrder(data.id)} icon={<DocumentAddRegular />}>
+                {t('domain:orders.createInvoice')}
+              </LinkButton>
+            ) : null}
             {canManage ? (
               <Button appearance="primary" onClick={() => setEditing(true)} icon={<EditRegular />}>
                 {t('common:action.edit')}
