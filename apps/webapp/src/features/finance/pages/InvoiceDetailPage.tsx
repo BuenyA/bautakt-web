@@ -1,5 +1,5 @@
 import { eurosToMinor, formatMoney } from '@bautakt/finance';
-import { StatusBadge, toast } from '@bautakt/ui';
+import { DeleteButton, StatusBadge, toast } from '@bautakt/ui';
 import {
   Button,
   Card,
@@ -24,7 +24,7 @@ import {
 } from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -38,6 +38,7 @@ import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
 import { DocumentStatusBadge } from '../DocumentStatusBadge';
+import { DraftDeleteDialog } from '../DraftDeleteDialog';
 import { PaymentSheet } from '../PaymentSheet';
 import { useFinalizeBlockers } from '../useFinalizeBlockers';
 import { useFinanceAccess } from '../useFinanceAccess';
@@ -65,6 +66,8 @@ export function InvoiceDetailPage() {
   const finalize = useFinalizeDocument(id);
   const { blockers } = useFinalizeBlockers(data);
   const [paymentOpen, setPaymentOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -154,6 +157,13 @@ export function InvoiceDetailPage() {
               >
                 {t('domain:invoices.finalize')}
               </Button>
+            ) : null}
+
+            {access.canWriteSalesDocuments && isDraft ? (
+              <DeleteButton
+                label={t('domain:invoices.deleteDraft.action')}
+                onClick={() => setDeleteOpen(true)}
+              />
             ) : null}
 
             {access.canWriteSalesDocuments && !isDraft && openMinor > 0 ? (
@@ -377,6 +387,15 @@ export function InvoiceDetailPage() {
         onOpenChange={setPaymentOpen}
         openMinor={openMinor}
       />
+
+      {isDraft ? (
+        <DraftDeleteDialog
+          documentId={data.id}
+          open={deleteOpen}
+          onOpenChange={setDeleteOpen}
+          onDeleted={() => void navigate(routes.invoices, { replace: true })}
+        />
+      ) : null}
     </div>
   );
 }

@@ -32,6 +32,12 @@ const MESSAGES: Record<string, string> = {
     'Dem Beleg fehlt das Leistungsdatum. Es steht auf jeder Rechnung und ist Pflicht.',
   MISSING_SELLER_TAX_ID:
     'Dem Betrieb fehlt Steuernummer und USt-IdNr. Ohne eine der beiden ist die Rechnung nach EN16931 nicht gültig.',
+  // GoBD-Sperren (bautakt-app 20261016175518_a_gobd_locks): Kopf, Positionen,
+  // Archivfelder und Löschen eines festgeschriebenen Belegs.
+  DOCUMENT_IMMUTABLE:
+    'Dieser Beleg ist festgeschrieben und lässt sich nicht mehr ändern oder löschen. Korrigieren kannst du ihn nur noch per Storno.',
+  DOCUMENT_FINALIZE_VIA_RPC:
+    'Ein Beleg wird nur über „Festschreiben“ ausgestellt. Bitte lade die Seite neu und versuche es noch einmal.',
   // Kontakte (Migration 20261014204410). Unique-Verletzungen tragen den Namen
   // des Index in der Meldung.
   customer_profiles_number_unique: 'Diese Kundennummer ist schon vergeben.',

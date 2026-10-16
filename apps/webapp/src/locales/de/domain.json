@@ -604,6 +604,15 @@
     "finalize": "Festschreiben",
     "finalizeSuccess": "Beleg festgeschrieben und nummeriert.",
     "finalizeError": "Festschreiben nicht möglich",
+    "deleteDraft": {
+      "action": "Entwurf löschen",
+      "title": "Entwurf löschen?",
+      "description": "Der Entwurf und seine Positionen werden endgültig gelöscht. Das lässt sich nicht rückgängig machen.",
+      "confirm": "Löschen",
+      "pending": "Wird gelöscht …",
+      "deleted": "Entwurf gelöscht",
+      "error": "Der Entwurf konnte nicht gelöscht werden. Lade die Seite neu und versuche es noch einmal."
+    },
     "notFoundTitle": "Beleg nicht gefunden",
     "notFoundDescription": "Dieser Beleg existiert nicht oder ist für dich nicht sichtbar.",
     "new": "Neue Rechnung",
