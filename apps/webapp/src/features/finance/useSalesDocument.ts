@@ -231,6 +231,29 @@ export function useArchiveDocument(documentId: string | undefined) {
 const ARCHIVE_URL_TTL_SECONDS = 300;
 
 /** Signierte URL auf das Archiv-Original. */
+/**
+ * Archiv-Original als Bytes für die eingebettete Ansicht (#152). Die Datei
+ * ändert sich nach dem Festschreiben nie mehr — einmal geladen, bleibt sie im
+ * Cache. queryKey beginnt mit dem Mandanten.
+ */
+export function useArchivedPdf(storagePath: string | null | undefined) {
+  const { data: membership } = useMembership();
+  const companyId = membership?.companyId;
+
+  return useQuery({
+    queryKey: ['archived-pdf', companyId, storagePath],
+    enabled: Boolean(companyId && storagePath),
+    staleTime: Infinity,
+    queryFn: async (): Promise<Uint8Array> => {
+      const { data, error } = await supabase.storage
+        .from('finance-documents')
+        .download(storagePath!);
+      if (error || !data) throw error ?? new Error('ARCHIVE_MISSING');
+      return new Uint8Array(await data.arrayBuffer());
+    },
+  });
+}
+
 export async function archivedPdfUrl(storagePath: string): Promise<string> {
   const { data, error } = await supabase.storage
     .from('finance-documents')
