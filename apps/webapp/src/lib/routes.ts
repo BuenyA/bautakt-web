@@ -21,6 +21,9 @@ export function withCreate(path: string): string {
 /** Query der alten Zeitenliste `/zeiten?order=…`; die Umleitung liest ihn noch. */
 export const legacyTimesOrderParam = 'order';
 
+/** Query von `/rechnungen/neu?auftrag=…`: der Editor übernimmt diesen Auftrag. */
+export const invoiceFromOrderParam = 'auftrag';
+
 export const routes = {
   // Oeffentlich
   login: '/login',
@@ -49,6 +52,9 @@ export const routes = {
   invoices: '/rechnungen/ausgang',
   invoice: (id: string) => `/rechnungen/${id}`,
   invoiceNew: '/rechnungen/neu',
+  /** Neue Rechnung mit Kunde und Positionen eines Auftrags (`?auftrag=`). */
+  invoiceNewFromOrder: (orderId: string) =>
+    `/rechnungen/neu?${invoiceFromOrderParam}=${encodeURIComponent(orderId)}`,
   invoiceEdit: (id: string) => `/rechnungen/${id}/bearbeiten`,
   invoicePrint: (id: string) => `/rechnungen/${id}/druck`,
   receivables: '/offene-posten',

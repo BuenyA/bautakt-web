@@ -166,7 +166,8 @@
       "endBeforeStart": "Das Ende liegt vor dem Beginn.",
       "saved": "Auftrag gespeichert.",
       "saveError": "Auftrag konnte nicht gespeichert werden."
-    }
+    },
+    "createInvoice": "Rechnung erstellen"
   },
   "contactKind": {
     "company": "Firma",
@@ -1200,6 +1201,7 @@
       "labor": "Arbeit",
       "material": "Material",
       "other": "Sonstiges",
+      "discount": "Nachlass",
       "text": "Textzeile"
     },
     "addLine": "Position hinzufügen",
@@ -1224,7 +1226,35 @@
     "skontoDays": "Skonto innerhalb (Tage)",
     "dueFromTerm_one": "Leer: Rechnungsdatum plus {{count}} Tag",
     "dueFromTerm_other": "Leer: Rechnungsdatum plus {{count}} Tage",
-    "termsInvalid": "Zahlungsziel und Skonto-Tage bitte als ganze Zahl, Skonto als Prozentsatz unter 100 angeben."
+    "termsInvalid": "Zahlungsziel und Skonto-Tage bitte als ganze Zahl, Skonto als Prozentsatz unter 100 angeben.",
+    "documentType": "Belegart",
+    "documentTypes": {
+      "invoice": "Rechnung",
+      "partial_invoice": "Abschlagsrechnung",
+      "final_invoice": "Schlussrechnung"
+    },
+    "order": {
+      "label": "Auftrag",
+      "none": "Kein Auftrag",
+      "import": "Positionen übernehmen",
+      "imported_one": "{{count}} Position aus dem Auftrag übernommen.",
+      "imported_other": "{{count}} Positionen aus dem Auftrag übernommen.",
+      "nothingToImport": "Der Auftrag hat keine offenen Zeiten oder Material zum Abrechnen.",
+      "importError": "Positionen aus dem Auftrag konnten nicht geladen werden"
+    },
+    "taxMode": {
+      "label": "Umsatzsteuer",
+      "modes": {
+        "standard": "Regulär (mit USt)",
+        "reverse_charge": "§ 13b – Steuerschuld beim Kunden",
+        "tax_free": "Steuerfrei",
+        "small_business": "Kleinunternehmer (§ 19)"
+      },
+      "smallBusinessLocked": "Dein Betrieb ist als Kleinunternehmer eingetragen. Die Rechnung enthält keine Umsatzsteuer.",
+      "noticeTitle": "Steht so auf der Rechnung:",
+      "missingVatIdTitle": "USt-IdNr. des Kunden fehlt",
+      "missingVatIdDescription": "Am Kontakt ist keine USt-IdNr. hinterlegt. Prüfe, ob § 13b hier greift, und ergänze sie am Kontakt."
+    }
   },
   "photoForm": {
     "upload": "Fotos hochladen",

@@ -91,3 +91,4 @@ export {
   type YearResult,
   type YearResultInput,
 } from './result';
+export { TAX_MODES, type TaxMode, taxModeChargesVat, taxModeNotice, toTaxMode } from './taxMode';
