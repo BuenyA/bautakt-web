@@ -177,6 +177,41 @@ export function useFinalizeDocument(documentId: string | undefined) {
   });
 }
 
+/**
+ * Entwurf löschen.
+ *
+ * Nur Entwürfe: festgeschriebene Belege sperrt die Datenbank
+ * (`trg_sales_documents_block_delete`), sie lassen sich nur stornieren. Der
+ * Statusfilter steht trotzdem hier, damit ein zwischenzeitlich festgeschriebener
+ * Beleg nicht erst am Trigger scheitert. Positionen gehen per Kaskade mit.
+ *
+ * RLS filtert verweigerte Zeilen still weg; ohne zurückgegebene Zeile gilt das
+ * Löschen deshalb als gescheitert.
+ */
+export function useDeleteDraft(documentId: string | undefined) {
+  const queryClient = useQueryClient();
+  const { data: membership } = useMembership();
+  const companyId = membership?.companyId;
+
+  return useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase
+        .from('sales_documents')
+        .delete()
+        .eq('company_id', companyId!)
+        .eq('id', documentId!)
+        .eq('status', 'draft')
+        .select('id');
+      if (error) throw error;
+      if (!data || data.length === 0) throw new Error('DRAFT_NOT_DELETED');
+    },
+    onSuccess: async () => {
+      queryClient.removeQueries({ queryKey: ['sales-document', companyId, documentId] });
+      await queryClient.invalidateQueries({ queryKey: ['sales-documents', companyId] });
+    },
+  });
+}
+
 export type NewPayment = {
   amountMajor: number;
   skontoMajor: number;
