@@ -614,7 +614,8 @@
       "creating": "Wird erzeugt …",
       "created": "Original-PDF erzeugt",
       "createError": "Das Original-PDF konnte nicht erzeugt werden",
-      "finalizedWithoutArchive": "Beleg festgeschrieben, aber das Original-PDF fehlt noch. Erzeuge es auf der Belegseite."
+      "finalizedWithoutArchive": "Beleg festgeschrieben, aber das Original-PDF fehlt noch. Erzeuge es auf der Belegseite.",
+      "viewerTitle": "Original (Archiv, schreibgeschützt)"
     },
     "deleteDraft": {
       "action": "Entwurf löschen",
@@ -1254,6 +1255,23 @@
       "noticeTitle": "Steht so auf der Rechnung:",
       "missingVatIdTitle": "USt-IdNr. des Kunden fehlt",
       "missingVatIdDescription": "Am Kontakt ist keine USt-IdNr. hinterlegt. Prüfe, ob § 13b hier greift, und ergänze sie am Kontakt."
+    },
+    "saveAndClose": "Speichern und schließen",
+    "sections": {
+      "document": "Beleg",
+      "recipient": "Empfänger",
+      "dates": "Belegdaten",
+      "payment": "Zahlungsbedingungen"
+    },
+    "preview": {
+      "title": "PDF-Vorschau",
+      "saving": "Speichert …",
+      "saved": "Entwurf gespeichert",
+      "notSaved": "Noch nicht gespeichert",
+      "error": "Die Vorschau konnte nicht erzeugt werden.",
+      "empty": "Die Vorschau erscheint, sobald du etwas einträgst.",
+      "refresh": "Aktualisieren",
+      "warningsTitle": "Hinweise zur E-Rechnung"
     }
   },
   "photoForm": {
@@ -1596,5 +1614,17 @@
     },
     "saved": "Nummernkreis gespeichert",
     "saveError": "Konnte nicht gespeichert werden."
+  },
+  "pdfViewer": {
+    "toolbar": "PDF-Ansicht",
+    "pageLabel": "Seite {{page}} von {{count}}",
+    "zoomOut": "Verkleinern",
+    "zoomIn": "Vergrößern",
+    "fit": "Breite",
+    "fitWidth": "An Breite anpassen",
+    "updating": "Wird aktualisiert",
+    "loading": "PDF wird geladen",
+    "renderError": "Das PDF lässt sich nicht anzeigen.",
+    "empty": "Kein PDF vorhanden."
   }
 }

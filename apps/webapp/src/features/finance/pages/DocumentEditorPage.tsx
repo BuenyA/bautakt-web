@@ -20,9 +20,15 @@ import {
   Select,
   Text,
   Textarea,
+  Tooltip,
 } from '@fluentui/react-components';
-import { AddRegular, ArrowDownloadRegular, DeleteRegular } from '@fluentui/react-icons';
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import {
+  AddRegular,
+  ArrowDownloadRegular,
+  ArrowSyncRegular,
+  DeleteRegular,
+} from '@fluentui/react-icons';
+import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 
@@ -40,6 +46,7 @@ import { readableDbError } from '@/lib/dbErrors';
 import { invoiceFromOrderParam, routes } from '@/lib/routes';
 
 import { invalidTermFields, prefillCustomerTerms } from '../customerTerms';
+import { PdfViewer } from '../PdfViewer';
 import {
   type EditableDocumentType,
   type EditorLine,
@@ -55,6 +62,7 @@ import {
   useCompanyTaxProfile,
   useSaveDraft,
 } from '../useDocumentEditor';
+import { useLivePreview } from '../useLivePreview';
 import { useSalesDocument } from '../useSalesDocument';
 
 function initialState(type: EditableDocumentType, taxMode: TaxMode): EditorState {
@@ -86,17 +94,17 @@ function numberText(value: number | null): string {
 /**
  * Editor fuer Angebote und Rechnungen.
  *
- * Eigene Seite statt Seitenpanel: eine Positionsliste mit Menge, Einzelpreis,
- * Rabatt und Steuersatz braucht die volle Breite. Kurze Formulare bleiben
- * Panels.
+ * Split-Screen (#152): links das Formular in der Reihenfolge des PDFs, rechts
+ * das echte PDF aus `finance-document-render`. Jede Änderung wird nach einer
+ * Tipp-Pause bzw. beim Verlassen des Felds als Entwurf gespeichert und neu
+ * gerendert (`useLivePreview`) — die Vorschau ist so dasselbe PDF, das beim
+ * Festschreiben entsteht, bis auf Nummer und Entwurfs-Wasserzeichen.
  *
  * ⚠️ Nur Entwuerfe. Festgeschriebene Belege sperrt die Datenbank
  * (`enforce_sales_document_immutability`) — sie hier zum Bearbeiten anzubieten
  * hiesse, dem Nutzer einen Speichern-Knopf zu zeigen, der scheitern muss.
  */
 export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
-  const footerFieldId = useId();
-  const introFieldId = useId();
   const customerFieldId = useId();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -114,7 +122,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const contacts = useContacts();
   const orders = useOrders();
   const taxProfile = useCompanyTaxProfile();
-  const save = useSaveDraft(id);
+  const save = useSaveDraft();
   const existingLoading = useCompanyListLoading(existing);
 
   const [state, setState] = useState<EditorState | null>(null);
@@ -200,6 +208,15 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
   const totals = useMemo(() => (state ? editorTotals(state.lines, state.taxMode) : null), [state]);
 
+  const isLocked = Boolean(id && existing.data && existing.data.status !== 'draft');
+  const live = useLivePreview({
+    state,
+    initialDocumentId: id ?? null,
+    save: (current, documentId) => save.mutateAsync({ state: current, documentId }),
+    enabled: state !== null && !isLocked,
+  });
+  const [saving, setSaving] = useState(false);
+
   async function importOrderLines(orderId: string) {
     const companyId = membership?.companyId;
     if (!companyId) return;
@@ -241,7 +258,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
   if (id && existingLoading) return <PageSpinner />;
 
-  if (id && existing.data && existing.data.status !== 'draft') {
+  if (isLocked && id) {
     return (
       <div className="flex flex-col gap-6">
         <PageHeader title={t('domain:editor.title')} />
@@ -341,33 +358,50 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     }
 
     setError(null);
+    setSaving(true);
     try {
-      const savedId = await save.mutateAsync(state);
+      // Über dieselbe Kette wie die Live-Vorschau, nie parallel dazu.
+      const savedId = await live.persist();
       toast.success(t('domain:editor.saved'));
-      void navigate(routes.invoice(savedId));
+      if (savedId) void navigate(routes.invoice(savedId));
     } catch (error) {
       toast.error(t('domain:editor.saveError'), {
         description: readableDbError(error) ?? undefined,
       });
+    } finally {
+      setSaving(false);
     }
   }
 
+  const previewError = live.error
+    ? (readableDbError(live.error) ?? t('domain:editor.preview.error'))
+    : null;
+  const statusText =
+    live.phase === 'saving'
+      ? t('domain:editor.preview.saving')
+      : live.documentId
+        ? t('domain:editor.preview.saved')
+        : t('domain:editor.preview.notSaved');
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       <PageHeader
         title={id ? t('domain:editor.editTitle') : t(`domain:editor.newTitle.${labelType}`)}
         description={t('domain:editor.draftHint')}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <Text size={200} className="text-muted-foreground" aria-live="polite">
+              {statusText}
+            </Text>
             <LinkButton to={state.type === 'quote' ? routes.quotes : routes.invoices}>
-              {t('common:action.cancel')}
+              {t('common:action.close')}
             </LinkButton>
             <Button
               appearance="primary"
-              disabled={save.isPending || dueBeforeIssue}
+              disabled={saving || dueBeforeIssue}
               onClick={() => void onSave()}
             >
-              {t('common:action.save')}
+              {t('domain:editor.saveAndClose')}
             </Button>
           </div>
         }
@@ -379,317 +413,377 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
         </MessageBar>
       ) : null}
 
-      <Card size="large">
-        <CardHeader
-          header={
-            <Text as="h2" size={400} weight="semibold">
-              {t('domain:editor.head')}
-            </Text>
-          }
-        />
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {/* Ueber den Feldern: der Kalender oeffnet nach unten und wuerde
-              die Meldung direkt unter dem Faellig-Feld verdecken. */}
-          {dueBeforeIssue ? (
-            <p
-              id={dueAlertId}
-              role="alert"
-              className="text-destructive text-sm sm:col-span-2 xl:col-span-4"
-            >
-              {t('domain:editor.dueBeforeIssue')}
-            </p>
-          ) : null}
-          {isInvoice ? (
-            <div className="grid gap-2">
-              <Label htmlFor={typeFieldId}>{t('domain:editor.documentType')}</Label>
-              <Select
-                id={typeFieldId}
-                value={state.type}
-                onChange={(_, { value }) => update({ type: value as EditableDocumentType })}
-              >
-                {INVOICE_EDITOR_TYPES.map((value) => (
-                  <option key={value} value={value}>
-                    {t(`domain:editor.documentTypes.${value}`)}
-                  </option>
-                ))}
-              </Select>
-            </div>
-          ) : null}
-          <div className="grid gap-2">
-            <Label htmlFor={orderFieldId}>{t('domain:editor.order.label')}</Label>
-            <div className="flex gap-2">
-              <Select
-                id={orderFieldId}
-                className="min-w-0 flex-1"
-                value={state.orderId ?? ''}
-                onChange={(_, { value }) => selectOrder(value || null)}
-              >
-                <option value="">{t('domain:editor.order.none')}</option>
-                {(orders.data ?? []).map((order) => (
-                  <option key={order.id} value={order.id}>
-                    {order.customer_label ? `${order.name} · ${order.customer_label}` : order.name}
-                  </option>
-                ))}
-              </Select>
-              {state.orderId ? (
-                <Button
-                  icon={<ArrowDownloadRegular />}
-                  disabled={importingOrder}
-                  onClick={() => state.orderId && void importOrderLines(state.orderId)}
-                >
-                  {t('domain:editor.order.import')}
-                </Button>
+      {/* Split-Screen: links das Formular in der Reihenfolge des PDFs, rechts
+          das PDF selbst. Unter xl untereinander, die Vorschau unten. */}
+      <div className="grid gap-6 xl:grid-cols-2">
+        <div className="flex min-w-0 flex-col gap-4" onBlur={() => live.flush()}>
+          <Section title={t('domain:editor.sections.document')}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {isInvoice ? (
+                <div className="grid gap-2">
+                  <Label htmlFor={typeFieldId}>{t('domain:editor.documentType')}</Label>
+                  <Select
+                    id={typeFieldId}
+                    value={state.type}
+                    onChange={(_, { value }) => update({ type: value as EditableDocumentType })}
+                  >
+                    {INVOICE_EDITOR_TYPES.map((value) => (
+                      <option key={value} value={value}>
+                        {t(`domain:editor.documentTypes.${value}`)}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
               ) : null}
+              <div className="grid gap-2">
+                <Label htmlFor={orderFieldId}>{t('domain:editor.order.label')}</Label>
+                <div className="flex gap-2">
+                  <Select
+                    id={orderFieldId}
+                    className="min-w-0 flex-1"
+                    value={state.orderId ?? ''}
+                    onChange={(_, { value }) => selectOrder(value || null)}
+                  >
+                    <option value="">{t('domain:editor.order.none')}</option>
+                    {(orders.data ?? []).map((order) => (
+                      <option key={order.id} value={order.id}>
+                        {order.customer_label
+                          ? `${order.name} · ${order.customer_label}`
+                          : order.name}
+                      </option>
+                    ))}
+                  </Select>
+                  {state.orderId ? (
+                    <Tooltip content={t('domain:editor.order.import')} relationship="label">
+                      <Button
+                        icon={<ArrowDownloadRegular />}
+                        disabled={importingOrder}
+                        onClick={() => state.orderId && void importOrderLines(state.orderId)}
+                      />
+                    </Tooltip>
+                  ) : null}
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor={customerFieldId}>{t('domain:invoices.columns.customer')}</Label>
-            <ContactPicker
-              id={customerFieldId}
-              contactRole="customer"
-              value={state.customerId}
-              onChange={(contact) => selectCustomer(contact?.id ?? null)}
-              allowNone
-              noneLabel={t('domain:invoices.noCustomer')}
-            />
-          </div>
+          </Section>
 
-          <div className="grid gap-2">
-            <Label htmlFor={taxModeFieldId}>{t('domain:editor.taxMode.label')}</Label>
-            <Select
-              id={taxModeFieldId}
-              value={state.taxMode}
-              disabled={isSmallBusiness}
-              onChange={(_, { value }) => update({ taxMode: value as TaxMode })}
-            >
-              {TAX_MODES.map((mode) => (
-                <option key={mode} value={mode}>
-                  {t(`domain:editor.taxMode.modes.${mode}`)}
-                </option>
-              ))}
-            </Select>
-            {isSmallBusiness ? (
-              <p className="text-muted-foreground text-sm">
-                {t('domain:editor.taxMode.smallBusinessLocked')}
-              </p>
-            ) : null}
-          </div>
-
-          <DateField
-            label={t(`domain:editor.issueDateLabel.${labelType}`)}
-            value={state.issueDate}
-            onChange={(value) => update({ issueDate: value })}
-            placeholder={t('domain:editor.issueDatePlaceholder')}
-            hint={state.issueDate ? undefined : t('domain:editor.issueDateEmptyHint')}
-          />
-          {/* Angebote: kein Leistungsdatum (keine Pflichtangabe, die App zeigt
-              es dort auch nicht) und kein Fällig-Feld. `due_date` druckt der
-              PDF-Renderer immer als „Zahlbar bis“ — als „Gültig bis“
-              beschriftet, stünde die Gültigkeit als Zahlungsziel im Angebot.
-              Ein eigenes Gültigkeitsfeld braucht Schema und Renderer (#86). */}
-          {isInvoice ? (
-            <>
-              <DateField
-                label={t('domain:editor.serviceDateRequiredLabel')}
-                value={state.serviceDate}
-                onChange={(value) => update({ serviceDate: value })}
-              />
-              <DateField
-                label={t('domain:editor.dueDateLabel')}
-                value={state.dueDate}
-                onChange={(value) => update({ dueDate: value })}
-                describedBy={dueBeforeIssue ? dueAlertId : undefined}
-                invalid={dueBeforeIssue}
-                hint={
-                  !state.dueDate && state.paymentTermDays.trim()
-                    ? t('domain:editor.dueFromTerm', { count: Number(state.paymentTermDays) || 0 })
-                    : undefined
-                }
-              />
-              <Field
-                label={t('domain:invoices.buyerReference')}
-                value={state.buyerReference}
-                onChange={(value) => update({ buyerReference: value })}
-              />
-              <Field
-                label={t('domain:editor.paymentTermDays')}
-                value={state.paymentTermDays}
-                onChange={(value) => update({ paymentTermDays: value })}
-                numeric
-                invalid={invalidTerms.includes('paymentTermDays')}
-              />
-              <Field
-                label={t('domain:editor.skontoPercent')}
-                value={state.skontoPercent}
-                onChange={(value) => update({ skontoPercent: value })}
-                numeric
-                invalid={invalidTerms.includes('skontoPercent')}
-              />
-              <Field
-                label={t('domain:editor.skontoDays')}
-                value={state.skontoDays}
-                onChange={(value) => update({ skontoDays: value })}
-                numeric
-                invalid={invalidTerms.includes('skontoDays')}
-              />
-            </>
-          ) : null}
-        </div>
-        {notice ? (
-          <MessageBar intent="info">
-            <MessageBarBody>
-              <MessageBarTitle>{t('domain:editor.taxMode.noticeTitle')}</MessageBarTitle>
-              {notice}
-            </MessageBarBody>
-          </MessageBar>
-        ) : null}
-        {missingBuyerVatId ? (
-          <MessageBar intent="warning">
-            <MessageBarBody>
-              <MessageBarTitle>{t('domain:editor.taxMode.missingVatIdTitle')}</MessageBarTitle>
-              {t('domain:editor.taxMode.missingVatIdDescription')}
-            </MessageBarBody>
-          </MessageBar>
-        ) : null}
-      </Card>
-
-      <Card size="large">
-        <CardHeader
-          header={
-            <Text as="h2" size={400} weight="semibold">
-              {t('domain:invoices.lines')}
-            </Text>
-          }
-        />
-        <div className="flex flex-col gap-3">
-          {state.lines.map((line) => (
-            <div
-              key={line.key}
-              className="border-border grid gap-3 rounded-lg border p-3 xl:grid-cols-[1fr_8rem_6rem_7rem_6rem_6rem_7rem_2.5rem]"
-            >
-              <Field
-                label={t('domain:invoices.lineColumns.title')}
-                value={line.title}
-                onChange={(value) => updateLine(line.key, { title: value })}
-              />
+          <Section title={t('domain:editor.sections.recipient')}>
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
-                <Label htmlFor={`line-${line.key}-kind`}>{t('domain:editor.kind')}</Label>
-                <Select
-                  id={`line-${line.key}-kind`}
-                  value={line.kind}
-                  onChange={(_, { value }) =>
-                    updateLine(line.key, { kind: value as EditorLine['kind'] })
-                  }
-                >
-                  {LINE_KINDS.map((kind) => (
-                    <option key={kind} value={kind}>
-                      {t(`domain:editor.kinds.${kind}`)}
-                    </option>
-                  ))}
-                </Select>
-              </div>
-              <Field
-                label={t('domain:invoices.lineColumns.quantity')}
-                value={line.quantity}
-                onChange={(value) => updateLine(line.key, { quantity: value })}
-                numeric
-              />
-              <Field
-                label={t('domain:editor.unit')}
-                value={line.unit}
-                onChange={(value) => updateLine(line.key, { unit: value })}
-              />
-              <Field
-                label={t('domain:invoices.lineColumns.unitPrice')}
-                value={line.unitPrice}
-                onChange={(value) => updateLine(line.key, { unitPrice: value })}
-                numeric
-              />
-              <Field
-                label={t('domain:editor.discount')}
-                value={line.discountPercent}
-                onChange={(value) => updateLine(line.key, { discountPercent: value })}
-                numeric
-              />
-              <div className="grid gap-2">
-                <Label>{t('domain:invoices.lineColumns.net')}</Label>
-                <span className="text-foreground flex h-9 items-center justify-end text-sm font-medium tabular-nums">
-                  {line.kind === 'text' ? '—' : formatMoney(lineNetMinor(line))}
-                </span>
-              </div>
-              <div className="flex items-end justify-end">
-                <DangerIconButton
-                  aria-label={t('domain:editor.removeLine')}
-                  disabled={state.lines.length === 1}
-                  onClick={() =>
-                    update({ lines: state.lines.filter((entry) => entry.key !== line.key) })
-                  }
-                  icon={<DeleteRegular />}
+                <Label htmlFor={customerFieldId}>{t('domain:invoices.columns.customer')}</Label>
+                <ContactPicker
+                  id={customerFieldId}
+                  contactRole="customer"
+                  value={state.customerId}
+                  onChange={(contact) => selectCustomer(contact?.id ?? null)}
+                  allowNone
+                  noneLabel={t('domain:invoices.noCustomer')}
                 />
               </div>
+              {isInvoice ? (
+                <Field
+                  label={t('domain:invoices.buyerReference')}
+                  value={state.buyerReference}
+                  onChange={(value) => update({ buyerReference: value })}
+                />
+              ) : null}
             </div>
-          ))}
+          </Section>
 
-          <div className="flex items-center justify-between gap-4">
-            <Button
-              onClick={() => update({ lines: [...state.lines, emptyLine()] })}
-              icon={<AddRegular />}
-            >
-              {t('domain:editor.addLine')}
-            </Button>
-
-            <dl className="flex w-full max-w-xs flex-col gap-1 text-sm">
-              <SumRow label={t('domain:invoices.net')} value={formatMoney(totals.netMinor)} />
-              {/* Ohne Umsatzsteuer gibt es keine 0-%-Zeile: der Hinweis oben sagt warum. */}
-              {totals.byRate
-                .filter((group) => state.taxMode === 'standard' || group.vatMinor !== 0)
-                .map((group) => (
-                  <SumRow
-                    key={group.rate}
-                    label={t('domain:invoices.vatAt', { rate: group.rate })}
-                    value={formatMoney(group.vatMinor)}
-                  />
-                ))}
-              <SumRow
-                label={t('domain:invoices.gross')}
-                value={formatMoney(totals.grossMinor)}
-                strong
+          <Section title={t('domain:editor.sections.dates')}>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {/* Ueber den Feldern: der Kalender oeffnet nach unten und wuerde
+                  die Meldung direkt unter dem Faellig-Feld verdecken. */}
+              {dueBeforeIssue ? (
+                <p id={dueAlertId} role="alert" className="text-destructive text-sm sm:col-span-3">
+                  {t('domain:editor.dueBeforeIssue')}
+                </p>
+              ) : null}
+              <DateField
+                label={t(`domain:editor.issueDateLabel.${labelType}`)}
+                value={state.issueDate}
+                onChange={(value) => update({ issueDate: value })}
+                placeholder={t('domain:editor.issueDatePlaceholder')}
+                hint={state.issueDate ? undefined : t('domain:editor.issueDateEmptyHint')}
               />
-            </dl>
-          </div>
-        </div>
-      </Card>
+              {/* Angebote: kein Leistungsdatum (keine Pflichtangabe, die App zeigt
+                  es dort auch nicht) und kein Fällig-Feld. `due_date` druckt der
+                  PDF-Renderer immer als „Zahlbar bis“ — als „Gültig bis“
+                  beschriftet, stünde die Gültigkeit als Zahlungsziel im Angebot.
+                  Ein eigenes Gültigkeitsfeld braucht Schema und Renderer (#86). */}
+              {isInvoice ? (
+                <>
+                  <DateField
+                    label={t('domain:editor.serviceDateRequiredLabel')}
+                    value={state.serviceDate}
+                    onChange={(value) => update({ serviceDate: value })}
+                  />
+                  <DateField
+                    label={t('domain:editor.dueDateLabel')}
+                    value={state.dueDate}
+                    onChange={(value) => update({ dueDate: value })}
+                    describedBy={dueBeforeIssue ? dueAlertId : undefined}
+                    invalid={dueBeforeIssue}
+                    hint={
+                      !state.dueDate && state.paymentTermDays.trim()
+                        ? t('domain:editor.dueFromTerm', {
+                            count: Number(state.paymentTermDays) || 0,
+                          })
+                        : undefined
+                    }
+                  />
+                </>
+              ) : null}
+            </div>
+          </Section>
 
-      <Card size="large">
-        <CardHeader
-          header={
-            <Text as="h2" size={400} weight="semibold">
-              {t('domain:editor.texts')}
-            </Text>
-          }
-        />
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div className="grid gap-2">
-            <Label htmlFor={introFieldId}>{t('domain:editor.intro')}</Label>
+          <Section title={t('domain:editor.intro')}>
             <Textarea
-              id={introFieldId}
+              aria-label={t('domain:editor.intro')}
               rows={3}
               value={state.introText}
               onChange={(event) => update({ introText: event.target.value })}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor={footerFieldId}>{t('domain:editor.footer')}</Label>
+          </Section>
+
+          <Section title={t('domain:invoices.lines')}>
+            <div className="flex flex-col gap-3">
+              {state.lines.map((line) => (
+                <div
+                  key={line.key}
+                  className="border-border grid gap-3 rounded-lg border p-3 sm:grid-cols-6"
+                >
+                  <div className="sm:col-span-4">
+                    <Field
+                      label={t('domain:invoices.lineColumns.title')}
+                      value={line.title}
+                      onChange={(value) => updateLine(line.key, { title: value })}
+                    />
+                  </div>
+                  <div className="grid gap-2 sm:col-span-2">
+                    <Label htmlFor={`line-${line.key}-kind`}>{t('domain:editor.kind')}</Label>
+                    <Select
+                      id={`line-${line.key}-kind`}
+                      value={line.kind}
+                      onChange={(_, { value }) =>
+                        updateLine(line.key, { kind: value as EditorLine['kind'] })
+                      }
+                    >
+                      {LINE_KINDS.map((kind) => (
+                        <option key={kind} value={kind}>
+                          {t(`domain:editor.kinds.${kind}`)}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+                  <Field
+                    label={t('domain:invoices.lineColumns.quantity')}
+                    value={line.quantity}
+                    onChange={(value) => updateLine(line.key, { quantity: value })}
+                    numeric
+                  />
+                  <Field
+                    label={t('domain:editor.unit')}
+                    value={line.unit}
+                    onChange={(value) => updateLine(line.key, { unit: value })}
+                  />
+                  <Field
+                    label={t('domain:invoices.lineColumns.unitPrice')}
+                    value={line.unitPrice}
+                    onChange={(value) => updateLine(line.key, { unitPrice: value })}
+                    numeric
+                  />
+                  <Field
+                    label={t('domain:editor.discount')}
+                    value={line.discountPercent}
+                    onChange={(value) => updateLine(line.key, { discountPercent: value })}
+                    numeric
+                  />
+                  <div className="grid gap-2">
+                    <Label>{t('domain:invoices.lineColumns.net')}</Label>
+                    <span className="text-foreground flex h-9 items-center justify-end text-sm font-medium tabular-nums">
+                      {line.kind === 'text' ? '—' : formatMoney(lineNetMinor(line))}
+                    </span>
+                  </div>
+                  <div className="flex items-end justify-end">
+                    <DangerIconButton
+                      aria-label={t('domain:editor.removeLine')}
+                      disabled={state.lines.length === 1}
+                      onClick={() =>
+                        update({ lines: state.lines.filter((entry) => entry.key !== line.key) })
+                      }
+                      icon={<DeleteRegular />}
+                    />
+                  </div>
+                </div>
+              ))}
+
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <Button
+                  onClick={() => update({ lines: [...state.lines, emptyLine()] })}
+                  icon={<AddRegular />}
+                >
+                  {t('domain:editor.addLine')}
+                </Button>
+
+                <dl className="flex w-full max-w-xs flex-col gap-1 text-sm">
+                  <SumRow label={t('domain:invoices.net')} value={formatMoney(totals.netMinor)} />
+                  {/* Ohne Umsatzsteuer gibt es keine 0-%-Zeile: der Hinweis unten sagt warum. */}
+                  {totals.byRate
+                    .filter((group) => state.taxMode === 'standard' || group.vatMinor !== 0)
+                    .map((group) => (
+                      <SumRow
+                        key={group.rate}
+                        label={t('domain:invoices.vatAt', { rate: group.rate })}
+                        value={formatMoney(group.vatMinor)}
+                      />
+                    ))}
+                  <SumRow
+                    label={t('domain:invoices.gross')}
+                    value={formatMoney(totals.grossMinor)}
+                    strong
+                  />
+                </dl>
+              </div>
+            </div>
+          </Section>
+
+          <Section title={t('domain:editor.taxMode.label')}>
+            <div className="flex flex-col gap-3">
+              <div className="grid gap-2 sm:max-w-sm">
+                <Label htmlFor={taxModeFieldId} className="sr-only">
+                  {t('domain:editor.taxMode.label')}
+                </Label>
+                <Select
+                  id={taxModeFieldId}
+                  value={state.taxMode}
+                  disabled={isSmallBusiness}
+                  onChange={(_, { value }) => update({ taxMode: value as TaxMode })}
+                >
+                  {TAX_MODES.map((mode) => (
+                    <option key={mode} value={mode}>
+                      {t(`domain:editor.taxMode.modes.${mode}`)}
+                    </option>
+                  ))}
+                </Select>
+                {isSmallBusiness ? (
+                  <p className="text-muted-foreground text-sm">
+                    {t('domain:editor.taxMode.smallBusinessLocked')}
+                  </p>
+                ) : null}
+              </div>
+              {notice ? (
+                <MessageBar intent="info">
+                  <MessageBarBody>
+                    <MessageBarTitle>{t('domain:editor.taxMode.noticeTitle')}</MessageBarTitle>
+                    {notice}
+                  </MessageBarBody>
+                </MessageBar>
+              ) : null}
+              {missingBuyerVatId ? (
+                <MessageBar intent="warning">
+                  <MessageBarBody>
+                    <MessageBarTitle>
+                      {t('domain:editor.taxMode.missingVatIdTitle')}
+                    </MessageBarTitle>
+                    {t('domain:editor.taxMode.missingVatIdDescription')}
+                  </MessageBarBody>
+                </MessageBar>
+              ) : null}
+            </div>
+          </Section>
+
+          {isInvoice ? (
+            <Section title={t('domain:editor.sections.payment')}>
+              <div className="grid gap-4 sm:grid-cols-3">
+                <Field
+                  label={t('domain:editor.paymentTermDays')}
+                  value={state.paymentTermDays}
+                  onChange={(value) => update({ paymentTermDays: value })}
+                  numeric
+                  invalid={invalidTerms.includes('paymentTermDays')}
+                />
+                <Field
+                  label={t('domain:editor.skontoPercent')}
+                  value={state.skontoPercent}
+                  onChange={(value) => update({ skontoPercent: value })}
+                  numeric
+                  invalid={invalidTerms.includes('skontoPercent')}
+                />
+                <Field
+                  label={t('domain:editor.skontoDays')}
+                  value={state.skontoDays}
+                  onChange={(value) => update({ skontoDays: value })}
+                  numeric
+                  invalid={invalidTerms.includes('skontoDays')}
+                />
+              </div>
+            </Section>
+          ) : null}
+
+          <Section title={t('domain:editor.footer')}>
             <Textarea
-              id={footerFieldId}
+              aria-label={t('domain:editor.footer')}
               rows={3}
               value={state.footerText}
               onChange={(event) => update({ footerText: event.target.value })}
             />
-          </div>
+          </Section>
         </div>
-      </Card>
+
+        {/* Vorschau bleibt beim Scrollen des Formulars stehen. */}
+        <aside
+          aria-label={t('domain:editor.preview.title')}
+          className="flex h-[80vh] min-h-0 flex-col gap-3 xl:sticky xl:top-4 xl:h-[calc(100vh-2rem)]"
+        >
+          <PdfViewer
+            data={live.pdf}
+            loading={live.phase !== 'idle'}
+            error={previewError}
+            emptyText={t('domain:editor.preview.empty')}
+            toolbarEnd={
+              <Button
+                size="small"
+                appearance="subtle"
+                icon={<ArrowSyncRegular />}
+                disabled={live.phase !== 'idle'}
+                onClick={() => live.refresh()}
+              >
+                {t('domain:editor.preview.refresh')}
+              </Button>
+            }
+          />
+          {live.warnings.length > 0 ? (
+            <MessageBar intent="warning" layout="multiline">
+              <MessageBarBody>
+                <MessageBarTitle>{t('domain:editor.preview.warningsTitle')}</MessageBarTitle>
+                <ul className="mt-1 list-disc pl-5">
+                  {live.warnings.map((warning) => (
+                    <li key={warning}>{warning}</li>
+                  ))}
+                </ul>
+              </MessageBarBody>
+            </MessageBar>
+          ) : null}
+        </aside>
+      </div>
     </div>
+  );
+}
+
+/** Abschnitt des Formulars; Reihenfolge und Titel folgen dem PDF. */
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <Card size="large">
+      <CardHeader
+        header={
+          <Text as="h2" size={400} weight="semibold">
+            {title}
+          </Text>
+        }
+      />
+      {children}
+    </Card>
   );
 }
 

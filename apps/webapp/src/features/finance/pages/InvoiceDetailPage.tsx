@@ -42,6 +42,7 @@ import { routes } from '@/lib/routes';
 import { DocumentStatusBadge } from '../DocumentStatusBadge';
 import { DraftDeleteDialog } from '../DraftDeleteDialog';
 import { PaymentSheet } from '../PaymentSheet';
+import { PdfViewer } from '../PdfViewer';
 import { useFinalizeBlockers } from '../useFinalizeBlockers';
 import { useFinanceAccess } from '../useFinanceAccess';
 import {
@@ -50,6 +51,7 @@ import {
   overpaidMinorOf,
   paidMinorOf,
   useArchiveDocument,
+  useArchivedPdf,
   useFinalizeDocument,
   useSalesDocument,
 } from '../useSalesDocument';
@@ -70,6 +72,10 @@ export function InvoiceDetailPage() {
   const finalize = useFinalizeDocument(id);
   const archive = useArchiveDocument(id);
   const { blockers } = useFinalizeBlockers(data);
+  // Nur für festgeschriebene Belege mit Original; Entwürfe zeigt der Editor.
+  const archivedPdf = useArchivedPdf(
+    data && data.status !== 'draft' && data.content_hash ? data.storage_path : null,
+  );
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const navigate = useNavigate();
@@ -276,6 +282,27 @@ export function InvoiceDetailPage() {
             : t('domain:invoices.openAmount', { amount: formatMoney(openMinor) })}
         </span>
       </div>
+
+      {isArchived ? (
+        // Das Original, schreibgeschützt: genau die Datei aus dem Archiv, nicht
+        // neu gerendert (Leitplanke L2).
+        <Card size="large">
+          <CardHeader
+            header={
+              <Text as="h2" size={400} weight="semibold">
+                {t('domain:invoices.archive.viewerTitle')}
+              </Text>
+            }
+          />
+          <div className="h-[80vh]">
+            <PdfViewer
+              data={archivedPdf.data ?? null}
+              loading={archivedPdf.isLoading}
+              error={archivedPdf.isError ? t('domain:invoices.archive.openError') : null}
+            />
+          </div>
+        </Card>
+      ) : null}
 
       <Card size="large">
         <CardHeader

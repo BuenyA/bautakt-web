@@ -295,13 +295,21 @@ export function useCompanyTaxProfile() {
  * das Formular nicht hat. Beleg und Positionen haengen am selben
  * `document_id` — die Zeilen verschwinden mit dem Beleg.
  */
-export function useSaveDraft(documentId?: string) {
+export function useSaveDraft() {
   const queryClient = useQueryClient();
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
 
   return useMutation({
-    mutationFn: async (state: EditorState): Promise<string> => {
+    // `documentId` je Aufruf statt je Hook: der erste automatische Speicherlauf
+    // legt den Entwurf an, alle weiteren überschreiben genau diesen.
+    mutationFn: async ({
+      state,
+      documentId,
+    }: {
+      state: EditorState;
+      documentId: string | null;
+    }): Promise<string> => {
       const totals = editorTotals(state.lines, state.taxMode);
       const savedLines = state.lines.filter((line) => !isBlankLine(line));
       const shareOf = (kind: LineKind) =>
