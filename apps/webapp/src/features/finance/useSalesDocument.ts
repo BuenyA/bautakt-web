@@ -63,6 +63,9 @@ export type SalesDocumentDetail = {
   skonto_percent: number | null;
   tax_mode: string;
   customer_id: string | null;
+  /** Archiv-Original; bei Entwürfen immer leer. */
+  storage_path: string | null;
+  content_hash: string | null;
   customer_label: string;
   lines: DocumentLine[];
   payments: DocumentPayment[];
@@ -116,6 +119,7 @@ export function useSalesDocument(id: string | undefined) {
           `id, type, status, document_number, issue_date, due_date, service_date, currency,
            net_total, vat_total, gross_total, intro_text, footer_text, notes, buyer_reference,
            payment_term_days, skonto_days, skonto_percent, tax_mode, customer_id,
+           storage_path, content_hash,
            ${SALES_DOCUMENT_BUYER_SELECT},
            sales_document_lines(id, title, description, kind, quantity, unit, unit_price,
              discount_percent, net_amount, tax_rate_percent, sort_order),
@@ -150,12 +154,33 @@ export function useSalesDocument(id: string | undefined) {
 }
 
 /**
+ * Archiv-Original erzeugen: PDF/A-3b, bei Rechnungen mit factur-x.xml.
+ *
+ * `finance-document-render` schreibt das Original genau einmal und setzt
+ * `storage_path`/`content_hash`. Ein 409 heisst, dass ein anderer Aufruf
+ * gerade dasselbe Original schreibt; dessen Ergebnis gilt, das ist kein Fehler.
+ */
+async function renderArchive(documentId: string): Promise<void> {
+  const { error } = await supabase.functions.invoke('finance-document-render', {
+    body: { document_id: documentId, mode: 'archive' },
+  });
+  if (!error) return;
+  const status = (error as { context?: { status?: number } }).context?.status;
+  if (status === 409) return;
+  throw error;
+}
+
+/**
  * Beleg festschreiben.
  *
  * Die Nummer vergibt `finalize_sales_document` in der Datenbank, nicht der
  * Client: nur dort ist der Nummernkreis luekenlos und gegen zwei gleichzeitige
  * Aufrufe geschuetzt. Die Funktion prueft ausserdem die Pflichtangaben und
  * macht den Beleg unveraenderlich.
+ *
+ * Direkt danach entsteht das Archiv-Original. Scheitert nur dieser zweite
+ * Schritt, ist der Beleg trotzdem festgeschrieben (`archived: false`); die
+ * Detailseite bietet das Nachholen an.
  */
 export function useFinalizeDocument(documentId: string | undefined) {
   const queryClient = useQueryClient();
@@ -167,6 +192,12 @@ export function useFinalizeDocument(documentId: string | undefined) {
         p_document_id: documentId!,
       });
       if (error) throw error;
+      try {
+        await renderArchive(documentId!);
+        return { archived: true };
+      } catch {
+        return { archived: false };
+      }
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -175,6 +206,33 @@ export function useFinalizeDocument(documentId: string | undefined) {
       await queryClient.invalidateQueries({ queryKey: ['sales-documents', membership?.companyId] });
     },
   });
+}
+
+/** Archiv-Original nachholen, wenn es beim Festschreiben nicht entstanden ist. */
+export function useArchiveDocument(documentId: string | undefined) {
+  const queryClient = useQueryClient();
+  const { data: membership } = useMembership();
+
+  return useMutation({
+    mutationFn: () => renderArchive(documentId!),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['sales-document', membership?.companyId, documentId],
+      });
+    },
+  });
+}
+
+/** Kurz: die URL geht sofort an den Browser. */
+const ARCHIVE_URL_TTL_SECONDS = 300;
+
+/** Signierte URL auf das Archiv-Original. */
+export async function archivedPdfUrl(storagePath: string): Promise<string> {
+  const { data, error } = await supabase.storage
+    .from('finance-documents')
+    .createSignedUrl(storagePath, ARCHIVE_URL_TTL_SECONDS);
+  if (error || !data?.signedUrl) throw error ?? new Error('SIGNED_URL_MISSING');
+  return data.signedUrl;
 }
 
 /**

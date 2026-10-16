@@ -6,6 +6,7 @@ import {
   CardHeader,
   Link as FluentLink,
   MessageBar,
+  MessageBarActions,
   MessageBarBody,
   MessageBarTitle,
   Table,
@@ -18,6 +19,7 @@ import {
 } from '@fluentui/react-components';
 import {
   CheckmarkCircleRegular,
+  DocumentPdfRegular,
   DocumentRegular,
   EditRegular,
   WalletRegular,
@@ -43,9 +45,11 @@ import { PaymentSheet } from '../PaymentSheet';
 import { useFinalizeBlockers } from '../useFinalizeBlockers';
 import { useFinanceAccess } from '../useFinanceAccess';
 import {
+  archivedPdfUrl,
   openMinorOf,
   overpaidMinorOf,
   paidMinorOf,
+  useArchiveDocument,
   useFinalizeDocument,
   useSalesDocument,
 } from '../useSalesDocument';
@@ -64,6 +68,7 @@ export function InvoiceDetailPage() {
   const { data, isError, refetch } = document;
   const isLoading = useCompanyListLoading(document);
   const finalize = useFinalizeDocument(id);
+  const archive = useArchiveDocument(id);
   const { blockers } = useFinalizeBlockers(data);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -104,20 +109,42 @@ export function InvoiceDetailPage() {
   }
 
   const isDraft = data.status === 'draft';
+  const storagePath = data.storage_path;
+  const isArchived = !isDraft && Boolean(storagePath && data.content_hash);
   const openMinor = openMinorOf(data);
   const paidMinor = paidMinorOf(data);
   const overpaidMinor = overpaidMinorOf(data);
 
   async function onFinalize() {
     try {
-      await finalize.mutateAsync();
-      toast.success(t('domain:invoices.finalizeSuccess'));
+      const { archived } = await finalize.mutateAsync();
+      if (archived) toast.success(t('domain:invoices.finalizeSuccess'));
+      else toast.warning(t('domain:invoices.archive.finalizedWithoutArchive'));
     } catch (error) {
       // Die Datenbank prueft Pflichtangaben (u. a. Steuernummer des Betriebs)
       // und lehnt sonst ab. Ihre Meldung ist praeziser als jeder Text hier.
       toast.error(t('domain:invoices.finalizeError'), {
         description: readableDbError(error) ?? undefined,
       });
+    }
+  }
+
+  async function onCreateArchive() {
+    try {
+      await archive.mutateAsync();
+      toast.success(t('domain:invoices.archive.created'));
+    } catch (error) {
+      toast.error(t('domain:invoices.archive.createError'), {
+        description: readableDbError(error) ?? undefined,
+      });
+    }
+  }
+
+  async function onOpenArchive(path: string) {
+    try {
+      window.open(await archivedPdfUrl(path), '_blank', 'noopener');
+    } catch {
+      toast.error(t('domain:invoices.archive.openError'));
     }
   }
 
@@ -129,6 +156,12 @@ export function InvoiceDetailPage() {
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <LinkButton to={routes.invoices}>{t('common:action.back')}</LinkButton>
+
+            {isArchived && storagePath ? (
+              <Button icon={<DocumentPdfRegular />} onClick={() => void onOpenArchive(storagePath)}>
+                {t('domain:invoices.archive.open')}
+              </Button>
+            ) : null}
 
             {!isDraft ? (
               <Button
@@ -194,6 +227,28 @@ export function InvoiceDetailPage() {
               </RouterLink>
             ) : null}
           </MessageBarBody>
+        </MessageBar>
+      ) : null}
+
+      {!isDraft && !isArchived ? (
+        <MessageBar intent="warning" layout="multiline">
+          <MessageBarBody>
+            <MessageBarTitle>{t('domain:invoices.archive.missingTitle')}</MessageBarTitle>
+            {t('domain:invoices.archive.missingDescription')}
+          </MessageBarBody>
+          {access.canWriteSalesDocuments ? (
+            <MessageBarActions>
+              <Button
+                disabled={archive.isPending}
+                aria-busy={archive.isPending}
+                onClick={() => void onCreateArchive()}
+              >
+                {archive.isPending
+                  ? t('domain:invoices.archive.creating')
+                  : t('domain:invoices.archive.create')}
+              </Button>
+            </MessageBarActions>
+          ) : null}
         </MessageBar>
       ) : null}
 
