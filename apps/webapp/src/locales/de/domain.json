@@ -1108,7 +1108,53 @@
     "invoicePrefix": "Nummernkreis",
     "nextNumber": "Nächste Rechnungsnummer",
     "noRoles": "Keine Rollen angelegt.",
-    "editHint": "Diese Angaben stehen auf jedem Beleg und sind nach dem Festschreiben unveränderlich. Bearbeitet werden sie bis auf Weiteres in der Handy-App, wo die Prüfungen dafür bereits sitzen."
+    "companyType": "Gewerk",
+    "street": "Straße und Hausnummer",
+    "postalCode": "PLZ",
+    "city": "Ort",
+    "country": "Land",
+    "countries": {
+      "DE": "Deutschland",
+      "AT": "Österreich",
+      "CH": "Schweiz"
+    },
+    "bankTitle": "Bankverbindung",
+    "smallBusinessLabel": "Kleinunternehmer (§ 19 UStG)",
+    "smallBusinessHint": "Rechnungen gehen dann ohne Umsatzsteuer hinaus, mit dem Pflichthinweis. Gilt für neue Entwürfe.",
+    "missingTaxId": "Steuernummer und USt-IdNr. fehlen. Ohne eine der beiden lässt sich keine Rechnung freigeben.",
+    "saved": "Gespeichert",
+    "saveError": "Konnte nicht gespeichert werden",
+    "errors": {
+      "name": "Mindestens 2 Zeichen.",
+      "type": "Wähle ein Gewerk oder tippe eins (mindestens 2 Zeichen).",
+      "street": "Mindestens 5 Zeichen, mit Hausnummer.",
+      "postalCode": "Die PLZ hat {{count}} Ziffern.",
+      "city": "Mindestens 2 Zeichen.",
+      "phone": "6 bis 15 Ziffern.",
+      "email": "Bitte eine gültige E-Mail-Adresse.",
+      "taxNumber": {
+        "DE": "Bitte eine gültige Steuernummer (10 bis 11 Ziffern).",
+        "AT": "Bitte eine gültige Steuernummer (9 Ziffern).",
+        "CH": "Bitte eine gültige UID (z. B. CHE-123.456.789)."
+      },
+      "vatId": {
+        "DE": "Bitte eine gültige USt-IdNr.: DE und 9 Ziffern, Prüfziffer muss stimmen.",
+        "AT": "Bitte eine gültige UID: ATU und 8 Ziffern, Prüfziffer muss stimmen.",
+        "CH": "Bitte eine gültige MWST-Nr. (z. B. CHE-123.456.789 MWST)."
+      },
+      "tradeRegister": {
+        "DE": "Bitte eine gültige Registernummer (z. B. HRB 12345).",
+        "AT": "Bitte eine gültige Firmenbuchnummer (z. B. FN 123456a).",
+        "CH": "Bitte eine gültige Handelsregisternummer (z. B. CHE-123.456.789)."
+      },
+      "iban": {
+        "DE": "Bitte eine gültige deutsche IBAN.",
+        "AT": "Bitte eine gültige österreichische IBAN.",
+        "CH": "Bitte eine gültige Schweizer IBAN."
+      },
+      "bic": "Diese BIC passt nicht (8 oder 11 Zeichen, Land wie die IBAN).",
+      "bankName": "Mindestens 2 Zeichen."
+    }
   },
   "calendar": {
     "title": "Mein Kalender",

@@ -6,8 +6,11 @@ import { useTranslation } from 'react-i18next';
 import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useMembership } from '@/features/company/useMembership';
+import { usePermission } from '@/features/company/usePermission';
 import { ContactNumberSettingsCard } from '@/features/contacts/ContactNumberSettingsCard';
 import { supabase } from '@/lib/supabase';
+
+import { BankCard, CompanyCard, LegalCard } from '../CompanyForms';
 
 /** Stammdaten des Betriebs und die Rollen, die es hier gibt. */
 function useCompanySettings() {
@@ -42,17 +45,19 @@ function useCompanySettings() {
 }
 
 /**
- * Einrichtung — vorerst lesend.
+ * Einrichtung: Firma, Rechtliches und Bank sind bearbeitbar (#61), mit
+ * denselben Prüfregeln wie die App (`companyValidation.ts`). Ohne das Recht
+ * `canEditCompanyMasterData` bleibt alles lesend.
  *
- * ⚠️ Die Firmenstammdaten sind keine Einstellung wie eine Farbe: Steuernummer
- * und Rechnungsnummernkreis stehen auf jedem Beleg und sind nach dem
- * Festschreiben unveraenderlich. Bearbeitet wird das bis auf Weiteres in der
- * Handy-App, wo die Pruefungen dafuer bereits sitzen.
+ * Nummernkreis und Zahlungsziel bleiben hier vorerst lesend.
  */
 export function SettingsPage() {
   const { t } = useTranslation();
   const { data, isLoading } = useCompanySettings();
   const company = data?.company;
+  const canEdit = usePermission('canEditCompanyMasterData');
+  // Nach dem Speichern starten die Formulare vom neuen Stand.
+  const formKey = JSON.stringify(company);
 
   return (
     <div className="flex flex-col gap-6">
@@ -65,38 +70,15 @@ export function SettingsPage() {
         <SkeletonBlock className="h-64 w-full max-w-3xl" />
       ) : (
         <div className="grid gap-4 xl:grid-cols-2">
-          <DetailCard title={t('domain:settings.company')} className="xl:col-span-2">
-            <DetailRow label={t('domain:settings.name')} value={company?.name ?? ''} />
-            <DetailRow
-              label={t('domain:settings.address')}
-              value={[
-                company?.street_address,
-                [company?.postal_code, company?.city].filter(Boolean).join(' '),
-                company?.country,
-              ]
-                .filter(Boolean)
-                .join('\n')}
-            />
-            <DetailRow label={t('domain:settings.email')} value={company?.email ?? ''} />
-            <DetailRow label={t('domain:settings.phone')} value={company?.phone_number ?? ''} />
-          </DetailCard>
-
-          <DetailCard title={t('domain:settings.tax')}>
-            <DetailRow label={t('domain:invoices.taxNumber')} value={company?.tax_number ?? ''} />
-            <DetailRow label={t('domain:invoices.vatId')} value={company?.vat_id ?? ''} />
-            <DetailRow
-              label={t('domain:settings.tradeRegister')}
-              value={company?.trade_register ?? ''}
-            />
-            <DetailRow
-              label={t('domain:settings.smallBusiness')}
-              value={
-                company?.is_small_business
-                  ? t('domain:settings.smallBusinessYes')
-                  : t('domain:settings.smallBusinessNo')
-              }
-            />
-          </DetailCard>
+          {company ? (
+            <>
+              <div className="xl:col-span-2">
+                <CompanyCard key={formKey} company={company} canEdit={canEdit} />
+              </div>
+              <LegalCard key={`legal-${formKey}`} company={company} canEdit={canEdit} />
+              <BankCard key={`bank-${formKey}`} company={company} canEdit={canEdit} />
+            </>
+          ) : null}
 
           <DetailCard title={t('domain:settings.invoicing')}>
             <DetailRow
@@ -111,8 +93,6 @@ export function SettingsPage() {
               label={t('domain:invoices.paymentTerm')}
               value={company ? t('domain:invoices.days', { count: company.payment_term_days }) : ''}
             />
-            <DetailRow label="IBAN" value={company?.iban ?? ''} />
-            <DetailRow label={t('domain:settings.bank')} value={company?.bank_name ?? ''} />
           </DetailCard>
 
           <ContactNumberSettingsCard />
@@ -138,8 +118,6 @@ export function SettingsPage() {
           </Card>
         </div>
       )}
-
-      <p className="text-text-subtle max-w-3xl text-xs">{t('domain:settings.editHint')}</p>
     </div>
   );
 }
