@@ -615,6 +615,19 @@
     "finalizeSuccess": "Ausgestellt: {{number}}",
     "finalizeError": "Freigeben nicht möglich",
     "noLines": "Füge zuerst mindestens eine Position hinzu.",
+    "cancel": {
+      "action": "Stornieren",
+      "title": "Rechnung stornieren?",
+      "description": "Es wird ein Stornobeleg erstellt und das Original als storniert markiert. Das lässt sich nicht rückgängig machen.",
+      "confirm": "Stornieren",
+      "success": "Storniert. Stornobeleg: {{number}}",
+      "successWithoutArchive": "Storniert. Stornobeleg: {{number}}. Sein Original-PDF fehlt aber noch, erzeuge es auf der Belegseite.",
+      "error": "Stornieren nicht möglich",
+      "cancelledBy": "Storniert durch",
+      "cancellationOf": "Storno zu",
+      "creditNoteOf": "Gutschrift zu",
+      "creditNotes": "Gutschriften"
+    },
     "archive": {
       "open": "Original-PDF",
       "openError": "Das Original-PDF konnte nicht geöffnet werden.",

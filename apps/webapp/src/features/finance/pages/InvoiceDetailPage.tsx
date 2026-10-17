@@ -28,6 +28,7 @@ import {
   ArrowDownloadRegular,
   CheckmarkCircleRegular,
   CodeRegular,
+  DismissCircleRegular,
   DocumentPdfRegular,
   EditRegular,
   MailCheckmarkRegular,
@@ -55,6 +56,7 @@ import {
   extractFacturX,
   isEInvoiceDocument,
 } from '../archiveFiles';
+import { CancelDialog } from '../CancelDialog';
 import { DocumentStatusBadge } from '../DocumentStatusBadge';
 import { DraftDeleteDialog } from '../DraftDeleteDialog';
 import { EInvoiceBadge } from '../EInvoiceBadge';
@@ -65,6 +67,7 @@ import { useFinalizeBlockers } from '../useFinalizeBlockers';
 import { useFinanceAccess } from '../useFinanceAccess';
 import {
   archivedPdfUrl,
+  type LinkedDocument,
   openMinorOf,
   overpaidMinorOf,
   paidMinorOf,
@@ -81,6 +84,9 @@ import {
  * an der Zelle wirkt darauf nicht. Ausgerichtet wird der Knopf selbst.
  */
 const END_ALIGNED = { style: { justifyContent: 'flex-end' } } as const;
+
+/** Belegarten, die `cancel_sales_document` storniert. */
+const CANCELLABLE_TYPES = new Set(['invoice', 'partial_invoice', 'final_invoice']);
 
 export function InvoiceDetailPage() {
   const { t } = useTranslation();
@@ -103,6 +109,7 @@ export function InvoiceDetailPage() {
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [releaseOpen, setReleaseOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -188,6 +195,14 @@ export function InvoiceDetailPage() {
   const archivedBytes = archivedPdf.data ?? null;
   const canMarkSent =
     access.canWriteSalesDocuments && !isDraft && data.status !== 'cancelled' && !data.sent_at;
+  // Wie `cancel_sales_document`: nur freigegebene, nicht stornierte Rechnungen.
+  const canCancel =
+    access.canWriteSalesDocuments &&
+    !isDraft &&
+    data.status !== 'cancelled' &&
+    CANCELLABLE_TYPES.has(data.type);
+  const cancellations = data.children.filter((child) => child.type === 'cancellation');
+  const creditNotes = data.children.filter((child) => child.type === 'credit_note');
 
   function onDownloadPdf() {
     if (archivedBytes) downloadBytes(archivedBytes, `${fileBaseName}.pdf`, 'application/pdf');
@@ -321,6 +336,12 @@ export function InvoiceDetailPage() {
                 label={t('domain:invoices.deleteDraft.action')}
                 onClick={() => setDeleteOpen(true)}
               />
+            ) : null}
+
+            {canCancel ? (
+              <Button icon={<DismissCircleRegular />} onClick={() => setCancelOpen(true)}>
+                {t('domain:invoices.cancel.action')}
+              </Button>
             ) : null}
 
             {access.canWriteSalesDocuments && !isDraft && openMinor > 0 ? (
@@ -552,6 +573,28 @@ export function InvoiceDetailPage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <DetailCard title={t('domain:invoices.details')}>
+          {data.parent ? (
+            <DetailRow
+              label={
+                data.type === 'credit_note'
+                  ? t('domain:invoices.cancel.creditNoteOf')
+                  : t('domain:invoices.cancel.cancellationOf')
+              }
+              value={<DocumentLinks documents={[data.parent]} />}
+            />
+          ) : null}
+          {cancellations.length > 0 ? (
+            <DetailRow
+              label={t('domain:invoices.cancel.cancelledBy')}
+              value={<DocumentLinks documents={cancellations} />}
+            />
+          ) : null}
+          {creditNotes.length > 0 ? (
+            <DetailRow
+              label={t('domain:invoices.cancel.creditNotes')}
+              value={<DocumentLinks documents={creditNotes} />}
+            />
+          ) : null}
           <DetailRow
             label={
               data.type === 'quote'
@@ -625,6 +668,10 @@ export function InvoiceDetailPage() {
         openMinor={openMinor}
       />
 
+      {canCancel ? (
+        <CancelDialog documentId={data.id} open={cancelOpen} onOpenChange={setCancelOpen} />
+      ) : null}
+
       {isDraft ? (
         <ReleaseDialog
           open={releaseOpen}
@@ -674,5 +721,19 @@ function SumRow({
       <dt className={labelClass}>{label}</dt>
       <dd className={valueClass}>{value}</dd>
     </div>
+  );
+}
+
+/** Verweise auf verknüpfte Belege (Original, Storno, Gutschrift). */
+function DocumentLinks({ documents }: { documents: LinkedDocument[] }) {
+  const { t } = useTranslation();
+  return (
+    <span className="flex flex-wrap gap-x-3">
+      {documents.map((document) => (
+        <RouterLink key={document.id} to={routes.invoice(document.id)}>
+          {document.document_number || t('domain:invoices.noNumber')}
+        </RouterLink>
+      ))}
+    </span>
   );
 }

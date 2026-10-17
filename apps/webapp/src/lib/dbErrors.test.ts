@@ -23,6 +23,6 @@ describe('readableDbError – GoBD-Sperren', () => {
       message:
         'DOCUMENT_FINALIZE_VIA_RPC: Belege werden ausschliesslich ueber finalize_sales_document festgeschrieben',
     });
-    assert.ok(text?.includes('Festschreiben'));
+    assert.ok(text?.includes('Freigeben'));
   });
 });
