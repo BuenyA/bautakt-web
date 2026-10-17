@@ -830,7 +830,14 @@ function TextField({
   const problem = useContext(FieldProblem);
   const message = problem?.field === id ? problem.message : null;
   return (
-    <Field label={label} validationMessage={message} validationState={message ? 'error' : 'none'}>
+    // Oben ausrichten: Sonst zieht das Rasterfeld das Nachbarfeld mit in die
+    // Höhe, sobald hier eine Fehlermeldung steht.
+    <Field
+      className="self-start"
+      label={label}
+      validationMessage={message}
+      validationState={message ? 'error' : 'none'}
+    >
       <Input
         id={id}
         type={type}
