@@ -1305,6 +1305,8 @@
   "eInvoice": {
     "badgeTooltip": "E-Rechnung (ZUGFeRD/XRechnung)",
     "switchLabel": "Als E-Rechnung erstellen",
+    "onLabel": "Eingeschaltet:",
+    "offLabel": "Ausgeschaltet:",
     "onHint": "Das PDF enthält die maschinenlesbaren Rechnungsdaten (ZUGFeRD).",
     "offHint": "Es entsteht nur ein PDF ohne E-Rechnungsdaten. An Unternehmen in Deutschland ist das nur noch bis Ende 2026 erlaubt, bei höchstens 800.000 € Vorjahresumsatz bis Ende 2027."
   },

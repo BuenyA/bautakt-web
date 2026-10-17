@@ -14,7 +14,8 @@
     "edit": "Bearbeiten",
     "close": "Schließen",
     "delete": "Löschen",
-    "more": "Weitere Aktionen"
+    "more": "Weitere Aktionen",
+    "helpFor": "Hilfe zu {{label}}"
   },
   "state": {
     "loading": "Wird geladen …",

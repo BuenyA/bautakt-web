@@ -18,7 +18,6 @@ import {
   DialogContent,
   DialogSurface,
   DialogTitle,
-  InfoLabel,
   Input,
   Label,
   MessageBar,
@@ -43,6 +42,7 @@ import { useTranslation } from 'react-i18next';
 import { useBlocker, useNavigate, useParams, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { HelpButton } from '@/components/common/HelpButton';
 import { LinkButton } from '@/components/common/LinkButton';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
@@ -584,7 +584,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                 </div>
               </div>
               {isInvoice ? (
-                <div className="grid gap-1 @lg:col-span-2">
+                <div className="flex items-center gap-1 @lg:col-span-2">
                   <Switch
                     checked={state.eInvoice}
                     onChange={(_, data) => update({ eInvoice: data.checked })}
@@ -595,9 +595,15 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                       </span>
                     }
                   />
-                  <p className="text-muted-foreground text-sm">
-                    {state.eInvoice ? t('domain:eInvoice.onHint') : t('domain:eInvoice.offHint')}
-                  </p>
+                  <HelpButton label={t('domain:eInvoice.switchLabel')}>
+                    <p>
+                      <strong>{t('domain:eInvoice.onLabel')}</strong> {t('domain:eInvoice.onHint')}
+                    </p>
+                    <p>
+                      <strong>{t('domain:eInvoice.offLabel')}</strong>{' '}
+                      {t('domain:eInvoice.offHint')}
+                    </p>
+                  </HelpButton>
                 </div>
               ) : null}
             </div>
@@ -992,9 +998,12 @@ function Field({
   return (
     <div className="grid gap-2">
       {info ? (
-        <InfoLabel htmlFor={fieldId} info={info}>
-          {label}
-        </InfoLabel>
+        <div className="flex items-center gap-1">
+          <Label htmlFor={fieldId}>{label}</Label>
+          <HelpButton label={label}>
+            <p>{info}</p>
+          </HelpButton>
+        </div>
       ) : (
         <Label htmlFor={fieldId}>{label}</Label>
       )}
