@@ -27,6 +27,8 @@ import { DatePicker } from '@/components/form/dateTime';
 import { useMembership } from '@/features/company/useMembership';
 import { usePermission } from '@/features/company/usePermission';
 import { useCostCategories } from '@/features/finance/useCostCategories';
+import { BUYER_REFERENCE_MAX_LENGTH } from '@/features/finance/useDocumentEditor';
+import { isPlausibleVatId } from '@/features/settings/companyValidation';
 import { readableDbError } from '@/lib/dbErrors';
 
 import {
@@ -190,6 +192,17 @@ function ContactForm({
     }
     if (ibanField && iban.trim() && !isValidIban(iban)) {
       return t('domain:bankAccounts.ibanInvalid');
+    }
+    if (draft.vat_id.trim() && !isPlausibleVatId(draft.vat_id)) {
+      return t('domain:contactForm.vatIdInvalid');
+    }
+    // Dieselbe Grenze wie im Rechnungseditor, sonst sperrt die Leitweg-ID
+    // erst beim Beleg.
+    if (
+      has('customer') &&
+      draft.customer.buyer_reference.trim().length > BUYER_REFERENCE_MAX_LENGTH
+    ) {
+      return t('domain:contactForm.buyerReferenceTooLong', { max: BUYER_REFERENCE_MAX_LENGTH });
     }
     return null;
   }

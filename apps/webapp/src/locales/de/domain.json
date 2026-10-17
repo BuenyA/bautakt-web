@@ -321,6 +321,8 @@
     "nameRequired": "Bitte einen Namen angeben – bei Firmen den Firmennamen, bei Personen Vor- oder Nachname.",
     "roleRequired": "Bitte mindestens eine Rolle wählen.",
     "daysInvalid": "Tage bitte als ganze Zahl angeben.",
+    "buyerReferenceTooLong": "Die Leitweg-ID darf höchstens {{max}} Zeichen haben.",
+    "vatIdInvalid": "Die USt-IdNr. stimmt nicht. Sie beginnt mit dem Länderkürzel, für Deutschland DE und neun Ziffern.",
     "percentInvalid": "Skonto bitte als Prozentwert zwischen 0 und 100 angeben.",
     "saved": "Kontakt gespeichert",
     "saveError": "Der Kontakt konnte nicht gespeichert werden."

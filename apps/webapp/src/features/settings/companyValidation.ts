@@ -113,6 +113,22 @@ export function isValidVatId(vatId: string, country: CompanyCountry): boolean {
   return /^CHE\d{9}$/.test(withoutSuffix) && chUidChecksum(withoutSuffix.slice(3));
 }
 
+/**
+ * USt-IdNr. eines Kontakts: Das Präfix bestimmt das Land, nicht der Sitz —
+ * ein Kunde in Deutschland kann eine ausländische Nummer haben. DE, AT und CH
+ * mit Prüfziffer, andere EU-Länder nur nach Grundformat.
+ */
+export function isPlausibleVatId(vatId: string): boolean {
+  const normalized = vatId
+    .trim()
+    .toUpperCase()
+    .replace(/[\s.-]/g, '');
+  if (normalized.startsWith('DE')) return isValidVatId(normalized, 'DE');
+  if (normalized.startsWith('AT')) return isValidVatId(normalized, 'AT');
+  if (normalized.startsWith('CH')) return isValidVatId(normalized, 'CH');
+  return /^[A-Z]{2}[A-Z0-9]{2,12}$/.test(normalized);
+}
+
 /** Leer ist erlaubt: nicht jeder Betrieb steht im Register. */
 export function isValidTradeRegister(tradeRegister: string, country: CompanyCountry): boolean {
   const trimmed = tradeRegister.trim();
