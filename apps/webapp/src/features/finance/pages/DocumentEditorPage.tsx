@@ -757,8 +757,10 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
             }
           />
           {live.warnings.length > 0 ? (
-            <MessageBar intent="warning" layout="multiline">
-              <MessageBarBody>
+            // Nicht schrumpfen: sonst ragt die Liste über den Rahmen hinaus.
+            // Lange Listen scrollen, damit das PDF sichtbar bleibt.
+            <MessageBar intent="warning" layout="multiline" className="shrink-0">
+              <MessageBarBody className="max-h-48 overflow-y-auto">
                 <MessageBarTitle>{t('domain:editor.preview.warningsTitle')}</MessageBarTitle>
                 <ul className="mt-1 list-disc pl-5">
                   {live.warnings.map((warning) => (
