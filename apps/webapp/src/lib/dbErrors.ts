@@ -41,6 +41,13 @@ const MESSAGES: Record<string, string> = {
   // Storno (bautakt-app 20261016215235_a_cancel_sales_document).
   CANCEL_NOT_ALLOWED:
     'Dieser Beleg lässt sich nicht stornieren. Storniert werden nur freigegebene Rechnungen, die noch nicht storniert sind.',
+  // Schlussrechnung (bautakt-app 20261017184308_a_partial_credit_link).
+  PARTIAL_CREDIT_INVALID:
+    'Abziehen lassen sich nur freigegebene, nicht stornierte Abschlagsrechnungen. Lade die Abschläge neu.',
+  PARTIAL_CREDIT_TAKEN:
+    'Ein Abschlag ist schon in einer anderen Schlussrechnung verrechnet. Lade die Abschläge neu.',
+  PARTIAL_CREDITED:
+    'Dieser Abschlag ist in einer Schlussrechnung verrechnet. Entferne dort zuerst den Abzug oder storniere die Schlussrechnung.',
   // Kontakte (Migration 20261014204410). Unique-Verletzungen tragen den Namen
   // des Index in der Meldung.
   customer_profiles_number_unique: 'Diese Kundennummer ist schon vergeben.',

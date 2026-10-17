@@ -1,5 +1,7 @@
 import {
   documentTotals,
+  formatIsoDateDe,
+  formatMoney,
   minorToEuros,
   multiplyMoney,
   percentOf,
@@ -17,9 +19,8 @@ import { supabase } from '@/lib/supabase';
 import type { TermFields } from './customerTerms';
 
 /**
- * Rechnungsarten, die der Editor anlegen kann. Gutschrift kommt mit #78, die
- * Verrechnung der Abschläge in der Schlussrechnung mit #155. Stornos
- * entstehen nur über `cancel_sales_document`, nie im Editor.
+ * Rechnungsarten, die der Editor anlegen kann. Gutschrift kommt mit #78.
+ * Stornos entstehen nur über `cancel_sales_document`, nie im Editor.
  */
 export const INVOICE_EDITOR_TYPES = ['invoice', 'partial_invoice', 'final_invoice'] as const;
 export type InvoiceEditorType = (typeof INVOICE_EDITOR_TYPES)[number];
@@ -32,11 +33,11 @@ export function isInvoiceEditorType(type: string): type is InvoiceEditorType {
 }
 
 /**
- * Positionsarten laut Datenbank-Constraint. `partial_credit` (Abzug eines
- * Abschlags) setzt erst die Schlussrechnung (#155), nicht der Nutzer.
+ * Positionsarten, die der Nutzer wählen kann. `partial_credit` (Abzug eines
+ * Abschlags) setzt nur die Schlussrechnung über `loadPartialCredits`.
  */
 export const LINE_KINDS = ['labor', 'material', 'other', 'discount', 'text'] as const;
-export type LineKind = (typeof LINE_KINDS)[number];
+export type LineKind = (typeof LINE_KINDS)[number] | 'partial_credit';
 
 /** Herkunft einer Position: Zeit oder Material eines Auftrags. */
 export type LineSource = { type: 'time_entry' | 'order_material'; id: string } | null;
@@ -59,6 +60,8 @@ export type EditorLine = {
    * abgerechnet.
    */
   source: LineSource;
+  /** Abschlagsrechnung, die diese Abzugszeile verrechnet (nur `partial_credit`). */
+  creditedDocumentId: string | null;
 };
 
 export type EditorState = TermFields & {
@@ -109,7 +112,12 @@ export function lineNetMinor(line: EditorLine): number {
     parseNumber(line.quantity),
   );
   const discount = percentOf(gross, parseNumber(line.discountPercent));
-  return line.kind === 'discount' ? -Math.abs(gross - discount) : gross - discount;
+  return isDeduction(line.kind) ? -Math.abs(gross - discount) : gross - discount;
+}
+
+/** Nachlass und Abschlagsabzug stehen negativ in der Datenbank, im Feld ohne Minus. */
+export function isDeduction(kind: string): boolean {
+  return kind === 'discount' || kind === 'partial_credit';
 }
 
 /** Steuersatz, mit dem die Position rechnet: außer bei `standard` immer 0 %. */
@@ -143,6 +151,7 @@ export function emptyLine(taxRatePercent = '19'): EditorLine {
     discountPercent: '0',
     taxRatePercent,
     source: null,
+    creditedDocumentId: null,
   };
 }
 
@@ -262,6 +271,88 @@ export async function loadOrderLines(
   return lines;
 }
 
+type PartialInvoiceRow = {
+  id: string;
+  document_number: string | null;
+  issue_date: string | null;
+  sales_document_lines: { kind: string; net_amount: unknown; tax_rate_percent: unknown }[];
+};
+
+/**
+ * Abzugszeilen der Schlussrechnung (§ 14 Abs. 5 UStG): je ausgestellter, nicht
+ * stornierter Abschlagsrechnung des Auftrags eine Zeile je Steuersatz, mit
+ * Nummer, Datum, Netto und USt. Abschläge, die schon ein anderer, nicht
+ * stornierter Beleg verrechnet, fehlen; die Datenbank lehnt sie ohnehin ab.
+ */
+export async function loadPartialCredits(
+  companyId: string,
+  orderId: string,
+  documentId: string | null,
+): Promise<EditorLine[]> {
+  // Ein Abschlag gehört zum Auftrag, wenn eine seiner Positionen daran hängt.
+  const linked = await supabase
+    .from('sales_document_lines')
+    .select('document_id')
+    .eq('company_id', companyId)
+    .eq('order_id', orderId);
+  if (linked.error) throw linked.error;
+  const candidateIds = [...new Set((linked.data ?? []).map((row) => row.document_id))];
+  if (candidateIds.length === 0) return [];
+
+  const [partials, credited] = await Promise.all([
+    supabase
+      .from('sales_documents')
+      .select(
+        'id, document_number, issue_date, sales_document_lines(kind, net_amount, tax_rate_percent)',
+      )
+      .eq('company_id', companyId)
+      .eq('type', 'partial_invoice')
+      .not('status', 'in', '(draft,cancelled)')
+      .in('id', candidateIds)
+      .order('issue_date', { ascending: true }),
+    supabase
+      .from('sales_document_lines')
+      .select('document_id, credited_document_id, sales_documents!inner(status)')
+      .eq('company_id', companyId)
+      .in('credited_document_id', candidateIds)
+      .neq('sales_documents.status', 'cancelled'),
+  ]);
+  if (partials.error) throw partials.error;
+  if (credited.error) throw credited.error;
+
+  const taken = new Set(
+    (credited.data ?? [])
+      .filter((row) => row.document_id !== documentId)
+      .map((row) => row.credited_document_id),
+  );
+
+  const lines: EditorLine[] = [];
+  for (const partial of (partials.data ?? []) as unknown as PartialInvoiceRow[]) {
+    if (taken.has(partial.id)) continue;
+    const netByRate = new Map<number, number>();
+    for (const line of partial.sales_document_lines) {
+      if (line.kind === 'text') continue;
+      const rate = finiteNumber(line.tax_rate_percent);
+      netByRate.set(rate, (netByRate.get(rate) ?? 0) + toMinorUnits(finiteNumber(line.net_amount)));
+    }
+    const label = `Abzüglich Abschlag ${partial.document_number ?? ''} vom ${formatIsoDateDe(partial.issue_date)}`;
+    for (const [rate, netMinor] of netByRate) {
+      if (netMinor === 0) continue;
+      lines.push({
+        ...emptyLine(String(rate)),
+        title: netByRate.size > 1 ? `${label} (${rate} %)` : label,
+        description: `Netto ${formatMoney(netMinor)} · USt ${formatMoney(percentOf(netMinor, rate))}`,
+        kind: 'partial_credit',
+        quantity: '1',
+        unit: 'Psch',
+        unitPrice: moneyText(Math.abs(netMinor) / 100),
+        creditedDocumentId: partial.id,
+      });
+    }
+  }
+  return lines;
+}
+
 /**
  * Was der Editor vom Betrieb braucht: Kleinunternehmer stellen ohne
  * Umsatzsteuer aus (§ 19 UStG), das Land wählt den Wortlaut der Hinweise.
@@ -352,7 +443,7 @@ export function buildDraftRows(state: EditorState, companyId: string) {
       description: line.description.trim(),
       quantity: parseNumber(line.quantity),
       unit: line.unit.trim(),
-      unit_price: line.kind === 'discount' ? -Math.abs(unitPrice) : unitPrice,
+      unit_price: isDeduction(line.kind) ? -Math.abs(unitPrice) : unitPrice,
       discount_percent: parseNumber(line.discountPercent),
       // Der Renderer liest die Steuerart je Position aus `tax_category`.
       // Stünde hier `standard`, käme eine § 13b-Rechnung mit 19 % aufs PDF.
@@ -362,6 +453,7 @@ export function buildDraftRows(state: EditorState, companyId: string) {
       labor_share: line.kind === 'labor' ? minorToEuros(netMinor) : 0,
       source_type: line.source?.type ?? null,
       source_id: line.source?.id ?? null,
+      credited_document_id: line.kind === 'partial_credit' ? line.creditedDocumentId : null,
     };
   });
 
