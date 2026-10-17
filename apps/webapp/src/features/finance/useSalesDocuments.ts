@@ -14,12 +14,15 @@ import {
 export const INVOICE_TYPE_LIST = ['invoice', 'partial_invoice', 'final_invoice'] as const;
 
 /**
- * Belege der Liste `/rechnungen`: Rechnungen, Auftragsbestätigungen,
- * Lieferscheine. Angebote bleiben auf der eigenen Seite. Gutschrift und
- * Storno haben auf der Handy-Liste keinen Chip und kommen hier nicht dazu.
+ * Belege der Liste `/rechnungen`: Rechnungen, Gutschriften, Stornos,
+ * Auftragsbestätigungen, Lieferscheine. Angebote bleiben auf der eigenen
+ * Seite. Gutschrift und Storno gehören dazu wie bei sevDesk (#78); offene
+ * Posten und Mahnwesen bleiben bei `INVOICE_TYPE_LIST`.
  */
 export const FINANCE_LIST_TYPES = [
   ...INVOICE_TYPE_LIST,
+  'credit_note',
+  'cancellation',
   'order_confirmation',
   'delivery_note',
 ] as const;
@@ -37,7 +40,7 @@ export type SalesDocumentListRow = SalesDocumentRow & {
 
 type QueryRow = Omit<SalesDocumentListRow, 'customer_label'> & SalesDocumentBuyerFields;
 
-const SELECT = `id, type, status, document_number, issue_date, due_date, gross_total, net_total, vat_total, customer_id, currency, payment_term_days, created_at, e_invoice, ${SALES_DOCUMENT_BUYER_SELECT}`;
+const SELECT = `id, type, status, document_number, issue_date, due_date, gross_total, net_total, vat_total, credited_total, customer_id, currency, payment_term_days, created_at, e_invoice, ${SALES_DOCUMENT_BUYER_SELECT}`;
 
 /**
  * Verkaufsbelege des aktiven Betriebs.

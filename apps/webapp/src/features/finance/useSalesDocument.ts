@@ -61,6 +61,8 @@ export type SalesDocumentDetail = {
   net_total: number;
   vat_total: number;
   gross_total: number;
+  /** Freigegebene Gutschriften zu dieser Rechnung (Brutto, positiv). */
+  credited_total: number;
   intro_text: string;
   footer_text: string;
   notes: string;
@@ -89,7 +91,14 @@ export type SalesDocumentDetail = {
 
 export type LinkedDocument = { id: string; document_number: string | null; type: string };
 
-type PayableDocument = Pick<SalesDocumentDetail, 'payments' | 'gross_total'>;
+type PayableDocument = Pick<SalesDocumentDetail, 'payments' | 'gross_total' | 'credited_total'>;
+
+/** Forderung nach Gutschriften in Cent: Brutto minus gutgeschriebener Betrag. */
+export function chargeableMinorOf(
+  document: Pick<SalesDocumentDetail, 'gross_total' | 'credited_total'>,
+): number {
+  return eurosToMinor(document.gross_total) - eurosToMinor(document.credited_total);
+}
 
 /** Bereits gezahlt inkl. Skonto, in Cent. */
 export function paidMinorOf(document: Pick<SalesDocumentDetail, 'payments'>): number {
@@ -108,12 +117,12 @@ export function paidMinorOf(document: Pick<SalesDocumentDetail, 'payments'>): nu
  * beides auf `paid`; die Oberflaeche muss den Unterschied selbst zeigen.
  */
 export function openMinorOf(document: PayableDocument): number {
-  return Math.max(0, eurosToMinor(document.gross_total) - paidMinorOf(document));
+  return Math.max(0, chargeableMinorOf(document) - paidMinorOf(document));
 }
 
 /** Ueberschuss in Cent, wenn Zahlungen (inkl. Skonto) das Brutto uebersteigen. */
 export function overpaidMinorOf(document: PayableDocument): number {
-  return overpaidMinor(eurosToMinor(document.gross_total), paidMinorOf(document));
+  return overpaidMinor(chargeableMinorOf(document), paidMinorOf(document));
 }
 
 /**
@@ -134,7 +143,8 @@ export function useSalesDocument(id: string | undefined) {
         .from('sales_documents')
         .select(
           `id, type, status, document_number, issue_date, due_date, service_date, currency,
-           net_total, vat_total, gross_total, intro_text, footer_text, notes, buyer_reference,
+           net_total, vat_total, gross_total, credited_total, intro_text, footer_text, notes,
+           buyer_reference, parent_document_id,
            payment_term_days, skonto_days, skonto_percent, tax_mode, customer_id,
            storage_path, content_hash, e_invoice,
            ${SALES_DOCUMENT_BUYER_SELECT},

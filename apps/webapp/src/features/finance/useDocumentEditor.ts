@@ -25,11 +25,34 @@ import type { TermFields } from './customerTerms';
 export const INVOICE_EDITOR_TYPES = ['invoice', 'partial_invoice', 'final_invoice'] as const;
 export type InvoiceEditorType = (typeof INVOICE_EDITOR_TYPES)[number];
 
-/** Belegarten, die der Editor anlegen kann. */
-export type EditableDocumentType = 'quote' | InvoiceEditorType;
+/**
+ * Belegarten, die der Editor anlegen kann. Die Gutschrift entsteht nur aus
+ * einer Rechnung („Gutschrift erstellen“), nie über die Typauswahl.
+ */
+export type EditableDocumentType = 'quote' | InvoiceEditorType | 'credit_note';
 
 export function isInvoiceEditorType(type: string): type is InvoiceEditorType {
   return (INVOICE_EDITOR_TYPES as readonly string[]).includes(type);
+}
+
+/** Rechnungsartig: Pflicht-Leistungsdatum, E-Rechnung, Käuferreferenz. */
+export function isInvoiceDocument(type: string): boolean {
+  return isInvoiceEditorType(type) || type === 'credit_note';
+}
+
+/**
+ * Höchstlänge der Käuferreferenz (BT-10), wie in der App
+ * (`BUYER_REFERENCE_MAX_LENGTH`). Die Leitweg-ID ist deutlich kürzer.
+ */
+export const BUYER_REFERENCE_MAX_LENGTH = 80;
+
+/**
+ * Vorzeichen, mit dem Beträge in der Datenbank stehen. Eine Gutschrift liegt
+ * negiert vor, wie Storno und die Gutschrift der App; im Formular wird sie
+ * positiv getippt. Der Renderer schreibt sie im XML (381) wieder positiv.
+ */
+export function storedSign(type: string): 1 | -1 {
+  return type === 'credit_note' ? -1 : 1;
 }
 
 /**
@@ -66,6 +89,8 @@ export type EditorLine = {
 
 export type EditorState = TermFields & {
   type: EditableDocumentType;
+  /** Ursprungsrechnung einer Gutschrift (`parent_document_id`), sonst leer. */
+  parentDocumentId: string | null;
   customerId: string | null;
   /** Auftrag des Belegs; landet in `order_id` jeder Position. */
   orderId: string | null;
@@ -396,12 +421,14 @@ export function useCompanyTaxProfile() {
  */
 export function buildDraftRows(state: EditorState, companyId: string) {
   const totals = editorTotals(state.lines, state.taxMode);
+  const sign = storedSign(state.type);
   const savedLines = state.lines.filter((line) => !isBlankLine(line));
   const shareOf = (kind: LineKind) =>
     minorToEuros(
-      savedLines
-        .filter((line) => line.kind === kind)
-        .reduce((sum, line) => sum + lineNetMinor(line), 0),
+      sign *
+        savedLines
+          .filter((line) => line.kind === kind)
+          .reduce((sum, line) => sum + lineNetMinor(line), 0),
     );
 
   const header = {
@@ -409,6 +436,7 @@ export function buildDraftRows(state: EditorState, companyId: string) {
     type: state.type,
     status: 'draft',
     customer_id: state.customerId,
+    parent_document_id: state.parentDocumentId,
     tax_mode: state.taxMode,
     // Leer bleibt null. Heute setzt erst finalize_sales_document
     // (coalesce(issue_date, CURRENT_DATE)), nicht das Speichern.
@@ -422,18 +450,18 @@ export function buildDraftRows(state: EditorState, companyId: string) {
     payment_term_days: optionalNumber(state.paymentTermDays),
     skonto_percent: optionalNumber(state.skontoPercent),
     skonto_days: optionalNumber(state.skontoDays),
-    net_total: minorToEuros(totals.netMinor),
-    vat_total: minorToEuros(totals.vatMinor),
-    gross_total: minorToEuros(totals.grossMinor),
+    net_total: minorToEuros(sign * totals.netMinor),
+    vat_total: minorToEuros(sign * totals.vatMinor),
+    gross_total: minorToEuros(sign * totals.grossMinor),
     labor_share: shareOf('labor'),
     material_share: shareOf('material'),
     // Angebote haben nie ein XML; die Spalte bleibt dort beim Standard.
-    e_invoice: isInvoiceEditorType(state.type) ? state.eInvoice : true,
+    e_invoice: isInvoiceDocument(state.type) ? state.eInvoice : true,
   };
 
   const lines = savedLines.map((line, index) => {
     const unitPrice = parseNumber(line.unitPrice);
-    const netMinor = line.kind === 'text' ? 0 : lineNetMinor(line);
+    const netMinor = line.kind === 'text' ? 0 : sign * lineNetMinor(line);
     return {
       company_id: companyId,
       order_id: state.orderId,
@@ -443,7 +471,7 @@ export function buildDraftRows(state: EditorState, companyId: string) {
       description: line.description.trim(),
       quantity: parseNumber(line.quantity),
       unit: line.unit.trim(),
-      unit_price: isDeduction(line.kind) ? -Math.abs(unitPrice) : unitPrice,
+      unit_price: sign * (isDeduction(line.kind) ? -Math.abs(unitPrice) : unitPrice),
       discount_percent: parseNumber(line.discountPercent),
       // Der Renderer liest die Steuerart je Position aus `tax_category`.
       // Stünde hier `standard`, käme eine § 13b-Rechnung mit 19 % aufs PDF.

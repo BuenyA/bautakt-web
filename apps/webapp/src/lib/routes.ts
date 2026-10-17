@@ -24,6 +24,9 @@ export const legacyTimesOrderParam = 'order';
 /** Query von `/rechnungen/neu?auftrag=…`: der Editor übernimmt diesen Auftrag. */
 export const invoiceFromOrderParam = 'auftrag';
 
+/** Query von `/rechnungen/neu?gutschrift=…`: Gutschrift zu dieser Rechnung. */
+export const creditNoteFromParam = 'gutschrift';
+
 export const routes = {
   // Oeffentlich
   login: '/login',
@@ -55,6 +58,9 @@ export const routes = {
   /** Neue Rechnung mit Kunde und Positionen eines Auftrags (`?auftrag=`). */
   invoiceNewFromOrder: (orderId: string) =>
     `/rechnungen/neu?${invoiceFromOrderParam}=${encodeURIComponent(orderId)}`,
+  /** Neue Gutschrift zu einer Rechnung (`?gutschrift=`). */
+  invoiceNewCreditNote: (invoiceId: string) =>
+    `/rechnungen/neu?${creditNoteFromParam}=${encodeURIComponent(invoiceId)}`,
   invoiceEdit: (id: string) => `/rechnungen/${id}/bearbeiten`,
   invoicePrint: (id: string) => `/rechnungen/${id}/druck`,
   receivables: '/offene-posten',

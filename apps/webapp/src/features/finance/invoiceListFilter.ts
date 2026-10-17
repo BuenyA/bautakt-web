@@ -6,6 +6,9 @@ export type InvoiceStatusFilter = 'all' | 'open' | 'overdue' | 'draft' | 'paid';
 
 const OPEN_STATUSES = new Set(['issued', 'sent', 'partially_paid', 'overdue']);
 
+/** Gutschrift und Storno sind nie offen oder überfällig: Sie fordern nichts. */
+const NEVER_OPEN_TYPES = new Set(['credit_note', 'cancellation']);
+
 export function invoiceStatusFromSearch(value: string | null): InvoiceStatusFilter {
   switch (value) {
     case 'offen':
@@ -22,14 +25,15 @@ export function invoiceStatusFromSearch(value: string | null): InvoiceStatusFilt
 }
 
 export function matchesInvoiceStatus(
-  document: { status: string },
+  document: { status: string; type?: string },
   filter: InvoiceStatusFilter,
 ): boolean {
+  const canBeOpen = !NEVER_OPEN_TYPES.has(document.type ?? '');
   switch (filter) {
     case 'open':
-      return OPEN_STATUSES.has(document.status);
+      return canBeOpen && OPEN_STATUSES.has(document.status);
     case 'overdue':
-      return document.status === 'overdue';
+      return canBeOpen && document.status === 'overdue';
     case 'draft':
       return document.status === 'draft';
     case 'paid':
