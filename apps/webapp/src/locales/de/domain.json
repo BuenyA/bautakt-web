@@ -612,9 +612,9 @@
       "error": "Konnte nicht als versendet markiert werden",
       "badge": "Versendet am {{date}}"
     },
-    "finalize": "Festschreiben",
-    "finalizeSuccess": "Beleg festgeschrieben und nummeriert.",
-    "finalizeError": "Festschreiben nicht möglich",
+    "finalizeSuccess": "Ausgestellt: {{number}}",
+    "finalizeError": "Freigeben nicht möglich",
+    "noLines": "Füge zuerst mindestens eine Position hinzu.",
     "archive": {
       "open": "Original-PDF",
       "openError": "Das Original-PDF konnte nicht geöffnet werden.",
@@ -624,7 +624,7 @@
       "creating": "Wird erzeugt …",
       "created": "Original-PDF erzeugt",
       "createError": "Das Original-PDF konnte nicht erzeugt werden",
-      "finalizedWithoutArchive": "Beleg festgeschrieben, aber das Original-PDF fehlt noch. Erzeuge es auf der Belegseite.",
+      "finalizedWithoutArchive": "Ausgestellt: {{number}}. Das Original-PDF fehlt aber noch, erzeuge es auf der Belegseite.",
       "viewerTitle": "Original (Archiv, schreibgeschützt)"
     },
     "deleteDraft": {
