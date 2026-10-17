@@ -207,15 +207,17 @@ export function useFinalizeDocument(documentId: string | undefined) {
     // Der Editor kennt die Id erst nach dem Speichern und reicht sie je Aufruf.
     mutationFn: async (savedId?: string) => {
       const target = savedId ?? documentId!;
-      const { error } = await supabase.rpc('finalize_sales_document', {
+      const { data, error } = await supabase.rpc('finalize_sales_document', {
         p_document_id: target,
       });
       if (error) throw error;
+      // Die vergebene Nummer kommt aus der Freigabe selbst, für den Toast.
+      const documentNumber = data?.document_number ?? '';
       try {
         await renderArchive(target);
-        return { archived: true };
+        return { archived: true, documentNumber };
       } catch {
-        return { archived: false };
+        return { archived: false, documentNumber };
       }
     },
     onSuccess: async (_, savedId) => {

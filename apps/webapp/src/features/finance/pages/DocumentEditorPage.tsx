@@ -57,6 +57,7 @@ import { invoiceFromOrderParam, routes } from '@/lib/routes';
 
 import { invalidTermFields, prefillCustomerTerms } from '../customerTerms';
 import { PdfViewer } from '../PdfViewer';
+import { ReleaseDialog } from '../ReleaseDialog';
 import {
   buildDraftRows,
   type EditableDocumentType,
@@ -398,6 +399,10 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       setError(t('domain:editor.termsInvalid'));
       return false;
     }
+    if (!state?.lines.some((line) => line.title.trim())) {
+      setError(t('domain:invoices.noLines'));
+      return false;
+    }
     setError(null);
     return true;
   }
@@ -443,16 +448,19 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   }
 
   async function onConfirmRelease() {
-    setConfirmRelease(false);
     setBusy('release');
     let savedId: string | null = null;
     try {
       savedId = await persist();
-      const { archived } = await finalize.mutateAsync(savedId);
-      if (archived) toast.success(t('domain:invoices.finalizeSuccess'));
-      else toast.warning(t('domain:invoices.archive.finalizedWithoutArchive'));
+      const { archived, documentNumber } = await finalize.mutateAsync(savedId);
+      if (archived) toast.success(t('domain:invoices.finalizeSuccess', { number: documentNumber }));
+      else
+        toast.warning(
+          t('domain:invoices.archive.finalizedWithoutArchive', { number: documentNumber }),
+        );
       leaveTo(routes.invoice(savedId));
     } catch (error) {
+      setConfirmRelease(false);
       // Gespeichert ist der Entwurf dann schon; die Datenbank sagt, was fehlt.
       toast.error(savedId ? t('domain:invoices.finalizeError') : t('domain:editor.saveError'), {
         description: readableDbError(error) ?? undefined,
@@ -923,20 +931,13 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
         </aside>
       </div>
 
-      <Dialog open={confirmRelease} onOpenChange={(_, data) => setConfirmRelease(data.open)}>
-        <DialogSurface>
-          <DialogBody>
-            <DialogTitle>{t(`domain:editor.release.title.${labelType}`)}</DialogTitle>
-            <DialogContent>{t('domain:editor.release.description')}</DialogContent>
-            <DialogActions>
-              <Button onClick={() => setConfirmRelease(false)}>{t('common:action.cancel')}</Button>
-              <Button appearance="primary" onClick={() => void onConfirmRelease()}>
-                {t('domain:editor.actions.release')}
-              </Button>
-            </DialogActions>
-          </DialogBody>
-        </DialogSurface>
-      </Dialog>
+      <ReleaseDialog
+        open={confirmRelease}
+        kind={labelType}
+        pending={busy === 'release'}
+        onConfirm={() => void onConfirmRelease()}
+        onClose={() => setConfirmRelease(false)}
+      />
 
       <Dialog open={discardOpen} onOpenChange={(_, data) => !data.open && onDiscardKept()}>
         <DialogSurface>

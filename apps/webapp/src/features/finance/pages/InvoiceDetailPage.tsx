@@ -22,6 +22,7 @@ import {
   TableHeaderCell,
   TableRow,
   Text,
+  Tooltip,
 } from '@fluentui/react-components';
 import {
   ArrowDownloadRegular,
@@ -59,6 +60,7 @@ import { DraftDeleteDialog } from '../DraftDeleteDialog';
 import { EInvoiceBadge } from '../EInvoiceBadge';
 import { PaymentSheet } from '../PaymentSheet';
 import { PdfViewer } from '../PdfViewer';
+import { ReleaseDialog } from '../ReleaseDialog';
 import { useFinalizeBlockers } from '../useFinalizeBlockers';
 import { useFinanceAccess } from '../useFinanceAccess';
 import {
@@ -100,6 +102,7 @@ export function InvoiceDetailPage() {
   const draftPreview = useDraftPreview(data?.status === 'draft' ? data.id : null);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [releaseOpen, setReleaseOpen] = useState(false);
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -143,17 +146,30 @@ export function InvoiceDetailPage() {
   const paidMinor = paidMinorOf(data);
   const overpaidMinor = overpaidMinorOf(data);
 
+  // Ohne Positionen gibt es nichts freizugeben; die Datenbank prüft das nicht.
+  const hasLines = data.lines.length > 0;
+  const releaseHint = !hasLines
+    ? t('domain:invoices.noLines')
+    : blockers.length > 0
+      ? t('domain:invoices.blockersTitle')
+      : null;
+
   async function onFinalize() {
     try {
-      const { archived } = await finalize.mutateAsync();
-      if (archived) toast.success(t('domain:invoices.finalizeSuccess'));
-      else toast.warning(t('domain:invoices.archive.finalizedWithoutArchive'));
+      const { archived, documentNumber } = await finalize.mutateAsync();
+      if (archived) toast.success(t('domain:invoices.finalizeSuccess', { number: documentNumber }));
+      else
+        toast.warning(
+          t('domain:invoices.archive.finalizedWithoutArchive', { number: documentNumber }),
+        );
     } catch (error) {
       // Die Datenbank prueft Pflichtangaben (u. a. Steuernummer des Betriebs)
       // und lehnt sonst ab. Ihre Meldung ist praeziser als jeder Text hier.
       toast.error(t('domain:invoices.finalizeError'), {
         description: readableDbError(error) ?? undefined,
       });
+    } finally {
+      setReleaseOpen(false);
     }
   }
 
@@ -282,14 +298,22 @@ export function InvoiceDetailPage() {
             ) : null}
 
             {access.canWriteSalesDocuments && isDraft ? (
-              <Button
-                appearance="primary"
-                disabled={finalize.isPending || blockers.length > 0}
-                onClick={() => void onFinalize()}
-                icon={<CheckmarkCircleRegular />}
-              >
-                {t('domain:invoices.finalize')}
-              </Button>
+              releaseHint ? (
+                <Tooltip content={releaseHint} relationship="description">
+                  <Button appearance="primary" disabledFocusable icon={<CheckmarkCircleRegular />}>
+                    {t('domain:editor.actions.release')}
+                  </Button>
+                </Tooltip>
+              ) : (
+                <Button
+                  appearance="primary"
+                  disabled={finalize.isPending}
+                  onClick={() => setReleaseOpen(true)}
+                  icon={<CheckmarkCircleRegular />}
+                >
+                  {t('domain:editor.actions.release')}
+                </Button>
+              )
             ) : null}
 
             {access.canWriteSalesDocuments && isDraft ? (
@@ -600,6 +624,16 @@ export function InvoiceDetailPage() {
         onOpenChange={setPaymentOpen}
         openMinor={openMinor}
       />
+
+      {isDraft ? (
+        <ReleaseDialog
+          open={releaseOpen}
+          kind={data.type === 'quote' ? 'quote' : 'invoice'}
+          pending={finalize.isPending}
+          onConfirm={() => void onFinalize()}
+          onClose={() => setReleaseOpen(false)}
+        />
+      ) : null}
 
       {isDraft ? (
         <DraftDeleteDialog
