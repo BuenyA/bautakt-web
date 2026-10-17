@@ -85,14 +85,15 @@ export function FinanceOverviewPage() {
             columns === 2 && 'lg:grid-cols-2',
           )}
         >
-          {outgoing ? (
-            <div className="min-w-0">
-              <OutgoingCard outgoing={outgoing} />
-            </div>
-          ) : null}
+          {/* Erst was reinkommt, dann was rausgeht (Owner 17.10.2026). */}
           {incoming ? (
             <div className="min-w-0">
               <IncomingCard incoming={incoming} />
+            </div>
+          ) : null}
+          {outgoing ? (
+            <div className="min-w-0">
+              <OutgoingCard outgoing={outgoing} />
             </div>
           ) : null}
           {numbers ? (
