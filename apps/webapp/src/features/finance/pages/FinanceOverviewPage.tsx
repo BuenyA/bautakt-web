@@ -24,7 +24,6 @@ import { routes, withCreate } from '@/lib/routes';
 
 import { FinanceHeader } from '../FinanceHeader';
 import { DeskCard, type DeskGroupView } from '../overview/DeskCard';
-import { FinanceNumbersCard } from '../overview/FinanceNumbersCard';
 import type { IncomingInvoiceListRow } from '../useExpenses';
 import { useFinanceOverviewData } from '../useFinanceOverviewData';
 
@@ -43,9 +42,9 @@ export function FinanceOverviewPage() {
   const { t } = useTranslation();
   const data = useFinanceOverviewData();
   const canManageOverheadCosts = usePermission('canManageOverheadCosts');
-  const { access, outgoing, incoming, numbers } = data;
+  const { access, outgoing, incoming } = data;
 
-  const columns = [outgoing, incoming, numbers].filter(Boolean).length;
+  const columns = [outgoing, incoming].filter(Boolean).length;
 
   return (
     <div className="flex flex-col gap-6">
@@ -78,13 +77,7 @@ export function FinanceOverviewPage() {
           description={t('domain:invoiceDesk.nothingVisible')}
         />
       ) : (
-        <div
-          className={cn(
-            'grid gap-4',
-            columns === 3 && 'lg:grid-cols-2 xl:grid-cols-[5fr_5fr_3fr]',
-            columns === 2 && 'lg:grid-cols-2',
-          )}
-        >
+        <div className={cn('grid gap-4', columns === 2 && 'lg:grid-cols-2')}>
           {/* Erst was reinkommt, dann was rausgeht (Owner 17.10.2026). */}
           {incoming ? (
             <div className="min-w-0">
@@ -94,11 +87,6 @@ export function FinanceOverviewPage() {
           {outgoing ? (
             <div className="min-w-0">
               <OutgoingCard outgoing={outgoing} />
-            </div>
-          ) : null}
-          {numbers ? (
-            <div className={cn('min-w-0', columns === 3 && 'lg:col-span-2 xl:col-span-1')}>
-              <FinanceNumbersCard numbers={numbers} />
             </div>
           ) : null}
         </div>

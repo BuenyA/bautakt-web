@@ -17,7 +17,9 @@ import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 
 import { FinanceHeader } from '../FinanceHeader';
+import { FinanceKpiCards } from '../FinanceKpiCards';
 import { expenseEntries, useExpenses, useIncomingInvoiceList } from '../useExpenses';
+import { useFinanceNumbers } from '../useFinanceNumbers';
 import { INVOICE_TYPE_LIST, useSalesDocuments } from '../useSalesDocuments';
 
 type CustomerTotal = { customer: string; minor: number; count: number };
@@ -36,6 +38,7 @@ export function ReportsPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
   const [months, setMonths] = useState<number>(12);
+  const numbers = useFinanceNumbers();
 
   const documents = useSalesDocuments(INVOICE_TYPE_LIST);
   const expenses = useExpenses();
@@ -102,8 +105,12 @@ export function ReportsPage() {
     <div className="flex flex-col gap-6">
       <FinanceHeader description={t('domain:reports.description')} />
 
-      {/* Unter den Reitern, nicht im Kopf: im Kopf bricht die Auswahl auf
-          schmalen Fenstern um und schiebt die Reiter nach unten. */}
+      {/* Kennzahlen aus der Übersicht, je Zahl eine Karte (Owner 17.10.2026).
+          Sie gelten für Monat und Jahr, nicht für den Zeitraum darunter. */}
+      {numbers ? <FinanceKpiCards numbers={numbers} /> : null}
+
+      {/* Nicht im Kopf: dort bricht die Auswahl auf schmalen Fenstern um und
+          schiebt die Reiter nach unten. Sie gilt für die Diagramme darunter. */}
       <Select
         className="self-start"
         aria-label={t('domain:reports.rangeLabel')}
