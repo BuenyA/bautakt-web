@@ -2,9 +2,8 @@ import { makeStyles, mergeClasses, tokens, Tooltip } from '@fluentui/react-compo
 import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles({
-  // Bewusst nicht in der Markenfarbe Blau: das „E“ soll als Besonderheit
-  // auffallen (Owner 17.10.2026). Verlauf aus zwei Fluent-Palettenfarben,
-  // Türkis nach Violett, dazu ein leichter Schein in derselben Farbe.
+  // Schlichtes Grün statt der Markenfarbe Blau, ohne Verlauf und Schein
+  // (Owner 17.10.2026): fällt auf, ohne zu laut zu sein.
   badge: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -13,9 +12,9 @@ const useStyles = makeStyles({
     width: '18px',
     height: '18px',
     borderRadius: tokens.borderRadiusMedium,
-    backgroundImage: `linear-gradient(135deg, ${tokens.colorPaletteLightTealBorderActive}, ${tokens.colorPaletteGrapeBorderActive})`,
-    boxShadow: `0 0 6px ${tokens.colorPaletteLightTealBorderActive}`,
-    color: tokens.colorNeutralForegroundOnBrand,
+    backgroundColor: tokens.colorPaletteGreenBackground1,
+    border: `${tokens.strokeWidthThin} solid ${tokens.colorPaletteGreenBorder1}`,
+    color: tokens.colorPaletteGreenForeground1,
     fontSize: tokens.fontSizeBase100,
     fontWeight: tokens.fontWeightBold,
     lineHeight: '1',
