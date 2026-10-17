@@ -417,11 +417,13 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       ) : null}
 
       {/* Split-Screen: links das Formular in der Reihenfolge des PDFs, rechts
-          das PDF selbst. Unter xl untereinander, die Vorschau unten. */}
+          das PDF selbst. Unter xl untereinander, die Vorschau unten. Die Raster im
+          Formular richten sich nach der Spaltenbreite (`@container`), nicht nach
+          dem Fenster: neben dem PDF ist die Spalte auf dem Laptop schmal. */}
       <div className="grid gap-6 xl:grid-cols-2">
-        <div className="flex min-w-0 flex-col gap-4" onBlur={() => live.flush()}>
+        <div className="@container flex min-w-0 flex-col gap-4" onBlur={() => live.flush()}>
           <Section title={t('domain:editor.sections.document')}>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 @lg:grid-cols-2">
               {isInvoice ? (
                 <div className="grid gap-2">
                   <Label htmlFor={typeFieldId}>{t('domain:editor.documentType')}</Label>
@@ -471,7 +473,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
           </Section>
 
           <Section title={t('domain:editor.sections.recipient')}>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 @lg:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor={customerFieldId}>{t('domain:invoices.columns.customer')}</Label>
                 <ContactPicker
@@ -494,11 +496,15 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
           </Section>
 
           <Section title={t('domain:editor.sections.dates')}>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 @2xl:grid-cols-3">
               {/* Ueber den Feldern: der Kalender oeffnet nach unten und wuerde
                   die Meldung direkt unter dem Faellig-Feld verdecken. */}
               {dueBeforeIssue ? (
-                <p id={dueAlertId} role="alert" className="text-destructive text-sm sm:col-span-3">
+                <p
+                  id={dueAlertId}
+                  role="alert"
+                  className="text-destructive text-sm @2xl:col-span-3"
+                >
                   {t('domain:editor.dueBeforeIssue')}
                 </p>
               ) : null}
@@ -554,16 +560,16 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
               {state.lines.map((line) => (
                 <div
                   key={line.key}
-                  className="border-border grid gap-3 rounded-lg border p-3 sm:grid-cols-6"
+                  className="border-border grid gap-3 rounded-lg border p-3 @xl:grid-cols-6"
                 >
-                  <div className="sm:col-span-4">
+                  <div className="@xl:col-span-4">
                     <Field
                       label={t('domain:invoices.lineColumns.title')}
                       value={line.title}
                       onChange={(value) => updateLine(line.key, { title: value })}
                     />
                   </div>
-                  <div className="grid gap-2 sm:col-span-2">
+                  <div className="grid gap-2 @xl:col-span-2">
                     <Label htmlFor={`line-${line.key}-kind`}>{t('domain:editor.kind')}</Label>
                     <Select
                       id={`line-${line.key}-kind`}
@@ -653,7 +659,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
           <Section title={t('domain:editor.taxMode.label')}>
             <div className="flex flex-col gap-3">
-              <div className="grid gap-2 sm:max-w-sm">
+              <div className="grid gap-2 @lg:max-w-sm">
                 <Label htmlFor={taxModeFieldId} className="sr-only">
                   {t('domain:editor.taxMode.label')}
                 </Label>
@@ -698,7 +704,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
           {isInvoice ? (
             <Section title={t('domain:editor.sections.payment')}>
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-4 @2xl:grid-cols-3">
                 <Field
                   label={t('domain:editor.paymentTermDays')}
                   value={state.paymentTermDays}
@@ -842,7 +848,7 @@ function DateField({
   const hintId = useId();
   const described = [describedBy, hint ? hintId : null].filter(Boolean).join(' ') || undefined;
   return (
-    <div className="grid gap-2">
+    <div className="grid min-w-0 gap-2">
       <Label htmlFor={id}>{label}</Label>
       <DatePicker
         id={id}
