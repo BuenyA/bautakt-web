@@ -48,9 +48,15 @@ import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
-import { documentFileBaseName, downloadBytes, extractFacturX, hasEInvoice } from '../archiveFiles';
+import {
+  documentFileBaseName,
+  downloadBytes,
+  extractFacturX,
+  isEInvoiceDocument,
+} from '../archiveFiles';
 import { DocumentStatusBadge } from '../DocumentStatusBadge';
 import { DraftDeleteDialog } from '../DraftDeleteDialog';
+import { EInvoiceBadge } from '../EInvoiceBadge';
 import { PaymentSheet } from '../PaymentSheet';
 import { PdfViewer } from '../PdfViewer';
 import { useFinalizeBlockers } from '../useFinalizeBlockers';
@@ -235,7 +241,7 @@ export function InvoiceDetailPage() {
                     >
                       {t('domain:invoices.download.pdf')}
                     </MenuItem>
-                    {hasEInvoice(data.type) ? (
+                    {isEInvoiceDocument(data) ? (
                       <MenuItem
                         icon={<CodeRegular />}
                         disabled={!archivedBytes}
@@ -356,6 +362,7 @@ export function InvoiceDetailPage() {
       ) : null}
 
       <div className="flex flex-wrap items-center gap-3">
+        {isEInvoiceDocument(data) ? <EInvoiceBadge size="large" /> : null}
         <DocumentStatusBadge status={data.status} />
         {data.sent_at ? (
           <StatusBadge tone="outline">

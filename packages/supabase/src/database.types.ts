@@ -2,7 +2,7 @@
  * GENERIERT — nicht von Hand bearbeiten.
  *
  * Quelle:  Supabase-Projekt "Bautakt" (bxivzvmlcnaxqlytumvz, eu-central-1)
- * Stand:   2026-10-14
+ * Stand:   2026-10-17
  *
  * Neu erzeugen:
  *   npx supabase gen types typescript --project-id bxivzvmlcnaxqlytumvz \
@@ -3219,6 +3219,7 @@ export type Database = {
           customer_id: string | null
           document_number: string | null
           due_date: string | null
+          e_invoice: boolean
           footer_text: string
           gross_total: number
           id: string
@@ -3259,6 +3260,7 @@ export type Database = {
           customer_id?: string | null
           document_number?: string | null
           due_date?: string | null
+          e_invoice?: boolean
           footer_text?: string
           gross_total?: number
           id?: string
@@ -3299,6 +3301,7 @@ export type Database = {
           customer_id?: string | null
           document_number?: string | null
           due_date?: string | null
+          e_invoice?: boolean
           footer_text?: string
           gross_total?: number
           id?: string
@@ -3748,6 +3751,56 @@ export type Database = {
         Args: { p_company_id: string; p_target_role: string }
         Returns: boolean
       }
+      cancel_sales_document: {
+        Args: { p_document_id: string }
+        Returns: {
+          buyer_city: string
+          buyer_country: string
+          buyer_customer_number: string
+          buyer_email: string
+          buyer_name: string
+          buyer_postal_code: string
+          buyer_reference: string
+          buyer_street: string
+          buyer_vat_id: string
+          company_id: string
+          content_hash: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          customer_id: string | null
+          document_number: string | null
+          due_date: string | null
+          e_invoice: boolean
+          footer_text: string
+          gross_total: number
+          id: string
+          intro_text: string
+          issue_date: string | null
+          issued_at: string | null
+          labor_share: number
+          material_share: number
+          modified_at: string | null
+          net_total: number
+          notes: string
+          parent_document_id: string | null
+          payment_term_days: number | null
+          service_date: string | null
+          skonto_days: number | null
+          skonto_percent: number | null
+          status: string
+          storage_path: string | null
+          tax_mode: string
+          type: string
+          vat_total: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sales_documents"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       checklist_company_id: {
         Args: { p_checklist_id: string }
         Returns: string
@@ -3858,6 +3911,7 @@ export type Database = {
           customer_id: string | null
           document_number: string | null
           due_date: string | null
+          e_invoice: boolean
           footer_text: string
           gross_total: number
           id: string

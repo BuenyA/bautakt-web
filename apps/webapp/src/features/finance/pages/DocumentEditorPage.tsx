@@ -12,12 +12,19 @@ import {
   Button,
   Card,
   CardHeader,
+  Dialog,
+  DialogActions,
+  DialogBody,
+  DialogContent,
+  DialogSurface,
+  DialogTitle,
   Input,
   Label,
   MessageBar,
   MessageBarBody,
   MessageBarTitle,
   Select,
+  Switch,
   Text,
   Textarea,
   Tooltip,
@@ -26,11 +33,13 @@ import {
   AddRegular,
   ArrowDownloadRegular,
   ArrowSyncRegular,
+  CheckmarkCircleRegular,
   DeleteRegular,
+  SaveRegular,
 } from '@fluentui/react-icons';
 import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams, useSearchParams } from 'react-router';
+import { useBlocker, useNavigate, useParams, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { LinkButton } from '@/components/common/LinkButton';
@@ -46,8 +55,10 @@ import { readableDbError } from '@/lib/dbErrors';
 import { invoiceFromOrderParam, routes } from '@/lib/routes';
 
 import { invalidTermFields, prefillCustomerTerms } from '../customerTerms';
+import { EInvoiceBadge } from '../EInvoiceBadge';
 import { PdfViewer } from '../PdfViewer';
 import {
+  buildDraftRows,
   type EditableDocumentType,
   type EditorLine,
   type EditorState,
@@ -60,11 +71,10 @@ import {
   lineNetMinor,
   loadOrderLines,
   useCompanyTaxProfile,
-  useDiscardDraft,
   useSaveDraft,
 } from '../useDocumentEditor';
 import { useLivePreview } from '../useLivePreview';
-import { useSalesDocument } from '../useSalesDocument';
+import { useFinalizeDocument, useSalesDocument } from '../useSalesDocument';
 
 function initialState(type: EditableDocumentType, taxMode: TaxMode): EditorState {
   return {
@@ -84,6 +94,8 @@ function initialState(type: EditableDocumentType, taxMode: TaxMode): EditorState
     paymentTermDays: '',
     skontoPercent: '',
     skontoDays: '',
+    // Standard ist die E-Rechnung; abwählen nur bewusst im Formular.
+    eInvoice: true,
     lines: [emptyLine()],
   };
 }
@@ -96,10 +108,10 @@ function numberText(value: number | null): string {
  * Editor fuer Angebote und Rechnungen.
  *
  * Split-Screen (#152): links das Formular in der Reihenfolge des PDFs, rechts
- * das echte PDF aus `finance-document-render`. Jede Änderung wird nach einer
- * Tipp-Pause bzw. beim Verlassen des Felds als Entwurf gespeichert und neu
- * gerendert (`useLivePreview`) — die Vorschau ist so dasselbe PDF, das beim
- * Festschreiben entsteht, bis auf Nummer und Entwurfs-Wasserzeichen.
+ * das echte PDF aus `finance-document-render`, nach jeder Tipp-Pause neu aus
+ * dem ungespeicherten Formular gerendert (`useLivePreview`). Gespeichert wird
+ * nur auf Klick: „Entwurf speichern“ oder „Freigeben“; „Abbrechen“ verwirft
+ * (Owner 17.10.2026). Die Knöpfe stehen oben und unter dem Formular.
  *
  * ⚠️ Nur Entwuerfe. Festgeschriebene Belege sperrt die Datenbank
  * (`enforce_sales_document_immutability`) — sie hier zum Bearbeiten anzubieten
@@ -124,10 +136,16 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const orders = useOrders();
   const taxProfile = useCompanyTaxProfile();
   const save = useSaveDraft();
-  const discardDraft = useDiscardDraft();
+  const finalize = useFinalizeDocument(id);
   const existingLoading = useCompanyListLoading(existing);
 
   const [state, setState] = useState<EditorState | null>(null);
+  // Gespeicherter Stand als JSON; weicht das Formular ab, gibt es Ungespeichertes.
+  const [baseline, setBaseline] = useState<string | null>(null);
+  const [documentId, setDocumentId] = useState<string | null>(id ?? null);
+  const [busy, setBusy] = useState<'save' | 'release' | null>(null);
+  const [confirmRelease, setConfirmRelease] = useState(false);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [importingOrder, setImportingOrder] = useState(false);
   // `?auftrag=` übernimmt die Positionen genau einmal, nicht bei jedem Rendern.
@@ -146,18 +164,16 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       ? (orders.data ?? []).find((row) => row.id === fromOrderId)
       : undefined;
     const fresh = initialState(type, defaultTaxMode);
-    if (order) {
-      pendingOrderImport.current = order.id;
-      setState({ ...fresh, orderId: order.id, customerId: order.customer_id });
-    } else {
-      setState(fresh);
-    }
+    const start = order ? { ...fresh, orderId: order.id, customerId: order.customer_id } : fresh;
+    if (order) pendingOrderImport.current = order.id;
+    setState(start);
+    setBaseline(JSON.stringify(start));
   }
 
   // Beim Bearbeiten: sobald der Beleg geladen ist, einmal in den Formularzustand
   // uebernehmen. Danach gehoert der Zustand dem Formular.
   if (id && state === null && existing.data && taxProfile.isFetched) {
-    setState({
+    const loaded: EditorState = {
       type: (existing.data.type as EditableDocumentType) ?? type,
       customerId: existing.data.customer_id,
       // Der Auftrag steht an den Positionen, nicht am Kopf. Der Editor schreibt
@@ -178,6 +194,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       paymentTermDays: numberText(existing.data.payment_term_days),
       skontoPercent: numberText(existing.data.skonto_percent),
       skontoDays: numberText(existing.data.skonto_days),
+      eInvoice: existing.data.e_invoice !== false,
       lines: existing.data.lines.length
         ? existing.data.lines.map((line) => ({
             key: line.id,
@@ -205,20 +222,40 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                 : null,
           }))
         : [emptyLine()],
-    });
+    };
+    setState(loaded);
+    setBaseline(JSON.stringify(loaded));
   }
 
   const totals = useMemo(() => (state ? editorTotals(state.lines, state.taxMode) : null), [state]);
 
   const isLocked = Boolean(id && existing.data && existing.data.status !== 'draft');
-  const live = useLivePreview({
-    state,
-    initialDocumentId: id ?? null,
-    save: (current, documentId) => save.mutateAsync({ state: current, documentId }),
-    discard: discardDraft,
-    enabled: state !== null && !isLocked,
-  });
-  const [saving, setSaving] = useState(false);
+  const companyId = membership?.companyId;
+  const rows = useMemo(
+    () => (state && companyId ? buildDraftRows(state, companyId) : null),
+    [state, companyId],
+  );
+  const live = useLivePreview({ rows, documentId, enabled: state !== null && !isLocked });
+
+  const dirty = state !== null && baseline !== null && JSON.stringify(state) !== baseline;
+
+  // Wegnavigieren mit Ungespeichertem fragt nach. Nach Speichern oder
+  // Freigeben geht es ohne Rückfrage weiter (`leavingRef`).
+  const dirtyRef = useRef(dirty);
+  const leavingRef = useRef(false);
+  useEffect(() => {
+    dirtyRef.current = dirty;
+  }, [dirty]);
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      !leavingRef.current && dirtyRef.current && currentLocation.pathname !== nextLocation.pathname,
+  );
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent) => event.preventDefault();
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [dirty]);
 
   async function importOrderLines(orderId: string) {
     const companyId = membership?.companyId;
@@ -341,50 +378,136 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     );
   }
 
-  async function onSave() {
-    if (!state) return;
-
+  /** Pflichtangaben vor dem Speichern; meldet den ersten Fehler. */
+  function validate(): boolean {
     // ⚠️ Das Leistungsdatum ist bei Rechnungen Pflicht: ohne es lehnt
     // `finalize_sales_document` das Festschreiben ab. Lieber hier melden als
     // den Beleg fertig tippen lassen und erst am Ende scheitern.
-    if (isInvoice && !state.serviceDate) {
+    if (isInvoice && !state?.serviceDate) {
       setError(t('domain:editor.serviceDateRequired'));
-      return;
+      return false;
     }
     if (dueBeforeIssue) {
       setError(t('domain:editor.dueBeforeIssue'));
-      return;
+      return false;
     }
     if (invalidTerms.length > 0) {
       setError(t('domain:editor.termsInvalid'));
-      return;
+      return false;
     }
-
     setError(null);
-    setSaving(true);
+    return true;
+  }
+
+  async function persist(): Promise<string> {
+    const current = state!;
+    const savedId = await save.mutateAsync({ state: current, documentId });
+    setDocumentId(savedId);
+    setBaseline(JSON.stringify(current));
+    return savedId;
+  }
+
+  function leaveTo(path: string) {
+    leavingRef.current = true;
+    void navigate(path);
+  }
+
+  const backTo = documentId
+    ? routes.invoice(documentId)
+    : state.type === 'quote'
+      ? routes.quotes
+      : routes.invoices;
+
+  async function onSaveDraft() {
+    if (!validate()) return;
+    setBusy('save');
     try {
-      // Über dieselbe Kette wie die Live-Vorschau, nie parallel dazu.
-      const savedId = await live.persist();
+      const savedId = await persist();
       toast.success(t('domain:editor.saved'));
-      if (savedId) void navigate(routes.invoice(savedId));
+      leaveTo(routes.invoice(savedId));
     } catch (error) {
       toast.error(t('domain:editor.saveError'), {
         description: readableDbError(error) ?? undefined,
       });
     } finally {
-      setSaving(false);
+      setBusy(null);
     }
   }
+
+  function onRelease() {
+    if (!validate()) return;
+    setConfirmRelease(true);
+  }
+
+  async function onConfirmRelease() {
+    setConfirmRelease(false);
+    setBusy('release');
+    let savedId: string | null = null;
+    try {
+      savedId = await persist();
+      const { archived } = await finalize.mutateAsync(savedId);
+      if (archived) toast.success(t('domain:invoices.finalizeSuccess'));
+      else toast.warning(t('domain:invoices.archive.finalizedWithoutArchive'));
+      leaveTo(routes.invoice(savedId));
+    } catch (error) {
+      // Gespeichert ist der Entwurf dann schon; die Datenbank sagt, was fehlt.
+      toast.error(savedId ? t('domain:invoices.finalizeError') : t('domain:editor.saveError'), {
+        description: readableDbError(error) ?? undefined,
+      });
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  function onCancel() {
+    if (dirty) setConfirmDiscard(true);
+    else leaveTo(backTo);
+  }
+
+  function onDiscardConfirmed() {
+    setConfirmDiscard(false);
+    if (blocker.state === 'blocked') blocker.proceed();
+    else leaveTo(backTo);
+  }
+
+  function onDiscardKept() {
+    setConfirmDiscard(false);
+    if (blocker.state === 'blocked') blocker.reset();
+  }
+
+  const actions = (
+    <div className="flex flex-wrap items-center justify-end gap-2">
+      <Button disabled={busy !== null} onClick={onCancel}>
+        {t('common:action.cancel')}
+      </Button>
+      <Button
+        icon={<SaveRegular />}
+        disabled={busy !== null || dueBeforeIssue}
+        onClick={() => void onSaveDraft()}
+      >
+        {t('domain:editor.actions.saveDraft')}
+      </Button>
+      <Button
+        appearance="primary"
+        icon={<CheckmarkCircleRegular />}
+        disabled={busy !== null || dueBeforeIssue}
+        onClick={onRelease}
+      >
+        {t('domain:editor.actions.release')}
+      </Button>
+    </div>
+  );
 
   const previewError = live.error
     ? (readableDbError(live.error) ?? t('domain:editor.preview.error'))
     : null;
   const statusText =
-    live.phase === 'saving'
+    busy !== null
       ? t('domain:editor.preview.saving')
-      : live.documentId
-        ? t('domain:editor.preview.saved')
-        : t('domain:editor.preview.notSaved');
+      : dirty || !documentId
+        ? t('domain:editor.preview.notSaved')
+        : t('domain:editor.preview.saved');
+  const discardOpen = confirmDiscard || blocker.state === 'blocked';
 
   return (
     <div className="flex flex-col gap-4">
@@ -392,20 +515,11 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
         title={id ? t('domain:editor.editTitle') : t(`domain:editor.newTitle.${labelType}`)}
         description={t('domain:editor.draftHint')}
         actions={
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-end gap-3">
             <Text size={200} className="text-muted-foreground" aria-live="polite">
               {statusText}
             </Text>
-            <LinkButton to={state.type === 'quote' ? routes.quotes : routes.invoices}>
-              {t('common:action.close')}
-            </LinkButton>
-            <Button
-              appearance="primary"
-              disabled={saving || dueBeforeIssue}
-              onClick={() => void onSave()}
-            >
-              {t('domain:editor.saveAndClose')}
-            </Button>
+            {actions}
           </div>
         }
       />
@@ -421,7 +535,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
           Formular richten sich nach der Spaltenbreite (`@container`), nicht nach
           dem Fenster: neben dem PDF ist die Spalte auf dem Laptop schmal. */}
       <div className="grid gap-6 xl:grid-cols-2">
-        <div className="@container flex min-w-0 flex-col gap-4" onBlur={() => live.flush()}>
+        <div className="@container flex min-w-0 flex-col gap-4">
           <Section title={t('domain:editor.sections.document')}>
             <div className="grid gap-4 @lg:grid-cols-2">
               {isInvoice ? (
@@ -469,6 +583,23 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                   ) : null}
                 </div>
               </div>
+              {isInvoice ? (
+                <div className="grid gap-1 @lg:col-span-2">
+                  <Switch
+                    checked={state.eInvoice}
+                    onChange={(_, data) => update({ eInvoice: data.checked })}
+                    label={
+                      <span className="inline-flex items-center gap-2">
+                        {t('domain:eInvoice.switchLabel')}
+                        {state.eInvoice ? <EInvoiceBadge /> : null}
+                      </span>
+                    }
+                  />
+                  <p className="text-muted-foreground text-sm">
+                    {state.eInvoice ? t('domain:eInvoice.onHint') : t('domain:eInvoice.offHint')}
+                  </p>
+                </div>
+              ) : null}
             </div>
           </Section>
 
@@ -738,6 +869,14 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
               onChange={(event) => update({ footerText: event.target.value })}
             />
           </Section>
+
+          {/* Dieselben Knöpfe wie oben: wer unten fertig ist, muss nicht hochscrollen. */}
+          <div className="border-border flex flex-wrap items-center justify-between gap-3 border-t pt-4">
+            <Text size={200} className="text-muted-foreground">
+              {statusText}
+            </Text>
+            {actions}
+          </div>
         </div>
 
         {/* Vorschau bleibt beim Scrollen des Formulars stehen. */}
@@ -767,7 +906,11 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
             // Lange Listen scrollen, damit das PDF sichtbar bleibt.
             <MessageBar intent="warning" layout="multiline" className="shrink-0">
               <MessageBarBody className="max-h-48 overflow-y-auto">
-                <MessageBarTitle>{t('domain:editor.preview.warningsTitle')}</MessageBarTitle>
+                <MessageBarTitle>
+                  {isInvoice && state.eInvoice
+                    ? t('domain:editor.preview.warningsTitle')
+                    : t('domain:editor.preview.warningsTitlePlain')}
+                </MessageBarTitle>
                 <ul className="mt-1 list-disc pl-5">
                   {live.warnings.map((warning) => (
                     <li key={warning}>{warning}</li>
@@ -778,6 +921,36 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
           ) : null}
         </aside>
       </div>
+
+      <Dialog open={confirmRelease} onOpenChange={(_, data) => setConfirmRelease(data.open)}>
+        <DialogSurface>
+          <DialogBody>
+            <DialogTitle>{t(`domain:editor.release.title.${labelType}`)}</DialogTitle>
+            <DialogContent>{t('domain:editor.release.description')}</DialogContent>
+            <DialogActions>
+              <Button onClick={() => setConfirmRelease(false)}>{t('common:action.cancel')}</Button>
+              <Button appearance="primary" onClick={() => void onConfirmRelease()}>
+                {t('domain:editor.actions.release')}
+              </Button>
+            </DialogActions>
+          </DialogBody>
+        </DialogSurface>
+      </Dialog>
+
+      <Dialog open={discardOpen} onOpenChange={(_, data) => !data.open && onDiscardKept()}>
+        <DialogSurface>
+          <DialogBody>
+            <DialogTitle>{t('domain:editor.discard.title')}</DialogTitle>
+            <DialogContent>{t('domain:editor.discard.description')}</DialogContent>
+            <DialogActions>
+              <Button onClick={onDiscardKept}>{t('domain:editor.discard.keep')}</Button>
+              <Button appearance="primary" onClick={onDiscardConfirmed}>
+                {t('domain:editor.discard.confirm')}
+              </Button>
+            </DialogActions>
+          </DialogBody>
+        </DialogSurface>
+      </Dialog>
     </div>
   );
 }

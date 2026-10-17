@@ -16,6 +16,16 @@ export function hasEInvoice(type: string): boolean {
   return (E_INVOICE_TYPES as readonly string[]).includes(type);
 }
 
+/** Ausgangsbeleg mit E-Rechnung: passende Belegart und nicht abgewählt. */
+export function isEInvoiceDocument(document: { type: string; e_invoice?: boolean | null }) {
+  return hasEInvoice(document.type) && document.e_invoice !== false;
+}
+
+/** Eingangsrechnung, die als ZUGFeRD oder XRechnung ankam. */
+export function isEInvoiceIncoming(invoice: { source_format?: string | null }) {
+  return invoice.source_format === 'zugferd' || invoice.source_format === 'xrechnung';
+}
+
 const UMLAUTS: Record<string, string> = {
   ä: 'ae',
   ö: 'oe',

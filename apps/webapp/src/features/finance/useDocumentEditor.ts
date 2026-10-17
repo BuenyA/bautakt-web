@@ -73,6 +73,8 @@ export type EditorState = TermFields & {
   introText: string;
   footerText: string;
   notes: string;
+  /** E-Rechnung (Factur-X im PDF). Standard an; nur bei Rechnungsarten wählbar. */
+  eInvoice: boolean;
   lines: EditorLine[];
 };
 
@@ -295,14 +297,87 @@ export function useCompanyTaxProfile() {
  * das Formular nicht hat. Beleg und Positionen haengen am selben
  * `document_id` — die Zeilen verschwinden mit dem Beleg.
  */
+/**
+ * Kopf und Positionen eines Entwurfs, genau so, wie `useSaveDraft` sie
+ * speichert. Die Vorschau schickt dieselben Zeilen ungespeichert an
+ * `finance-document-render` — so ist das PDF der Vorschau dasselbe wie das
+ * nach dem Speichern.
+ */
+export function buildDraftRows(state: EditorState, companyId: string) {
+  const totals = editorTotals(state.lines, state.taxMode);
+  const savedLines = state.lines.filter((line) => !isBlankLine(line));
+  const shareOf = (kind: LineKind) =>
+    minorToEuros(
+      savedLines
+        .filter((line) => line.kind === kind)
+        .reduce((sum, line) => sum + lineNetMinor(line), 0),
+    );
+
+  const header = {
+    company_id: companyId,
+    type: state.type,
+    status: 'draft',
+    customer_id: state.customerId,
+    tax_mode: state.taxMode,
+    // Leer bleibt null. Heute setzt erst finalize_sales_document
+    // (coalesce(issue_date, CURRENT_DATE)), nicht das Speichern.
+    issue_date: state.issueDate || null,
+    service_date: state.serviceDate || null,
+    due_date: state.dueDate || null,
+    intro_text: state.introText,
+    footer_text: state.footerText,
+    notes: state.notes,
+    buyer_reference: state.buyerReference.trim(),
+    payment_term_days: optionalNumber(state.paymentTermDays),
+    skonto_percent: optionalNumber(state.skontoPercent),
+    skonto_days: optionalNumber(state.skontoDays),
+    net_total: minorToEuros(totals.netMinor),
+    vat_total: minorToEuros(totals.vatMinor),
+    gross_total: minorToEuros(totals.grossMinor),
+    labor_share: shareOf('labor'),
+    material_share: shareOf('material'),
+    // Angebote haben nie ein XML; die Spalte bleibt dort beim Standard.
+    e_invoice: isInvoiceEditorType(state.type) ? state.eInvoice : true,
+  };
+
+  const lines = savedLines.map((line, index) => {
+    const unitPrice = parseNumber(line.unitPrice);
+    const netMinor = line.kind === 'text' ? 0 : lineNetMinor(line);
+    return {
+      company_id: companyId,
+      order_id: state.orderId,
+      sort_order: index,
+      kind: line.kind,
+      title: line.title.trim(),
+      description: line.description.trim(),
+      quantity: parseNumber(line.quantity),
+      unit: line.unit.trim(),
+      unit_price: line.kind === 'discount' ? -Math.abs(unitPrice) : unitPrice,
+      discount_percent: parseNumber(line.discountPercent),
+      // Der Renderer liest die Steuerart je Position aus `tax_category`.
+      // Stünde hier `standard`, käme eine § 13b-Rechnung mit 19 % aufs PDF.
+      tax_category: state.taxMode,
+      tax_rate_percent: effectiveTaxRate(line, state.taxMode),
+      net_amount: minorToEuros(netMinor),
+      labor_share: line.kind === 'labor' ? minorToEuros(netMinor) : 0,
+      source_type: line.source?.type ?? null,
+      source_id: line.source?.id ?? null,
+    };
+  });
+
+  return { header, lines };
+}
+
+export type DraftRows = ReturnType<typeof buildDraftRows>;
+
 export function useSaveDraft() {
   const queryClient = useQueryClient();
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
 
   return useMutation({
-    // `documentId` je Aufruf statt je Hook: der erste automatische Speicherlauf
-    // legt den Entwurf an, alle weiteren überschreiben genau diesen.
+    // `documentId` je Aufruf statt je Hook: das erste Speichern legt den
+    // Entwurf an, jedes weitere überschreibt genau diesen.
     mutationFn: async ({
       state,
       documentId,
@@ -310,39 +385,7 @@ export function useSaveDraft() {
       state: EditorState;
       documentId: string | null;
     }): Promise<string> => {
-      const totals = editorTotals(state.lines, state.taxMode);
-      const savedLines = state.lines.filter((line) => !isBlankLine(line));
-      const shareOf = (kind: LineKind) =>
-        minorToEuros(
-          savedLines
-            .filter((line) => line.kind === kind)
-            .reduce((sum, line) => sum + lineNetMinor(line), 0),
-        );
-
-      const header = {
-        company_id: companyId!,
-        type: state.type,
-        status: 'draft',
-        customer_id: state.customerId,
-        tax_mode: state.taxMode,
-        // Leer bleibt null. Heute setzt erst finalize_sales_document
-        // (coalesce(issue_date, CURRENT_DATE)), nicht das Speichern.
-        issue_date: state.issueDate || null,
-        service_date: state.serviceDate || null,
-        due_date: state.dueDate || null,
-        intro_text: state.introText,
-        footer_text: state.footerText,
-        notes: state.notes,
-        buyer_reference: state.buyerReference.trim(),
-        payment_term_days: optionalNumber(state.paymentTermDays),
-        skonto_percent: optionalNumber(state.skontoPercent),
-        skonto_days: optionalNumber(state.skontoDays),
-        net_total: minorToEuros(totals.netMinor),
-        vat_total: minorToEuros(totals.vatMinor),
-        gross_total: minorToEuros(totals.grossMinor),
-        labor_share: shareOf('labor'),
-        material_share: shareOf('material'),
-      };
+      const { header, lines: rows } = buildDraftRows(state, companyId!);
 
       let id = documentId;
 
@@ -370,32 +413,7 @@ export function useSaveDraft() {
         id = data.id;
       }
 
-      const lines = savedLines.map((line, index) => {
-        const unitPrice = parseNumber(line.unitPrice);
-        const netMinor = line.kind === 'text' ? 0 : lineNetMinor(line);
-        return {
-          company_id: companyId!,
-          document_id: id!,
-          order_id: state.orderId,
-          sort_order: index,
-          kind: line.kind,
-          title: line.title.trim(),
-          description: line.description.trim(),
-          quantity: parseNumber(line.quantity),
-          unit: line.unit.trim(),
-          unit_price: line.kind === 'discount' ? -Math.abs(unitPrice) : unitPrice,
-          discount_percent: parseNumber(line.discountPercent),
-          // Der Renderer liest die Steuerart je Position aus `tax_category`.
-          // Stünde hier `standard`, käme eine § 13b-Rechnung mit 19 % aufs PDF.
-          tax_category: state.taxMode,
-          tax_rate_percent: effectiveTaxRate(line, state.taxMode),
-          net_amount: minorToEuros(netMinor),
-          labor_share: line.kind === 'labor' ? minorToEuros(netMinor) : 0,
-          source_type: line.source?.type ?? null,
-          source_id: line.source?.id ?? null,
-        };
-      });
-
+      const lines = rows.map((row) => ({ ...row, document_id: id! }));
       if (lines.length > 0) {
         const { error } = await supabase.from('sales_document_lines').insert(lines);
         if (error) throw error;
@@ -408,26 +426,4 @@ export function useSaveDraft() {
       await queryClient.invalidateQueries({ queryKey: ['sales-document', companyId, id] });
     },
   });
-}
-
-/**
- * Löscht einen Entwurf, den der Editor beim Öffnen angelegt hat und der nie
- * geändert wurde (`useLivePreview`). Nur Entwürfe; festgeschriebene Belege
- * sperrt die Datenbank ohnehin.
- */
-export function useDiscardDraft() {
-  const queryClient = useQueryClient();
-  const { data: membership } = useMembership();
-  const companyId = membership?.companyId;
-
-  return async (documentId: string) => {
-    const { error } = await supabase
-      .from('sales_documents')
-      .delete()
-      .eq('company_id', companyId!)
-      .eq('id', documentId)
-      .eq('status', 'draft');
-    if (error) throw error;
-    await queryClient.invalidateQueries({ queryKey: ['sales-documents', companyId] });
-  };
 }

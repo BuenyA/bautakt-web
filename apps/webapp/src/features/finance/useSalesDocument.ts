@@ -68,6 +68,8 @@ export type SalesDocumentDetail = {
   skonto_percent: number | null;
   tax_mode: string;
   customer_id: string | null;
+  /** E-Rechnung gewählt (Standard). `false`: PDF ohne Factur-X-XML. */
+  e_invoice: boolean;
   /** Archiv-Original; bei Entwürfen immer leer. */
   storage_path: string | null;
   content_hash: string | null;
@@ -126,7 +128,7 @@ export function useSalesDocument(id: string | undefined) {
           `id, type, status, document_number, issue_date, due_date, service_date, currency,
            net_total, vat_total, gross_total, intro_text, footer_text, notes, buyer_reference,
            payment_term_days, skonto_days, skonto_percent, tax_mode, customer_id,
-           storage_path, content_hash,
+           storage_path, content_hash, e_invoice,
            ${SALES_DOCUMENT_BUYER_SELECT},
            sales_document_lines(id, title, description, kind, quantity, unit, unit_price,
              discount_percent, net_amount, tax_rate_percent, sort_order, order_id,
@@ -202,21 +204,23 @@ export function useFinalizeDocument(documentId: string | undefined) {
   const { data: membership } = useMembership();
 
   return useMutation({
-    mutationFn: async () => {
+    // Der Editor kennt die Id erst nach dem Speichern und reicht sie je Aufruf.
+    mutationFn: async (savedId?: string) => {
+      const target = savedId ?? documentId!;
       const { error } = await supabase.rpc('finalize_sales_document', {
-        p_document_id: documentId!,
+        p_document_id: target,
       });
       if (error) throw error;
       try {
-        await renderArchive(documentId!);
+        await renderArchive(target);
         return { archived: true };
       } catch {
         return { archived: false };
       }
     },
-    onSuccess: async () => {
+    onSuccess: async (_, savedId) => {
       await queryClient.invalidateQueries({
-        queryKey: ['sales-document', membership?.companyId, documentId],
+        queryKey: ['sales-document', membership?.companyId, savedId ?? documentId],
       });
       await queryClient.invalidateQueries({ queryKey: ['sales-documents', membership?.companyId] });
     },

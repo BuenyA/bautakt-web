@@ -12,6 +12,8 @@ import { useCompanyListLoading } from '@/features/company/useCompanyListLoading'
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 
+import { isEInvoiceIncoming } from '../archiveFiles';
+import { EInvoiceBadge } from '../EInvoiceBadge';
 import { ExpenseSheet } from '../ExpenseSheet';
 import { FinanceHeader } from '../FinanceHeader';
 import {
@@ -50,8 +52,11 @@ export function ExpensesPage() {
         accessorKey: 'invoice_number',
         header: t('domain:expenses.columns.number'),
         cell: ({ row }) => (
-          <span className="text-foreground font-medium whitespace-nowrap">
-            {row.original.invoice_number || t('domain:invoices.noNumber')}
+          <span className="inline-flex items-center gap-2">
+            <span className="text-foreground font-medium whitespace-nowrap">
+              {row.original.invoice_number || t('domain:invoices.noNumber')}
+            </span>
+            {isEInvoiceIncoming(row.original) ? <EInvoiceBadge /> : null}
           </span>
         ),
       },
