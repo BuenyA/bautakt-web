@@ -51,18 +51,23 @@ export type LivePreviewPhase = 'idle' | 'saving' | 'rendering';
  * auf „Speichern“. Zwei gleichzeitige Läufe würden beide die Positionen
  * löschen und neu einfügen — danach stünden sie doppelt im Beleg.
  *
- * Ein neuer Beleg wird erst gespeichert, wenn sich am Formular etwas ändert;
- * bloßes Öffnen legt keinen leeren Entwurf an.
+ * Ein neuer Beleg wird beim Öffnen sofort als Entwurf gespeichert, damit die
+ * Vorschau gleich ein PDF zeigt. Bleibt er unverändert, löscht `discard` ihn
+ * beim Verlassen des Editors wieder — bloßes Öffnen hinterlässt keinen
+ * leeren Entwurf.
  */
 export function useLivePreview({
   state,
   initialDocumentId,
   save,
+  discard,
   enabled,
 }: {
   state: EditorState | null;
   initialDocumentId: string | null;
   save: (state: EditorState, documentId: string | null) => Promise<string>;
+  /** Löscht einen beim Öffnen angelegten, nie geänderten Entwurf. */
+  discard: (documentId: string) => Promise<void>;
   enabled: boolean;
 }) {
   const [documentId, setDocumentId] = useState<string | null>(initialDocumentId);
@@ -77,6 +82,12 @@ export function useLivePreview({
   const baselineJsonRef = useRef<string | null>(null);
   const latestStateRef = useRef<EditorState | null>(state);
   const timerRef = useRef<number | null>(null);
+  // Beim Öffnen angelegt und seitdem weder geändert noch ausdrücklich gespeichert.
+  const untouchedRef = useRef(false);
+  const discardRef = useRef(discard);
+  useEffect(() => {
+    discardRef.current = discard;
+  }, [discard]);
 
   // Vor allen anderen Effekten: Der Zeitgeber unten liest beides erst später.
   useEffect(() => {
@@ -104,7 +115,9 @@ export function useLivePreview({
         const needsSave = !unchanged || (force && !documentIdRef.current);
         if (!needsSave) return documentIdRef.current;
         setPhase('saving');
+        const created = !documentIdRef.current;
         const id = await save(current, documentIdRef.current);
+        untouchedRef.current = created && json === baselineJsonRef.current;
         documentIdRef.current = id;
         savedJsonRef.current = json;
         setDocumentId(id);
@@ -154,20 +167,36 @@ export function useLivePreview({
     [persist],
   );
 
-  // Entprellt nach jeder Änderung. Ein bestehender Entwurf zeigt sein PDF
-  // gleich beim Öffnen, ohne die Pause abzuwarten.
+  // Entprellt nach jeder Änderung. Beim Öffnen kommt das PDF sofort, ohne die
+  // Pause abzuwarten; ein neuer Beleg wird dafür gleich angelegt.
   useEffect(() => {
     if (!enabled || !state) return;
     if (timerRef.current !== null) window.clearTimeout(timerRef.current);
-    const firstOpen = renderedJsonRef.current === null && Boolean(documentIdRef.current);
+    const firstOpen = renderedJsonRef.current === null;
+    const createNow = firstOpen && !documentIdRef.current;
     timerRef.current = window.setTimeout(
-      () => void update(),
+      () => void update(createNow),
       firstOpen ? 0 : LIVE_PREVIEW_DELAY_MS,
     );
     return () => {
       if (timerRef.current !== null) window.clearTimeout(timerRef.current);
     };
   }, [state, enabled, update]);
+
+  // Editor verlassen, ohne etwas einzutragen: den leeren Entwurf wieder löschen.
+  // Erst nach allen laufenden Speicherläufen, sonst fehlt die Id noch.
+  useEffect(
+    () => () => {
+      void chainRef.current.then(() => {
+        const id = documentIdRef.current;
+        if (id && untouchedRef.current) {
+          untouchedRef.current = false;
+          void discardRef.current(id).catch(() => undefined);
+        }
+      });
+    },
+    [],
+  );
 
   return {
     documentId,
@@ -180,6 +209,10 @@ export function useLivePreview({
     /** Knopf „Vorschau aktualisieren“: rendert auch ohne Änderung neu. */
     refresh: () => void update(true),
     /** Für „Speichern“: wartet auf alle laufenden Läufe und speichert den Stand. */
-    persist: () => persist(true),
+    persist: async () => {
+      const id = await persist(true);
+      untouchedRef.current = false;
+      return id;
+    },
   };
 }

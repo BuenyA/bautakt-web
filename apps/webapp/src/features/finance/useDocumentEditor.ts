@@ -409,3 +409,25 @@ export function useSaveDraft() {
     },
   });
 }
+
+/**
+ * Löscht einen Entwurf, den der Editor beim Öffnen angelegt hat und der nie
+ * geändert wurde (`useLivePreview`). Nur Entwürfe; festgeschriebene Belege
+ * sperrt die Datenbank ohnehin.
+ */
+export function useDiscardDraft() {
+  const queryClient = useQueryClient();
+  const { data: membership } = useMembership();
+  const companyId = membership?.companyId;
+
+  return async (documentId: string) => {
+    const { error } = await supabase
+      .from('sales_documents')
+      .delete()
+      .eq('company_id', companyId!)
+      .eq('id', documentId)
+      .eq('status', 'draft');
+    if (error) throw error;
+    await queryClient.invalidateQueries({ queryKey: ['sales-documents', companyId] });
+  };
+}
