@@ -79,7 +79,13 @@ export type SalesDocumentDetail = {
   dunning: DunningNotice[];
   /** Letzter Eintrag im Versandprotokoll (`finance_send_log`), sonst leer. */
   sent_at: string | null;
+  /** Ursprungsbeleg eines Stornos oder einer Gutschrift. */
+  parent: LinkedDocument | null;
+  /** Belege, die auf diesen verweisen (Storno, Gutschrift). */
+  children: LinkedDocument[];
 };
+
+export type LinkedDocument = { id: string; document_number: string | null; type: string };
 
 type PayableDocument = Pick<SalesDocumentDetail, 'payments' | 'gross_total'>;
 
@@ -135,7 +141,9 @@ export function useSalesDocument(id: string | undefined) {
              source_type, source_id),
            payments(id, amount, skonto_amount, paid_at, method, note),
            dunning_notices(id, level, notice_date, sent_at, fee_amount, interest_amount),
-           finance_send_log(created_at)`,
+           finance_send_log(created_at),
+           parent:parent_document_id(id, document_number, type),
+           children:sales_documents!parent_document_id(id, document_number, type)`,
         )
         .eq('company_id', companyId!)
         .eq('id', id!)
@@ -150,6 +158,8 @@ export function useSalesDocument(id: string | undefined) {
           payments: DocumentPayment[];
           dunning_notices: DunningNotice[];
           finance_send_log: { created_at: string }[] | null;
+          parent: LinkedDocument | null;
+          children: LinkedDocument[] | null;
         };
 
       const label = salesDocumentBuyerLabel(row);
@@ -165,6 +175,8 @@ export function useSalesDocument(id: string | undefined) {
             .map((entry) => entry.created_at)
             .sort()
             .at(-1) ?? null,
+        parent: row.parent ?? null,
+        children: row.children ?? [],
       };
     },
   });
@@ -240,6 +252,39 @@ export function useArchiveDocument(documentId: string | undefined) {
       await queryClient.invalidateQueries({
         queryKey: ['sales-document', membership?.companyId, documentId],
       });
+    },
+  });
+}
+
+/**
+ * Rechnung stornieren über die RPC `cancel_sales_document` (#153), dieselbe
+ * wie in der App: Stornobeleg mit negierten Positionen, festgeschrieben im
+ * Nummernkreis ST, Original auf „storniert“ — in einer Transaktion. Danach
+ * entsteht wie beim Freigeben das Archiv-Original des Stornobelegs.
+ */
+export function useCancelDocument(documentId: string | undefined) {
+  const queryClient = useQueryClient();
+  const { data: membership } = useMembership();
+
+  return useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.rpc('cancel_sales_document', {
+        p_document_id: documentId!,
+      });
+      if (error) throw error;
+      const documentNumber = data.document_number ?? '';
+      try {
+        await renderArchive(data.id);
+        return { id: data.id, archived: true, documentNumber };
+      } catch {
+        return { id: data.id, archived: false, documentNumber };
+      }
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['sales-document', membership?.companyId, documentId],
+      });
+      await queryClient.invalidateQueries({ queryKey: ['sales-documents', membership?.companyId] });
     },
   });
 }

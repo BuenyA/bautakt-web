@@ -37,7 +37,10 @@ const MESSAGES: Record<string, string> = {
   DOCUMENT_IMMUTABLE:
     'Dieser Beleg ist festgeschrieben und lässt sich nicht mehr ändern oder löschen. Korrigieren kannst du ihn nur noch per Storno.',
   DOCUMENT_FINALIZE_VIA_RPC:
-    'Ein Beleg wird nur über „Festschreiben“ ausgestellt. Bitte lade die Seite neu und versuche es noch einmal.',
+    'Ein Beleg wird nur über „Freigeben“ ausgestellt. Bitte lade die Seite neu und versuche es noch einmal.',
+  // Storno (bautakt-app 20261016215235_a_cancel_sales_document).
+  CANCEL_NOT_ALLOWED:
+    'Dieser Beleg lässt sich nicht stornieren. Storniert werden nur freigegebene Rechnungen, die noch nicht storniert sind.',
   // Kontakte (Migration 20261014204410). Unique-Verletzungen tragen den Namen
   // des Index in der Meldung.
   customer_profiles_number_unique: 'Diese Kundennummer ist schon vergeben.',
