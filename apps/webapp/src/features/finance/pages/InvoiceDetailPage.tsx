@@ -5,6 +5,12 @@ import {
   Card,
   CardHeader,
   Link as FluentLink,
+  Menu,
+  MenuDivider,
+  MenuItem,
+  MenuList,
+  MenuPopover,
+  MenuTrigger,
   MessageBar,
   MessageBarActions,
   MessageBarBody,
@@ -18,10 +24,13 @@ import {
   Text,
 } from '@fluentui/react-components';
 import {
+  ArrowDownloadRegular,
   CheckmarkCircleRegular,
+  CodeRegular,
   DocumentPdfRegular,
-  DocumentRegular,
   EditRegular,
+  MailCheckmarkRegular,
+  PrintRegular,
   WalletRegular,
 } from '@fluentui/react-icons';
 import { useState } from 'react';
@@ -39,6 +48,7 @@ import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import { documentFileBaseName, downloadBytes, extractFacturX, hasEInvoice } from '../archiveFiles';
 import { DocumentStatusBadge } from '../DocumentStatusBadge';
 import { DraftDeleteDialog } from '../DraftDeleteDialog';
 import { PaymentSheet } from '../PaymentSheet';
@@ -52,7 +62,9 @@ import {
   paidMinorOf,
   useArchiveDocument,
   useArchivedPdf,
+  useDraftPreview,
   useFinalizeDocument,
+  useMarkSent,
   useSalesDocument,
 } from '../useSalesDocument';
 
@@ -71,11 +83,15 @@ export function InvoiceDetailPage() {
   const isLoading = useCompanyListLoading(document);
   const finalize = useFinalizeDocument(id);
   const archive = useArchiveDocument(id);
+  const markSent = useMarkSent(id);
   const { blockers } = useFinalizeBlockers(data);
   // Nur für festgeschriebene Belege mit Original; Entwürfe zeigt der Editor.
   const archivedPdf = useArchivedPdf(
     data && data.status !== 'draft' && data.content_hash ? data.storage_path : null,
   );
+  // Entwürfe: dasselbe PDF wie beim Festschreiben, nur mit Wasserzeichen,
+  // samt Hinweisen auf fehlende Pflichtangaben.
+  const draftPreview = useDraftPreview(data?.status === 'draft' ? data.id : null);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const navigate = useNavigate();
@@ -146,6 +162,40 @@ export function InvoiceDetailPage() {
     }
   }
 
+  const fileBaseName = documentFileBaseName(data.document_number, data.customer_label);
+  const archivedBytes = archivedPdf.data ?? null;
+  const canMarkSent =
+    access.canWriteSalesDocuments && !isDraft && data.status !== 'cancelled' && !data.sent_at;
+
+  function onDownloadPdf() {
+    if (archivedBytes) downloadBytes(archivedBytes, `${fileBaseName}.pdf`, 'application/pdf');
+  }
+
+  async function onDownloadXml() {
+    if (!archivedBytes) return;
+    try {
+      const xml = await extractFacturX(archivedBytes);
+      if (!xml) {
+        toast.warning(t('domain:invoices.download.noXml'));
+        return;
+      }
+      downloadBytes(xml, `${fileBaseName}.xml`, 'application/xml');
+    } catch {
+      toast.error(t('domain:invoices.download.xmlError'));
+    }
+  }
+
+  async function onMarkSent() {
+    try {
+      await markSent.mutateAsync(data!);
+      toast.success(t('domain:invoices.markSent.success'));
+    } catch (error) {
+      toast.error(t('domain:invoices.markSent.error'), {
+        description: readableDbError(error) ?? undefined,
+      });
+    }
+  }
+
   async function onOpenArchive(path: string) {
     try {
       window.open(await archivedPdfUrl(path), '_blank', 'noopener');
@@ -170,14 +220,52 @@ export function InvoiceDetailPage() {
             ) : null}
 
             {!isDraft ? (
+              <Menu positioning="below-end">
+                <MenuTrigger disableButtonEnhancement>
+                  <Button icon={<ArrowDownloadRegular />}>
+                    {t('domain:invoices.download.action')}
+                  </Button>
+                </MenuTrigger>
+                <MenuPopover>
+                  <MenuList>
+                    <MenuItem
+                      icon={<DocumentPdfRegular />}
+                      disabled={!archivedBytes}
+                      onClick={onDownloadPdf}
+                    >
+                      {t('domain:invoices.download.pdf')}
+                    </MenuItem>
+                    {hasEInvoice(data.type) ? (
+                      <MenuItem
+                        icon={<CodeRegular />}
+                        disabled={!archivedBytes}
+                        onClick={() => void onDownloadXml()}
+                      >
+                        {t('domain:invoices.download.xml')}
+                      </MenuItem>
+                    ) : null}
+                    <MenuDivider />
+                    {/* Nur Fallback: kein Original, keine E-Rechnung. */}
+                    <MenuItem
+                      icon={<PrintRegular />}
+                      onClick={() =>
+                        window.open(routes.invoicePrint(data.id), '_blank', 'noopener')
+                      }
+                    >
+                      {t('domain:invoices.print')}
+                    </MenuItem>
+                  </MenuList>
+                </MenuPopover>
+              </Menu>
+            ) : null}
+
+            {canMarkSent ? (
               <Button
-                as="a"
-                href={routes.invoicePrint(data.id)}
-                target="_blank"
-                rel="noreferrer"
-                icon={<DocumentRegular />}
+                icon={<MailCheckmarkRegular />}
+                disabled={markSent.isPending}
+                onClick={() => void onMarkSent()}
               >
-                {t('domain:invoices.print')}
+                {t('domain:invoices.markSent.action')}
               </Button>
             ) : null}
 
@@ -269,6 +357,11 @@ export function InvoiceDetailPage() {
 
       <div className="flex flex-wrap items-center gap-3">
         <DocumentStatusBadge status={data.status} />
+        {data.sent_at ? (
+          <StatusBadge tone="outline">
+            {t('domain:invoices.markSent.badge', { date: formatDate(data.sent_at) })}
+          </StatusBadge>
+        ) : null}
         {overpaidMinor > 0 ? (
           <StatusBadge tone="warning">{t('domain:invoices.overpaid')}</StatusBadge>
         ) : null}
@@ -282,6 +375,37 @@ export function InvoiceDetailPage() {
             : t('domain:invoices.openAmount', { amount: formatMoney(openMinor) })}
         </span>
       </div>
+
+      {isDraft ? (
+        <Card size="large">
+          <CardHeader
+            header={
+              <Text as="h2" size={400} weight="semibold">
+                {t('domain:editor.preview.title')}
+              </Text>
+            }
+          />
+          {draftPreview.data && draftPreview.data.warnings.length > 0 ? (
+            <MessageBar intent="warning" layout="multiline">
+              <MessageBarBody>
+                <MessageBarTitle>{t('domain:editor.preview.warningsTitle')}</MessageBarTitle>
+                <ul className="mt-1 list-inside list-disc">
+                  {draftPreview.data.warnings.map((warning) => (
+                    <li key={warning}>{warning}</li>
+                  ))}
+                </ul>
+              </MessageBarBody>
+            </MessageBar>
+          ) : null}
+          <div className="h-[80vh]">
+            <PdfViewer
+              data={draftPreview.data?.pdf ?? null}
+              loading={draftPreview.isLoading}
+              error={draftPreview.isError ? t('domain:editor.preview.error') : null}
+            />
+          </div>
+        </Card>
+      ) : null}
 
       {isArchived ? (
         // Das Original, schreibgeschützt: genau die Datei aus dem Archiv, nicht

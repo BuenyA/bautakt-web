@@ -601,7 +601,20 @@
     "taxNumber": "Steuernummer",
     "vatId": "USt-IdNr.",
     "smallBusinessNote": "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
-    "print": "Druckansicht",
+    "print": "Druckansicht (ohne E-Rechnung)",
+    "download": {
+      "action": "Herunterladen",
+      "pdf": "PDF (Original)",
+      "xml": "E-Rechnung (XML)",
+      "noXml": "Dieses Original enthält keine E-Rechnung (factur-x.xml).",
+      "xmlError": "Die E-Rechnung konnte nicht aus dem Original gelesen werden."
+    },
+    "markSent": {
+      "action": "Als versendet markieren",
+      "success": "Als versendet markiert",
+      "error": "Konnte nicht als versendet markiert werden",
+      "badge": "Versendet am {{date}}"
+    },
     "finalize": "Festschreiben",
     "finalizeSuccess": "Beleg festgeschrieben und nummeriert.",
     "finalizeError": "Festschreiben nicht möglich",
