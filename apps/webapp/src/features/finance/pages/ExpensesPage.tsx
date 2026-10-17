@@ -1,5 +1,5 @@
 import { daysBetween, eurosToMinor, formatMoney, todayIso } from '@bautakt/finance';
-import { DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
+import { cn, DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
 import { Button, Text } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useMemo, useState } from 'react';
@@ -22,8 +22,9 @@ import {
 } from '../useExpenses';
 
 /**
- * Ausgaben in zwei Listen untereinander: Eingangsrechnungen (was zu zahlen
- * ist) und sonstige Ausgaben (was bereits gebucht ist). In der Handy-App liegt
+ * Ausgaben in zwei Listen nebeneinander: Eingangsrechnungen (was zu zahlen
+ * ist) und sonstige Ausgaben (was bereits gebucht ist), letztere nur, wenn
+ * es welche gibt. In der Handy-App liegt
  * beides unter „Ausgaben"; hier bleibt es zusammen, aber sichtbar getrennt —
  * die eine Liste ist eine Aufgabe, die andere eine Auswertung. Keine zweite
  * Reiterleiste unter den Bereichs-Reitern (Owner 17.10.2026).
@@ -40,6 +41,8 @@ export function ExpensesPage() {
   const expenses = useExpenses();
 
   const isLoading = useCompanyListLoading(incoming, expenses);
+  // Sonstige Ausgaben nur zeigen, wenn wirklich welche angefallen sind.
+  const hasExpenses = (expenses.data?.length ?? 0) > 0;
 
   const incomingColumns = useMemo<DataTableColumn<IncomingInvoiceListRow>[]>(
     () => [
@@ -131,37 +134,41 @@ export function ExpensesPage() {
         }
       />
 
-      <ListSection title={t('domain:expenses.tabIncoming')}>
-        <DataTable
-          columns={incomingColumns}
-          data={incoming.data ?? []}
-          isLoading={isLoading}
-          labels={labels}
-          exportFileName="eingangsrechnungen"
-          empty={
-            <EmptyState
-              title={t('domain:expenses.emptyIncomingTitle')}
-              description={t('domain:expenses.emptyIncomingDescription')}
-            />
-          }
-        />
-      </ListSection>
+      <div className={cn('grid gap-6', hasExpenses && 'xl:grid-cols-2')}>
+        <ListSection title={t('domain:expenses.tabIncoming')}>
+          <DataTable
+            columns={incomingColumns}
+            data={incoming.data ?? []}
+            isLoading={isLoading}
+            labels={labels}
+            exportFileName="eingangsrechnungen"
+            empty={
+              <EmptyState
+                title={t('domain:expenses.emptyIncomingTitle')}
+                description={t('domain:expenses.emptyIncomingDescription')}
+              />
+            }
+          />
+        </ListSection>
 
-      <ListSection title={t('domain:expenses.tabExpenses')}>
-        <DataTable
-          columns={expenseColumns}
-          data={expenses.data ?? []}
-          isLoading={isLoading}
-          labels={labels}
-          exportFileName="ausgaben"
-          empty={
-            <EmptyState
-              title={t('domain:expenses.emptyExpensesTitle')}
-              description={t('domain:expenses.emptyExpensesDescription')}
+        {hasExpenses ? (
+          <ListSection title={t('domain:expenses.tabExpenses')}>
+            <DataTable
+              columns={expenseColumns}
+              data={expenses.data ?? []}
+              isLoading={isLoading}
+              labels={labels}
+              exportFileName="ausgaben"
+              empty={
+                <EmptyState
+                  title={t('domain:expenses.emptyExpensesTitle')}
+                  description={t('domain:expenses.emptyExpensesDescription')}
+                />
+              }
             />
-          }
-        />
-      </ListSection>
+          </ListSection>
+        ) : null}
+      </div>
 
       <ExpenseSheet open={sheetOpen} onOpenChange={setSheetOpen} />
     </div>
@@ -193,7 +200,7 @@ function DueCell({ dueDate, status }: { dueDate: string | null; status: string }
 
 function ListSection({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex min-w-0 flex-col gap-3">
       <Text as="h2" size={400} weight="semibold">
         {title}
       </Text>

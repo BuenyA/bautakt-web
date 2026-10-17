@@ -100,18 +100,22 @@ export function ReportsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <FinanceHeader
-        description={t('domain:reports.description')}
-        actions={
-          <Select value={String(months)} onChange={(_, { value }) => setMonths(Number(value))}>
-            {RANGES.map((value) => (
-              <option key={value} value={String(value)}>
-                {t('domain:reports.lastMonths', { count: value })}
-              </option>
-            ))}
-          </Select>
-        }
-      />
+      <FinanceHeader description={t('domain:reports.description')} />
+
+      {/* Unter den Reitern, nicht im Kopf: im Kopf bricht die Auswahl auf
+          schmalen Fenstern um und schiebt die Reiter nach unten. */}
+      <Select
+        className="self-start"
+        aria-label={t('domain:reports.rangeLabel')}
+        value={String(months)}
+        onChange={(_, { value }) => setMonths(Number(value))}
+      >
+        {RANGES.map((value) => (
+          <option key={value} value={String(value)}>
+            {t('domain:reports.lastMonths', { count: value })}
+          </option>
+        ))}
+      </Select>
 
       <div className="grid gap-4 xl:grid-cols-2">
         <Card size="large">
