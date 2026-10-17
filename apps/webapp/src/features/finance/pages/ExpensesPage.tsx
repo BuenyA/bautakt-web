@@ -1,13 +1,11 @@
 import { daysBetween, eurosToMinor, formatMoney, todayIso } from '@bautakt/finance';
-import { DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
-import { Button, Tab, TabList } from '@fluentui/react-components';
+import { cn, DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
+import { Button, Text } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
-import { useId, useMemo, useState } from 'react';
+import { type ReactNode, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
-import { PageHeader } from '@/components/common/PageHeader';
 import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
@@ -15,6 +13,7 @@ import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 
 import { ExpenseSheet } from '../ExpenseSheet';
+import { FinanceHeader } from '../FinanceHeader';
 import {
   type ExpenseRow,
   type IncomingInvoiceListRow,
@@ -23,18 +22,16 @@ import {
 } from '../useExpenses';
 
 /**
- * Ausgaben in zwei Registern: Eingangsrechnungen (was zu zahlen ist) und
- * sonstige Ausgaben (was bereits gebucht ist). In der Handy-App liegt beides
- * unter „Ausgaben"; hier bleibt es zusammen, aber sichtbar getrennt — die eine
- * Liste ist eine Aufgabe, die andere eine Auswertung.
+ * Ausgaben in zwei Listen nebeneinander: Eingangsrechnungen (was zu zahlen
+ * ist) und sonstige Ausgaben (was bereits gebucht ist), letztere nur, wenn
+ * es welche gibt. In der Handy-App liegt
+ * beides unter „Ausgaben"; hier bleibt es zusammen, aber sichtbar getrennt —
+ * die eine Liste ist eine Aufgabe, die andere eine Auswertung. Keine zweite
+ * Reiterleiste unter den Bereichs-Reitern (Owner 17.10.2026).
  */
 export function ExpensesPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const tab = searchParams.get('bereich') === 'sonstige' ? 'expenses' : 'incoming';
-  const panelId = useId();
-  const tabIds = { incoming: useId(), expenses: useId() };
 
   const canManage = usePermission('canManageOverheadCosts');
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -44,6 +41,8 @@ export function ExpensesPage() {
   const expenses = useExpenses();
 
   const isLoading = useCompanyListLoading(incoming, expenses);
+  // Sonstige Ausgaben nur zeigen, wenn wirklich welche angefallen sind.
+  const hasExpenses = (expenses.data?.length ?? 0) > 0;
 
   const incomingColumns = useMemo<DataTableColumn<IncomingInvoiceListRow>[]>(
     () => [
@@ -124,8 +123,7 @@ export function ExpensesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader
-        title={t('domain:expenses.title')}
+      <FinanceHeader
         description={t('domain:expenses.description')}
         actions={
           canManage ? (
@@ -136,37 +134,25 @@ export function ExpensesPage() {
         }
       />
 
-      <div className="flex flex-col gap-4">
-        <TabList
-          selectedValue={tab}
-          onTabSelect={(_, { value }) =>
-            setSearchParams(value === 'expenses' ? { bereich: 'sonstige' } : {}, { replace: true })
-          }
-        >
-          <Tab value="incoming" id={tabIds.incoming} aria-controls={panelId}>
-            {t('domain:expenses.tabIncoming')}
-          </Tab>
-          <Tab value="expenses" id={tabIds.expenses} aria-controls={panelId}>
-            {t('domain:expenses.tabExpenses')}
-          </Tab>
-        </TabList>
+      <div className={cn('grid gap-6', hasExpenses && 'xl:grid-cols-2')}>
+        <ListSection title={t('domain:expenses.tabIncoming')}>
+          <DataTable
+            columns={incomingColumns}
+            data={incoming.data ?? []}
+            isLoading={isLoading}
+            labels={labels}
+            exportFileName="eingangsrechnungen"
+            empty={
+              <EmptyState
+                title={t('domain:expenses.emptyIncomingTitle')}
+                description={t('domain:expenses.emptyIncomingDescription')}
+              />
+            }
+          />
+        </ListSection>
 
-        <div role="tabpanel" id={panelId} aria-labelledby={tabIds[tab]}>
-          {tab === 'incoming' ? (
-            <DataTable
-              columns={incomingColumns}
-              data={incoming.data ?? []}
-              isLoading={isLoading}
-              labels={labels}
-              exportFileName="eingangsrechnungen"
-              empty={
-                <EmptyState
-                  title={t('domain:expenses.emptyIncomingTitle')}
-                  description={t('domain:expenses.emptyIncomingDescription')}
-                />
-              }
-            />
-          ) : (
+        {hasExpenses ? (
+          <ListSection title={t('domain:expenses.tabExpenses')}>
             <DataTable
               columns={expenseColumns}
               data={expenses.data ?? []}
@@ -180,8 +166,8 @@ export function ExpensesPage() {
                 />
               }
             />
-          )}
-        </div>
+          </ListSection>
+        ) : null}
       </div>
 
       <ExpenseSheet open={sheetOpen} onOpenChange={setSheetOpen} />
@@ -209,5 +195,16 @@ function DueCell({ dueDate, status }: { dueDate: string | null; status: string }
       {formatDate(dueDate)}
       {!paid && days < 0 ? ` · ${t('domain:expenses.overdue', { count: -days })}` : ''}
     </span>
+  );
+}
+
+function ListSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="flex min-w-0 flex-col gap-3">
+      <Text as="h2" size={400} weight="semibold">
+        {title}
+      </Text>
+      {children}
+    </section>
   );
 }

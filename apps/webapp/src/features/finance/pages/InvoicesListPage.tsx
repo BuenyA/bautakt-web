@@ -8,8 +8,6 @@ import { useNavigate, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { LinkButton } from '@/components/common/LinkButton';
-import { ListFilterChips } from '@/components/common/ListFilterChips';
-import { PageHeader } from '@/components/common/PageHeader';
 import { RouterLink } from '@/components/common/RouterLink';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
@@ -17,13 +15,8 @@ import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
 import { DocumentStatusBadge } from '../DocumentStatusBadge';
-import {
-  invoiceStatusFromSearch,
-  type InvoiceTypeFilter,
-  invoiceTypeFromSearch,
-  matchesInvoiceStatus,
-  matchesInvoiceType,
-} from '../invoiceListFilter';
+import { FinanceHeader } from '../FinanceHeader';
+import { invoiceStatusFromSearch, matchesInvoiceStatus } from '../invoiceListFilter';
 import { useFinanceAccess } from '../useFinanceAccess';
 import {
   FINANCE_LIST_TYPES,
@@ -36,40 +29,18 @@ export function InvoicesListPage() {
   const labels = useDataTableLabels();
   const navigate = useNavigate();
   const access = useFinanceAccess();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const typeFilter = invoiceTypeFromSearch(searchParams.get('filter'));
+  const [searchParams] = useSearchParams();
   const statusFilter = invoiceStatusFromSearch(searchParams.get('status'));
   const documents = useSalesDocuments(FINANCE_LIST_TYPES);
   const { data, isError, refetch } = documents;
 
-  function setTypeFilter(next: InvoiceTypeFilter) {
-    const params = new URLSearchParams(searchParams);
-    // Default ist Rechnungen — ohne Param. `status` bleibt, falls ein
-    // Deep-Link ihn gesetzt hat; dafür gibt es keine Chips mehr.
-    if (next === 'invoice') params.delete('filter');
-    else params.set('filter', next);
-    setSearchParams(params, { replace: true });
-  }
-
   const rows = useMemo(
     () =>
-      (data ?? []).filter(
-        (document) =>
-          matchesInvoiceType(document.type, typeFilter) &&
-          matchesInvoiceStatus(document, statusFilter),
-      ),
-    [data, typeFilter, statusFilter],
-  );
-
-  const filterOptions = useMemo(
-    () =>
-      [
-        { value: 'invoice', label: t('domain:invoices.filterInvoices') },
-        { value: 'order_confirmation', label: t('domain:invoices.filterOrderConfirmations') },
-        { value: 'delivery', label: t('domain:invoices.filterDeliveryNotes') },
-        { value: 'all', label: t('domain:invoices.filterAll') },
-      ] as const,
-    [t],
+      // Keine Filter-Reiter unter den Bereichs-Reitern (Owner 17.10.2026):
+      // Rechnungen, Auftragsbestätigungen und Lieferscheine stehen zusammen,
+      // die Spalte „Art“ unterscheidet sie. `?status=` bleibt als Deep-Link.
+      (data ?? []).filter((document) => matchesInvoiceStatus(document, statusFilter)),
+    [data, statusFilter],
   );
 
   const hasAny = (data?.length ?? 0) > 0;
@@ -87,6 +58,15 @@ export function InvoicesListPage() {
               {row.original.document_number || t('domain:invoices.noNumber')}
             </span>
           </RouterLink>
+        ),
+      },
+      {
+        accessorKey: 'type',
+        header: t('domain:invoices.columns.type'),
+        cell: ({ row }) => (
+          <span className="text-muted-foreground whitespace-nowrap">
+            {t(`domain:documentType.${row.original.type}`, { defaultValue: row.original.type })}
+          </span>
         ),
       },
       {
@@ -140,10 +120,7 @@ export function InvoicesListPage() {
   if (isError) {
     return (
       <div className="flex flex-col gap-6">
-        <PageHeader
-          title={t('domain:invoices.listTitle')}
-          description={t('domain:invoices.listDescription')}
-        />
+        <FinanceHeader description={t('domain:invoices.listDescription')} />
         <EmptyState
           title={t('domain:invoices.loadErrorTitle')}
           description={t('domain:invoices.loadErrorDescription')}
@@ -159,8 +136,7 @@ export function InvoicesListPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader
-        title={t('domain:invoices.listTitle')}
+      <FinanceHeader
         description={t('domain:invoices.listDescription')}
         actions={
           access.canWriteSalesDocuments ? (
@@ -178,15 +154,6 @@ export function InvoicesListPage() {
         labels={labels}
         exportFileName="rechnungen"
         onRowClick={(document) => void navigate(routes.invoice(document.id))}
-        toolbar={
-          <ListFilterChips
-            nowrap
-            label={t('domain:invoices.filtersLabel')}
-            value={typeFilter}
-            onValueChange={setTypeFilter}
-            options={filterOptions}
-          />
-        }
         empty={
           <EmptyState
             title={

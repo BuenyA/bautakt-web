@@ -81,7 +81,7 @@ export const financeHub: Hub = {
   descriptionKey: 'common:hub.finance.description',
   icon: DocumentTextRegular,
   // Kein Kachel-Hub mehr: `/rechnungen` ist die Rechnungs-Übersicht, und diese
-  // Liste sind ihre Reiter (`FinanceTabs`). Die Übersicht selbst steht dort
+  // Liste sind ihre Reiter (`FinanceHeader`). Die Übersicht selbst steht dort
   // vorn und zählt hier nicht — sie allein soll den Leistenpunkt nicht zeigen.
   cards: [
     {

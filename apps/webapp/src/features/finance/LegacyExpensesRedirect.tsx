@@ -4,8 +4,7 @@ import { routes } from '@/lib/routes';
 
 /**
  * `/ausgaben` hieß bis 2026-10-14 die Seite der Eingangsrechnungen. Die Query
- * reist mit: `?bereich=sonstige` öffnet das zweite Register, `?neu=1` das
- * Anlege-Panel.
+ * reist mit: `?neu=1` öffnet das Anlege-Panel.
  */
 export function LegacyExpensesRedirect() {
   const { search } = useLocation();

@@ -17,7 +17,6 @@ import { RequirePermission } from '@/features/company/RequirePermission';
 import { ContactDetailPage } from '@/features/contacts/pages/ContactDetailPage';
 import { ContactsListPage } from '@/features/contacts/pages/ContactsListPage';
 import { LegacyCustomerRedirect } from '@/features/contacts/pages/LegacyCustomerRedirect';
-import { FinanceLayout } from '@/features/finance/FinanceLayout';
 import { LegacyExpensesRedirect } from '@/features/finance/LegacyExpensesRedirect';
 import { DocumentEditorPage } from '@/features/finance/pages/DocumentEditorPage';
 import { DunningPage } from '@/features/finance/pages/DunningPage';
@@ -101,67 +100,56 @@ export const router = createBrowserRouter([
               { path: `${routes.assignments}/:id`, element: <AssignmentDetailPage /> },
               { path: routes.calendar, element: <CalendarPage /> },
 
-              // --- Rechnungen: Übersicht und Listen unter einer Reiterleiste.
-              // Editor, Beleg und Druck stehen bewusst außerhalb. ---
+              // --- Rechnungen: Übersicht und Listen. Die Reiter stehen im Kopf
+              // jeder Seite (`FinanceHeader`), unter der Überschrift. ---
+              { path: routes.financeHub, element: <FinanceOverviewPage /> },
               {
-                element: <FinanceLayout />,
-                children: [
-                  { path: routes.financeHub, element: <FinanceOverviewPage /> },
-                  {
-                    path: routes.quotes,
-                    element: (
-                      <RequirePermission
-                        anyOf={['canUseBillingModule', 'canViewManagementInvoices']}
-                      >
-                        <QuotesListPage />
-                      </RequirePermission>
-                    ),
-                  },
-                  {
-                    path: routes.invoices,
-                    element: (
-                      <RequirePermission
-                        anyOf={['canUseBillingModule', 'canViewManagementInvoices']}
-                      >
-                        <InvoicesListPage />
-                      </RequirePermission>
-                    ),
-                  },
-                  {
-                    path: routes.receivables,
-                    element: (
-                      <RequirePermission anyOf={['canViewCompanyFinance']}>
-                        <ReceivablesPage />
-                      </RequirePermission>
-                    ),
-                  },
-                  {
-                    path: routes.expenses,
-                    element: (
-                      <RequirePermission
-                        anyOf={['canViewCompanyFinance', 'canManageOverheadCosts']}
-                      >
-                        <ExpensesPage />
-                      </RequirePermission>
-                    ),
-                  },
-                  {
-                    path: routes.dunning,
-                    element: (
-                      <RequirePermission anyOf={['canUseBillingModule', 'canViewCompanyFinance']}>
-                        <DunningPage />
-                      </RequirePermission>
-                    ),
-                  },
-                  {
-                    path: routes.reports,
-                    element: (
-                      <RequirePermission anyOf={['canViewCompanyFinance']}>
-                        <ReportsPage />
-                      </RequirePermission>
-                    ),
-                  },
-                ],
+                path: routes.quotes,
+                element: (
+                  <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
+                    <QuotesListPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.invoices,
+                element: (
+                  <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
+                    <InvoicesListPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.receivables,
+                element: (
+                  <RequirePermission anyOf={['canViewCompanyFinance']}>
+                    <ReceivablesPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.expenses,
+                element: (
+                  <RequirePermission anyOf={['canViewCompanyFinance', 'canManageOverheadCosts']}>
+                    <ExpensesPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.dunning,
+                element: (
+                  <RequirePermission anyOf={['canUseBillingModule', 'canViewCompanyFinance']}>
+                    <DunningPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.reports,
+                element: (
+                  <RequirePermission anyOf={['canViewCompanyFinance']}>
+                    <ReportsPage />
+                  </RequirePermission>
+                ),
               },
               {
                 path: routes.invoiceNew,

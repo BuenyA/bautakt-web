@@ -4,23 +4,22 @@ import {
   buildReceivables,
   formatMoney,
   type ReceivableItem,
-  receivablesByBucket,
   totalOpenMinor,
   totalOverdueMinor,
 } from '@bautakt/finance';
 import { cn, DataTable, type DataTableColumn } from '@bautakt/ui';
-import { Card, Link as FluentLink, Tab, TabList } from '@fluentui/react-components';
+import { Card, Link as FluentLink } from '@fluentui/react-components';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
-import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { formatDate } from '@/lib/format';
 
+import { FinanceHeader } from '../FinanceHeader';
 import { INVOICE_TYPE_LIST, usePayments, useSalesDocuments } from '../useSalesDocuments';
 
 /**
@@ -43,7 +42,9 @@ function bucketFromSearch(value: string | null): AgingBucket | 'all' {
 export function ReceivablesPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
-  const [searchParams, setSearchParams] = useSearchParams();
+  // `?klasse=` bleibt als Deep-Link (Übersicht → „1–30 Tage“); eigene
+  // Filter-Reiter hat die Seite nicht mehr (Owner 17.10.2026).
+  const [searchParams] = useSearchParams();
   const bucket = bucketFromSearch(searchParams.get('klasse'));
 
   const documents = useSalesDocuments(INVOICE_TYPE_LIST);
@@ -56,15 +57,10 @@ export function ReceivablesPage() {
     () => buildReceivables(documents.data ?? [], payments.data ?? []),
     [documents.data, payments.data],
   );
-  const summary = useMemo(() => receivablesByBucket(items), [items]);
   const rows = useMemo(
     () => (bucket === 'all' ? items : items.filter((item) => item.bucket === bucket)),
     [items, bucket],
   );
-
-  function setBucket(next: string) {
-    setSearchParams(next === 'all' ? {} : { klasse: next }, { replace: true });
-  }
 
   const columns = useMemo<DataTableColumn<ReceivableItem>[]>(
     () => [
@@ -124,7 +120,7 @@ export function ReceivablesPage() {
   if (isError) {
     return (
       <div className="flex flex-col gap-6">
-        <PageHeader title={t('domain:receivables.title')} />
+        <FinanceHeader title={t('domain:receivables.title')} />
         <EmptyState
           title={t('domain:invoices.loadErrorTitle')}
           description={t('domain:invoices.loadErrorDescription')}
@@ -147,7 +143,7 @@ export function ReceivablesPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-6">
-        <PageHeader title={t('domain:receivables.title')} />
+        <FinanceHeader title={t('domain:receivables.title')} />
         <PageSpinner />
       </div>
     );
@@ -155,7 +151,7 @@ export function ReceivablesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader
+      <FinanceHeader
         title={t('domain:receivables.title')}
         description={t('domain:receivables.description')}
       />
@@ -181,21 +177,6 @@ export function ReceivablesPage() {
         data={rows}
         labels={labels}
         exportFileName="offene-posten"
-        toolbar={
-          <TabList
-            selectedValue={bucket}
-            onTabSelect={(_, data) => setBucket(data.value as typeof bucket)}
-            aria-label={t('domain:receivables.bucketsLabel')}
-          >
-            <Tab value="all">{t('domain:receivables.filterAll')}</Tab>
-            {AGING_BUCKET_ORDER.map((key) => (
-              <Tab key={key} value={key}>
-                {t(`domain:agingBucket.${key}`)}
-                <span className="text-text-subtle ml-1 tabular-nums">{summary[key].count}</span>
-              </Tab>
-            ))}
-          </TabList>
-        }
         empty={
           <EmptyState
             title={t('domain:receivables.emptyTitle')}
