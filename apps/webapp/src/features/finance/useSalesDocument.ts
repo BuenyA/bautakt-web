@@ -1,6 +1,7 @@
 import { eurosToMinor, overpaidMinor } from '@bautakt/finance';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { useAuth } from '@/features/auth/useAuth';
 import { useMembership } from '@/features/company/useMembership';
 import { supabase } from '@/lib/supabase';
 
@@ -9,6 +10,7 @@ import {
   type SalesDocumentBuyerFields,
   salesDocumentBuyerLabel,
 } from './salesDocumentBuyer';
+import { renderPreview } from './useLivePreview';
 
 export type DocumentLine = {
   id: string;
@@ -73,6 +75,8 @@ export type SalesDocumentDetail = {
   lines: DocumentLine[];
   payments: DocumentPayment[];
   dunning: DunningNotice[];
+  /** Letzter Eintrag im Versandprotokoll (`finance_send_log`), sonst leer. */
+  sent_at: string | null;
 };
 
 type PayableDocument = Pick<SalesDocumentDetail, 'payments' | 'gross_total'>;
@@ -128,7 +132,8 @@ export function useSalesDocument(id: string | undefined) {
              discount_percent, net_amount, tax_rate_percent, sort_order, order_id,
              source_type, source_id),
            payments(id, amount, skonto_amount, paid_at, method, note),
-           dunning_notices(id, level, notice_date, sent_at, fee_amount, interest_amount)`,
+           dunning_notices(id, level, notice_date, sent_at, fee_amount, interest_amount),
+           finance_send_log(created_at)`,
         )
         .eq('company_id', companyId!)
         .eq('id', id!)
@@ -142,6 +147,7 @@ export function useSalesDocument(id: string | undefined) {
           sales_document_lines: DocumentLine[];
           payments: DocumentPayment[];
           dunning_notices: DunningNotice[];
+          finance_send_log: { created_at: string }[] | null;
         };
 
       const label = salesDocumentBuyerLabel(row);
@@ -152,6 +158,11 @@ export function useSalesDocument(id: string | undefined) {
         lines: [...(row.sales_document_lines ?? [])].sort((a, b) => a.sort_order - b.sort_order),
         payments: [...(row.payments ?? [])].sort((a, b) => a.paid_at.localeCompare(b.paid_at)),
         dunning: [...(row.dunning_notices ?? [])].sort((a, b) => a.level - b.level),
+        sent_at:
+          (row.finance_send_log ?? [])
+            .map((entry) => entry.created_at)
+            .sort()
+            .at(-1) ?? null,
       };
     },
   });
@@ -224,6 +235,65 @@ export function useArchiveDocument(documentId: string | undefined) {
         queryKey: ['sales-document', membership?.companyId, documentId],
       });
     },
+  });
+}
+
+/**
+ * Beleg als versendet markieren, wie „Beleg teilen“ in der App
+ * (`markFinanceDocumentShared`): Eintrag im Versandprotokoll und Status
+ * `sent`. Den Status setzen nur `issued` und `overdue` — ein (teil)bezahlter
+ * Beleg bleibt, was er ist, bekommt aber den Protokolleintrag.
+ *
+ * Erst das Protokoll, dann der Status: scheitert das Protokoll, bleibt der
+ * Beleg unverändert und der Nutzer sieht den Fehler.
+ */
+export function useMarkSent(documentId: string | undefined) {
+  const queryClient = useQueryClient();
+  const { data: membership } = useMembership();
+  const { user } = useAuth();
+  const companyId = membership?.companyId;
+
+  return useMutation({
+    mutationFn: async (document: Pick<SalesDocumentDetail, 'type' | 'document_number'>) => {
+      const { error: logError } = await supabase.from('finance_send_log').insert({
+        company_id: companyId!,
+        document_id: documentId!,
+        channel: 'other',
+        intent: `mark_sent:${document.type}:${document.document_number ?? documentId}`,
+        created_by: user?.id ?? null,
+      });
+      if (logError) throw logError;
+
+      const { error } = await supabase
+        .from('sales_documents')
+        .update({ status: 'sent', modified_at: new Date().toISOString() })
+        .eq('company_id', companyId!)
+        .eq('id', documentId!)
+        .in('status', ['issued', 'overdue']);
+      if (error) throw error;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['sales-document', companyId, documentId] });
+      await queryClient.invalidateQueries({ queryKey: ['sales-documents', companyId] });
+    },
+  });
+}
+
+/**
+ * PDF-Vorschau eines Entwurfs samt Hinweisen der Render-Function (fehlende
+ * Pflichtangaben). Nicht im Cache halten: Der Entwurf kann sich im Editor
+ * jederzeit geändert haben.
+ */
+export function useDraftPreview(documentId: string | null | undefined) {
+  const { data: membership } = useMembership();
+  const companyId = membership?.companyId;
+
+  return useQuery({
+    queryKey: ['draft-preview', companyId, documentId],
+    enabled: Boolean(companyId && documentId),
+    staleTime: 0,
+    gcTime: 0,
+    queryFn: () => renderPreview(documentId!),
   });
 }
 
