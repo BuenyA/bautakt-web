@@ -27,6 +27,8 @@ export type DocumentLine = {
   order_id: string | null;
   source_type: 'time_entry' | 'order_material' | null;
   source_id: string | null;
+  /** Abschlagsrechnung, die eine Abzugszeile (`partial_credit`) verrechnet. */
+  credited_document_id: string | null;
 };
 
 export type DocumentPayment = {
@@ -138,7 +140,7 @@ export function useSalesDocument(id: string | undefined) {
            ${SALES_DOCUMENT_BUYER_SELECT},
            sales_document_lines(id, title, description, kind, quantity, unit, unit_price,
              discount_percent, net_amount, tax_rate_percent, sort_order, order_id,
-             source_type, source_id),
+             source_type, source_id, credited_document_id),
            payments(id, amount, skonto_amount, paid_at, method, note),
            dunning_notices(id, level, notice_date, sent_at, fee_amount, interest_amount),
            finance_send_log(created_at),

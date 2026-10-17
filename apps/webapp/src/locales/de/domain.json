@@ -1267,6 +1267,14 @@
       "nothingToImport": "Der Auftrag hat keine offenen Zeiten oder Material zum Abrechnen.",
       "importError": "Positionen aus dem Auftrag konnten nicht geladen werden"
     },
+    "partialCredits": {
+      "action": "Abschläge abziehen",
+      "needsOrder": "Wähle zuerst den Auftrag. Abgezogen werden seine ausgestellten Abschlagsrechnungen.",
+      "applied_one": "{{count}} Abschlag abgezogen.",
+      "applied_other": "{{count}} Abschläge abgezogen.",
+      "none": "Zu diesem Auftrag gibt es keine offenen Abschlagsrechnungen.",
+      "error": "Abschläge konnten nicht geladen werden"
+    },
     "taxMode": {
       "label": "Umsatzsteuer",
       "modes": {

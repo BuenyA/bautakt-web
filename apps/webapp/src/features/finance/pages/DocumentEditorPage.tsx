@@ -35,6 +35,7 @@ import {
   ArrowSyncRegular,
   CheckmarkCircleRegular,
   DeleteRegular,
+  ReceiptMoneyRegular,
   SaveRegular,
 } from '@fluentui/react-icons';
 import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react';
@@ -67,10 +68,12 @@ import {
   emptyLine,
   INVOICE_EDITOR_TYPES,
   isBlankLine,
+  isDeduction,
   isInvoiceEditorType,
   LINE_KINDS,
   lineNetMinor,
   loadOrderLines,
+  loadPartialCredits,
   useCompanyTaxProfile,
   useSaveDraft,
 } from '../useDocumentEditor';
@@ -201,14 +204,16 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
             key: line.id,
             title: line.title,
             description: line.description,
-            kind: (LINE_KINDS as readonly string[]).includes(line.kind)
-              ? (line.kind as EditorLine['kind'])
-              : 'other',
+            kind:
+              (LINE_KINDS as readonly string[]).includes(line.kind) ||
+              line.kind === 'partial_credit'
+                ? (line.kind as EditorLine['kind'])
+                : 'other',
             quantity: String(line.quantity),
             unit: line.unit,
-            // Ein Nachlass steht negativ in der Datenbank; im Feld ohne Minus.
+            // Ein Nachlass oder Abzug steht negativ in der Datenbank; im Feld ohne Minus.
             unitPrice: formatMoneyInput(
-              line.kind === 'discount' ? Math.abs(line.unit_price) : line.unit_price,
+              isDeduction(line.kind) ? Math.abs(line.unit_price) : line.unit_price,
             ),
             discountPercent: String(line.discount_percent),
             // Bei § 13b & Co. steht 0 % in der Zeile. Wechselt man zurück auf
@@ -221,6 +226,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
               line.source_type && line.source_id
                 ? { type: line.source_type, id: line.source_id }
                 : null,
+            creditedDocumentId: line.credited_document_id,
           }))
         : [emptyLine()],
     };
@@ -271,16 +277,52 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       const fresh = imported.filter((line) => !line.source || !known.has(line.source.id));
       if (fresh.length === 0) {
         toast.info(t('domain:editor.order.nothingToImport'));
-        return;
+      } else {
+        setState((current) =>
+          current
+            ? {
+                ...current,
+                lines: [...current.lines.filter((line) => !isBlankLine(line)), ...fresh],
+              }
+            : current,
+        );
+        toast.success(t('domain:editor.order.imported', { count: fresh.length }));
       }
-      setState((current) =>
-        current
-          ? { ...current, lines: [...current.lines.filter((line) => !isBlankLine(line)), ...fresh] }
-          : current,
-      );
-      toast.success(t('domain:editor.order.imported', { count: fresh.length }));
+      // Die Schlussrechnung zieht die Abschläge des Auftrags gleich mit ab.
+      if (state?.type === 'final_invoice') await applyPartialCredits(orderId);
     } catch (error) {
       toast.error(t('domain:editor.order.importError'), {
+        description: readableDbError(error) ?? undefined,
+      });
+    } finally {
+      setImportingOrder(false);
+    }
+  }
+
+  /** Abzüge neu aufbauen: alte Abzugszeilen raus, aktuelle Abschläge ans Ende. */
+  async function applyPartialCredits(orderId: string) {
+    const companyId = membership?.companyId;
+    if (!companyId) return;
+    setImportingOrder(true);
+    try {
+      const credits = await loadPartialCredits(companyId, orderId, documentId);
+      setState((current) =>
+        current
+          ? {
+              ...current,
+              lines: [
+                ...current.lines.filter(
+                  (line) => line.kind !== 'partial_credit' && !isBlankLine(line),
+                ),
+                ...credits,
+              ],
+            }
+          : current,
+      );
+      if (credits.length === 0) toast.info(t('domain:editor.partialCredits.none'));
+      else toast.success(t('domain:editor.partialCredits.applied', { count: credits.length }));
+    } catch (error) {
+      toast.error(t('domain:editor.partialCredits.error'), {
         description: readableDbError(error) ?? undefined,
       });
     } finally {
@@ -697,83 +739,124 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
           <Section title={t('domain:invoices.lines')}>
             <div className="flex flex-col gap-3">
-              {state.lines.map((line) => (
-                <div
-                  key={line.key}
-                  className="border-border grid gap-3 rounded-lg border p-3 @xl:grid-cols-6"
-                >
-                  <div className="@xl:col-span-4">
-                    <Field
-                      label={t('domain:invoices.lineColumns.title')}
-                      value={line.title}
-                      onChange={(value) => updateLine(line.key, { title: value })}
-                    />
-                  </div>
-                  <div className="grid gap-2 @xl:col-span-2">
-                    <Label htmlFor={`line-${line.key}-kind`}>{t('domain:editor.kind')}</Label>
-                    <Select
-                      id={`line-${line.key}-kind`}
-                      value={line.kind}
-                      onChange={(_, { value }) =>
-                        updateLine(line.key, { kind: value as EditorLine['kind'] })
-                      }
-                    >
-                      {LINE_KINDS.map((kind) => (
-                        <option key={kind} value={kind}>
-                          {t(`domain:editor.kinds.${kind}`)}
-                        </option>
-                      ))}
-                    </Select>
-                  </div>
-                  <Field
-                    label={t('domain:invoices.lineColumns.quantity')}
-                    value={line.quantity}
-                    onChange={(value) => updateLine(line.key, { quantity: value })}
-                    numeric
-                  />
-                  <Field
-                    label={t('domain:editor.unit')}
-                    value={line.unit}
-                    onChange={(value) => updateLine(line.key, { unit: value })}
-                  />
-                  <Field
-                    label={t('domain:invoices.lineColumns.unitPrice')}
-                    value={line.unitPrice}
-                    onChange={(value) => updateLine(line.key, { unitPrice: value })}
-                    numeric
-                  />
-                  <Field
-                    label={t('domain:editor.discount')}
-                    value={line.discountPercent}
-                    onChange={(value) => updateLine(line.key, { discountPercent: value })}
-                    numeric
-                  />
-                  <div className="grid gap-2">
-                    <Label>{t('domain:invoices.lineColumns.net')}</Label>
-                    <span className="text-foreground flex h-9 items-center justify-end text-sm font-medium tabular-nums">
-                      {line.kind === 'text' ? '—' : formatMoney(lineNetMinor(line))}
+              {state.lines.map((line) =>
+                line.kind === 'partial_credit' ? (
+                  <div
+                    key={line.key}
+                    className="border-border bg-muted/40 flex items-start gap-3 rounded-lg border p-3"
+                  >
+                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <Text weight="semibold">{line.title}</Text>
+                      <Text size={200} className="text-muted-foreground">
+                        {line.description}
+                      </Text>
+                    </div>
+                    <span className="text-foreground text-sm font-medium tabular-nums">
+                      {formatMoney(lineNetMinor(line))}
                     </span>
-                  </div>
-                  <div className="flex items-end justify-end">
                     <DangerIconButton
                       aria-label={t('domain:editor.removeLine')}
-                      disabled={state.lines.length === 1}
                       onClick={() =>
                         update({ lines: state.lines.filter((entry) => entry.key !== line.key) })
                       }
                       icon={<DeleteRegular />}
                     />
                   </div>
-                </div>
-              ))}
+                ) : (
+                  <div
+                    key={line.key}
+                    className="border-border grid gap-3 rounded-lg border p-3 @xl:grid-cols-6"
+                  >
+                    <div className="@xl:col-span-4">
+                      <Field
+                        label={t('domain:invoices.lineColumns.title')}
+                        value={line.title}
+                        onChange={(value) => updateLine(line.key, { title: value })}
+                      />
+                    </div>
+                    <div className="grid gap-2 @xl:col-span-2">
+                      <Label htmlFor={`line-${line.key}-kind`}>{t('domain:editor.kind')}</Label>
+                      <Select
+                        id={`line-${line.key}-kind`}
+                        value={line.kind}
+                        onChange={(_, { value }) =>
+                          updateLine(line.key, { kind: value as EditorLine['kind'] })
+                        }
+                      >
+                        {LINE_KINDS.map((kind) => (
+                          <option key={kind} value={kind}>
+                            {t(`domain:editor.kinds.${kind}`)}
+                          </option>
+                        ))}
+                      </Select>
+                    </div>
+                    <Field
+                      label={t('domain:invoices.lineColumns.quantity')}
+                      value={line.quantity}
+                      onChange={(value) => updateLine(line.key, { quantity: value })}
+                      numeric
+                    />
+                    <Field
+                      label={t('domain:editor.unit')}
+                      value={line.unit}
+                      onChange={(value) => updateLine(line.key, { unit: value })}
+                    />
+                    <Field
+                      label={t('domain:invoices.lineColumns.unitPrice')}
+                      value={line.unitPrice}
+                      onChange={(value) => updateLine(line.key, { unitPrice: value })}
+                      numeric
+                    />
+                    <Field
+                      label={t('domain:editor.discount')}
+                      value={line.discountPercent}
+                      onChange={(value) => updateLine(line.key, { discountPercent: value })}
+                      numeric
+                    />
+                    <div className="grid gap-2">
+                      <Label>{t('domain:invoices.lineColumns.net')}</Label>
+                      <span className="text-foreground flex h-9 items-center justify-end text-sm font-medium tabular-nums">
+                        {line.kind === 'text' ? '—' : formatMoney(lineNetMinor(line))}
+                      </span>
+                    </div>
+                    <div className="flex items-end justify-end">
+                      <DangerIconButton
+                        aria-label={t('domain:editor.removeLine')}
+                        disabled={state.lines.length === 1}
+                        onClick={() =>
+                          update({ lines: state.lines.filter((entry) => entry.key !== line.key) })
+                        }
+                        icon={<DeleteRegular />}
+                      />
+                    </div>
+                  </div>
+                ),
+              )}
 
               <div className="flex flex-wrap items-start justify-between gap-4">
-                <Button
-                  onClick={() => update({ lines: [...state.lines, emptyLine()] })}
-                  icon={<AddRegular />}
-                >
-                  {t('domain:editor.addLine')}
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    onClick={() => update({ lines: [...state.lines, emptyLine()] })}
+                    icon={<AddRegular />}
+                  >
+                    {t('domain:editor.addLine')}
+                  </Button>
+                  {state.type === 'final_invoice' ? (
+                    <Tooltip
+                      content={t('domain:editor.partialCredits.needsOrder')}
+                      relationship="description"
+                      visible={state.orderId ? false : undefined}
+                    >
+                      <Button
+                        icon={<ReceiptMoneyRegular />}
+                        disabledFocusable={!state.orderId || importingOrder}
+                        onClick={() => state.orderId && void applyPartialCredits(state.orderId)}
+                      >
+                        {t('domain:editor.partialCredits.action')}
+                      </Button>
+                    </Tooltip>
+                  ) : null}
+                </div>
 
                 <dl className="flex w-full max-w-xs flex-col gap-1 text-sm">
                   <SumRow label={t('domain:invoices.net')} value={formatMoney(totals.netMinor)} />

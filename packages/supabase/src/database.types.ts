@@ -3116,6 +3116,7 @@ export type Database = {
         Row: {
           company_id: string
           created_at: string
+          credited_document_id: string | null
           description: string
           discount_percent: number
           document_id: string
@@ -3137,6 +3138,7 @@ export type Database = {
         Insert: {
           company_id: string
           created_at?: string
+          credited_document_id?: string | null
           description?: string
           discount_percent?: number
           document_id: string
@@ -3158,6 +3160,7 @@ export type Database = {
         Update: {
           company_id?: string
           created_at?: string
+          credited_document_id?: string | null
           description?: string
           discount_percent?: number
           document_id?: string
