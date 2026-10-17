@@ -378,7 +378,10 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     );
   }
 
-  /** Pflichtangaben vor dem Speichern; meldet den ersten Fehler. */
+  /**
+   * Pflichtangaben vor dem Freigeben; meldet den ersten Fehler. Ein Entwurf
+   * lässt sich dagegen immer speichern, auch halb ausgefüllt (Owner 17.10.2026).
+   */
   function validate(): boolean {
     // ⚠️ Das Leistungsdatum ist bei Rechnungen Pflicht: ohne es lehnt
     // `finalize_sales_document` das Festschreiben ab. Lieber hier melden als
@@ -419,7 +422,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       : routes.invoices;
 
   async function onSaveDraft() {
-    if (!validate()) return;
+    setError(null);
     setBusy('save');
     try {
       const savedId = await persist();
@@ -480,11 +483,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       <Button disabled={busy !== null} onClick={onCancel}>
         {t('common:action.cancel')}
       </Button>
-      <Button
-        icon={<SaveRegular />}
-        disabled={busy !== null || dueBeforeIssue}
-        onClick={() => void onSaveDraft()}
-      >
+      <Button icon={<SaveRegular />} disabled={busy !== null} onClick={() => void onSaveDraft()}>
         {t('domain:editor.actions.saveDraft')}
       </Button>
       <Button
@@ -619,6 +618,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
               {isInvoice ? (
                 <Field
                   label={t('domain:invoices.buyerReference')}
+                  hint={t('domain:invoices.buyerReferenceHint')}
                   value={state.buyerReference}
                   onChange={(value) => update({ buyerReference: value })}
                 />
@@ -977,14 +977,17 @@ function Field({
   onChange,
   numeric,
   invalid,
+  hint,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   numeric?: boolean;
   invalid?: boolean;
+  hint?: string;
 }) {
   const fieldId = useId();
+  const hintId = useId();
   return (
     <div className="grid gap-2">
       <Label htmlFor={fieldId}>{label}</Label>
@@ -993,9 +996,15 @@ function Field({
         input={numeric ? { className: 'text-right tabular-nums' } : undefined}
         inputMode={numeric ? 'decimal' : undefined}
         aria-invalid={invalid || undefined}
+        aria-describedby={hint ? hintId : undefined}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
+      {hint ? (
+        <Text id={hintId} size={200} className="text-muted-foreground">
+          {hint}
+        </Text>
+      ) : null}
     </div>
   );
 }

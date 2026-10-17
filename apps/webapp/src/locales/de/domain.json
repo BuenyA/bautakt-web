@@ -589,7 +589,8 @@
     "overpaidWarning": "Die Zahlungen übersteigen den Bruttobetrag um {{amount}}.",
     "serviceDate": "Leistungsdatum",
     "paymentTerm": "Zahlungsziel",
-    "buyerReference": "Referenz des Kunden",
+    "buyerReference": "Käuferreferenz",
+    "buyerReferenceHint": "Bei öffentlichen Auftraggebern die Leitweg-ID, sonst zum Beispiel die Bestellnummer des Kunden. Darf leer bleiben.",
     "notes": "Notizen",
     "days_one": "{{count}} Tag",
     "days_other": "{{count}} Tage",
@@ -1222,7 +1223,7 @@
     "lockedTitle": "Beleg ist festgeschrieben",
     "lockedDescription": "Ein festgeschriebener Beleg lässt sich nicht mehr ändern. Für eine Korrektur wird eine Storno- oder Gutschrift erstellt.",
     "toDocument": "Zum Beleg",
-    "serviceDateRequired": "Bitte das Leistungsdatum angeben — ohne es lässt sich die Rechnung später nicht festschreiben.",
+    "serviceDateRequired": "Bitte das Leistungsdatum angeben. Ohne es lässt sich die Rechnung nicht freigeben.",
     "serviceDateRequiredLabel": "Leistungsdatum *",
     "dueBeforeIssue": "Das Fälligkeitsdatum liegt vor dem Rechnungsdatum.",
     "issueDateLabel": {
