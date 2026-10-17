@@ -18,6 +18,7 @@ import {
   DialogContent,
   DialogSurface,
   DialogTitle,
+  InfoLabel,
   Input,
   Label,
   MessageBar,
@@ -618,7 +619,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
               {isInvoice ? (
                 <Field
                   label={t('domain:invoices.buyerReference')}
-                  hint={t('domain:invoices.buyerReferenceHint')}
+                  info={t('domain:invoices.buyerReferenceHint')}
                   value={state.buyerReference}
                   onChange={(value) => update({ buyerReference: value })}
                 />
@@ -977,34 +978,34 @@ function Field({
   onChange,
   numeric,
   invalid,
-  hint,
+  info,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   numeric?: boolean;
   invalid?: boolean;
-  hint?: string;
+  /** Erklärung hinter einem „?“ neben der Beschriftung, öffnet per Klick. */
+  info?: string;
 }) {
   const fieldId = useId();
-  const hintId = useId();
   return (
     <div className="grid gap-2">
-      <Label htmlFor={fieldId}>{label}</Label>
+      {info ? (
+        <InfoLabel htmlFor={fieldId} info={info}>
+          {label}
+        </InfoLabel>
+      ) : (
+        <Label htmlFor={fieldId}>{label}</Label>
+      )}
       <Input
         id={fieldId}
         input={numeric ? { className: 'text-right tabular-nums' } : undefined}
         inputMode={numeric ? 'decimal' : undefined}
         aria-invalid={invalid || undefined}
-        aria-describedby={hint ? hintId : undefined}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
-      {hint ? (
-        <Text id={hintId} size={200} className="text-muted-foreground">
-          {hint}
-        </Text>
-      ) : null}
     </div>
   );
 }
