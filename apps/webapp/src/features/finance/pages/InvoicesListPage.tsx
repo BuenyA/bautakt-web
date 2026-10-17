@@ -14,7 +14,9 @@ import { useCompanyListLoading } from '@/features/company/useCompanyListLoading'
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import { isEInvoiceDocument } from '../archiveFiles';
 import { DocumentStatusBadge } from '../DocumentStatusBadge';
+import { EInvoiceBadge } from '../EInvoiceBadge';
 import { FinanceHeader } from '../FinanceHeader';
 import { invoiceStatusFromSearch, matchesInvoiceStatus } from '../invoiceListFilter';
 import { useFinanceAccess } from '../useFinanceAccess';
@@ -53,11 +55,14 @@ export function InvoicesListPage() {
         accessorKey: 'document_number',
         header: t('domain:invoices.columns.number'),
         cell: ({ row }) => (
-          <RouterLink appearance="subtle" to={routes.invoice(row.original.id)} stopPropagation>
-            <span className="font-medium whitespace-nowrap">
-              {row.original.document_number || t('domain:invoices.noNumber')}
-            </span>
-          </RouterLink>
+          <span className="inline-flex items-center gap-2">
+            <RouterLink appearance="subtle" to={routes.invoice(row.original.id)} stopPropagation>
+              <span className="font-medium whitespace-nowrap">
+                {row.original.document_number || t('domain:invoices.noNumber')}
+              </span>
+            </RouterLink>
+            {isEInvoiceDocument(row.original) ? <EInvoiceBadge /> : null}
+          </span>
         ),
       },
       {

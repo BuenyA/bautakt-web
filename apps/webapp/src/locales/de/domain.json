@@ -589,7 +589,8 @@
     "overpaidWarning": "Die Zahlungen übersteigen den Bruttobetrag um {{amount}}.",
     "serviceDate": "Leistungsdatum",
     "paymentTerm": "Zahlungsziel",
-    "buyerReference": "Referenz des Kunden",
+    "buyerReference": "Käuferreferenz",
+    "buyerReferenceHint": "Bei öffentlichen Auftraggebern die Leitweg-ID, sonst zum Beispiel die Bestellnummer des Kunden. Darf leer bleiben.",
     "notes": "Notizen",
     "days_one": "{{count}} Tag",
     "days_other": "{{count}} Tage",
@@ -1200,7 +1201,7 @@
       "invoice": "Neue Rechnung",
       "quote": "Neues Angebot"
     },
-    "draftHint": "Wird als Entwurf gespeichert. Die Nummer vergibt erst das Festschreiben.",
+    "draftHint": "Gespeichert wird erst mit „Entwurf speichern“ oder „Freigeben“. Die Nummer vergibt das Freigeben.",
     "head": "Kopfdaten",
     "texts": "Texte",
     "intro": "Einleitung",
@@ -1222,7 +1223,7 @@
     "lockedTitle": "Beleg ist festgeschrieben",
     "lockedDescription": "Ein festgeschriebener Beleg lässt sich nicht mehr ändern. Für eine Korrektur wird eine Storno- oder Gutschrift erstellt.",
     "toDocument": "Zum Beleg",
-    "serviceDateRequired": "Bitte das Leistungsdatum angeben — ohne es lässt sich die Rechnung später nicht festschreiben.",
+    "serviceDateRequired": "Bitte das Leistungsdatum angeben. Ohne es lässt sich die Rechnung nicht freigeben.",
     "serviceDateRequiredLabel": "Leistungsdatum *",
     "dueBeforeIssue": "Das Fälligkeitsdatum liegt vor dem Rechnungsdatum.",
     "issueDateLabel": {
@@ -1266,7 +1267,23 @@
       "missingVatIdTitle": "USt-IdNr. des Kunden fehlt",
       "missingVatIdDescription": "Am Kontakt ist keine USt-IdNr. hinterlegt. Prüfe, ob § 13b hier greift, und ergänze sie am Kontakt."
     },
-    "saveAndClose": "Speichern und schließen",
+    "actions": {
+      "saveDraft": "Entwurf speichern",
+      "release": "Freigeben"
+    },
+    "release": {
+      "title": {
+        "invoice": "Rechnung freigeben?",
+        "quote": "Angebot freigeben?"
+      },
+      "description": "Der Beleg bekommt seine Nummer und wird festgeschrieben. Danach lässt er sich nicht mehr ändern, nur noch stornieren."
+    },
+    "discard": {
+      "title": "Änderungen verwerfen?",
+      "description": "Du hast Änderungen, die noch nicht gespeichert sind. Sie gehen verloren, wenn du den Editor jetzt verlässt.",
+      "confirm": "Verwerfen",
+      "keep": "Weiter bearbeiten"
+    },
     "sections": {
       "document": "Beleg",
       "recipient": "Empfänger",
@@ -1281,8 +1298,18 @@
       "error": "Die Vorschau konnte nicht erzeugt werden.",
       "empty": "Die Vorschau wird erstellt …",
       "refresh": "Aktualisieren",
-      "warningsTitle": "Hinweise zur E-Rechnung"
+      "warningsTitle": "Hinweise zur E-Rechnung",
+      "warningsTitlePlain": "Hinweise zur Rechnung"
     }
+  },
+  "eInvoice": {
+    "badge": "E-Rechnung",
+    "badgeTooltip": "Enthält die maschinenlesbaren Rechnungsdaten (ZUGFeRD/XRechnung)",
+    "switchLabel": "Als E-Rechnung erstellen",
+    "onLabel": "Eingeschaltet:",
+    "offLabel": "Ausgeschaltet:",
+    "onHint": "Das PDF enthält die maschinenlesbaren Rechnungsdaten (ZUGFeRD).",
+    "offHint": "Es entsteht nur ein PDF ohne E-Rechnungsdaten. An Unternehmen in Deutschland ist das nur noch bis Ende 2026 erlaubt, bei höchstens 800.000 € Vorjahresumsatz bis Ende 2027."
   },
   "photoForm": {
     "upload": "Fotos hochladen",

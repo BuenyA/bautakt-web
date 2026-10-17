@@ -2,9 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { supabase } from '@/lib/supabase';
 
-import type { EditorState } from './useDocumentEditor';
+import type { DraftRows } from './useDocumentEditor';
 
-/** Tipp-Pause, nach der gespeichert und neu gerendert wird (Owner F2: ~800 ms). */
+/** Tipp-Pause, nach der neu gerendert wird (Owner F2: ~800 ms). */
 export const LIVE_PREVIEW_DELAY_MS = 800;
 
 type PreviewResponse = {
@@ -20,199 +20,103 @@ function base64ToBytes(value: string): Uint8Array {
   return bytes;
 }
 
-/**
- * Echtes PDF des gespeicherten Entwurfs aus `finance-document-render`
- * (`mode: 'preview'`, #150): dieselbe Pipeline wie beim Festschreiben, ohne
- * Ablage. Vorschau = Versand bis auf Nummer und Entwurfs-Wasserzeichen.
- */
-export async function renderPreview(
-  documentId: string,
-): Promise<{ pdf: Uint8Array; warnings: string[] }> {
+async function invokePreview(body: object): Promise<{ pdf: Uint8Array; warnings: string[] }> {
   const { data, error } = await supabase.functions.invoke<PreviewResponse>(
     'finance-document-render',
-    { body: { document_id: documentId, mode: 'preview' } },
+    { body: { ...body, mode: 'preview' } },
   );
   if (error) throw error;
   if (!data?.ok || !data.pdf_base64) throw new Error('PREVIEW_EMPTY');
   return { pdf: base64ToBytes(data.pdf_base64), warnings: data.warnings ?? [] };
 }
 
-export type LivePreviewPhase = 'idle' | 'saving' | 'rendering';
+/**
+ * Echtes PDF des gespeicherten Entwurfs aus `finance-document-render`
+ * (`mode: 'preview'`, #150): dieselbe Pipeline wie beim Festschreiben, ohne
+ * Ablage. Vorschau = Versand bis auf die Nummer.
+ */
+export function renderPreview(documentId: string) {
+  return invokePreview({ document_id: documentId });
+}
+
+export type LivePreviewPhase = 'idle' | 'rendering';
 
 /**
- * Live-Vorschau des Editors: Formular speichern, dann das PDF rendern.
+ * Live-Vorschau des Editors aus dem **ungespeicherten** Formular.
  *
- * Die Render-Function liest den Beleg aus der Datenbank, nicht aus dem
- * Formular — nur so ist die Vorschau dasselbe PDF, das beim Festschreiben
- * entsteht. Deshalb speichert der Editor einen Entwurf nach jeder Tipp-Pause
- * und beim Verlassen eines Felds (`flush`); Entwürfe sind frei änderbar.
+ * Gespeichert wird nur auf ausdrücklichen Klick („Entwurf speichern“,
+ * „Freigeben“; Owner 17.10.2026). Die Vorschau schickt deshalb Kopf und
+ * Positionen so an die Render-Function, wie `useSaveDraft` sie speichern
+ * würde (`buildDraftRows`) — das PDF ist dasselbe wie nach dem Speichern.
  *
- * ⚠️ Alle Speicherläufe laufen nacheinander über eine Kette, auch der Klick
- * auf „Speichern“. Zwei gleichzeitige Läufe würden beide die Positionen
- * löschen und neu einfügen — danach stünden sie doppelt im Beleg.
- *
- * Ein neuer Beleg wird beim Öffnen sofort als Entwurf gespeichert, damit die
- * Vorschau gleich ein PDF zeigt. Bleibt er unverändert, löscht `discard` ihn
- * beim Verlassen des Editors wieder — bloßes Öffnen hinterlässt keinen
- * leeren Entwurf.
+ * Beim Öffnen kommt das PDF sofort, danach nach jeder Tipp-Pause. Antworten
+ * eines überholten Laufs werden verworfen, damit nie ein älterer Stand den
+ * neueren überschreibt.
  */
 export function useLivePreview({
-  state,
-  initialDocumentId,
-  save,
-  discard,
+  rows,
+  documentId,
   enabled,
 }: {
-  state: EditorState | null;
-  initialDocumentId: string | null;
-  save: (state: EditorState, documentId: string | null) => Promise<string>;
-  /** Löscht einen beim Öffnen angelegten, nie geänderten Entwurf. */
-  discard: (documentId: string) => Promise<void>;
+  rows: DraftRows | null;
+  /** Gespeicherter Entwurf, falls vorhanden; nur zur Zuordnung im Function-Log. */
+  documentId: string | null;
   enabled: boolean;
 }) {
-  const [documentId, setDocumentId] = useState<string | null>(initialDocumentId);
   const [pdf, setPdf] = useState<Uint8Array | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [phase, setPhase] = useState<LivePreviewPhase>('idle');
   const [error, setError] = useState<unknown>(null);
 
-  const documentIdRef = useRef<string | null>(initialDocumentId);
-  const chainRef = useRef<Promise<unknown>>(Promise.resolve());
-  const savedJsonRef = useRef<string | null>(null);
-  const baselineJsonRef = useRef<string | null>(null);
-  const latestStateRef = useRef<EditorState | null>(state);
-  const timerRef = useRef<number | null>(null);
-  // Beim Öffnen angelegt und seitdem weder geändert noch ausdrücklich gespeichert.
-  const untouchedRef = useRef(false);
-  const discardRef = useRef(discard);
-  useEffect(() => {
-    discardRef.current = discard;
-  }, [discard]);
+  const latestRef = useRef<{ rows: DraftRows | null; documentId: string | null }>({
+    rows,
+    documentId,
+  });
+  const runRef = useRef(0);
+  const renderedOnceRef = useRef(false);
+  const json = rows ? JSON.stringify(rows) : null;
 
-  // Vor allen anderen Effekten: Der Zeitgeber unten liest beides erst später.
   useEffect(() => {
-    latestStateRef.current = state;
-    // Erster Zustand gilt als „unverändert“: beim Bearbeiten ist er
-    // gespeichert, beim neuen Beleg soll er nicht als leerer Entwurf landen.
-    if (state && baselineJsonRef.current === null) {
-      baselineJsonRef.current = JSON.stringify(state);
-      if (initialDocumentId) savedJsonRef.current = baselineJsonRef.current;
+    latestRef.current = { rows, documentId };
+  }, [rows, documentId]);
+
+  const render = useCallback(async () => {
+    const { rows: current, documentId: id } = latestRef.current;
+    if (!current) return;
+    const run = ++runRef.current;
+    setPhase('rendering');
+    try {
+      const result = await invokePreview({
+        draft: { document: { ...current.header, id }, lines: current.lines },
+      });
+      if (run !== runRef.current) return;
+      renderedOnceRef.current = true;
+      setPdf(result.pdf);
+      setWarnings(result.warnings);
+      setError(null);
+    } catch (cause) {
+      if (run !== runRef.current) return;
+      setError(cause);
+    } finally {
+      if (run === runRef.current) setPhase('idle');
     }
-  }, [state, initialDocumentId]);
+  }, []);
 
-  /** Speichert, wenn nötig, und gibt die Beleg-Id zurück. Läuft in der Kette. */
-  const persist = useCallback(
-    (force = false): Promise<string | null> => {
-      const run = chainRef.current.then(async () => {
-        const current = latestStateRef.current;
-        if (!current) return documentIdRef.current;
-        const json = JSON.stringify(current);
-        const unchanged =
-          json === savedJsonRef.current ||
-          (!documentIdRef.current && json === baselineJsonRef.current);
-        // `force` legt einen neuen Beleg auch ohne Änderung an (Knopf
-        // „Speichern“ oder „Vorschau aktualisieren“).
-        const needsSave = !unchanged || (force && !documentIdRef.current);
-        if (!needsSave) return documentIdRef.current;
-        setPhase('saving');
-        const created = !documentIdRef.current;
-        const id = await save(current, documentIdRef.current);
-        untouchedRef.current = created && json === baselineJsonRef.current;
-        documentIdRef.current = id;
-        savedJsonRef.current = json;
-        setDocumentId(id);
-        return id;
-      });
-      // Ein Fehler darf die Kette nicht für alle folgenden Läufe blockieren.
-      chainRef.current = run.catch(() => undefined);
-      return run;
-    },
-    [save],
-  );
-
-  const renderedJsonRef = useRef<string | null>(null);
-
-  const update = useCallback(
-    async (force = false) => {
-      if (timerRef.current !== null) {
-        window.clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-      try {
-        const id = await persist(force);
-        if (!id) {
-          setPhase('idle');
-          return;
-        }
-        // Nichts Neues gespeichert und schon gerendert: kein zweiter Aufruf.
-        if (!force && renderedJsonRef.current === savedJsonRef.current) {
-          setPhase('idle');
-          return;
-        }
-        const renderedFor = savedJsonRef.current;
-        setPhase('rendering');
-        const result = await renderPreview(id);
-        // Während des Renderns weitergetippt: das Ergebnis trotzdem zeigen,
-        // der nächste Lauf ersetzt es gleich.
-        renderedJsonRef.current = renderedFor;
-        setPdf(result.pdf);
-        setWarnings(result.warnings);
-        setError(null);
-      } catch (cause) {
-        setError(cause);
-      } finally {
-        setPhase('idle');
-      }
-    },
-    [persist],
-  );
-
-  // Entprellt nach jeder Änderung. Beim Öffnen kommt das PDF sofort, ohne die
-  // Pause abzuwarten; ein neuer Beleg wird dafür gleich angelegt.
   useEffect(() => {
-    if (!enabled || !state) return;
-    if (timerRef.current !== null) window.clearTimeout(timerRef.current);
-    const firstOpen = renderedJsonRef.current === null;
-    const createNow = firstOpen && !documentIdRef.current;
-    timerRef.current = window.setTimeout(
-      () => void update(createNow),
-      firstOpen ? 0 : LIVE_PREVIEW_DELAY_MS,
+    if (!enabled || json === null) return;
+    const timer = window.setTimeout(
+      () => void render(),
+      renderedOnceRef.current ? LIVE_PREVIEW_DELAY_MS : 0,
     );
-    return () => {
-      if (timerRef.current !== null) window.clearTimeout(timerRef.current);
-    };
-  }, [state, enabled, update]);
-
-  // Editor verlassen, ohne etwas einzutragen: den leeren Entwurf wieder löschen.
-  // Erst nach allen laufenden Speicherläufen, sonst fehlt die Id noch.
-  useEffect(
-    () => () => {
-      void chainRef.current.then(() => {
-        const id = documentIdRef.current;
-        if (id && untouchedRef.current) {
-          untouchedRef.current = false;
-          void discardRef.current(id).catch(() => undefined);
-        }
-      });
-    },
-    [],
-  );
+    return () => window.clearTimeout(timer);
+  }, [json, enabled, render]);
 
   return {
-    documentId,
     pdf,
     warnings,
     phase,
     error,
-    /** Sofort speichern und rendern, z. B. beim Verlassen eines Felds. */
-    flush: () => void update(),
-    /** Knopf „Vorschau aktualisieren“: rendert auch ohne Änderung neu. */
-    refresh: () => void update(true),
-    /** Für „Speichern“: wartet auf alle laufenden Läufe und speichert den Stand. */
-    persist: async () => {
-      const id = await persist(true);
-      untouchedRef.current = false;
-      return id;
-    },
+    /** Knopf „Vorschau aktualisieren“. */
+    refresh: () => void render(),
   };
 }
