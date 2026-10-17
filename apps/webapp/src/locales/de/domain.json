@@ -590,7 +590,7 @@
     "serviceDate": "Leistungsdatum",
     "paymentTerm": "Zahlungsziel",
     "buyerReference": "Käuferreferenz",
-    "buyerReferenceHint": "Bei öffentlichen Auftraggebern die Leitweg-ID, sonst zum Beispiel die Bestellnummer des Kunden. Darf leer bleiben.",
+    "buyerReferenceHint": "Bei öffentlichen Auftraggebern die Leitweg-ID, sonst zum Beispiel die Bestellnummer des Kunden. Ohne Leitweg-ID kommt eine E-Rechnung bei Behörden nicht an. Darf leer bleiben, höchstens {{max}} Zeichen.",
     "notes": "Notizen",
     "days_one": "{{count}} Tag",
     "days_other": "{{count}} Tage",
@@ -615,6 +615,10 @@
     "finalizeSuccess": "Ausgestellt: {{number}}",
     "finalizeError": "Freigeben nicht möglich",
     "noLines": "Füge zuerst mindestens eine Position hinzu.",
+    "creditNote": {
+      "action": "Gutschrift erstellen",
+      "credited": "Gutgeschrieben"
+    },
     "cancel": {
       "action": "Stornieren",
       "title": "Rechnung stornieren?",
@@ -1212,8 +1216,15 @@
     "editTitle": "Entwurf bearbeiten",
     "newTitle": {
       "invoice": "Neue Rechnung",
-      "quote": "Neues Angebot"
+      "quote": "Neues Angebot",
+      "credit_note": "Neue Gutschrift"
     },
+    "creditNote": {
+      "info": "Gutschrift zu Rechnung {{number}}. Noch gutschreibbar: {{amount}}. Streiche oder ändere die Positionen, die nicht gutgeschrieben werden.",
+      "noAmount": "Die Gutschrift braucht einen Betrag über 0.",
+      "exceeds": "Die Gutschrift ist höher als der noch gutschreibbare Betrag von {{amount}}."
+    },
+    "buyerReferenceTooLong": "Die Käuferreferenz darf höchstens {{max}} Zeichen haben.",
     "draftHint": "Gespeichert wird erst mit „Entwurf speichern“ oder „Freigeben“. Die Nummer vergibt das Freigeben.",
     "head": "Kopfdaten",
     "texts": "Texte",

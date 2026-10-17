@@ -41,6 +41,13 @@ const MESSAGES: Record<string, string> = {
   // Storno (bautakt-app 20261016215235_a_cancel_sales_document).
   CANCEL_NOT_ALLOWED:
     'Dieser Beleg lässt sich nicht stornieren. Storniert werden nur freigegebene Rechnungen, die noch nicht storniert sind.',
+  // Gutschrift (bautakt-app 20261017193801_a_credit_note_settlement).
+  CREDIT_NOTE_INVALID:
+    'Eine Gutschrift gehört zu einer freigegebenen, nicht stornierten Rechnung. Lege sie über „Gutschrift erstellen“ auf der Rechnung an.',
+  CREDIT_NOTE_EXCEEDS:
+    'Die Gutschrift ist höher als der noch nicht gutgeschriebene Betrag der Rechnung oder nicht größer als 0.',
+  CANCEL_HAS_CREDIT_NOTES:
+    'Zu dieser Rechnung gibt es schon eine Gutschrift. Ein Storno würde doppelt gutschreiben; schreibe den Rest mit einer weiteren Gutschrift gut.',
   // Schlussrechnung (bautakt-app 20261017184308_a_partial_credit_link).
   PARTIAL_CREDIT_INVALID:
     'Abziehen lassen sich nur freigegebene, nicht stornierte Abschlagsrechnungen. Lade die Abschläge neu.',

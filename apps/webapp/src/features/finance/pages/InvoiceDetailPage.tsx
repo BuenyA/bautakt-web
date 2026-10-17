@@ -26,6 +26,7 @@ import {
 } from '@fluentui/react-components';
 import {
   ArrowDownloadRegular,
+  ArrowUndoRegular,
   CheckmarkCircleRegular,
   CodeRegular,
   DismissCircleRegular,
@@ -67,6 +68,7 @@ import { useFinalizeBlockers } from '../useFinalizeBlockers';
 import { useFinanceAccess } from '../useFinanceAccess';
 import {
   archivedPdfUrl,
+  chargeableMinorOf,
   type LinkedDocument,
   openMinorOf,
   overpaidMinorOf,
@@ -200,7 +202,17 @@ export function InvoiceDetailPage() {
     access.canWriteSalesDocuments &&
     !isDraft &&
     data.status !== 'cancelled' &&
-    CANCELLABLE_TYPES.has(data.type);
+    CANCELLABLE_TYPES.has(data.type) &&
+    eurosToMinor(data.credited_total) === 0;
+  // Eine teilweise gutgeschriebene Rechnung storniert die Datenbank nicht
+  // (CANCEL_HAS_CREDIT_NOTES); den Rest schreibt eine weitere Gutschrift gut.
+  const creditedMinor = eurosToMinor(data.credited_total);
+  const canCreditNote =
+    access.canWriteSalesDocuments &&
+    !isDraft &&
+    data.status !== 'cancelled' &&
+    CANCELLABLE_TYPES.has(data.type) &&
+    chargeableMinorOf(data) > 0;
   const cancellations = data.children.filter((child) => child.type === 'cancellation');
   const creditNotes = data.children.filter((child) => child.type === 'credit_note');
 
@@ -336,6 +348,12 @@ export function InvoiceDetailPage() {
                 label={t('domain:invoices.deleteDraft.action')}
                 onClick={() => setDeleteOpen(true)}
               />
+            ) : null}
+
+            {canCreditNote ? (
+              <LinkButton to={routes.invoiceNewCreditNote(data.id)} icon={<ArrowUndoRegular />}>
+                {t('domain:invoices.creditNote.action')}
+              </LinkButton>
             ) : null}
 
             {canCancel ? (
@@ -553,6 +571,12 @@ export function InvoiceDetailPage() {
               value={formatMoney(eurosToMinor(data.gross_total))}
               strong
             />
+            {creditedMinor > 0 ? (
+              <SumRow
+                label={t('domain:invoices.creditNote.credited')}
+                value={`− ${formatMoney(creditedMinor)}`}
+              />
+            ) : null}
             {paidMinor > 0 ? (
               <>
                 <SumRow label={t('domain:invoices.paid')} value={`− ${formatMoney(paidMinor)}`} />

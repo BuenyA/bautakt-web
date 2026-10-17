@@ -3218,6 +3218,7 @@ export type Database = {
           content_hash: string | null
           created_at: string
           created_by: string | null
+          credited_total: number
           currency: string
           customer_id: string | null
           document_number: string | null
@@ -3259,6 +3260,7 @@ export type Database = {
           content_hash?: string | null
           created_at?: string
           created_by?: string | null
+          credited_total?: number
           currency?: string
           customer_id?: string | null
           document_number?: string | null
@@ -3300,6 +3302,7 @@ export type Database = {
           content_hash?: string | null
           created_at?: string
           created_by?: string | null
+          credited_total?: number
           currency?: string
           customer_id?: string | null
           document_number?: string | null

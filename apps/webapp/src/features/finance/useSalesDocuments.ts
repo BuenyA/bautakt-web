@@ -37,7 +37,7 @@ export type SalesDocumentListRow = SalesDocumentRow & {
 
 type QueryRow = Omit<SalesDocumentListRow, 'customer_label'> & SalesDocumentBuyerFields;
 
-const SELECT = `id, type, status, document_number, issue_date, due_date, gross_total, net_total, vat_total, customer_id, currency, payment_term_days, created_at, e_invoice, ${SALES_DOCUMENT_BUYER_SELECT}`;
+const SELECT = `id, type, status, document_number, issue_date, due_date, gross_total, net_total, vat_total, credited_total, customer_id, currency, payment_term_days, created_at, e_invoice, ${SALES_DOCUMENT_BUYER_SELECT}`;
 
 /**
  * Verkaufsbelege des aktiven Betriebs.

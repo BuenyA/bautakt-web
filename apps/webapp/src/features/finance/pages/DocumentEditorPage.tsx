@@ -54,13 +54,14 @@ import { ContactPicker } from '@/features/contacts/ContactPicker';
 import { useContacts } from '@/features/contacts/useContacts';
 import { useOrders } from '@/features/orders/useOrders';
 import { readableDbError } from '@/lib/dbErrors';
-import { invoiceFromOrderParam, routes } from '@/lib/routes';
+import { creditNoteFromParam, invoiceFromOrderParam, routes } from '@/lib/routes';
 
 import { invalidTermFields, prefillCustomerTerms } from '../customerTerms';
 import { PdfViewer } from '../PdfViewer';
 import { ReleaseDialog } from '../ReleaseDialog';
 import {
   buildDraftRows,
+  BUYER_REFERENCE_MAX_LENGTH,
   type EditableDocumentType,
   type EditorLine,
   type EditorState,
@@ -69,20 +70,29 @@ import {
   INVOICE_EDITOR_TYPES,
   isBlankLine,
   isDeduction,
+  isInvoiceDocument,
   isInvoiceEditorType,
   LINE_KINDS,
   lineNetMinor,
   loadOrderLines,
   loadPartialCredits,
+  storedSign,
   useCompanyTaxProfile,
   useSaveDraft,
 } from '../useDocumentEditor';
 import { useLivePreview } from '../useLivePreview';
-import { useFinalizeDocument, useSalesDocument } from '../useSalesDocument';
+import {
+  chargeableMinorOf,
+  type DocumentLine,
+  type SalesDocumentDetail,
+  useFinalizeDocument,
+  useSalesDocument,
+} from '../useSalesDocument';
 
 function initialState(type: EditableDocumentType, taxMode: TaxMode): EditorState {
   return {
     type,
+    parentDocumentId: null,
     customerId: null,
     orderId: null,
     taxMode,
@@ -109,6 +119,71 @@ function numberText(value: number | null): string {
 }
 
 /**
+ * Positionen aus der Datenbank fürs Formular. `type` ist die Belegart, aus
+ * der die Zeilen stammen: Eine Gutschrift liegt negiert vor und wird positiv
+ * gezeigt. Neue Zeilen-Keys, wenn die Zeilen in einen neuen Beleg wandern.
+ */
+function toEditorLines(
+  lines: DocumentLine[],
+  type: string,
+  taxMode: string,
+  freshKeys = false,
+): EditorLine[] {
+  const sign = storedSign(type);
+  return lines.map((line) => {
+    const price = sign * line.unit_price;
+    return {
+      key: freshKeys ? crypto.randomUUID() : line.id,
+      title: line.title,
+      description: line.description,
+      kind:
+        (LINE_KINDS as readonly string[]).includes(line.kind) || line.kind === 'partial_credit'
+          ? (line.kind as EditorLine['kind'])
+          : 'other',
+      quantity: String(line.quantity),
+      unit: line.unit,
+      // Ein Nachlass oder Abzug steht negativ in der Datenbank; im Feld ohne Minus.
+      unitPrice: formatMoneyInput(isDeduction(line.kind) ? Math.abs(price) : price),
+      discountPercent: String(line.discount_percent),
+      // Bei § 13b & Co. steht 0 % in der Zeile. Wechselt man zurück auf
+      // `standard`, soll der übliche Satz kommen, nicht 0 %.
+      taxRatePercent:
+        line.tax_rate_percent > 0 || taxMode === 'standard' ? String(line.tax_rate_percent) : '19',
+      // Eine Gutschrift rechnet Zeit und Material nicht noch einmal ab.
+      source:
+        !freshKeys && line.source_type && line.source_id
+          ? { type: line.source_type, id: line.source_id }
+          : null,
+      creditedDocumentId: line.credited_document_id,
+    };
+  });
+}
+
+/**
+ * Gutschrift-Entwurf zu einer Rechnung: Kunde, Steuerart, Käuferreferenz und
+ * Leistungsdatum vom Original, die Positionen als Vorlage. Der Nutzer streicht
+ * oder ändert, was nicht gutgeschrieben wird. Abschlagsabzüge bleiben weg.
+ */
+function creditNoteState(original: SalesDocumentDetail, taxMode: TaxMode): EditorState {
+  const lines = toEditorLines(
+    original.lines.filter((line) => line.kind !== 'partial_credit'),
+    original.type,
+    original.tax_mode,
+    true,
+  ).map((line) => ({ ...line, creditedDocumentId: null }));
+  return {
+    ...initialState('credit_note', taxMode),
+    parentDocumentId: original.id,
+    customerId: original.customer_id,
+    orderId: original.lines.find((line) => line.order_id)?.order_id ?? null,
+    serviceDate: original.service_date ?? '',
+    buyerReference: original.buyer_reference,
+    eInvoice: original.e_invoice !== false,
+    lines: lines.length ? lines : [emptyLine()],
+  };
+}
+
+/**
  * Editor fuer Angebote und Rechnungen.
  *
  * Split-Screen (#152): links das Formular in der Reihenfolge des PDFs, rechts
@@ -130,12 +205,18 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
   const [searchParams] = useSearchParams();
   const fromOrderId = id ? null : searchParams.get(invoiceFromOrderParam);
+  const creditFromId = id ? null : searchParams.get(creditNoteFromParam);
   const orderFieldId = useId();
   const typeFieldId = useId();
   const taxModeFieldId = useId();
 
   const { data: membership } = useMembership();
   const existing = useSalesDocument(id);
+  // Ursprungsrechnung einer Gutschrift: Vorlage beim Anlegen, Obergrenze beim Freigeben.
+  const parentId =
+    creditFromId ??
+    (existing.data?.type === 'credit_note' ? (existing.data.parent?.id ?? undefined) : undefined);
+  const parentDocument = useSalesDocument(parentId ?? undefined);
   const contacts = useContacts();
   const orders = useOrders();
   const taxProfile = useCompanyTaxProfile();
@@ -163,11 +244,17 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   // Neuer Beleg: erst anlegen, wenn Betrieb und ggf. Auftrag bekannt sind —
   // sonst stünde kurz `standard` statt § 19 im Formular, oder der Kunde fehlte.
   const ordersReady = !fromOrderId || orders.isFetched;
-  if (!id && state === null && taxProfile.isFetched && ordersReady) {
+  const parentReady = !creditFromId || parentDocument.isFetched;
+  if (!id && state === null && taxProfile.isFetched && ordersReady && parentReady) {
     const order = fromOrderId
       ? (orders.data ?? []).find((row) => row.id === fromOrderId)
       : undefined;
-    const fresh = initialState(type, defaultTaxMode);
+    const fresh = parentDocument.data
+      ? creditNoteState(
+          parentDocument.data,
+          isSmallBusiness ? 'small_business' : toTaxMode(parentDocument.data.tax_mode),
+        )
+      : initialState(type, defaultTaxMode);
     const start = order ? { ...fresh, orderId: order.id, customerId: order.customer_id } : fresh;
     if (order) pendingOrderImport.current = order.id;
     setState(start);
@@ -179,6 +266,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   if (id && state === null && existing.data && taxProfile.isFetched) {
     const loaded: EditorState = {
       type: (existing.data.type as EditableDocumentType) ?? type,
+      parentDocumentId: existing.data.parent?.id ?? null,
       customerId: existing.data.customer_id,
       // Der Auftrag steht an den Positionen, nicht am Kopf. Der Editor schreibt
       // ihn an alle; ein Entwurf aus der App kann gemischte haben, dann gilt
@@ -200,34 +288,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       skontoDays: numberText(existing.data.skonto_days),
       eInvoice: existing.data.e_invoice !== false,
       lines: existing.data.lines.length
-        ? existing.data.lines.map((line) => ({
-            key: line.id,
-            title: line.title,
-            description: line.description,
-            kind:
-              (LINE_KINDS as readonly string[]).includes(line.kind) ||
-              line.kind === 'partial_credit'
-                ? (line.kind as EditorLine['kind'])
-                : 'other',
-            quantity: String(line.quantity),
-            unit: line.unit,
-            // Ein Nachlass oder Abzug steht negativ in der Datenbank; im Feld ohne Minus.
-            unitPrice: formatMoneyInput(
-              isDeduction(line.kind) ? Math.abs(line.unit_price) : line.unit_price,
-            ),
-            discountPercent: String(line.discount_percent),
-            // Bei § 13b & Co. steht 0 % in der Zeile. Wechselt man zurück auf
-            // `standard`, soll der übliche Satz kommen, nicht 0 %.
-            taxRatePercent:
-              line.tax_rate_percent > 0 || existing.data?.tax_mode === 'standard'
-                ? String(line.tax_rate_percent)
-                : '19',
-            source:
-              line.source_type && line.source_id
-                ? { type: line.source_type, id: line.source_id }
-                : null,
-            creditedDocumentId: line.credited_document_id,
-          }))
+        ? toEditorLines(existing.data.lines, existing.data.type, existing.data.tax_mode)
         : [emptyLine()],
     };
     setState(loaded);
@@ -356,7 +417,11 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
   if (!state || !totals) return <PageSpinner />;
 
-  const isInvoice = isInvoiceEditorType(state.type);
+  const isInvoice = isInvoiceDocument(state.type);
+  const isCreditNote = state.type === 'credit_note';
+  // Noch gutschreibbar: Brutto der Rechnung minus freigegebene Gutschriften.
+  const creditLimitMinor = parentDocument.data ? chargeableMinorOf(parentDocument.data) : null;
+  const buyerReferenceTooLong = state.buyerReference.trim().length > BUYER_REFERENCE_MAX_LENGTH;
   // Beschriftungen unterscheiden nur Angebot und Rechnung, nicht die Rechnungsart.
   const labelType = isInvoice ? 'invoice' : 'quote';
 
@@ -445,6 +510,20 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       setError(t('domain:invoices.noLines'));
       return false;
     }
+    if (buyerReferenceTooLong) {
+      setError(t('domain:editor.buyerReferenceTooLong', { max: BUYER_REFERENCE_MAX_LENGTH }));
+      return false;
+    }
+    if (isCreditNote && totals) {
+      if (totals.grossMinor <= 0) {
+        setError(t('domain:editor.creditNote.noAmount'));
+        return false;
+      }
+      if (creditLimitMinor !== null && totals.grossMinor > creditLimitMinor) {
+        setError(t('domain:editor.creditNote.exceeds', { amount: formatMoney(creditLimitMinor) }));
+        return false;
+      }
+    }
     setError(null);
     return true;
   }
@@ -464,9 +543,11 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
   const backTo = documentId
     ? routes.invoice(documentId)
-    : state.type === 'quote'
-      ? routes.quotes
-      : routes.invoices;
+    : state.parentDocumentId
+      ? routes.invoice(state.parentDocumentId)
+      : state.type === 'quote'
+        ? routes.quotes
+        : routes.invoices;
 
   async function onSaveDraft() {
     setError(null);
@@ -561,7 +642,11 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader
-        title={id ? t('domain:editor.editTitle') : t(`domain:editor.newTitle.${labelType}`)}
+        title={
+          id
+            ? t('domain:editor.editTitle')
+            : t(`domain:editor.newTitle.${isCreditNote ? 'credit_note' : labelType}`)
+        }
         description={t('domain:editor.draftHint')}
         actions={
           <div className="flex flex-wrap items-center justify-end gap-3">
@@ -587,7 +672,17 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
         <div className="@container flex min-w-0 flex-col gap-4">
           <Section title={t('domain:editor.sections.document')}>
             <div className="grid gap-4 @lg:grid-cols-2">
-              {isInvoice ? (
+              {isCreditNote && parentDocument.data ? (
+                <MessageBar intent="info" className="@lg:col-span-2">
+                  <MessageBarBody>
+                    {t('domain:editor.creditNote.info', {
+                      number: parentDocument.data.document_number ?? '',
+                      amount: formatMoney(creditLimitMinor ?? 0),
+                    })}
+                  </MessageBarBody>
+                </MessageBar>
+              ) : null}
+              {isInvoiceEditorType(state.type) ? (
                 <div className="grid gap-2">
                   <Label htmlFor={typeFieldId}>{t('domain:editor.documentType')}</Label>
                   <Select
@@ -669,9 +764,13 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
               {isInvoice ? (
                 <Field
                   label={t('domain:invoices.buyerReference')}
-                  info={t('domain:invoices.buyerReferenceHint')}
+                  info={t('domain:invoices.buyerReferenceHint', {
+                    max: BUYER_REFERENCE_MAX_LENGTH,
+                  })}
                   value={state.buyerReference}
                   onChange={(value) => update({ buyerReference: value })}
+                  maxLength={BUYER_REFERENCE_MAX_LENGTH}
+                  invalid={buyerReferenceTooLong}
                 />
               ) : null}
             </div>
@@ -1063,12 +1162,14 @@ function Field({
   numeric,
   invalid,
   info,
+  maxLength,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   numeric?: boolean;
   invalid?: boolean;
+  maxLength?: number;
   /** Erklärung hinter einem „?“ neben der Beschriftung, öffnet per Klick. */
   info?: string;
 }) {
@@ -1090,6 +1191,7 @@ function Field({
         input={numeric ? { className: 'text-right tabular-nums' } : undefined}
         inputMode={numeric ? 'decimal' : undefined}
         aria-invalid={invalid || undefined}
+        maxLength={maxLength}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />

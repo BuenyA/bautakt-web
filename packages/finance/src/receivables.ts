@@ -34,6 +34,8 @@ export type SalesDocumentRow = {
   net_total: number | null;
   vat_total: number | null;
   customer_id: string | null;
+  /** Freigegebene Gutschriften zu dieser Rechnung (Brutto, positiv). */
+  credited_total?: number | null;
 };
 
 /** Ausschnitt aus `payments`. */
@@ -101,7 +103,11 @@ export function buildReceivables(
     .filter((document) => INVOICE_TYPES.has(document.type) && OPEN_STATUSES.has(document.status))
     .map((document) => {
       const paidMinor = paid.get(document.id) ?? 0;
-      const openMinor = Math.max(0, eurosToMinor(document.gross_total) - paidMinor);
+      // Eine Teilgutschrift mindert die Forderung wie eine Zahlung (bautakt-web#78).
+      const openMinor = Math.max(
+        0,
+        eurosToMinor(document.gross_total) - eurosToMinor(document.credited_total) - paidMinor,
+      );
       const overdue = document.due_date
         ? Math.max(0, daysBetween(document.due_date, referenceIso))
         : 0;
