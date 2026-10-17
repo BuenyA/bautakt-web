@@ -362,7 +362,7 @@ export function InvoiceDetailPage() {
       ) : null}
 
       <div className="flex flex-wrap items-center gap-3">
-        {isEInvoiceDocument(data) ? <EInvoiceBadge size="large" /> : null}
+        {isEInvoiceDocument(data) ? <EInvoiceBadge /> : null}
         <DocumentStatusBadge status={data.status} />
         {data.sent_at ? (
           <StatusBadge tone="outline">

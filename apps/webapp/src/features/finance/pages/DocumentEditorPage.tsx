@@ -56,7 +56,6 @@ import { readableDbError } from '@/lib/dbErrors';
 import { invoiceFromOrderParam, routes } from '@/lib/routes';
 
 import { invalidTermFields, prefillCustomerTerms } from '../customerTerms';
-import { EInvoiceBadge } from '../EInvoiceBadge';
 import { PdfViewer } from '../PdfViewer';
 import {
   buildDraftRows,
@@ -588,12 +587,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                   <Switch
                     checked={state.eInvoice}
                     onChange={(_, data) => update({ eInvoice: data.checked })}
-                    label={
-                      <span className="inline-flex items-center gap-2">
-                        {t('domain:eInvoice.switchLabel')}
-                        {state.eInvoice ? <EInvoiceBadge /> : null}
-                      </span>
-                    }
+                    label={t('domain:eInvoice.switchLabel')}
                   />
                   <HelpButton label={t('domain:eInvoice.switchLabel')}>
                     <p>

@@ -1303,7 +1303,8 @@
     }
   },
   "eInvoice": {
-    "badgeTooltip": "E-Rechnung (ZUGFeRD/XRechnung)",
+    "badge": "E-Rechnung",
+    "badgeTooltip": "Enthält die maschinenlesbaren Rechnungsdaten (ZUGFeRD/XRechnung)",
     "switchLabel": "Als E-Rechnung erstellen",
     "onLabel": "Eingeschaltet:",
     "offLabel": "Ausgeschaltet:",
