@@ -84,6 +84,13 @@ export const financeHub: Hub = {
   // Liste sind ihre Reiter (`FinanceHeader`). Die Übersicht selbst steht dort
   // vorn und zählt hier nicht — sie allein soll den Leistenpunkt nicht zeigen.
   cards: [
+    // Eingang vor Ausgang, wie in der Übersicht (Owner 17.10.2026).
+    {
+      titleKey: 'common:hub.finance.tabs.incoming',
+      to: routes.expenses,
+      icon: ReceiptRegular,
+      anyPermission: ['canViewCompanyFinance', 'canManageOverheadCosts'],
+    },
     {
       titleKey: 'common:hub.finance.tabs.outgoing',
       to: routes.invoices,
@@ -92,12 +99,6 @@ export const financeHub: Hub = {
       // Offene Posten ist kein eigener Reiter mehr; die Seite bleibt und
       // gehört zu den Ausgangsrechnungen.
       alsoMatches: [routes.receivables],
-    },
-    {
-      titleKey: 'common:hub.finance.tabs.incoming',
-      to: routes.expenses,
-      icon: ReceiptRegular,
-      anyPermission: ['canViewCompanyFinance', 'canManageOverheadCosts'],
     },
     {
       titleKey: 'common:hub.finance.tabs.quotes',

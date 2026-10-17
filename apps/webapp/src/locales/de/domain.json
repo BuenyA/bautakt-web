@@ -1576,7 +1576,6 @@
       "noVendor": "Unbekannter Lieferant"
     },
     "kpis": {
-      "title": "Zahlen",
       "subtitle": "netto",
       "revenueMonth": "Umsatz {{month}}",
       "versusPreviousMonth": "{{value}} zum Vormonat",

@@ -1,19 +1,9 @@
-import {
-  buildIncomingDesk,
-  buildOutgoingDesk,
-  buildReceivables,
-  computeYearResult,
-  netRevenueMonth,
-  totalOpenMinor,
-  totalOverdueMinor,
-} from '@bautakt/finance';
+import { buildIncomingDesk, buildOutgoingDesk } from '@bautakt/finance';
 import { useMemo } from 'react';
 
-import { usePermission } from '@/features/company/usePermission';
 import { localIsoDate, newSince, parseLocalIso } from '@/features/overview/today';
-import { useLaborInputs } from '@/features/overview/useTodayData';
 
-import { useExpenses, useIncomingInvoiceList } from './useExpenses';
+import { useIncomingInvoiceList } from './useExpenses';
 import { useFinanceAccess } from './useFinanceAccess';
 import { INVOICE_TYPE_LIST, usePayments, useSalesDocuments } from './useSalesDocuments';
 
@@ -23,19 +13,16 @@ import { INVOICE_TYPE_LIST, usePayments, useSalesDocuments } from './useSalesDoc
  * Dieselben Abfragen wie die Startseite — der Query-Cache teilt sie, ein
  * Wechsel zwischen beiden Seiten lädt nichts doppelt. Gerechnet wird in
  * `@bautakt/finance`. Jeder Block trägt sein Recht: ohne Recht `null`, nie
- * eine Null, die wie „nichts offen“ aussieht.
+ * eine Null, die wie „nichts offen“ aussieht. Die Kennzahlen stehen seit
+ * 17.10.2026 in den Auswertungen (`useFinanceNumbers`).
  */
 export function useFinanceOverviewData() {
   const access = useFinanceAccess();
-  const canViewWageCosts = usePermission('canViewWageCosts');
   const todayIso = localIsoDate(new Date());
-  const month = todayIso.slice(0, 7);
 
   const documents = useSalesDocuments(INVOICE_TYPE_LIST);
   const payments = usePayments();
-  const expenses = useExpenses();
   const incoming = useIncomingInvoiceList();
-  const labor = useLaborInputs(access.canViewCompanyFinance && canViewWageCosts);
 
   const outgoing = useMemo(
     () => buildOutgoingDesk(documents.data ?? [], payments.data ?? [], todayIso),
@@ -58,36 +45,6 @@ export function useFinanceOverviewData() {
     [documents.data],
   );
 
-  const numbers = useMemo(() => {
-    const docs = documents.data ?? [];
-    const incomingRows = incoming.data ?? [];
-    const receivables = buildReceivables(docs, payments.data ?? [], todayIso);
-
-    return {
-      month: netRevenueMonth(docs, month),
-      year: computeYearResult({
-        documents: docs,
-        expenses: expenses.data ?? [],
-        incoming: incomingRows,
-        labor: canViewWageCosts && labor.data ? labor.data : null,
-        referenceIso: todayIso,
-      }),
-      receivablesMinor: totalOpenMinor(receivables),
-      overdueMinor: totalOverdueMinor(receivables),
-      payablesMinor: incomingDesk.open.minor,
-    };
-  }, [
-    documents.data,
-    payments.data,
-    expenses.data,
-    incoming.data,
-    labor.data,
-    canViewWageCosts,
-    incomingDesk.open.minor,
-    month,
-    todayIso,
-  ]);
-
   return {
     access,
     outgoing: access.canReadSalesDocuments
@@ -100,19 +57,6 @@ export function useFinanceOverviewData() {
       : null,
     incoming: access.canViewExpenses
       ? { desk: incomingDesk, isLoading: incoming.isPending, isError: incoming.isError }
-      : null,
-    numbers: access.canViewCompanyFinance
-      ? {
-          ...numbers,
-          laborIncluded: canViewWageCosts,
-          isLoading:
-            documents.isPending ||
-            payments.isPending ||
-            expenses.isPending ||
-            incoming.isPending ||
-            (canViewWageCosts && labor.isPending),
-          isError: documents.isError || payments.isError || expenses.isError || incoming.isError,
-        }
       : null,
   };
 }
