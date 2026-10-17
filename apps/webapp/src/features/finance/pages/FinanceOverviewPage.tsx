@@ -17,12 +17,12 @@ import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { LinkButton } from '@/components/common/LinkButton';
-import { PageHeader } from '@/components/common/PageHeader';
 import { usePermission } from '@/features/company/usePermission';
 import { Row } from '@/features/overview/components/TodoPanel';
 import { formatDate } from '@/lib/format';
 import { routes, withCreate } from '@/lib/routes';
 
+import { FinanceHeader } from '../FinanceHeader';
 import { DeskCard, type DeskGroupView } from '../overview/DeskCard';
 import { FinanceNumbersCard } from '../overview/FinanceNumbersCard';
 import type { IncomingInvoiceListRow } from '../useExpenses';
@@ -49,8 +49,7 @@ export function FinanceOverviewPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader
-        title={t('domain:invoiceDesk.title')}
+      <FinanceHeader
         description={t('domain:invoiceDesk.description')}
         actions={
           <div className="flex flex-wrap gap-2">

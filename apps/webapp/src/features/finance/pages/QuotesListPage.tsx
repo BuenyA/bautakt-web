@@ -7,13 +7,13 @@ import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { LinkButton } from '@/components/common/LinkButton';
-import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
 import { DocumentStatusBadge } from '../DocumentStatusBadge';
+import { FinanceHeader } from '../FinanceHeader';
 import { useFinanceAccess } from '../useFinanceAccess';
 import {
   QUOTE_TYPE_LIST,
@@ -80,7 +80,7 @@ export function QuotesListPage() {
   if (isError) {
     return (
       <div className="flex flex-col gap-6">
-        <PageHeader title={t('domain:quotes.listTitle')} />
+        <FinanceHeader />
         <EmptyState
           title={t('domain:invoices.loadErrorTitle')}
           description={t('domain:invoices.loadErrorDescription')}
@@ -96,8 +96,7 @@ export function QuotesListPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader
-        title={t('domain:quotes.listTitle')}
+      <FinanceHeader
         description={t('domain:quotes.listDescription')}
         actions={
           access.canWriteSalesDocuments ? (

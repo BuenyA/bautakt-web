@@ -547,14 +547,10 @@
   "invoices": {
     "listTitle": "Ausgangsrechnungen",
     "listDescription": "Ausgangsrechnungen meines Betriebs.",
-    "filtersLabel": "Belegfilter",
-    "filterInvoices": "Rechnungen",
-    "filterOrderConfirmations": "Auftragsbestätigungen",
-    "filterDeliveryNotes": "Lieferscheine",
-    "filterAll": "Alle",
     "emptyResultsTitle": "Keine Ergebnisse",
     "emptyResultsDescription": "Für diesen Filter oder diese Suche gibt es keine Treffer.",
     "columns": {
+      "type": "Art",
       "number": "Nummer",
       "customer": "Kunde",
       "status": "Status",

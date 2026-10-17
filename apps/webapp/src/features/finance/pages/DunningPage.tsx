@@ -22,7 +22,6 @@ import { type FormEvent, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
-import { PageHeader } from '@/components/common/PageHeader';
 import { RouterLink } from '@/components/common/RouterLink';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
@@ -30,6 +29,7 @@ import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import { FinanceHeader } from '../FinanceHeader';
 import { useCreateDunningNotice, useDunningLevels } from '../useDunning';
 import { useFinanceAccess } from '../useFinanceAccess';
 import { INVOICE_TYPE_LIST, usePayments, useSalesDocuments } from '../useSalesDocuments';
@@ -167,7 +167,7 @@ export function DunningPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title={t('domain:dunning.title')} description={t('domain:dunning.description')} />
+      <FinanceHeader description={t('domain:dunning.description')} />
 
       <DataTable
         columns={columns}

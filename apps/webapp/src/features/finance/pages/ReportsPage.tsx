@@ -13,10 +13,10 @@ import { useTranslation } from 'react-i18next';
 
 import { MonthlyBarChart } from '@/components/charts/MonthlyBarChart';
 import { EmptyState } from '@/components/common/EmptyState';
-import { PageHeader } from '@/components/common/PageHeader';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 
+import { FinanceHeader } from '../FinanceHeader';
 import { expenseEntries, useExpenses, useIncomingInvoiceList } from '../useExpenses';
 import { INVOICE_TYPE_LIST, useSalesDocuments } from '../useSalesDocuments';
 
@@ -100,8 +100,7 @@ export function ReportsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader
-        title={t('domain:reports.title')}
+      <FinanceHeader
         description={t('domain:reports.description')}
         actions={
           <Select value={String(months)} onChange={(_, { value }) => setMonths(Number(value))}>

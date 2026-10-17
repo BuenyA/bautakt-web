@@ -1,21 +1,39 @@
 import { Tab, TabList } from '@fluentui/react-components';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
+import { PageHeader } from '@/components/common/PageHeader';
 import { useMembership } from '@/features/company/useMembership';
 import { cardMatches, financeHub, visibleHubCards } from '@/features/hubs/hubs';
 
 /**
- * Rahmen des Bereichs „Rechnungen“: die Reiter über jeder Liste des Bereichs.
+ * Kopf jeder Liste im Bereich „Rechnungen“: Überschrift, darunter die Reiter
+ * des Bereichs — dasselbe Muster wie bei Aufträgen. Die Überschrift ist der
+ * Bereich, die Beschreibung sagt, welcher Reiter offen ist.
  *
- * Editor, Beleg und Druck hängen bewusst nicht darunter — wer eine Rechnung
+ * Editor, Beleg und Druck haben keinen solchen Kopf — wer eine Rechnung
  * schreibt, braucht keinen Weg in die Mahnungen.
  */
-export function FinanceLayout() {
+export function FinanceHeader({
+  title,
+  description,
+  actions,
+}: {
+  /** Nur für Unterseiten ohne eigenen Reiter (Offene Posten). */
+  title?: string;
+  description?: string;
+  actions?: ReactNode;
+}) {
+  const { t } = useTranslation();
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
+      <PageHeader
+        title={title ?? t('common:nav.finance')}
+        description={description}
+        actions={actions}
+      />
       <FinanceTabs />
-      <Outlet />
     </div>
   );
 }
@@ -33,7 +51,7 @@ function FinanceTabs() {
 
   return (
     <TabList
-      // Ohne Rand links: die Reiter stehen bündig mit der Überschrift darunter.
+      // Ohne Rand links: die Reiter stehen bündig mit der Überschrift darüber.
       // Am Handy wischt man durch die Reiter; ein Scrollbalken wäre nur Lärm.
       className="-mx-2.5 overflow-x-auto [scrollbar-width:none]"
       selectedValue={selected}

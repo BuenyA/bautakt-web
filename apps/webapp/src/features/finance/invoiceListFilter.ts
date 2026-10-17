@@ -1,48 +1,10 @@
-import { INVOICE_TYPE_LIST } from './useSalesDocuments';
-
-/** Chip-Werte der Belegliste. Default ohne Query ist `invoice`. */
-export type InvoiceTypeFilter = 'invoice' | 'order_confirmation' | 'delivery' | 'all';
-
 /**
- * Optionaler Deep-Link `?status=`. Die Handy-Hauptliste hat dafür keine
- * Chips — die Web-Status-Tabs sind deshalb weg, der Param bleibt.
+ * Optionaler Deep-Link `?status=`. Die Belegliste hat keine Filter-Reiter
+ * (weder Status noch Art), der Param bleibt für Links aus der Übersicht.
  */
 export type InvoiceStatusFilter = 'all' | 'open' | 'overdue' | 'draft' | 'paid';
 
 const OPEN_STATUSES = new Set(['issued', 'sent', 'partially_paid', 'overdue']);
-
-/** Abschlag und Schluss sind Rechnungen. Eigene Chips hat die App nicht. */
-const INVOICE_CHIP_TYPES = new Set<string>(INVOICE_TYPE_LIST);
-
-export function invoiceTypeFromSearch(value: string | null): InvoiceTypeFilter {
-  if (
-    value === 'invoice' ||
-    value === 'order_confirmation' ||
-    value === 'delivery' ||
-    value === 'all'
-  ) {
-    return value;
-  }
-  return 'invoice';
-}
-
-/**
- * `delivery` ist der Chip-Schlüssel, gespeichert ist `delivery_note`.
- * `all` lässt die geladenen Belegarten durch — die Abfrage holt nur die
- * Arten dieser Liste, nicht Angebote, Gutschriften oder Stornos.
- */
-export function matchesInvoiceType(type: string, filter: InvoiceTypeFilter): boolean {
-  switch (filter) {
-    case 'invoice':
-      return INVOICE_CHIP_TYPES.has(type);
-    case 'order_confirmation':
-      return type === 'order_confirmation';
-    case 'delivery':
-      return type === 'delivery_note';
-    default:
-      return true;
-  }
-}
 
 export function invoiceStatusFromSearch(value: string | null): InvoiceStatusFilter {
   switch (value) {
