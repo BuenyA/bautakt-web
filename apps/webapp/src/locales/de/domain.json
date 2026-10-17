@@ -1282,7 +1282,7 @@
       "saved": "Entwurf gespeichert",
       "notSaved": "Noch nicht gespeichert",
       "error": "Die Vorschau konnte nicht erzeugt werden.",
-      "empty": "Die Vorschau erscheint, sobald du etwas einträgst.",
+      "empty": "Die Vorschau wird erstellt …",
       "refresh": "Aktualisieren",
       "warningsTitle": "Hinweise zur E-Rechnung"
     }

@@ -60,6 +60,7 @@ import {
   lineNetMinor,
   loadOrderLines,
   useCompanyTaxProfile,
+  useDiscardDraft,
   useSaveDraft,
 } from '../useDocumentEditor';
 import { useLivePreview } from '../useLivePreview';
@@ -123,6 +124,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const orders = useOrders();
   const taxProfile = useCompanyTaxProfile();
   const save = useSaveDraft();
+  const discardDraft = useDiscardDraft();
   const existingLoading = useCompanyListLoading(existing);
 
   const [state, setState] = useState<EditorState | null>(null);
@@ -213,6 +215,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     state,
     initialDocumentId: id ?? null,
     save: (current, documentId) => save.mutateAsync({ state: current, documentId }),
+    discard: discardDraft,
     enabled: state !== null && !isLocked,
   });
   const [saving, setSaving] = useState(false);
