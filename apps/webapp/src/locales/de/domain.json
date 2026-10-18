@@ -1310,7 +1310,7 @@
     "skontoDays": "Skonto innerhalb (Tage)",
     "dueFromTerm_one": "Leer: Rechnungsdatum plus {{count}} Tag",
     "dueFromTerm_other": "Leer: Rechnungsdatum plus {{count}} Tage",
-    "termsInvalid": "Zahlungsziel und Skonto-Tage bitte als ganze Zahl, Skonto als Prozentsatz unter 100 angeben.",
+    "termsInvalid": "Prüfe die Zahlungsbedingungen: Tage als ganze Zahl, Skonto als Prozentsatz unter 100. Skonto braucht Prozent und Tage, und die Skontofrist darf nicht länger als das Zahlungsziel sein.",
     "documentType": "Belegart",
     "documentTypes": {
       "invoice": "Rechnung",
