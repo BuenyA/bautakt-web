@@ -53,20 +53,32 @@ export function prefillCustomerTerms<T extends TermFields>(
 
 /**
  * Felder, die sich nicht speichern lassen: Tage sind ganze Zahlen (Spalte
- * `integer`), Skonto ein Prozentsatz unter 100. Leer ist erlaubt.
+ * `integer`), Skonto ein Prozentsatz unter 100. Leer ist erlaubt. Skonto gilt
+ * nur mit Prozent und Frist, und die Frist liegt nicht hinter dem Zahlungsziel.
  */
 export function invalidTermFields(fields: TermFields): (keyof TermFields)[] {
-  const invalid: (keyof TermFields)[] = [];
+  const invalid = new Set<keyof TermFields>();
   for (const key of ['paymentTermDays', 'skontoDays'] as const) {
     const value = fields[key].trim();
-    if (value && !/^\d{1,4}$/.test(value)) invalid.push(key);
+    if (value && !/^\d{1,4}$/.test(value)) invalid.add(key);
   }
   const percent = fields.skontoPercent.trim();
+  const parsedPercent = Number(percent.replace(',', '.'));
   if (percent) {
-    const parsed = Number(percent.replace(',', '.'));
-    if (!/^\d{1,2}([.,]\d{1,2})?$/.test(percent) || !(parsed >= 0 && parsed < 100)) {
-      invalid.push('skontoPercent');
+    if (!/^\d{1,2}([.,]\d{1,2})?$/.test(percent) || !(parsedPercent >= 0 && parsedPercent < 100)) {
+      invalid.add('skontoPercent');
     }
   }
-  return invalid;
+  const days = fields.skontoDays.trim();
+  const hasPercent = percent !== '' && parsedPercent > 0;
+  const hasDays = days !== '' && Number(days) > 0;
+  if (hasPercent && !days) invalid.add('skontoDays');
+  if (hasDays && !percent) invalid.add('skontoPercent');
+  const term = fields.paymentTermDays.trim();
+  if (hasDays && term && !invalid.has('paymentTermDays') && Number(days) > Number(term)) {
+    invalid.add('skontoDays');
+  }
+  return (['paymentTermDays', 'skontoPercent', 'skontoDays'] as const).filter((key) =>
+    invalid.has(key),
+  );
 }

@@ -75,7 +75,17 @@ describe('invalidTermFields', () => {
         skontoDays: 'zehn',
         skontoPercent: '100',
       }),
-      ['paymentTermDays', 'skontoDays', 'skontoPercent'],
+      ['paymentTermDays', 'skontoPercent', 'skontoDays'],
     );
+  });
+  it('Skonto braucht Prozent und Tage', () => {
+    assert.deepEqual(invalidTermFields({ ...empty, skontoPercent: '2' }), ['skontoDays']);
+    assert.deepEqual(invalidTermFields({ ...empty, skontoDays: '14' }), ['skontoPercent']);
+    assert.deepEqual(invalidTermFields({ ...empty, skontoPercent: '0', skontoDays: '' }), []);
+  });
+  it('Skontofrist liegt nicht hinter dem Zahlungsziel', () => {
+    const base = { ...empty, skontoPercent: '2', paymentTermDays: '14' };
+    assert.deepEqual(invalidTermFields({ ...base, skontoDays: '14' }), []);
+    assert.deepEqual(invalidTermFields({ ...base, skontoDays: '30' }), ['skontoDays']);
   });
 });
