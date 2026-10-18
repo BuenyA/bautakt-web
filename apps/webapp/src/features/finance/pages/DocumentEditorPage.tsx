@@ -475,6 +475,15 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     setState((current) => (current ? { ...current, ...patch } : current));
   }
 
+  // Die letzte Position darf weg; dann steht eine leere zum Neuanfangen da.
+  function removeLine(key: string) {
+    setState((current) => {
+      if (!current) return current;
+      const rest = current.lines.filter((entry) => entry.key !== key);
+      return { ...current, lines: rest.length ? rest : [emptyLine()] };
+    });
+  }
+
   function updateLine(key: string, patch: Partial<EditorLine>) {
     setState((current) =>
       current
@@ -855,9 +864,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                     </span>
                     <DangerIconButton
                       aria-label={t('domain:editor.removeLine')}
-                      onClick={() =>
-                        update({ lines: state.lines.filter((entry) => entry.key !== line.key) })
-                      }
+                      onClick={() => removeLine(line.key)}
                       icon={<DeleteRegular />}
                     />
                   </div>
@@ -921,10 +928,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                     <div className="flex items-end justify-end">
                       <DangerIconButton
                         aria-label={t('domain:editor.removeLine')}
-                        disabled={state.lines.length === 1}
-                        onClick={() =>
-                          update({ lines: state.lines.filter((entry) => entry.key !== line.key) })
-                        }
+                        onClick={() => removeLine(line.key)}
                         icon={<DeleteRegular />}
                       />
                     </div>
