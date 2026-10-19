@@ -36,6 +36,12 @@ export function isInvoiceEditorType(type: string): type is InvoiceEditorType {
 }
 
 /** Rechnungsartig: Pflicht-Leistungsdatum, E-Rechnung, Käuferreferenz. */
+export type EInvoiceFormat = 'zugferd' | 'xrechnung';
+
+export function toEInvoiceFormat(value: string | null | undefined): EInvoiceFormat {
+  return value === 'xrechnung' ? 'xrechnung' : 'zugferd';
+}
+
 export function isInvoiceDocument(type: string): boolean {
   return isInvoiceEditorType(type) || type === 'credit_note';
 }
@@ -103,6 +109,8 @@ export type EditorState = TermFields & {
   notes: string;
   /** E-Rechnung (Factur-X im PDF). Standard an; nur bei Rechnungsarten wählbar. */
   eInvoice: boolean;
+  /** Format der E-Rechnung: fast immer ZUGFeRD, XRechnung für Behörden (#184). */
+  eInvoiceFormat: EInvoiceFormat;
   lines: EditorLine[];
 };
 
@@ -457,6 +465,8 @@ export function buildDraftRows(state: EditorState, companyId: string) {
     material_share: shareOf('material'),
     // Angebote haben nie ein XML; die Spalte bleibt dort beim Standard.
     e_invoice: isInvoiceDocument(state.type) ? state.eInvoice : true,
+    einvoice_format:
+      isInvoiceDocument(state.type) && state.eInvoice ? state.eInvoiceFormat : 'zugferd',
   };
 
   const lines = savedLines.map((line, index) => {

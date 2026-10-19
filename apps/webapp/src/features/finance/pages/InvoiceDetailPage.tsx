@@ -213,6 +213,7 @@ export function InvoiceDetailPage() {
     data.status !== 'cancelled' &&
     CANCELLABLE_TYPES.has(data.type) &&
     chargeableMinorOf(data) > 0;
+  const isXRechnung = isEInvoiceDocument(data) && data.einvoice_format === 'xrechnung';
   const cancellations = data.children.filter((child) => child.type === 'cancellation');
   const creditNotes = data.children.filter((child) => child.type === 'credit_note');
 
@@ -277,14 +278,26 @@ export function InvoiceDetailPage() {
                 </MenuTrigger>
                 <MenuPopover>
                   <MenuList>
+                    {/* XRechnung: das XML ist das Original, das PDF nur Sichtbeleg (#184). */}
+                    {isXRechnung ? (
+                      <MenuItem
+                        icon={<CodeRegular />}
+                        disabled={!archivedBytes}
+                        onClick={() => void onDownloadXml()}
+                      >
+                        {t('domain:invoices.download.xrechnung')}
+                      </MenuItem>
+                    ) : null}
                     <MenuItem
                       icon={<DocumentPdfRegular />}
                       disabled={!archivedBytes}
                       onClick={onDownloadPdf}
                     >
-                      {t('domain:invoices.download.pdf')}
+                      {isXRechnung
+                        ? t('domain:invoices.download.visualPdf')
+                        : t('domain:invoices.download.pdf')}
                     </MenuItem>
-                    {isEInvoiceDocument(data) ? (
+                    {isEInvoiceDocument(data) && !isXRechnung ? (
                       <MenuItem
                         icon={<CodeRegular />}
                         disabled={!archivedBytes}
@@ -384,7 +397,7 @@ export function InvoiceDetailPage() {
                 <li key={blocker}>{t(`domain:invoices.blockers.${blocker}`)}</li>
               ))}
             </ul>
-            {blockers.includes('sellerTaxId') ? (
+            {blockers.includes('sellerTaxId') || blockers.includes('sellerContact') ? (
               <RouterLink to={routes.settings} className="mt-1 inline-block">
                 <span className="font-medium">{t('domain:invoices.toSettings')}</span>
               </RouterLink>
@@ -425,7 +438,7 @@ export function InvoiceDetailPage() {
       ) : null}
 
       <div className="flex flex-wrap items-center gap-3">
-        {isEInvoiceDocument(data) ? <EInvoiceBadge /> : null}
+        {isEInvoiceDocument(data) ? <EInvoiceBadge format={data.einvoice_format} /> : null}
         <DocumentStatusBadge status={data.status} />
         {data.sent_at ? (
           <StatusBadge tone="outline">

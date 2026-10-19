@@ -77,6 +77,7 @@ import {
   loadOrderLines,
   loadPartialCredits,
   storedSign,
+  toEInvoiceFormat,
   useCompanyTaxProfile,
   useSaveDraft,
 } from '../useDocumentEditor';
@@ -110,6 +111,7 @@ function initialState(type: EditableDocumentType, taxMode: TaxMode): EditorState
     skontoDays: '',
     // Standard ist die E-Rechnung; abwählen nur bewusst im Formular.
     eInvoice: true,
+    eInvoiceFormat: 'zugferd',
     lines: [emptyLine()],
   };
 }
@@ -179,6 +181,7 @@ function creditNoteState(original: SalesDocumentDetail, taxMode: TaxMode): Edito
     serviceDate: original.service_date ?? '',
     buyerReference: original.buyer_reference,
     eInvoice: original.e_invoice !== false,
+    eInvoiceFormat: toEInvoiceFormat(original.einvoice_format),
     lines: lines.length ? lines : [emptyLine()],
   };
 }
@@ -287,6 +290,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       skontoPercent: numberText(existing.data.skonto_percent),
       skontoDays: numberText(existing.data.skonto_days),
       eInvoice: existing.data.e_invoice !== false,
+      eInvoiceFormat: toEInvoiceFormat(existing.data.einvoice_format),
       lines: existing.data.lines.length
         ? toEditorLines(existing.data.lines, existing.data.type, existing.data.tax_mode)
         : [emptyLine()],
@@ -422,6 +426,8 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   // Noch gutschreibbar: Brutto der Rechnung minus freigegebene Gutschriften.
   const creditLimitMinor = parentDocument.data ? chargeableMinorOf(parentDocument.data) : null;
   const buyerReferenceTooLong = state.buyerReference.trim().length > BUYER_REFERENCE_MAX_LENGTH;
+  const isXRechnung = isInvoice && state.eInvoice && state.eInvoiceFormat === 'xrechnung';
+  const leitwegMissing = isXRechnung && !state.buyerReference.trim();
   // Beschriftungen unterscheiden nur Angebot und Rechnung, nicht die Rechnungsart.
   const labelType = isInvoice ? 'invoice' : 'quote';
 
@@ -521,6 +527,11 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     }
     if (buyerReferenceTooLong) {
       setError(t('domain:editor.buyerReferenceTooLong', { max: BUYER_REFERENCE_MAX_LENGTH }));
+      return false;
+    }
+    // BR-DE-15; die Datenbank sperrt dasselbe (XRECHNUNG_BUYER_REFERENCE).
+    if (leitwegMissing) {
+      setError(t('domain:eInvoice.leitwegRequired'));
       return false;
     }
     if (isCreditNote && totals) {
@@ -743,6 +754,22 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                     onChange={(_, data) => update({ eInvoice: data.checked })}
                     label={t('domain:eInvoice.switchLabel')}
                   />
+                  {/* Fast immer ZUGFeRD; deshalb nur ein kleiner, unauffälliger
+                      Schalter statt eines eigenen Felds (#184). */}
+                  {state.eInvoice ? (
+                    <Select
+                      size="small"
+                      appearance="underline"
+                      aria-label={t('domain:eInvoice.formatLabel')}
+                      value={state.eInvoiceFormat}
+                      onChange={(_, data) =>
+                        update({ eInvoiceFormat: toEInvoiceFormat(data.value) })
+                      }
+                    >
+                      <option value="zugferd">{t('domain:eInvoice.formats.zugferd')}</option>
+                      <option value="xrechnung">{t('domain:eInvoice.formats.xrechnung')}</option>
+                    </Select>
+                  ) : null}
                   <HelpButton label={t('domain:eInvoice.switchLabel')}>
                     <p>
                       <strong>{t('domain:eInvoice.onLabel')}</strong> {t('domain:eInvoice.onHint')}
@@ -750,6 +777,10 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                     <p>
                       <strong>{t('domain:eInvoice.offLabel')}</strong>{' '}
                       {t('domain:eInvoice.offHint')}
+                    </p>
+                    <p>
+                      <strong>{t('domain:eInvoice.formats.xrechnung')}:</strong>{' '}
+                      {t('domain:eInvoice.xrechnungHint')}
                     </p>
                   </HelpButton>
                 </div>
@@ -779,7 +810,8 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                   value={state.buyerReference}
                   onChange={(value) => update({ buyerReference: value })}
                   maxLength={BUYER_REFERENCE_MAX_LENGTH}
-                  invalid={buyerReferenceTooLong}
+                  invalid={buyerReferenceTooLong || leitwegMissing}
+                  hint={leitwegMissing ? t('domain:eInvoice.leitwegRequired') : undefined}
                 />
               ) : null}
             </div>
@@ -1167,6 +1199,7 @@ function Field({
   invalid,
   info,
   maxLength,
+  hint,
 }: {
   label: string;
   value: string;
@@ -1176,8 +1209,11 @@ function Field({
   maxLength?: number;
   /** Erklärung hinter einem „?“ neben der Beschriftung, öffnet per Klick. */
   info?: string;
+  /** Fehlermeldung unter dem Feld, sichtbar ohne Klick. */
+  hint?: string;
 }) {
   const fieldId = useId();
+  const hintId = useId();
   return (
     <div className="grid gap-2">
       {info ? (
@@ -1195,10 +1231,16 @@ function Field({
         input={numeric ? { className: 'text-right tabular-nums' } : undefined}
         inputMode={numeric ? 'decimal' : undefined}
         aria-invalid={invalid || undefined}
+        aria-describedby={hint ? hintId : undefined}
         maxLength={maxLength}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
+      {hint ? (
+        <p id={hintId} className="text-destructive text-sm">
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }
