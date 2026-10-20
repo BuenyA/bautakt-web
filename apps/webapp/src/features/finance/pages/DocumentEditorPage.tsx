@@ -20,6 +20,7 @@ import {
   DialogTitle,
   Input,
   Label,
+  makeStyles,
   MessageBar,
   MessageBarBody,
   MessageBarTitle,
@@ -28,6 +29,7 @@ import {
   Text,
   Textarea,
   ToggleButton,
+  tokens,
   Tooltip,
 } from '@fluentui/react-components';
 import {
@@ -201,6 +203,16 @@ function creditNoteState(original: SalesDocumentDetail, taxMode: TaxMode): Edito
  * (`enforce_sales_document_immutability`) — sie hier zum Bearbeiten anzubieten
  * hiesse, dem Nutzer einen Speichern-Knopf zu zeigen, der scheitern muss.
  */
+const useStyles = makeStyles({
+  // Gewähltes Format im Blau des E-Rechnung-Schalters daneben, nicht im
+  // etwas dunkleren Blau des Primary-Buttons.
+  formatSelected: {
+    backgroundColor: tokens.colorCompoundBrandBackground,
+    ':hover': { backgroundColor: tokens.colorCompoundBrandBackgroundHover },
+    ':hover:active': { backgroundColor: tokens.colorCompoundBrandBackgroundPressed },
+  },
+});
+
 export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const customerFieldId = useId();
   const { t } = useTranslation();
@@ -212,6 +224,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const fromOrderId = id ? null : searchParams.get(invoiceFromOrderParam);
   const creditFromId = id ? null : searchParams.get(creditNoteFromParam);
   const orderFieldId = useId();
+  const styles = useStyles();
   const typeFieldId = useId();
   const taxModeFieldId = useId();
 
@@ -695,6 +708,9 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                       shape="circular"
                       appearance={state.eInvoiceFormat === format ? 'primary' : 'subtle'}
                       checked={state.eInvoiceFormat === format}
+                      className={
+                        state.eInvoiceFormat === format ? styles.formatSelected : undefined
+                      }
                       onClick={() => update({ eInvoiceFormat: format })}
                     >
                       {t(`domain:eInvoice.formats.${format}`)}
