@@ -686,7 +686,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                 <div
                   role="group"
                   aria-label={t('domain:eInvoice.formatGroupLabel')}
-                  className="flex items-center gap-1"
+                  className="bg-muted border-border flex items-center gap-0.5 rounded-full border p-0.5"
                 >
                   {E_INVOICE_FORMATS.map((format) => (
                     <ToggleButton
