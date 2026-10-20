@@ -1389,15 +1389,13 @@
   "eInvoice": {
     "badge": "E-Rechnung",
     "badgeTooltip": "Enthält die maschinenlesbaren Rechnungsdaten (ZUGFeRD/XRechnung)",
-    "switchLabel": "Als E-Rechnung erstellen",
-    "onLabel": "Eingeschaltet:",
-    "offLabel": "Ausgeschaltet:",
-    "onHint": "Das PDF enthält die maschinenlesbaren Rechnungsdaten (ZUGFeRD).",
+    "onHint": "Der Standard für Unternehmen und Privatkunden. Das PDF enthält die maschinenlesbaren Rechnungsdaten.",
     "offHint": "Es entsteht nur ein PDF ohne E-Rechnungsdaten. An Unternehmen in Deutschland ist das nur noch bis Ende 2026 erlaubt, bei höchstens 800.000 € Vorjahresumsatz bis Ende 2027.",
-    "formatLabel": "Format der E-Rechnung",
+    "formatLabel": "E-Rechnung",
     "formats": {
       "zugferd": "ZUGFeRD",
-      "xrechnung": "XRechnung"
+      "xrechnung": "XRechnung",
+      "none": "Keine"
     },
     "xrechnungHint": "Für öffentliche Auftraggeber. Die Rechnung geht als XML hinaus, das PDF ist nur zur Ansicht. Pflicht sind die Leitweg-ID, die E-Mail-Adresse des Kunden sowie E-Mail und Telefon deines Betriebs.",
     "leitwegRequired": "Eine XRechnung braucht die Leitweg-ID des Auftraggebers.",

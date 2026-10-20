@@ -23,8 +23,9 @@ import {
   MessageBar,
   MessageBarBody,
   MessageBarTitle,
+  Radio,
+  RadioGroup,
   Select,
-  Switch,
   Text,
   Textarea,
   Tooltip,
@@ -211,6 +212,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const creditFromId = id ? null : searchParams.get(creditNoteFromParam);
   const orderFieldId = useId();
   const typeFieldId = useId();
+  const eInvoiceLabelId = useId();
   const taxModeFieldId = useId();
 
   const { data: membership } = useMembership();
@@ -748,41 +750,42 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                 </div>
               </div>
               {isInvoice ? (
-                <div className="flex items-center gap-1 @lg:col-span-2">
-                  <Switch
-                    checked={state.eInvoice}
-                    onChange={(_, data) => update({ eInvoice: data.checked })}
-                    label={t('domain:eInvoice.switchLabel')}
-                  />
-                  {/* Fast immer ZUGFeRD; deshalb nur ein kleiner, unauffälliger
-                      Schalter statt eines eigenen Felds (#184). */}
-                  {state.eInvoice ? (
-                    <Select
-                      size="small"
-                      appearance="underline"
-                      aria-label={t('domain:eInvoice.formatLabel')}
-                      value={state.eInvoiceFormat}
-                      onChange={(_, data) =>
-                        update({ eInvoiceFormat: toEInvoiceFormat(data.value) })
-                      }
-                    >
-                      <option value="zugferd">{t('domain:eInvoice.formats.zugferd')}</option>
-                      <option value="xrechnung">{t('domain:eInvoice.formats.xrechnung')}</option>
-                    </Select>
-                  ) : null}
-                  <HelpButton label={t('domain:eInvoice.switchLabel')}>
-                    <p>
-                      <strong>{t('domain:eInvoice.onLabel')}</strong> {t('domain:eInvoice.onHint')}
-                    </p>
-                    <p>
-                      <strong>{t('domain:eInvoice.offLabel')}</strong>{' '}
-                      {t('domain:eInvoice.offHint')}
-                    </p>
-                    <p>
-                      <strong>{t('domain:eInvoice.formats.xrechnung')}:</strong>{' '}
-                      {t('domain:eInvoice.xrechnungHint')}
-                    </p>
-                  </HelpButton>
+                <div className="grid content-start gap-2 @lg:col-span-2">
+                  <div className="flex items-center gap-1">
+                    <Label id={eInvoiceLabelId}>{t('domain:eInvoice.formatLabel')}</Label>
+                    <HelpButton label={t('domain:eInvoice.formatLabel')}>
+                      <p>
+                        <strong>{t('domain:eInvoice.formats.zugferd')}:</strong>{' '}
+                        {t('domain:eInvoice.onHint')}
+                      </p>
+                      <p>
+                        <strong>{t('domain:eInvoice.formats.xrechnung')}:</strong>{' '}
+                        {t('domain:eInvoice.xrechnungHint')}
+                      </p>
+                      <p>
+                        <strong>{t('domain:eInvoice.formats.none')}:</strong>{' '}
+                        {t('domain:eInvoice.offHint')}
+                      </p>
+                    </HelpButton>
+                  </div>
+                  {/* Eine Auswahl statt Schalter plus Format: E-Rechnung an/aus
+                      und ZUGFeRD/XRechnung sind für den Nutzer eine Frage (#184). */}
+                  <RadioGroup
+                    layout="horizontal"
+                    aria-labelledby={eInvoiceLabelId}
+                    value={state.eInvoice ? state.eInvoiceFormat : 'none'}
+                    onChange={(_, { value }) =>
+                      update(
+                        value === 'none'
+                          ? { eInvoice: false }
+                          : { eInvoice: true, eInvoiceFormat: toEInvoiceFormat(value) },
+                      )
+                    }
+                  >
+                    <Radio value="zugferd" label={t('domain:eInvoice.formats.zugferd')} />
+                    <Radio value="xrechnung" label={t('domain:eInvoice.formats.xrechnung')} />
+                    <Radio value="none" label={t('domain:eInvoice.formats.none')} />
+                  </RadioGroup>
                 </div>
               ) : null}
             </div>
@@ -790,7 +793,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
           <Section title={t('domain:editor.sections.recipient')}>
             <div className="grid gap-4 @lg:grid-cols-2">
-              <div className="grid gap-2">
+              <div className="grid content-start gap-2">
                 <Label htmlFor={customerFieldId}>{t('domain:invoices.columns.customer')}</Label>
                 <ContactPicker
                   id={customerFieldId}
@@ -1215,7 +1218,7 @@ function Field({
   const fieldId = useId();
   const hintId = useId();
   return (
-    <div className="grid gap-2">
+    <div className="grid content-start gap-2">
       {info ? (
         <div className="flex items-center gap-1">
           <Label htmlFor={fieldId}>{label}</Label>
@@ -1266,7 +1269,7 @@ function DateField({
   const hintId = useId();
   const described = [describedBy, hint ? hintId : null].filter(Boolean).join(' ') || undefined;
   return (
-    <div className="grid min-w-0 gap-2">
+    <div className="grid min-w-0 content-start gap-2">
       <Label htmlFor={id}>{label}</Label>
       <DatePicker
         id={id}
