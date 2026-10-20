@@ -2,7 +2,7 @@
  * GENERIERT — nicht von Hand bearbeiten.
  *
  * Quelle:  Supabase-Projekt "Bautakt" (bxivzvmlcnaxqlytumvz, eu-central-1)
- * Stand:   2026-10-17
+ * Stand:   2026-10-20
  *
  * Neu erzeugen:
  *   npx supabase gen types typescript --project-id bxivzvmlcnaxqlytumvz \
@@ -545,6 +545,57 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: true
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_datev_settings: {
+        Row: {
+          account_length: number
+          chart_of_accounts: string
+          client_number: number | null
+          company_id: string
+          consultant_number: number | null
+          created_at: string
+          fiscal_year_start_month: number
+          modified_at: string | null
+          modified_by: string | null
+        }
+        Insert: {
+          account_length?: number
+          chart_of_accounts?: string
+          client_number?: number | null
+          company_id: string
+          consultant_number?: number | null
+          created_at?: string
+          fiscal_year_start_month?: number
+          modified_at?: string | null
+          modified_by?: string | null
+        }
+        Update: {
+          account_length?: number
+          chart_of_accounts?: string
+          client_number?: number | null
+          company_id?: string
+          consultant_number?: number | null
+          created_at?: string
+          fiscal_year_start_month?: number
+          modified_at?: string | null
+          modified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_datev_settings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_datev_settings_modified_by_fkey"
+            columns: ["modified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1140,6 +1191,96 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      datev_account_mappings: {
+        Row: {
+          account: string
+          chart_of_accounts: string
+          company_id: string
+          created_at: string
+          id: string
+          modified_at: string | null
+          modified_by: string | null
+          purpose: string
+          tax_key: string
+          tax_mode: string
+          tax_rate: number | null
+        }
+        Insert: {
+          account: string
+          chart_of_accounts: string
+          company_id: string
+          created_at?: string
+          id?: string
+          modified_at?: string | null
+          modified_by?: string | null
+          purpose: string
+          tax_key?: string
+          tax_mode?: string
+          tax_rate?: number | null
+        }
+        Update: {
+          account?: string
+          chart_of_accounts?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          modified_at?: string | null
+          modified_by?: string | null
+          purpose?: string
+          tax_key?: string
+          tax_mode?: string
+          tax_rate?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "datev_account_mappings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "datev_account_mappings_modified_by_fkey"
+            columns: ["modified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      datev_default_accounts: {
+        Row: {
+          account: string
+          chart_of_accounts: string
+          id: string
+          label: string
+          purpose: string
+          tax_key: string
+          tax_mode: string
+          tax_rate: number | null
+        }
+        Insert: {
+          account: string
+          chart_of_accounts: string
+          id?: string
+          label: string
+          purpose: string
+          tax_key?: string
+          tax_mode?: string
+          tax_rate?: number | null
+        }
+        Update: {
+          account?: string
+          chart_of_accounts?: string
+          id?: string
+          label?: string
+          purpose?: string
+          tax_key?: string
+          tax_mode?: string
+          tax_rate?: number | null
+        }
+        Relationships: []
       }
       document_number_sequences: {
         Row: {
@@ -3203,6 +3344,27 @@ export type Database = {
           },
         ]
       }
+      sales_document_type_codes: {
+        Row: {
+          document_type: string
+          note: string
+          type_code: string
+          updated_at: string
+        }
+        Insert: {
+          document_type: string
+          note?: string
+          type_code: string
+          updated_at?: string
+        }
+        Update: {
+          document_type?: string
+          note?: string
+          type_code?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sales_documents: {
         Row: {
           buyer_city: string
@@ -3776,6 +3938,7 @@ export type Database = {
           content_hash: string | null
           created_at: string
           created_by: string | null
+          credited_total: number
           currency: string
           customer_id: string | null
           document_number: string | null
@@ -3877,6 +4040,58 @@ export type Database = {
         }
         Returns: string
       }
+      datev_effective_settings: {
+        Args: { p_company_id: string }
+        Returns: {
+          account_length: number
+          chart_of_accounts: string
+          client_number: number
+          consultant_number: number
+          fiscal_year_start_month: number
+          has_settings: boolean
+        }[]
+      }
+      datev_resolve_account: {
+        Args: {
+          p_company_id: string
+          p_purpose: string
+          p_tax_mode?: string
+          p_tax_rate?: number
+        }
+        Returns: {
+          account: string
+          source: string
+          tax_key: string
+        }[]
+      }
+      datev_resolve_account_internal: {
+        Args: {
+          p_company_id: string
+          p_purpose: string
+          p_tax_mode: string
+          p_tax_rate: number
+        }
+        Returns: {
+          account: string
+          source: string
+          tax_key: string
+        }[]
+      }
+      datev_resolve_sales_accounts: {
+        Args: { p_document_id: string }
+        Returns: {
+          chart_of_accounts: string
+          debtor_account: string
+          debtor_source: string
+          net_amount: number
+          revenue_account: string
+          revenue_account_source: string
+          revenue_tax_key: string
+          tax_mode: string
+          tax_rate_percent: number
+          warnings: string[]
+        }[]
+      }
       delete_company_as_chef: {
         Args: { p_company_id: string }
         Returns: undefined
@@ -3917,6 +4132,7 @@ export type Database = {
           content_hash: string | null
           created_at: string
           created_by: string | null
+          credited_total: number
           currency: string
           customer_id: string | null
           document_number: string | null

@@ -11,6 +11,7 @@ import { ContactNumberSettingsCard } from '@/features/contacts/ContactNumberSett
 import { supabase } from '@/lib/supabase';
 
 import { BankCard, CompanyCard, LegalCard } from '../CompanyForms';
+import { DatevSettingsCard } from '../DatevSettingsCard';
 
 /** Stammdaten des Betriebs und die Rollen, die es hier gibt. */
 function useCompanySettings() {
@@ -50,6 +51,8 @@ function useCompanySettings() {
  * `canEditCompanyMasterData` bleibt alles lesend.
  *
  * Nummernkreis und Zahlungsziel bleiben hier vorerst lesend.
+ *
+ * Die DATEV-Karte (#167) prüft ihre Rechte selbst und fehlt ohne sie ganz.
  */
 export function SettingsPage() {
   const { t } = useTranslation();
@@ -96,6 +99,8 @@ export function SettingsPage() {
           </DetailCard>
 
           <ContactNumberSettingsCard />
+
+          <DatevSettingsCard />
 
           <Card size="large" className="xl:col-span-2">
             <CardHeader
