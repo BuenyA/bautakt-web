@@ -1743,6 +1743,65 @@
     "saved": "Nummernkreis gespeichert",
     "saveError": "Konnte nicht gespeichert werden."
   },
+  "datev": {
+    "title": "Export im DATEV-Format",
+    "description": "Diese Angaben stehen im Kopf jeder Exportdatei. Dein Steuerberater kennt sie und kann sie dir bestätigen.",
+    "loadError": "Die DATEV-Einstellungen konnten nicht geladen werden.",
+    "notSaved": "Noch nicht gespeichert. Bis dahin gelten SKR03, 4-stellige Sachkonten und ein Wirtschaftsjahr ab Januar.",
+    "consultantNumber": "Beraternummer",
+    "consultantNumberHint": "Vom Steuerberater, 4 bis 7 Ziffern.",
+    "clientNumber": "Mandantennummer",
+    "clientNumberHint": "Deine Nummer beim Steuerberater, bis 5 Ziffern.",
+    "chart": "Kontenrahmen",
+    "chartChangedHint": "Abweichende Konten gelten je Kontenrahmen. Nach dem Speichern siehst du die Konten des neuen Rahmens.",
+    "accountLength": "Sachkontenlänge",
+    "accountLengthHint": "Fast immer 4. Personenkonten haben eine Stelle mehr.",
+    "accountLengthChangedHint": "Die Standardkonten gelten nur bei 4 Stellen. Bei einer anderen Länge trägst du alle Konten selbst ein.",
+    "digits_one": "{{count}} Stelle",
+    "digits_other": "{{count}} Stellen",
+    "fiscalYearStart": "Beginn des Wirtschaftsjahrs",
+    "accountsTitle": "Konten im {{chart}}",
+    "accountsDescription": "Leer gelassen gilt das Standardkonto. Trag nur ein, was dein Steuerberater anders bucht. Den Steuerschlüssel brauchst du nur bei Konten ohne Automatik.",
+    "standardNotApplicable_one": "Mit {{count}}-stelligen Sachkonten gelten die Standardkonten nicht. Trag alle Konten selbst ein, sonst fehlen sie im Export.",
+    "standardNotApplicable_other": "Mit {{count}}-stelligen Sachkonten gelten die Standardkonten nicht. Trag alle Konten selbst ein, sonst fehlen sie im Export.",
+    "columns": {
+      "purpose": "Wofür",
+      "standard": "Standard",
+      "account": "Mein Konto",
+      "taxKey": "Steuerschlüssel",
+      "actions": "Aktionen"
+    },
+    "purposes": {
+      "revenue": "Erlöse",
+      "revenue_cash_discount": "Gewährte Skonti",
+      "expense": "Wareneingang",
+      "expense_cash_discount": "Erhaltene Skonti",
+      "collective_debtor": "Sammel-Debitor",
+      "collective_creditor": "Sammel-Kreditor"
+    },
+    "taxModes": {
+      "standard": "Regelbesteuerung",
+      "reverse_charge": "§ 13b UStG",
+      "tax_free": "steuerfrei",
+      "small_business": "Kleinunternehmer (§ 19 UStG)"
+    },
+    "rate": "{{rate}} %",
+    "own": "Eigenes Konto",
+    "missing": "Fehlt",
+    "reset": "Standard verwenden",
+    "resetDone": "{{label}}: wieder Standardkonto",
+    "errors": {
+      "consultant": "Die Beraternummer liegt zwischen 1001 und 9999999.",
+      "client": "Die Mandantennummer liegt zwischen 1 und 99999.",
+      "digits_one": "Genau {{count}} Ziffer.",
+      "digits_other": "Genau {{count}} Ziffern.",
+      "debtorRange": "Debitoren liegen zwischen {{from}} und {{to}}.",
+      "creditorRange": "Kreditoren liegen zwischen {{from}} und {{to}}.",
+      "taxKey": "Höchstens 4 Ziffern.",
+      "saveFailed": "Konnte nicht gespeichert werden.",
+      "nothingWritten": "Es wurde nichts gespeichert. Dir fehlt vermutlich das Recht, die Firmeneinstellungen zu ändern."
+    }
+  },
   "pdfViewer": {
     "toolbar": "PDF-Ansicht",
     "pageLabel": "Seite {{page}} von {{count}}",
