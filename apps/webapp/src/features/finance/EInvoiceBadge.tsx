@@ -6,15 +6,17 @@ import { useTranslation } from 'react-i18next';
 /**
  * Kennzeichen „E-Rechnung“ (ZUGFeRD/XRechnung), in Tabellen neben der Nummer
  * und im Kopf eines Belegs. Grüne Marke mit Haken nach Vorlage des Owners
- * (17.10.2026). Ohne E-Rechnung erscheint nichts.
+ * (17.10.2026). Ohne E-Rechnung erscheint nichts. Eine XRechnung heißt so.
  */
-export function EInvoiceBadge() {
+export function EInvoiceBadge({ format }: { format?: string | null }) {
   const { t } = useTranslation();
   return (
     <Tooltip content={t('domain:eInvoice.badgeTooltip')} relationship="description">
       <span className="inline-flex">
         <StatusBadge tone="success" icon={<CheckmarkCircleRegular />}>
-          {t('domain:eInvoice.badge')}
+          {format === 'xrechnung'
+            ? t('domain:eInvoice.xrechnungBadge')
+            : t('domain:eInvoice.badge')}
         </StatusBadge>
       </span>
     </Tooltip>

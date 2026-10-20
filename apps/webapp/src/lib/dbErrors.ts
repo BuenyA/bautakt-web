@@ -46,6 +46,12 @@ const MESSAGES: Record<string, string> = {
     'Eine Gutschrift gehört zu einer freigegebenen, nicht stornierten Rechnung. Lege sie über „Gutschrift erstellen“ auf der Rechnung an.',
   CREDIT_NOTE_EXCEEDS:
     'Die Gutschrift ist höher als der noch nicht gutgeschriebene Betrag der Rechnung oder nicht größer als 0.',
+  XRECHNUNG_BUYER_REFERENCE:
+    'Eine XRechnung braucht die Leitweg-ID des Auftraggebers. Trag sie unter „Käuferreferenz“ ein.',
+  XRECHNUNG_BUYER_EMAIL:
+    'Eine XRechnung braucht die E-Mail-Adresse des Kunden. Ergänze sie beim Kontakt.',
+  XRECHNUNG_SELLER_CONTACT:
+    'Eine XRechnung braucht E-Mail und Telefon deines Betriebs. Ergänze beides in den Firmendaten.',
   CANCEL_HAS_CREDIT_NOTES:
     'Zu dieser Rechnung gibt es schon eine Gutschrift. Ein Storno würde doppelt gutschreiben; schreibe den Rest mit einer weiteren Gutschrift gut.',
   // Schlussrechnung (bautakt-app 20261017184308_a_partial_credit_link).

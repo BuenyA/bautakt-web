@@ -74,6 +74,8 @@ export type SalesDocumentDetail = {
   customer_id: string | null;
   /** E-Rechnung gewählt (Standard). `false`: PDF ohne Factur-X-XML. */
   e_invoice: boolean;
+  /** `zugferd` (Standard) oder `xrechnung`; nur bei `e_invoice` wirksam. */
+  einvoice_format: string;
   /** Archiv-Original; bei Entwürfen immer leer. */
   storage_path: string | null;
   content_hash: string | null;
@@ -146,7 +148,7 @@ export function useSalesDocument(id: string | undefined) {
            net_total, vat_total, gross_total, credited_total, intro_text, footer_text, notes,
            buyer_reference, parent_document_id,
            payment_term_days, skonto_days, skonto_percent, tax_mode, customer_id,
-           storage_path, content_hash, e_invoice,
+           storage_path, content_hash, e_invoice, einvoice_format,
            ${SALES_DOCUMENT_BUYER_SELECT},
            sales_document_lines(id, title, description, kind, quantity, unit, unit_price,
              discount_percent, net_amount, tax_rate_percent, sort_order, order_id,

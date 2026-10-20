@@ -14,7 +14,7 @@ const STRICT_TYPES = new Set([
   'cancellation',
 ]);
 
-export type FinalizeBlocker = 'serviceDate' | 'sellerTaxId';
+export type FinalizeBlocker = 'serviceDate' | 'sellerTaxId' | 'buyerReference' | 'sellerContact';
 
 /**
  * Was dem Festschreiben noch im Weg steht.
@@ -27,6 +27,10 @@ export type FinalizeBlocker = 'serviceDate' | 'sellerTaxId';
  * Die Pruefung gehoert deshalb VOR den Knopf. Sonst tippt jemand einen Beleg
  * fertig, klickt „Festschreiben" und bekommt eine Datenbankmeldung in
  * Grossbuchstaben zu sehen — mit einer Ursache, die drei Seiten weiter liegt.
+ *
+ * Bei einer XRechnung (#184) zusaetzlich Leitweg-ID und Kontakt des Betriebs
+ * (`sales_documents_check_xrechnung`). Die E-Mail des Kunden prueft die
+ * Datenbank an der Kaeuferkopie; die Vorschau warnt vorher.
  *
  * Die Datenbank bleibt die Grenze: sie prueft dasselbe noch einmal.
  */
@@ -43,7 +47,7 @@ export function useFinalizeBlockers(document: SalesDocumentDetail | null | undef
     queryFn: async () => {
       const { data, error } = await supabase
         .from('companies')
-        .select('vat_id, tax_number')
+        .select('vat_id, tax_number, email, phone_number')
         .eq('id', companyId!)
         .maybeSingle();
 
@@ -61,6 +65,12 @@ export function useFinalizeBlockers(document: SalesDocumentDetail | null | undef
 
   const hasTaxId = Boolean(company.data?.vat_id?.trim() || company.data?.tax_number?.trim());
   if (company.data && !hasTaxId) blockers.push('sellerTaxId');
+
+  if (document.e_invoice && document.einvoice_format === 'xrechnung') {
+    if (!document.buyer_reference.trim()) blockers.push('buyerReference');
+    const hasContact = Boolean(company.data?.email?.trim() && company.data?.phone_number?.trim());
+    if (company.data && !hasContact) blockers.push('sellerContact');
+  }
 
   return { blockers, isLoading: company.isPending };
 }

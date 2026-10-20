@@ -20,6 +20,7 @@ import {
   DialogTitle,
   Input,
   Label,
+  makeStyles,
   MessageBar,
   MessageBarBody,
   MessageBarTitle,
@@ -27,6 +28,8 @@ import {
   Switch,
   Text,
   Textarea,
+  ToggleButton,
+  tokens,
   Tooltip,
 } from '@fluentui/react-components';
 import {
@@ -62,6 +65,7 @@ import { ReleaseDialog } from '../ReleaseDialog';
 import {
   buildDraftRows,
   BUYER_REFERENCE_MAX_LENGTH,
+  E_INVOICE_FORMATS,
   type EditableDocumentType,
   type EditorLine,
   type EditorState,
@@ -77,6 +81,7 @@ import {
   loadOrderLines,
   loadPartialCredits,
   storedSign,
+  toEInvoiceFormat,
   useCompanyTaxProfile,
   useSaveDraft,
 } from '../useDocumentEditor';
@@ -110,6 +115,7 @@ function initialState(type: EditableDocumentType, taxMode: TaxMode): EditorState
     skontoDays: '',
     // Standard ist die E-Rechnung; abwählen nur bewusst im Formular.
     eInvoice: true,
+    eInvoiceFormat: 'zugferd',
     lines: [emptyLine()],
   };
 }
@@ -179,6 +185,7 @@ function creditNoteState(original: SalesDocumentDetail, taxMode: TaxMode): Edito
     serviceDate: original.service_date ?? '',
     buyerReference: original.buyer_reference,
     eInvoice: original.e_invoice !== false,
+    eInvoiceFormat: toEInvoiceFormat(original.einvoice_format),
     lines: lines.length ? lines : [emptyLine()],
   };
 }
@@ -196,6 +203,16 @@ function creditNoteState(original: SalesDocumentDetail, taxMode: TaxMode): Edito
  * (`enforce_sales_document_immutability`) — sie hier zum Bearbeiten anzubieten
  * hiesse, dem Nutzer einen Speichern-Knopf zu zeigen, der scheitern muss.
  */
+const useStyles = makeStyles({
+  // Gewähltes Format im Blau des E-Rechnung-Schalters daneben, nicht im
+  // etwas dunkleren Blau des Primary-Buttons.
+  formatSelected: {
+    backgroundColor: tokens.colorCompoundBrandBackground,
+    ':hover': { backgroundColor: tokens.colorCompoundBrandBackgroundHover },
+    ':hover:active': { backgroundColor: tokens.colorCompoundBrandBackgroundPressed },
+  },
+});
+
 export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const customerFieldId = useId();
   const { t } = useTranslation();
@@ -207,6 +224,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const fromOrderId = id ? null : searchParams.get(invoiceFromOrderParam);
   const creditFromId = id ? null : searchParams.get(creditNoteFromParam);
   const orderFieldId = useId();
+  const styles = useStyles();
   const typeFieldId = useId();
   const taxModeFieldId = useId();
 
@@ -287,6 +305,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       skontoPercent: numberText(existing.data.skonto_percent),
       skontoDays: numberText(existing.data.skonto_days),
       eInvoice: existing.data.e_invoice !== false,
+      eInvoiceFormat: toEInvoiceFormat(existing.data.einvoice_format),
       lines: existing.data.lines.length
         ? toEditorLines(existing.data.lines, existing.data.type, existing.data.tax_mode)
         : [emptyLine()],
@@ -422,8 +441,18 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   // Noch gutschreibbar: Brutto der Rechnung minus freigegebene Gutschriften.
   const creditLimitMinor = parentDocument.data ? chargeableMinorOf(parentDocument.data) : null;
   const buyerReferenceTooLong = state.buyerReference.trim().length > BUYER_REFERENCE_MAX_LENGTH;
+  const isXRechnung = isInvoice && state.eInvoice && state.eInvoiceFormat === 'xrechnung';
+  const leitwegMissing = isXRechnung && !state.buyerReference.trim();
   // Beschriftungen unterscheiden nur Angebot und Rechnung, nicht die Rechnungsart.
   const labelType = isInvoice ? 'invoice' : 'quote';
+  // Gutschriften erben E-Rechnung und Format der Rechnung (DB-Trigger), dort
+  // gibt es nichts zu wählen.
+  const showEInvoiceToggle = isInvoice && !isCreditNote;
+  const newTitleKey = isCreditNote
+    ? 'credit_note'
+    : isInvoice && state.eInvoice
+      ? 'e_invoice'
+      : labelType;
 
   // Nur bei Rechnungen: Bei Angeboten ist das Fällig-Feld ausgeblendet, ein
   // alter Wert darf das Speichern nicht über ein unsichtbares Feld sperren.
@@ -521,6 +550,11 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     }
     if (buyerReferenceTooLong) {
       setError(t('domain:editor.buyerReferenceTooLong', { max: BUYER_REFERENCE_MAX_LENGTH }));
+      return false;
+    }
+    // BR-DE-15; die Datenbank sperrt dasselbe (XRECHNUNG_BUYER_REFERENCE).
+    if (leitwegMissing) {
+      setError(t('domain:eInvoice.leitwegRequired'));
       return false;
     }
     if (isCreditNote && totals) {
@@ -651,10 +685,54 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader
-        title={
-          id
-            ? t('domain:editor.editTitle')
-            : t(`domain:editor.newTitle.${isCreditNote ? 'credit_note' : labelType}`)
+        title={id ? t('domain:editor.editTitle') : t(`domain:editor.newTitle.${newTitleKey}`)}
+        titleAddon={
+          showEInvoiceToggle ? (
+            <div className="flex flex-wrap items-center gap-3">
+              <Switch
+                checked={state.eInvoice}
+                onChange={(_, data) => update({ eInvoice: data.checked })}
+                label={t('domain:eInvoice.formatLabel')}
+              />
+              {/* Format nur bei eingeschalteter E-Rechnung; fast immer ZUGFeRD (#184). */}
+              {state.eInvoice ? (
+                <div
+                  role="group"
+                  aria-label={t('domain:eInvoice.formatGroupLabel')}
+                  className="bg-muted border-border flex items-center gap-0.5 rounded-full border p-0.5"
+                >
+                  {E_INVOICE_FORMATS.map((format) => (
+                    <ToggleButton
+                      key={format}
+                      size="small"
+                      shape="circular"
+                      appearance={state.eInvoiceFormat === format ? 'primary' : 'subtle'}
+                      checked={state.eInvoiceFormat === format}
+                      className={
+                        state.eInvoiceFormat === format ? styles.formatSelected : undefined
+                      }
+                      onClick={() => update({ eInvoiceFormat: format })}
+                    >
+                      {t(`domain:eInvoice.formats.${format}`)}
+                    </ToggleButton>
+                  ))}
+                </div>
+              ) : null}
+              <HelpButton label={t('domain:eInvoice.formatLabel')}>
+                <p>
+                  <strong>{t('domain:eInvoice.formats.zugferd')}:</strong>{' '}
+                  {t('domain:eInvoice.onHint')}
+                </p>
+                <p>
+                  <strong>{t('domain:eInvoice.formats.xrechnung')}:</strong>{' '}
+                  {t('domain:eInvoice.xrechnungHint')}
+                </p>
+                <p>
+                  <strong>{t('domain:eInvoice.offLabel')}</strong> {t('domain:eInvoice.offHint')}
+                </p>
+              </HelpButton>
+            </div>
+          ) : null
         }
         description={t('domain:editor.draftHint')}
         actions={
@@ -736,30 +814,12 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                   ) : null}
                 </div>
               </div>
-              {isInvoice ? (
-                <div className="flex items-center gap-1 @lg:col-span-2">
-                  <Switch
-                    checked={state.eInvoice}
-                    onChange={(_, data) => update({ eInvoice: data.checked })}
-                    label={t('domain:eInvoice.switchLabel')}
-                  />
-                  <HelpButton label={t('domain:eInvoice.switchLabel')}>
-                    <p>
-                      <strong>{t('domain:eInvoice.onLabel')}</strong> {t('domain:eInvoice.onHint')}
-                    </p>
-                    <p>
-                      <strong>{t('domain:eInvoice.offLabel')}</strong>{' '}
-                      {t('domain:eInvoice.offHint')}
-                    </p>
-                  </HelpButton>
-                </div>
-              ) : null}
             </div>
           </Section>
 
           <Section title={t('domain:editor.sections.recipient')}>
             <div className="grid gap-4 @lg:grid-cols-2">
-              <div className="grid gap-2">
+              <div className="grid content-start gap-2">
                 <Label htmlFor={customerFieldId}>{t('domain:invoices.columns.customer')}</Label>
                 <ContactPicker
                   id={customerFieldId}
@@ -779,7 +839,8 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                   value={state.buyerReference}
                   onChange={(value) => update({ buyerReference: value })}
                   maxLength={BUYER_REFERENCE_MAX_LENGTH}
-                  invalid={buyerReferenceTooLong}
+                  invalid={buyerReferenceTooLong || leitwegMissing}
+                  hint={leitwegMissing ? t('domain:eInvoice.leitwegRequired') : undefined}
                 />
               ) : null}
             </div>
@@ -1167,6 +1228,7 @@ function Field({
   invalid,
   info,
   maxLength,
+  hint,
 }: {
   label: string;
   value: string;
@@ -1176,10 +1238,13 @@ function Field({
   maxLength?: number;
   /** Erklärung hinter einem „?“ neben der Beschriftung, öffnet per Klick. */
   info?: string;
+  /** Fehlermeldung unter dem Feld, sichtbar ohne Klick. */
+  hint?: string;
 }) {
   const fieldId = useId();
+  const hintId = useId();
   return (
-    <div className="grid gap-2">
+    <div className="grid content-start gap-2">
       {info ? (
         <div className="flex items-center gap-1">
           <Label htmlFor={fieldId}>{label}</Label>
@@ -1195,10 +1260,16 @@ function Field({
         input={numeric ? { className: 'text-right tabular-nums' } : undefined}
         inputMode={numeric ? 'decimal' : undefined}
         aria-invalid={invalid || undefined}
+        aria-describedby={hint ? hintId : undefined}
         maxLength={maxLength}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
+      {hint ? (
+        <p id={hintId} className="text-destructive text-sm">
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -1224,7 +1295,7 @@ function DateField({
   const hintId = useId();
   const described = [describedBy, hint ? hintId : null].filter(Boolean).join(' ') || undefined;
   return (
-    <div className="grid min-w-0 gap-2">
+    <div className="grid min-w-0 content-start gap-2">
       <Label htmlFor={id}>{label}</Label>
       <DatePicker
         id={id}

@@ -3224,6 +3224,7 @@ export type Database = {
           document_number: string | null
           due_date: string | null
           e_invoice: boolean
+          einvoice_format: string
           footer_text: string
           gross_total: number
           id: string
@@ -3266,6 +3267,7 @@ export type Database = {
           document_number?: string | null
           due_date?: string | null
           e_invoice?: boolean
+          einvoice_format?: string
           footer_text?: string
           gross_total?: number
           id?: string
@@ -3308,6 +3310,7 @@ export type Database = {
           document_number?: string | null
           due_date?: string | null
           e_invoice?: boolean
+          einvoice_format?: string
           footer_text?: string
           gross_total?: number
           id?: string
@@ -3778,6 +3781,7 @@ export type Database = {
           document_number: string | null
           due_date: string | null
           e_invoice: boolean
+          einvoice_format: string
           footer_text: string
           gross_total: number
           id: string
@@ -3918,6 +3922,7 @@ export type Database = {
           document_number: string | null
           due_date: string | null
           e_invoice: boolean
+          einvoice_format: string
           footer_text: string
           gross_total: number
           id: string

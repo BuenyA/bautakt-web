@@ -605,7 +605,9 @@
       "action": "Herunterladen",
       "pdf": "PDF (Original)",
       "xml": "E-Rechnung (XML)",
-      "noXml": "Dieses Original enthält keine E-Rechnung (factur-x.xml).",
+      "xrechnung": "XRechnung (XML, Original)",
+      "visualPdf": "PDF (Sichtbeleg)",
+      "noXml": "Dieses Original enthält keine E-Rechnung (XML).",
       "xmlError": "Die E-Rechnung konnte nicht aus dem Original gelesen werden."
     },
     "markSent": {
@@ -661,7 +663,9 @@
     "blockersTitle": "Vor dem Festschreiben fehlt noch etwas",
     "blockers": {
       "serviceDate": "Das Leistungsdatum fehlt. Es steht auf jeder Rechnung und ist Pflicht.",
-      "sellerTaxId": "Dem Betrieb fehlt Steuernummer und USt-IdNr. Ohne eine der beiden ist die Rechnung nach EN16931 nicht gültig."
+      "sellerTaxId": "Dem Betrieb fehlt Steuernummer und USt-IdNr. Ohne eine der beiden ist die Rechnung nach EN16931 nicht gültig.",
+      "buyerReference": "Die Leitweg-ID fehlt. Ohne sie nimmt keine Behörde die XRechnung an.",
+      "sellerContact": "Dem Betrieb fehlen E-Mail oder Telefon. Beides ist in der XRechnung Pflicht."
     },
     "toSettings": "Zur Einrichtung"
   },
@@ -1264,6 +1268,7 @@
     "editTitle": "Entwurf bearbeiten",
     "newTitle": {
       "invoice": "Neue Rechnung",
+      "e_invoice": "Neue E-Rechnung",
       "quote": "Neues Angebot",
       "credit_note": "Neue Gutschrift"
     },
@@ -1385,11 +1390,18 @@
   "eInvoice": {
     "badge": "E-Rechnung",
     "badgeTooltip": "Enthält die maschinenlesbaren Rechnungsdaten (ZUGFeRD/XRechnung)",
-    "switchLabel": "Als E-Rechnung erstellen",
-    "onLabel": "Eingeschaltet:",
+    "onHint": "Der Standard für Unternehmen und Privatkunden. Das PDF enthält die maschinenlesbaren Rechnungsdaten.",
+    "offHint": "Es entsteht nur ein PDF ohne E-Rechnungsdaten. An Unternehmen in Deutschland ist das nur noch bis Ende 2026 erlaubt, bei höchstens 800.000 € Vorjahresumsatz bis Ende 2027.",
+    "formatLabel": "E-Rechnung",
+    "formatGroupLabel": "Format der E-Rechnung",
     "offLabel": "Ausgeschaltet:",
-    "onHint": "Das PDF enthält die maschinenlesbaren Rechnungsdaten (ZUGFeRD).",
-    "offHint": "Es entsteht nur ein PDF ohne E-Rechnungsdaten. An Unternehmen in Deutschland ist das nur noch bis Ende 2026 erlaubt, bei höchstens 800.000 € Vorjahresumsatz bis Ende 2027."
+    "formats": {
+      "zugferd": "ZUGFeRD",
+      "xrechnung": "XRechnung"
+    },
+    "xrechnungHint": "Für öffentliche Auftraggeber. Die Rechnung geht als XML hinaus, das PDF ist nur zur Ansicht. Pflicht sind die Leitweg-ID, die E-Mail-Adresse des Kunden sowie E-Mail und Telefon deines Betriebs.",
+    "leitwegRequired": "Eine XRechnung braucht die Leitweg-ID des Auftraggebers.",
+    "xrechnungBadge": "XRechnung"
   },
   "photoForm": {
     "upload": "Fotos hochladen",

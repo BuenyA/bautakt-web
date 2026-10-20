@@ -65,8 +65,13 @@ export function downloadBytes(bytes: Uint8Array, fileName: string, mimeType: str
   window.setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
+/** Name des eingebetteten XML: ZUGFeRD `factur-x.xml`, XRechnung `xrechnung.xml` (#184). */
+const EMBEDDED_XML_NAMES = new Set(['factur-x.xml', 'xrechnung.xml']);
+
 /**
- * `factur-x.xml` aus dem Archiv-Original lesen.
+ * Das eingebettete XML (`factur-x.xml` bzw. `xrechnung.xml`) aus dem
+ * Archiv-Original lesen. Bei einer XRechnung ist es das Original, das der
+ * Auftraggeber bekommt; das PDF ist nur Sichtbeleg.
  *
  * Bewusst aus dem PDF und nicht neu erzeugt: Das XML im Original ist die
  * E-Rechnung, die der Kunde bekommt — ein neu gerendertes XML könnte davon
@@ -81,7 +86,7 @@ export async function extractFacturX(pdf: Uint8Array): Promise<Uint8Array | null
     const attachments = await doc.getAttachments();
     if (!attachments) return null;
     for (const [id, attachment] of attachments) {
-      if (attachment.filename.toLowerCase() !== 'factur-x.xml') continue;
+      if (!EMBEDDED_XML_NAMES.has(attachment.filename.toLowerCase())) continue;
       return attachment.content ?? (await doc.getAttachmentContent(id));
     }
     return null;
