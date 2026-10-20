@@ -23,11 +23,11 @@ import {
   MessageBar,
   MessageBarBody,
   MessageBarTitle,
-  Radio,
-  RadioGroup,
   Select,
+  Switch,
   Text,
   Textarea,
+  ToggleButton,
   Tooltip,
 } from '@fluentui/react-components';
 import {
@@ -63,6 +63,7 @@ import { ReleaseDialog } from '../ReleaseDialog';
 import {
   buildDraftRows,
   BUYER_REFERENCE_MAX_LENGTH,
+  E_INVOICE_FORMATS,
   type EditableDocumentType,
   type EditorLine,
   type EditorState,
@@ -212,7 +213,6 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const creditFromId = id ? null : searchParams.get(creditNoteFromParam);
   const orderFieldId = useId();
   const typeFieldId = useId();
-  const eInvoiceLabelId = useId();
   const taxModeFieldId = useId();
 
   const { data: membership } = useMembership();
@@ -432,6 +432,14 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const leitwegMissing = isXRechnung && !state.buyerReference.trim();
   // Beschriftungen unterscheiden nur Angebot und Rechnung, nicht die Rechnungsart.
   const labelType = isInvoice ? 'invoice' : 'quote';
+  // Gutschriften erben E-Rechnung und Format der Rechnung (DB-Trigger), dort
+  // gibt es nichts zu wählen.
+  const showEInvoiceToggle = isInvoice && !isCreditNote;
+  const newTitleKey = isCreditNote
+    ? 'credit_note'
+    : isInvoice && state.eInvoice
+      ? 'e_invoice'
+      : labelType;
 
   // Nur bei Rechnungen: Bei Angeboten ist das Fällig-Feld ausgeblendet, ein
   // alter Wert darf das Speichern nicht über ein unsichtbares Feld sperren.
@@ -664,10 +672,51 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   return (
     <div className="flex flex-col gap-4">
       <PageHeader
-        title={
-          id
-            ? t('domain:editor.editTitle')
-            : t(`domain:editor.newTitle.${isCreditNote ? 'credit_note' : labelType}`)
+        title={id ? t('domain:editor.editTitle') : t(`domain:editor.newTitle.${newTitleKey}`)}
+        titleAddon={
+          showEInvoiceToggle ? (
+            <div className="flex flex-wrap items-center gap-3">
+              <Switch
+                checked={state.eInvoice}
+                onChange={(_, data) => update({ eInvoice: data.checked })}
+                label={t('domain:eInvoice.formatLabel')}
+              />
+              {/* Format nur bei eingeschalteter E-Rechnung; fast immer ZUGFeRD (#184). */}
+              {state.eInvoice ? (
+                <div
+                  role="group"
+                  aria-label={t('domain:eInvoice.formatGroupLabel')}
+                  className="flex items-center gap-1"
+                >
+                  {E_INVOICE_FORMATS.map((format) => (
+                    <ToggleButton
+                      key={format}
+                      size="small"
+                      shape="circular"
+                      appearance={state.eInvoiceFormat === format ? 'primary' : 'subtle'}
+                      checked={state.eInvoiceFormat === format}
+                      onClick={() => update({ eInvoiceFormat: format })}
+                    >
+                      {t(`domain:eInvoice.formats.${format}`)}
+                    </ToggleButton>
+                  ))}
+                </div>
+              ) : null}
+              <HelpButton label={t('domain:eInvoice.formatLabel')}>
+                <p>
+                  <strong>{t('domain:eInvoice.formats.zugferd')}:</strong>{' '}
+                  {t('domain:eInvoice.onHint')}
+                </p>
+                <p>
+                  <strong>{t('domain:eInvoice.formats.xrechnung')}:</strong>{' '}
+                  {t('domain:eInvoice.xrechnungHint')}
+                </p>
+                <p>
+                  <strong>{t('domain:eInvoice.offLabel')}</strong> {t('domain:eInvoice.offHint')}
+                </p>
+              </HelpButton>
+            </div>
+          ) : null
         }
         description={t('domain:editor.draftHint')}
         actions={
@@ -749,45 +798,6 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                   ) : null}
                 </div>
               </div>
-              {isInvoice ? (
-                <div className="grid content-start gap-2 @lg:col-span-2">
-                  <div className="flex items-center gap-1">
-                    <Label id={eInvoiceLabelId}>{t('domain:eInvoice.formatLabel')}</Label>
-                    <HelpButton label={t('domain:eInvoice.formatLabel')}>
-                      <p>
-                        <strong>{t('domain:eInvoice.formats.zugferd')}:</strong>{' '}
-                        {t('domain:eInvoice.onHint')}
-                      </p>
-                      <p>
-                        <strong>{t('domain:eInvoice.formats.xrechnung')}:</strong>{' '}
-                        {t('domain:eInvoice.xrechnungHint')}
-                      </p>
-                      <p>
-                        <strong>{t('domain:eInvoice.formats.none')}:</strong>{' '}
-                        {t('domain:eInvoice.offHint')}
-                      </p>
-                    </HelpButton>
-                  </div>
-                  {/* Eine Auswahl statt Schalter plus Format: E-Rechnung an/aus
-                      und ZUGFeRD/XRechnung sind für den Nutzer eine Frage (#184). */}
-                  <RadioGroup
-                    layout="horizontal"
-                    aria-labelledby={eInvoiceLabelId}
-                    value={state.eInvoice ? state.eInvoiceFormat : 'none'}
-                    onChange={(_, { value }) =>
-                      update(
-                        value === 'none'
-                          ? { eInvoice: false }
-                          : { eInvoice: true, eInvoiceFormat: toEInvoiceFormat(value) },
-                      )
-                    }
-                  >
-                    <Radio value="zugferd" label={t('domain:eInvoice.formats.zugferd')} />
-                    <Radio value="xrechnung" label={t('domain:eInvoice.formats.xrechnung')} />
-                    <Radio value="none" label={t('domain:eInvoice.formats.none')} />
-                  </RadioGroup>
-                </div>
-              ) : null}
             </div>
           </Section>
 

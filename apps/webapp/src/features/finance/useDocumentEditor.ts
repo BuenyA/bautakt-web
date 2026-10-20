@@ -35,13 +35,15 @@ export function isInvoiceEditorType(type: string): type is InvoiceEditorType {
   return (INVOICE_EDITOR_TYPES as readonly string[]).includes(type);
 }
 
-/** Rechnungsartig: Pflicht-Leistungsdatum, E-Rechnung, Käuferreferenz. */
-export type EInvoiceFormat = 'zugferd' | 'xrechnung';
+/** Format der E-Rechnung; ZUGFeRD ist der Standard (#184). */
+export const E_INVOICE_FORMATS = ['zugferd', 'xrechnung'] as const;
+export type EInvoiceFormat = (typeof E_INVOICE_FORMATS)[number];
 
 export function toEInvoiceFormat(value: string | null | undefined): EInvoiceFormat {
   return value === 'xrechnung' ? 'xrechnung' : 'zugferd';
 }
 
+/** Rechnungsartig: Pflicht-Leistungsdatum, E-Rechnung, Käuferreferenz. */
 export function isInvoiceDocument(type: string): boolean {
   return isInvoiceEditorType(type) || type === 'credit_note';
 }
