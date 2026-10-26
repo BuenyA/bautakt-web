@@ -11,7 +11,7 @@ import {
   type SalesDocumentBuyerFields,
   salesDocumentBuyerLabel,
 } from './salesDocumentBuyer';
-import { renderPreview } from './useLivePreview';
+import { fetchFingerprint, renderPreview } from './useLivePreview';
 
 export type DocumentLine = {
   id: string;
@@ -206,14 +206,16 @@ export function useSalesDocument(id: string | undefined) {
  * `storage_path`/`content_hash`. Ein 409 heisst, dass ein anderer Aufruf
  * gerade dasselbe Original schreibt; dessen Ergebnis gilt, das ist kein Fehler.
  */
-async function renderArchive(documentId: string): Promise<void> {
-  const { error } = await supabase.functions.invoke('finance-document-render', {
-    body: { document_id: documentId, mode: 'archive' },
-  });
-  if (!error) return;
+async function renderArchive(documentId: string): Promise<{ fingerprint: string | null }> {
+  const { data, error } = await supabase.functions.invoke<{ fingerprint?: string }>(
+    'finance-document-render',
+    { body: { document_id: documentId, mode: 'archive' } },
+  );
+  // Fingerabdruck nur bei frisch geschriebenem Original (#217).
+  if (!error) return { fingerprint: data?.fingerprint ?? null };
   const context = (error as { context?: unknown }).context;
   const response = context instanceof Response ? context : null;
-  if (response?.status === 409) return;
+  if (response?.status === 409) return { fingerprint: null };
   // Grund lesbar machen und protokollieren (#216): Der Beleg ist dann schon
   // festgeschrieben, ohne Log bliebe ein dauerhafter Fehler unbemerkt.
   const detail = response ? await readFunctionErrorDetail(response) : error.message;
@@ -231,6 +233,17 @@ function archiveErrorText(error: unknown): string | null {
 }
 
 /**
+ * Der gespeicherte Stand weicht von der angezeigten Vorschau ab (#217).
+ * Festgeschrieben ist dann nichts; der Aufrufer zeigt den gespeicherten
+ * Stand und lässt erneut bestätigen.
+ */
+export class PreviewMismatchError extends Error {
+  constructor() {
+    super('PREVIEW_MISMATCH');
+  }
+}
+
+/**
  * Beleg festschreiben.
  *
  * Die Nummer vergibt `finalize_sales_document` in der Datenbank, nicht der
@@ -241,6 +254,12 @@ function archiveErrorText(error: unknown): string | null {
  * Direkt danach entsteht das Archiv-Original. Scheitert nur dieser zweite
  * Schritt, ist der Beleg trotzdem festgeschrieben (`archived: false`); die
  * Detailseite bietet das Nachholen an.
+ *
+ * Festgeschrieben wird nur, was der Nutzer gesehen hat (#217): vorher muss
+ * der gespeicherte Stand denselben Fingerabdruck haben wie die angezeigte
+ * Vorschau (`expectedFingerprint`), sonst `PreviewMismatchError`. Das Original
+ * wird danach noch einmal verglichen; `matchesPreview: false` heisst, dass es
+ * trotzdem abweicht (etwa weil die Firmendaten gerade geändert wurden).
  */
 export function useFinalizeDocument(documentId: string | undefined) {
   const queryClient = useQueryClient();
@@ -248,8 +267,17 @@ export function useFinalizeDocument(documentId: string | undefined) {
 
   return useMutation({
     // Der Editor kennt die Id erst nach dem Speichern und reicht sie je Aufruf.
-    mutationFn: async (savedId?: string) => {
+    mutationFn: async ({
+      savedId,
+      expectedFingerprint,
+    }: {
+      savedId?: string;
+      expectedFingerprint: string;
+    }) => {
       const target = savedId ?? documentId!;
+      if ((await fetchFingerprint(target)) !== expectedFingerprint) {
+        throw new PreviewMismatchError();
+      }
       const { data, error } = await supabase.rpc('finalize_sales_document', {
         p_document_id: target,
       });
@@ -257,13 +285,22 @@ export function useFinalizeDocument(documentId: string | undefined) {
       // Die vergebene Nummer kommt aus der Freigabe selbst, für den Toast.
       const documentNumber = data?.document_number ?? '';
       try {
-        await renderArchive(target);
-        return { archived: true, documentNumber, archiveError: null };
+        const { fingerprint } = await renderArchive(target);
+        const matchesPreview = fingerprint === null ? null : fingerprint === expectedFingerprint;
+        if (matchesPreview === false) {
+          console.error('Original weicht von der Vorschau ab', { documentId: target });
+        }
+        return { archived: true, documentNumber, archiveError: null, matchesPreview };
       } catch (archiveError) {
-        return { archived: false, documentNumber, archiveError: archiveErrorText(archiveError) };
+        return {
+          archived: false,
+          documentNumber,
+          archiveError: archiveErrorText(archiveError),
+          matchesPreview: null,
+        };
       }
     },
-    onSuccess: async (_, savedId) => {
+    onSuccess: async (_, { savedId }) => {
       await queryClient.invalidateQueries({
         queryKey: ['sales-document', membership?.companyId, savedId ?? documentId],
       });
@@ -278,7 +315,9 @@ export function useArchiveDocument(documentId: string | undefined) {
   const { data: membership } = useMembership();
 
   return useMutation({
-    mutationFn: () => renderArchive(documentId!),
+    mutationFn: async () => {
+      await renderArchive(documentId!);
+    },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ['sales-document', membership?.companyId, documentId],

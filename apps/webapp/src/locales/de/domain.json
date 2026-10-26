@@ -1398,7 +1398,13 @@
         "invoice": "Rechnung freigeben?",
         "quote": "Angebot freigeben?"
       },
-      "description": "Der Beleg bekommt seine Nummer und wird festgeschrieben. Danach lässt er sich nicht mehr ändern, nur noch stornieren."
+      "description": "Der Beleg bekommt seine Nummer und wird festgeschrieben. Danach lässt er sich nicht mehr ändern, nur noch stornieren.",
+      "previewPending": "Die Vorschau wird noch aktualisiert. Freigeben kannst du, sobald sie deinen aktuellen Stand zeigt.",
+      "previewFailed": "Die Vorschau konnte nicht erstellt werden. Freigeben geht erst, wenn sie deinen aktuellen Stand zeigt.",
+      "mismatchTitle": "Nicht freigegeben: Vorschau war nicht aktuell",
+      "mismatchDescription": "Der gespeicherte Stand weicht von der angezeigten Vorschau ab. Die Vorschau zeigt jetzt den gespeicherten Stand. Prüf sie und gib dann erneut frei.",
+      "originalDiffersTitle": "{{number}} festgeschrieben, weicht aber von der Vorschau ab",
+      "originalDiffersDescription": "Zwischen Vorschau und Festschreiben hat sich etwas geändert, zum Beispiel die Firmendaten. Prüf das Original. Falls es nicht stimmt, storniere den Beleg."
     },
     "discard": {
       "title": "Änderungen verwerfen?",

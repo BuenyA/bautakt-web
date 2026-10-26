@@ -90,6 +90,7 @@ import { useLivePreview } from '../useLivePreview';
 import {
   chargeableMinorOf,
   type DocumentLine,
+  PreviewMismatchError,
   type SalesDocumentDetail,
   useFinalizeDocument,
   useSalesDocument,
@@ -624,24 +625,47 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
   function onRelease() {
     if (!validate()) return;
+    // Steht noch eine Tipp-Pause aus, gleich rendern statt zu warten (#217).
+    live.flush();
     setConfirmRelease(true);
   }
 
   async function onConfirmRelease() {
+    // Der Dialog lässt nur mit aktueller Vorschau bestätigen.
+    const expectedFingerprint = live.fingerprint;
+    if (!expectedFingerprint) {
+      // Nie still abbrechen: der Dialog sollte das schon verhindert haben.
+      toast.error(t('domain:editor.release.previewFailed'));
+      return;
+    }
     setBusy('release');
     let savedId: string | null = null;
     try {
       savedId = await persist();
-      const { archived, documentNumber, archiveError } = await finalize.mutateAsync(savedId);
-      if (archived) toast.success(t('domain:invoices.finalizeSuccess', { number: documentNumber }));
-      else
+      const { archived, documentNumber, archiveError, matchesPreview } = await finalize.mutateAsync(
+        { savedId, expectedFingerprint },
+      );
+      if (!archived)
         toast.warning(
           t('domain:invoices.archive.finalizedWithoutArchive', { number: documentNumber }),
           { description: archiveError ?? undefined },
         );
+      else if (matchesPreview === false)
+        toast.warning(t('domain:editor.release.originalDiffersTitle', { number: documentNumber }), {
+          description: t('domain:editor.release.originalDiffersDescription'),
+        });
+      else toast.success(t('domain:invoices.finalizeSuccess', { number: documentNumber }));
       leaveTo(routes.invoice(savedId));
     } catch (error) {
       setConfirmRelease(false);
+      if (error instanceof PreviewMismatchError && savedId) {
+        // Nichts festgeschrieben. Gezeigt wird jetzt, was festgeschrieben würde.
+        void live.showSaved(savedId);
+        toast.warning(t('domain:editor.release.mismatchTitle'), {
+          description: t('domain:editor.release.mismatchDescription'),
+        });
+        return;
+      }
       // Gespeichert ist der Entwurf dann schon; die Datenbank sagt, was fehlt.
       toast.error(savedId ? t('domain:invoices.finalizeError') : t('domain:editor.saveError'), {
         description: readableDbError(error) ?? undefined,
@@ -686,6 +710,14 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     </div>
   );
 
+  // Aktuell, aber ohne Fingerabdruck: Vorschau taugt nicht als Freigabe-Grundlage.
+  const releasePreview = live.current
+    ? live.fingerprint
+      ? 'ready'
+      : 'failed'
+    : live.error && live.phase === 'idle'
+      ? 'failed'
+      : 'pending';
   const previewError = live.error
     ? (readableDbError(live.error) ?? t('domain:editor.preview.error'))
     : null;
@@ -1206,6 +1238,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
         open={confirmRelease}
         kind={labelType}
         pending={busy === 'release'}
+        preview={releasePreview}
         onConfirm={() => void onConfirmRelease()}
         onClose={() => setConfirmRelease(false)}
       />
