@@ -633,7 +633,11 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   async function onConfirmRelease() {
     // Der Dialog lässt nur mit aktueller Vorschau bestätigen.
     const expectedFingerprint = live.fingerprint;
-    if (!expectedFingerprint) return;
+    if (!expectedFingerprint) {
+      // Nie still abbrechen: der Dialog sollte das schon verhindert haben.
+      toast.error(t('domain:editor.release.previewFailed'));
+      return;
+    }
     setBusy('release');
     let savedId: string | null = null;
     try {
@@ -706,6 +710,14 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     </div>
   );
 
+  // Aktuell, aber ohne Fingerabdruck: Vorschau taugt nicht als Freigabe-Grundlage.
+  const releasePreview = live.current
+    ? live.fingerprint
+      ? 'ready'
+      : 'failed'
+    : live.error && live.phase === 'idle'
+      ? 'failed'
+      : 'pending';
   const previewError = live.error
     ? (readableDbError(live.error) ?? t('domain:editor.preview.error'))
     : null;
@@ -1226,9 +1238,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
         open={confirmRelease}
         kind={labelType}
         pending={busy === 'release'}
-        preview={
-          live.current ? 'ready' : live.error && live.phase === 'idle' ? 'failed' : 'pending'
-        }
+        preview={releasePreview}
         onConfirm={() => void onConfirmRelease()}
         onClose={() => setConfirmRelease(false)}
       />

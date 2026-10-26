@@ -172,8 +172,17 @@ export function InvoiceDetailPage() {
     ? null
     : (draftPreview.data?.fingerprint ?? null);
 
+  const releasePreview = previewFingerprint
+    ? 'ready'
+    : draftPreview.isError || (draftPreview.isSuccess && !draftPreview.isFetching)
+      ? 'failed'
+      : 'pending';
+
   async function onFinalize() {
-    if (!previewFingerprint) return;
+    if (!previewFingerprint) {
+      toast.error(t('domain:editor.release.previewFailed'));
+      return;
+    }
     try {
       const { archived, documentNumber, archiveError, matchesPreview } = await finalize.mutateAsync(
         { expectedFingerprint: previewFingerprint },
@@ -751,7 +760,7 @@ export function InvoiceDetailPage() {
           open={releaseOpen}
           kind={data.type === 'quote' ? 'quote' : 'invoice'}
           pending={finalize.isPending}
-          preview={previewFingerprint ? 'ready' : draftPreview.isError ? 'failed' : 'pending'}
+          preview={releasePreview}
           onConfirm={() => void onFinalize()}
           onClose={() => setReleaseOpen(false)}
         />
