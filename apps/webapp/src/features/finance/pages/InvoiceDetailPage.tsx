@@ -168,11 +168,12 @@ export function InvoiceDetailPage() {
 
   async function onFinalize() {
     try {
-      const { archived, documentNumber } = await finalize.mutateAsync();
+      const { archived, documentNumber, archiveError } = await finalize.mutateAsync();
       if (archived) toast.success(t('domain:invoices.finalizeSuccess', { number: documentNumber }));
       else
         toast.warning(
           t('domain:invoices.archive.finalizedWithoutArchive', { number: documentNumber }),
+          { description: archiveError ?? undefined },
         );
     } catch (error) {
       // Die Datenbank prueft Pflichtangaben (u. a. Steuernummer des Betriebs)

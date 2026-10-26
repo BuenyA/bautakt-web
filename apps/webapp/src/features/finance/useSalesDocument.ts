@@ -5,6 +5,7 @@ import { useAuth } from '@/features/auth/useAuth';
 import { useMembership } from '@/features/company/useMembership';
 import { supabase } from '@/lib/supabase';
 
+import { archiveFailureReason, readFunctionErrorDetail } from './archiveError';
 import {
   SALES_DOCUMENT_BUYER_SELECT,
   type SalesDocumentBuyerFields,
@@ -210,9 +211,23 @@ async function renderArchive(documentId: string): Promise<void> {
     body: { document_id: documentId, mode: 'archive' },
   });
   if (!error) return;
-  const status = (error as { context?: { status?: number } }).context?.status;
-  if (status === 409) return;
-  throw error;
+  const context = (error as { context?: unknown }).context;
+  const response = context instanceof Response ? context : null;
+  if (response?.status === 409) return;
+  // Grund lesbar machen und protokollieren (#216): Der Beleg ist dann schon
+  // festgeschrieben, ohne Log bliebe ein dauerhafter Fehler unbemerkt.
+  const detail = response ? await readFunctionErrorDetail(response) : error.message;
+  console.error('Archiv-Original nicht erzeugt', {
+    documentId,
+    status: response?.status ?? null,
+    detail,
+  });
+  throw new Error(archiveFailureReason(response?.status, detail));
+}
+
+/** Grund aus `renderArchive`, für die Beschreibung des Warnhinweises. */
+function archiveErrorText(error: unknown): string | null {
+  return error instanceof Error ? error.message : null;
 }
 
 /**
@@ -243,9 +258,9 @@ export function useFinalizeDocument(documentId: string | undefined) {
       const documentNumber = data?.document_number ?? '';
       try {
         await renderArchive(target);
-        return { archived: true, documentNumber };
-      } catch {
-        return { archived: false, documentNumber };
+        return { archived: true, documentNumber, archiveError: null };
+      } catch (archiveError) {
+        return { archived: false, documentNumber, archiveError: archiveErrorText(archiveError) };
       }
     },
     onSuccess: async (_, savedId) => {
@@ -291,9 +306,14 @@ export function useCancelDocument(documentId: string | undefined) {
       const documentNumber = data.document_number ?? '';
       try {
         await renderArchive(data.id);
-        return { id: data.id, archived: true, documentNumber };
-      } catch {
-        return { id: data.id, archived: false, documentNumber };
+        return { id: data.id, archived: true, documentNumber, archiveError: null };
+      } catch (archiveError) {
+        return {
+          id: data.id,
+          archived: false,
+          documentNumber,
+          archiveError: archiveErrorText(archiveError),
+        };
       }
     },
     onSuccess: async () => {

@@ -632,11 +632,12 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     let savedId: string | null = null;
     try {
       savedId = await persist();
-      const { archived, documentNumber } = await finalize.mutateAsync(savedId);
+      const { archived, documentNumber, archiveError } = await finalize.mutateAsync(savedId);
       if (archived) toast.success(t('domain:invoices.finalizeSuccess', { number: documentNumber }));
       else
         toast.warning(
           t('domain:invoices.archive.finalizedWithoutArchive', { number: documentNumber }),
+          { description: archiveError ?? undefined },
         );
       leaveTo(routes.invoice(savedId));
     } catch (error) {
