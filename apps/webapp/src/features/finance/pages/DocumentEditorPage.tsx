@@ -1,4 +1,5 @@
 import {
+  eurosToMinor,
   formatMoney,
   formatMoneyInput,
   TAX_MODES,
@@ -168,15 +169,21 @@ function toEditorLines(
 /**
  * Gutschrift-Entwurf zu einer Rechnung: Kunde, Steuerart, Käuferreferenz und
  * Leistungsdatum vom Original, die Positionen als Vorlage. Der Nutzer streicht
- * oder ändert, was nicht gutgeschrieben wird. Abschlagsabzüge bleiben weg.
+ * oder ändert, was nicht gutgeschrieben wird.
+ *
+ * Abschlagsabzüge einer Schlussrechnung kommen als Nachlass mit: Die Vorlage
+ * ergibt dann genau den Betrag der Schlussrechnung, also das, was noch
+ * gutgeschrieben werden kann (#215). Als `partial_credit` gingen sie nicht,
+ * der Abschlag ist schon in der Schlussrechnung verrechnet.
  */
 function creditNoteState(original: SalesDocumentDetail, taxMode: TaxMode): EditorState {
-  const lines = toEditorLines(
-    original.lines.filter((line) => line.kind !== 'partial_credit'),
-    original.type,
-    original.tax_mode,
-    true,
-  ).map((line) => ({ ...line, creditedDocumentId: null }));
+  const lines = toEditorLines(original.lines, original.type, original.tax_mode, true).map(
+    (line) => ({
+      ...line,
+      kind: line.kind === 'partial_credit' ? ('discount' as const) : line.kind,
+      creditedDocumentId: null,
+    }),
+  );
   return {
     ...initialState('credit_note', taxMode),
     parentDocumentId: original.id,
@@ -440,6 +447,13 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const isCreditNote = state.type === 'credit_note';
   // Noch gutschreibbar: Brutto der Rechnung minus freigegebene Gutschriften.
   const creditLimitMinor = parentDocument.data ? chargeableMinorOf(parentDocument.data) : null;
+  const creditedMinor = parentDocument.data ? eurosToMinor(parentDocument.data.credited_total) : 0;
+  // Schon in der Vorlage sichtbar, nicht erst beim Freigeben (#215): Nach einer
+  // Teilgutschrift liegen die übernommenen Positionen über dem Rest.
+  const creditExcessMinor =
+    isCreditNote && creditLimitMinor !== null
+      ? Math.max(0, totals.grossMinor - creditLimitMinor)
+      : 0;
   const buyerReferenceTooLong = state.buyerReference.trim().length > BUYER_REFERENCE_MAX_LENGTH;
   const isXRechnung = isInvoice && state.eInvoice && state.eInvoiceFormat === 'xrechnung';
   const leitwegMissing = isXRechnung && !state.buyerReference.trim();
@@ -760,12 +774,21 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
           <Section title={t('domain:editor.sections.document')}>
             <div className="grid gap-4 @lg:grid-cols-2">
               {isCreditNote && parentDocument.data ? (
-                <MessageBar intent="info" className="@lg:col-span-2">
+                <MessageBar
+                  intent={creditExcessMinor > 0 ? 'warning' : 'info'}
+                  className="@lg:col-span-2"
+                >
                   <MessageBarBody>
                     {t('domain:editor.creditNote.info', {
                       number: parentDocument.data.document_number ?? '',
                       amount: formatMoney(creditLimitMinor ?? 0),
                     })}
+                    {creditedMinor > 0
+                      ? ` ${t('domain:editor.creditNote.alreadyCredited', { amount: formatMoney(creditedMinor) })}`
+                      : null}
+                    {creditExcessMinor > 0
+                      ? ` ${t('domain:editor.creditNote.reduceBy', { amount: formatMoney(creditExcessMinor) })}`
+                      : null}
                   </MessageBarBody>
                 </MessageBar>
               ) : null}
