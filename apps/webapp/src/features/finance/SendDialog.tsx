@@ -292,8 +292,8 @@ export function SendDialog({
                   <MessageBarTitle>{t('domain:send.footerIncomplete')}</MessageBarTitle>
                   {missingFields
                     .map((field) => t(`domain:settings.register.fields.${field}`))
-                    .join(', ')}
-                  <RouterLink to={routes.settings} className="ml-1 font-medium">
+                    .join(', ')}{' '}
+                  <RouterLink to={routes.settings} className="font-medium">
                     {t('domain:invoices.toSettings')}
                   </RouterLink>
                 </MessageBarBody>
