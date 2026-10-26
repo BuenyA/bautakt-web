@@ -1274,6 +1274,8 @@
     },
     "creditNote": {
       "info": "Gutschrift zu Rechnung {{number}}. Noch gutschreibbar: {{amount}}. Streiche oder ändere die Positionen, die nicht gutgeschrieben werden.",
+      "alreadyCredited": "Bereits gutgeschrieben: {{amount}}.",
+      "reduceBy": "Die Gutschrift liegt {{amount}} darüber. Bitte die Positionen um diesen Betrag verringern.",
       "noAmount": "Die Gutschrift braucht einen Betrag über 0.",
       "exceeds": "Die Gutschrift ist höher als der noch gutschreibbare Betrag von {{amount}}."
     },
