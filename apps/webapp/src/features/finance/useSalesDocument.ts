@@ -67,6 +67,8 @@ export type SalesDocumentDetail = {
   footer_text: string;
   notes: string;
   buyer_reference: string;
+  /** E-Mail des Käufers, beim Festschreiben vom Kunden übernommen; sonst leer. */
+  buyer_email: string | null;
   payment_term_days: number | null;
   skonto_days: number | null;
   skonto_percent: number | null;
@@ -146,7 +148,7 @@ export function useSalesDocument(id: string | undefined) {
         .select(
           `id, type, status, document_number, issue_date, due_date, service_date, currency,
            net_total, vat_total, gross_total, credited_total, intro_text, footer_text, notes,
-           buyer_reference, parent_document_id,
+           buyer_reference, buyer_email, parent_document_id,
            payment_term_days, skonto_days, skonto_percent, tax_mode, customer_id,
            storage_path, content_hash, e_invoice, einvoice_format,
            ${SALES_DOCUMENT_BUYER_SELECT},

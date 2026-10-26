@@ -10,7 +10,7 @@ import { usePermission } from '@/features/company/usePermission';
 import { ContactNumberSettingsCard } from '@/features/contacts/ContactNumberSettingsCard';
 import { supabase } from '@/lib/supabase';
 
-import { BankCard, CompanyCard, LegalCard } from '../CompanyForms';
+import { BankCard, CompanyCard, LegalCard, RegisterCard } from '../CompanyForms';
 import { DatevSettingsCard } from '../DatevSettingsCard';
 
 /** Stammdaten des Betriebs und die Rollen, die es hier gibt. */
@@ -26,7 +26,7 @@ function useCompanySettings() {
         supabase
           .from('companies')
           .select(
-            'name, type, street_address, postal_code, city, country, email, phone_number, tax_number, vat_id, trade_register, iban, bic, bank_name, invoice_prefix, next_invoice_number, payment_term_days, is_small_business',
+            'name, type, street_address, postal_code, city, country, email, phone_number, tax_number, vat_id, trade_register, legal_form, register_court, managing_directors, registered_office, iban, bic, bank_name, invoice_prefix, next_invoice_number, payment_term_days, is_small_business',
           )
           .eq('id', companyId!)
           .maybeSingle(),
@@ -78,6 +78,7 @@ export function SettingsPage() {
               <div className="xl:col-span-2">
                 <CompanyCard key={formKey} company={company} canEdit={canEdit} />
               </div>
+              <RegisterCard key={`register-${formKey}`} company={company} canEdit={canEdit} />
               <LegalCard key={`legal-${formKey}`} company={company} canEdit={canEdit} />
               <BankCard key={`bank-${formKey}`} company={company} canEdit={canEdit} />
             </>
