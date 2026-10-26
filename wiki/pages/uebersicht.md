@@ -15,7 +15,10 @@ Ziel: der ganze Betrieb auf einen Blick.
      „Maps“ (Google-Maps-Suche, neuer Tab, `mapsSearchUrl`) und „Zum Einsatz“.
      Alle Kacheln sehen gleich aus: laufende nicht farbig hervorgehoben (Farbe zog
      den Blick zu stark), vergangene nicht gedämpft (Owner-Vorgabe). „Zum Einsatz“
-     steht rechtsbündig.
+     steht rechtsbündig. Ohne Einsätze stehen Icon, Hinweis und „Einsatz planen“
+     in der Mitte des Kartenkörpers — der füllt die Zeilenhöhe (`flex: 1`,
+     `min-height: 0`). „Zu erledigen“ nutzt diesen Baustein nicht; dort bleibt
+     der Satz oben.
    - **Zu erledigen** (Mitte, `TodoPanel`, so breit wie der Einsatzplan): Anträge (mit
      „Genehmigen“ über `approve_absence` und „Ablehnen“ mit Grund, siehe
      [abwesenheiten.md](abwesenheiten.md)), neu eingegangene Eingangsrechnungen, Fristen

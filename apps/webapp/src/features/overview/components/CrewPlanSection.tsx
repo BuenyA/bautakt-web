@@ -35,6 +35,41 @@ const useStyles = makeStyles({
   noCrew: {
     color: tokens.colorPaletteMarigoldForeground2,
   },
+  // Die Karte ist in der Zeile so hoch wie die Zeitleiste. Der Körper füllt
+  // diese Höhe, sonst klebt der leere Zustand unter dem Kopf.
+  card: {
+    height: '100%',
+  },
+  body: {
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+    minHeight: 0,
+  },
+  empty: {
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: tokens.spacingVerticalS,
+    minHeight: 0,
+    textAlign: 'center',
+  },
+  emptyIcon: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '48px',
+    height: '48px',
+    borderRadius: tokens.borderRadiusCircular,
+    backgroundColor: tokens.colorNeutralBackground3,
+    color: tokens.colorNeutralForeground3,
+  },
+  // Der Spaltenabstand allein lässt den Knopf am Hinweis kleben.
+  emptyAction: {
+    marginTop: tokens.spacingVerticalS,
+  },
 });
 
 /**
@@ -55,9 +90,10 @@ export function CrewPlanSection({
   isLoading: boolean;
 }) {
   const { t } = useTranslation();
+  const styles = useStyles();
 
   return (
-    <Card size="large" className="h-full" id="einsatzplan">
+    <Card size="large" className={styles.card} id="einsatzplan">
       <CardHeader
         image={<PeopleTeamRegular fontSize={20} aria-hidden />}
         header={
@@ -73,27 +109,28 @@ export function CrewPlanSection({
         action={<RouterLink to={routes.assignments}>{t('domain:overview.crew.toPlan')}</RouterLink>}
       />
 
-      <div className={COLUMN_SCROLL}>
+      <div className={mergeClasses(COLUMN_SCROLL, styles.body)}>
         {isLoading ? (
           <div className="flex flex-col gap-3">
             <SkeletonBlock className="h-36 w-full" />
             <SkeletonBlock className="h-36 w-full" />
           </div>
         ) : assignments.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 py-10 text-center">
-            <span className="bg-muted text-muted-foreground flex size-12 items-center justify-center rounded-full">
+          <div className={styles.empty}>
+            <span className={styles.emptyIcon}>
               <PeopleTeamRegular fontSize={24} aria-hidden />
             </span>
             <Text className="text-muted-foreground">{t('domain:overview.crew.empty')}</Text>
             {canPlan ? (
-              <LinkButton
-                to={withCreate(routes.assignments)}
-                appearance="primary"
-                icon={<AddRegular />}
-                className="mt-2"
-              >
-                {t('domain:overview.today.plan')}
-              </LinkButton>
+              <span className={styles.emptyAction}>
+                <LinkButton
+                  to={withCreate(routes.assignments)}
+                  appearance="primary"
+                  icon={<AddRegular />}
+                >
+                  {t('domain:overview.today.plan')}
+                </LinkButton>
+              </span>
             ) : null}
           </div>
         ) : (
