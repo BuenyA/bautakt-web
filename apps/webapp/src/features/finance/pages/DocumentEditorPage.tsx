@@ -1239,6 +1239,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
         kind={labelType}
         pending={busy === 'release'}
         preview={releasePreview}
+        datevDocumentId={dirty ? null : documentId}
         onConfirm={() => void onConfirmRelease()}
         onClose={() => setConfirmRelease(false)}
       />

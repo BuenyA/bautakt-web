@@ -6,6 +6,7 @@ import { useMembership } from '@/features/company/useMembership';
 import { supabase } from '@/lib/supabase';
 
 import { archiveFailureReason, readFunctionErrorDetail } from './archiveError';
+import { type DatevRevenueAccount, sortRevenueAccounts } from './datevAccounts';
 import {
   SALES_DOCUMENT_BUYER_SELECT,
   type SalesDocumentBuyerFields,
@@ -82,6 +83,12 @@ export type SalesDocumentDetail = {
   /** Archiv-Original; bei Entwürfen immer leer. */
   storage_path: string | null;
   content_hash: string | null;
+  /** DATEV-Kopie beim Festschreiben (#187); leer bei Entwürfen, Angeboten und Altbelegen. */
+  datev_chart_of_accounts: string;
+  datev_debtor_account: string;
+  /** `customer`, `collective` (Sammel-Debitor), `parent` (vom Original) oder leer. */
+  datev_debtor_source: string;
+  datev_accounts: DatevRevenueAccount[];
   customer_label: string;
   lines: DocumentLine[];
   payments: DocumentPayment[];
@@ -152,6 +159,7 @@ export function useSalesDocument(id: string | undefined) {
            buyer_reference, buyer_email, parent_document_id,
            payment_term_days, skonto_days, skonto_percent, tax_mode, customer_id,
            storage_path, content_hash, e_invoice, einvoice_format,
+           datev_chart_of_accounts, datev_debtor_account, datev_debtor_source,
            ${SALES_DOCUMENT_BUYER_SELECT},
            sales_document_lines(id, title, description, kind, quantity, unit, unit_price,
              discount_percent, net_amount, tax_rate_percent, sort_order, order_id,
@@ -159,6 +167,8 @@ export function useSalesDocument(id: string | undefined) {
            payments(id, amount, skonto_amount, paid_at, method, note),
            dunning_notices(id, level, notice_date, sent_at, fee_amount, interest_amount),
            finance_send_log(created_at),
+           sales_document_datev_accounts(tax_mode, tax_rate_percent, net_amount,
+             revenue_account, tax_key),
            parent:parent_document_id(id, document_number, type),
            children:sales_documents!parent_document_id(id, document_number, type)`,
         )
@@ -175,6 +185,7 @@ export function useSalesDocument(id: string | undefined) {
           payments: DocumentPayment[];
           dunning_notices: DunningNotice[];
           finance_send_log: { created_at: string }[] | null;
+          sales_document_datev_accounts: DatevRevenueAccount[] | null;
           parent: LinkedDocument | null;
           children: LinkedDocument[] | null;
         };
@@ -192,6 +203,7 @@ export function useSalesDocument(id: string | undefined) {
             .map((entry) => entry.created_at)
             .sort()
             .at(-1) ?? null,
+        datev_accounts: sortRevenueAccounts(row.sales_document_datev_accounts ?? []),
         parent: row.parent ?? null,
         children: row.children ?? [],
       };

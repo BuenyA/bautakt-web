@@ -570,6 +570,18 @@
     "detailTitle": "Rechnung",
     "draftTitle": "Entwurf",
     "details": "Angaben",
+    "datev": {
+      "title": "DATEV",
+      "chart": "Kontenrahmen",
+      "debtor": "Debitor",
+      "debtorSource": {
+        "collective": "{{account}} (Sammel-Debitor)",
+        "parent": "{{account}} (wie Ursprungsbeleg)"
+      },
+      "revenue": "Erlöskonten",
+      "taxKey": "BU {{key}}",
+      "missing": "fehlt"
+    },
     "lines": "Positionen",
     "noLines": "Füge zuerst mindestens eine Position hinzu.",
     "lineColumns": {
@@ -1404,7 +1416,16 @@
       "mismatchTitle": "Nicht freigegeben: Vorschau war nicht aktuell",
       "mismatchDescription": "Der gespeicherte Stand weicht von der angezeigten Vorschau ab. Die Vorschau zeigt jetzt den gespeicherten Stand. Prüf sie und gib dann erneut frei.",
       "originalDiffersTitle": "{{number}} festgeschrieben, weicht aber von der Vorschau ab",
-      "originalDiffersDescription": "Zwischen Vorschau und Festschreiben hat sich etwas geändert, zum Beispiel die Firmendaten. Prüf das Original. Falls es nicht stimmt, storniere den Beleg."
+      "originalDiffersDescription": "Zwischen Vorschau und Festschreiben hat sich etwas geändert, zum Beispiel die Firmendaten. Prüf das Original. Falls es nicht stimmt, storniere den Beleg.",
+      "datev": {
+        "title": "Hinweis für DATEV",
+        "debtorCollective": {
+          "missing": "Der Kunde hat keine Kundennummer. Gebucht wird auf den Sammel-Debitor {{account}}.",
+          "invalid": "Die Kundennummer passt nicht als DATEV-Debitor. Gebucht wird auf den Sammel-Debitor {{account}}."
+        },
+        "debtorUnresolved": "Es gibt keinen Debitor. Ergänze die Kundennummer am Kontakt oder einen Sammel-Debitor in den DATEV-Einstellungen.",
+        "accountMissing": "Für {{tax}} ist kein Erlöskonto hinterlegt. Ergänze es in den DATEV-Einstellungen, sonst fehlt es im Export."
+      }
     },
     "discard": {
       "title": "Änderungen verwerfen?",

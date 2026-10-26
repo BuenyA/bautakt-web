@@ -702,6 +702,53 @@ export function InvoiceDetailPage() {
           <DetailRow label={t('domain:invoices.notes')} value={data.notes} />
         </DetailCard>
 
+        {data.datev_debtor_account || data.datev_accounts.length > 0 ? (
+          <DetailCard title={t('domain:invoices.datev.title')}>
+            <DetailRow
+              label={t('domain:invoices.datev.chart')}
+              value={data.datev_chart_of_accounts}
+            />
+            <DetailRow
+              label={t('domain:invoices.datev.debtor')}
+              value={
+                data.datev_debtor_account
+                  ? data.datev_debtor_source === 'collective' ||
+                    data.datev_debtor_source === 'parent'
+                    ? t(`domain:invoices.datev.debtorSource.${data.datev_debtor_source}`, {
+                        account: data.datev_debtor_account,
+                      })
+                    : data.datev_debtor_account
+                  : t('domain:invoices.datev.missing')
+              }
+            />
+            <DetailRow
+              label={t('domain:invoices.datev.revenue')}
+              value={
+                data.datev_accounts.length === 0 ? null : (
+                  <ul className="flex flex-col gap-1">
+                    {data.datev_accounts.map((entry) => (
+                      <li key={`${entry.tax_mode}|${entry.tax_rate_percent}`}>
+                        {[
+                          entry.revenue_account || t('domain:invoices.datev.missing'),
+                          entry.tax_mode === 'standard'
+                            ? t('domain:datev.rate', { rate: Number(entry.tax_rate_percent) })
+                            : t(`domain:datev.taxModes.${entry.tax_mode}`),
+                          formatMoney(eurosToMinor(entry.net_amount)),
+                          entry.tax_key
+                            ? t('domain:invoices.datev.taxKey', { key: entry.tax_key })
+                            : null,
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </li>
+                    ))}
+                  </ul>
+                )
+              }
+            />
+          </DetailCard>
+        ) : null}
+
         <Card size="large">
           <CardHeader
             header={
@@ -761,6 +808,7 @@ export function InvoiceDetailPage() {
           kind={data.type === 'quote' ? 'quote' : 'invoice'}
           pending={finalize.isPending}
           preview={releasePreview}
+          datevDocumentId={data.id}
           onConfirm={() => void onFinalize()}
           onClose={() => setReleaseOpen(false)}
         />
