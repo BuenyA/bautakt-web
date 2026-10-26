@@ -75,6 +75,7 @@ import {
   openMinorOf,
   overpaidMinorOf,
   paidMinorOf,
+  PreviewMismatchError,
   useArchiveDocument,
   useArchivedPdf,
   useDraftPreview,
@@ -166,16 +167,36 @@ export function InvoiceDetailPage() {
       ? t('domain:invoices.blockersTitle')
       : null;
 
+  // Freigeben nur mit geladener Vorschau dieses Stands (#217).
+  const previewFingerprint = draftPreview.isFetching
+    ? null
+    : (draftPreview.data?.fingerprint ?? null);
+
   async function onFinalize() {
+    if (!previewFingerprint) return;
     try {
-      const { archived, documentNumber, archiveError } = await finalize.mutateAsync();
-      if (archived) toast.success(t('domain:invoices.finalizeSuccess', { number: documentNumber }));
-      else
+      const { archived, documentNumber, archiveError, matchesPreview } = await finalize.mutateAsync(
+        { expectedFingerprint: previewFingerprint },
+      );
+      if (!archived)
         toast.warning(
           t('domain:invoices.archive.finalizedWithoutArchive', { number: documentNumber }),
           { description: archiveError ?? undefined },
         );
+      else if (matchesPreview === false)
+        toast.warning(t('domain:editor.release.originalDiffersTitle', { number: documentNumber }), {
+          description: t('domain:editor.release.originalDiffersDescription'),
+        });
+      else toast.success(t('domain:invoices.finalizeSuccess', { number: documentNumber }));
     } catch (error) {
+      if (error instanceof PreviewMismatchError) {
+        // Etwa in der App geändert, während die Seite offen war.
+        void draftPreview.refetch();
+        toast.warning(t('domain:editor.release.mismatchTitle'), {
+          description: t('domain:editor.release.mismatchDescription'),
+        });
+        return;
+      }
       // Die Datenbank prueft Pflichtangaben (u. a. Steuernummer des Betriebs)
       // und lehnt sonst ab. Ihre Meldung ist praeziser als jeder Text hier.
       toast.error(t('domain:invoices.finalizeError'), {
@@ -730,6 +751,7 @@ export function InvoiceDetailPage() {
           open={releaseOpen}
           kind={data.type === 'quote' ? 'quote' : 'invoice'}
           pending={finalize.isPending}
+          preview={previewFingerprint ? 'ready' : draftPreview.isError ? 'failed' : 'pending'}
           onConfirm={() => void onFinalize()}
           onClose={() => setReleaseOpen(false)}
         />
