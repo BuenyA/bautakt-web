@@ -37,11 +37,12 @@ export function CancelDialog({
   async function onConfirm() {
     setError(null);
     try {
-      const { archived, documentNumber } = await cancel.mutateAsync();
+      const { archived, documentNumber, archiveError } = await cancel.mutateAsync();
       if (archived) toast.success(t('domain:invoices.cancel.success', { number: documentNumber }));
       else
         toast.warning(
           t('domain:invoices.cancel.successWithoutArchive', { number: documentNumber }),
+          { description: archiveError ?? undefined },
         );
       onOpenChange(false);
     } catch (caught) {
