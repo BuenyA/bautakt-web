@@ -194,3 +194,36 @@ export const PLACEHOLDERS: Record<
     iban: 'CH93 0076 2011 6238 5295 7',
   },
 };
+
+/** Rechtsformen wie im CHECK von `companies.legal_form` (#186). */
+export const LEGAL_FORMS = [
+  'einzelunternehmen',
+  'ek',
+  'gbr',
+  'ohg',
+  'kg',
+  'gmbh',
+  'ug',
+  'gmbh_co_kg',
+  'ag',
+  'eg',
+  'other',
+] as const;
+
+/**
+ * Eingetragen: Sitz, Registergericht und -nummer sind Pflicht im
+ * Geschäftsbrief. Gleiche Regel wie `company_legal_footer_missing`.
+ */
+export function legalFormNeedsRegister(legalForm: string): boolean {
+  return ['ek', 'ohg', 'kg', 'gmbh', 'ug', 'gmbh_co_kg', 'ag', 'eg'].includes(legalForm);
+}
+
+/** Kapitalgesellschaften: alle Geschäftsführer bzw. Vorstände (§ 35a GmbHG, § 80 AktG). */
+export function legalFormNeedsDirectors(legalForm: string): boolean {
+  return ['gmbh', 'ug', 'ag'].includes(legalForm);
+}
+
+/** Geschäftsführer stehen auch bei der GmbH & Co. KG im Feld, dort freiwillig. */
+export function legalFormShowsDirectors(legalForm: string): boolean {
+  return legalFormNeedsDirectors(legalForm) || legalForm === 'gmbh_co_kg';
+}

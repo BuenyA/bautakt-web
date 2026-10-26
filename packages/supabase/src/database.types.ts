@@ -410,14 +410,18 @@ export type Database = {
           invoice_intro_text: string
           invoice_prefix: string | null
           is_small_business: boolean | null
+          legal_form: string | null
           logo_image_url: string | null
           logo_url: string | null
+          managing_directors: string[]
           modified_at: string | null
           name: string | null
           next_invoice_number: number
           payment_term_days: number
           phone_number: string | null
           postal_code: string | null
+          register_court: string | null
+          registered_office: string | null
           reminder_days_after_due: number | null
           second_dunning_days_after_due: number | null
           street_address: string | null
@@ -450,14 +454,18 @@ export type Database = {
           invoice_intro_text?: string
           invoice_prefix?: string | null
           is_small_business?: boolean | null
+          legal_form?: string | null
           logo_image_url?: string | null
           logo_url?: string | null
+          managing_directors?: string[]
           modified_at?: string | null
           name?: string | null
           next_invoice_number?: number
           payment_term_days?: number
           phone_number?: string | null
           postal_code?: string | null
+          register_court?: string | null
+          registered_office?: string | null
           reminder_days_after_due?: number | null
           second_dunning_days_after_due?: number | null
           street_address?: string | null
@@ -490,14 +498,18 @@ export type Database = {
           invoice_intro_text?: string
           invoice_prefix?: string | null
           is_small_business?: boolean | null
+          legal_form?: string | null
           logo_image_url?: string | null
           logo_url?: string | null
+          managing_directors?: string[]
           modified_at?: string | null
           name?: string | null
           next_invoice_number?: number
           payment_term_days?: number
           phone_number?: string | null
           postal_code?: string | null
+          register_court?: string | null
+          registered_office?: string | null
           reminder_days_after_due?: number | null
           second_dunning_days_after_due?: number | null
           street_address?: string | null
@@ -3984,6 +3996,10 @@ export type Database = {
       }
       checklist_order_id: { Args: { p_checklist_id: string }; Returns: string }
       checklist_user_id: { Args: { p_checklist_id: string }; Returns: string }
+      company_legal_footer_missing: {
+        Args: { p_company_id: string }
+        Returns: string[]
+      }
       count_active_chefs: {
         Args: { p_company_id: string; p_exclude_employment_id?: string }
         Returns: number

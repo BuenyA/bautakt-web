@@ -571,7 +571,7 @@
     "draftTitle": "Entwurf",
     "details": "Angaben",
     "lines": "Positionen",
-    "noLines": "Keine Positionen erfasst.",
+    "noLines": "Füge zuerst mindestens eine Position hinzu.",
     "lineColumns": {
       "title": "Position",
       "quantity": "Menge",
@@ -618,7 +618,6 @@
     },
     "finalizeSuccess": "Ausgestellt: {{number}}",
     "finalizeError": "Freigeben nicht möglich",
-    "noLines": "Füge zuerst mindestens eine Position hinzu.",
     "creditNote": {
       "action": "Gutschrift erstellen",
       "credited": "Gutgeschrieben"
@@ -1160,6 +1159,42 @@
       },
       "bic": "Diese BIC passt nicht (8 oder 11 Zeichen, Land wie die IBAN).",
       "bankName": "Mindestens 2 Zeichen."
+    },
+    "register": {
+      "title": "Rechtsform und Register",
+      "description": "Diese Angaben stehen als Pflichtangaben in der Fußzeile jeder Mail, die du aus Bautakt versendest.",
+      "legalForm": "Rechtsform",
+      "legalFormPlaceholder": "Rechtsform wählen …",
+      "legalForms": {
+        "einzelunternehmen": "Einzelunternehmen (nicht eingetragen)",
+        "ek": "Eingetragener Kaufmann (e. K.)",
+        "gbr": "GbR",
+        "ohg": "OHG",
+        "kg": "KG",
+        "gmbh": "GmbH",
+        "ug": "UG (haftungsbeschränkt)",
+        "gmbh_co_kg": "GmbH & Co. KG",
+        "ag": "AG",
+        "eg": "eG",
+        "other": "Andere"
+      },
+      "court": "Registergericht",
+      "courtPlaceholder": "z. B. Amtsgericht Stuttgart",
+      "office": "Sitz",
+      "officeHint": "Nur ausfüllen, wenn der Sitz laut Register vom Ort der Anschrift abweicht.",
+      "directors": "Geschäftsführer",
+      "directorsHint": "Alle mit vollem Namen, mehrere durch Komma getrennt.",
+      "directorsPlaceholder": "z. B. Max Muster, Erika Beispiel",
+      "missing": "Für Rechnungen per E-Mail fehlt noch: {{fields}}.",
+      "fields": {
+        "name": "Name des Betriebs",
+        "address": "Anschrift",
+        "legal_form": "Rechtsform",
+        "registered_office": "Sitz",
+        "register_court": "Registergericht",
+        "trade_register": "Registernummer",
+        "managing_directors": "Geschäftsführer"
+      }
     }
   },
   "calendar": {
@@ -1815,5 +1850,68 @@
     "loading": "PDF wird geladen",
     "renderError": "Das PDF lässt sich nicht anzeigen.",
     "empty": "Kein PDF vorhanden."
+  },
+  "send": {
+    "action": "Per E-Mail versenden",
+    "title": "{{number}} per E-Mail versenden",
+    "previewTitle": "Vorschau der E-Mail",
+    "to": "An",
+    "toHint": "Mehrere Empfänger durch Komma trennen.",
+    "subject": "Betreff",
+    "text": "Nachricht",
+    "attachment": "Anhang: {{file}} (Archiv-Original)",
+    "toPreview": "Weiter zur Vorschau",
+    "back": "Zurück",
+    "send": "Jetzt senden",
+    "confirm": "Ich habe Empfänger, Betreff, Text und Anhang geprüft.",
+    "footerIncomplete": "Für den Versand fehlen Pflichtangaben deines Betriebs:",
+    "testMode": {
+      "title": "Testmodus",
+      "description": "Mails gehen nur an freigegebene Testadressen. Der Versand an Kunden wird erst nach Unterzeichnung von AVV und Pilotvertrag freigeschaltet."
+    },
+    "preview": {
+      "from": "Von",
+      "replyTo": "Antwort an",
+      "senderAddress": "rechnungen@mail.bautakt.com"
+    },
+    "footer": {
+      "office": "Sitz",
+      "directors": "Geschäftsführer",
+      "missing": "{{field}} fehlt"
+    },
+    "template": {
+      "invoice": {
+        "subject": "Rechnung {{number}} von {{company}}",
+        "text": "Guten Tag,\n\nanbei erhalten Sie unsere Rechnung {{number}} über {{amount}}.\n\nVielen Dank für Ihren Auftrag.\n\nMit freundlichen Grüßen\n{{company}}",
+        "textWithDue": "Guten Tag,\n\nanbei erhalten Sie unsere Rechnung {{number}} über {{amount}}. Bitte überweisen Sie den Betrag bis zum {{dueDate}}.\n\nVielen Dank für Ihren Auftrag.\n\nMit freundlichen Grüßen\n{{company}}"
+      },
+      "creditNote": {
+        "subject": "Gutschrift {{number}} von {{company}}",
+        "text": "Guten Tag,\n\nanbei erhalten Sie unsere Gutschrift {{number}} über {{amount}}.\n\nMit freundlichen Grüßen\n{{company}}",
+        "textWithDue": "Guten Tag,\n\nanbei erhalten Sie unsere Gutschrift {{number}} über {{amount}}.\n\nMit freundlichen Grüßen\n{{company}}"
+      },
+      "quote": {
+        "subject": "Angebot {{number}} von {{company}}",
+        "text": "Guten Tag,\n\nanbei erhalten Sie unser Angebot {{number}} über {{amount}}.\n\nBei Fragen sind wir gern für Sie da.\n\nMit freundlichen Grüßen\n{{company}}",
+        "textWithDue": "Guten Tag,\n\nanbei erhalten Sie unser Angebot {{number}} über {{amount}}.\n\nBei Fragen sind wir gern für Sie da.\n\nMit freundlichen Grüßen\n{{company}}"
+      }
+    },
+    "errors": {
+      "title": "Die E-Mail wurde nicht versendet.",
+      "noRecipient": "Bitte mindestens eine E-Mail-Adresse angeben.",
+      "invalidRecipient": "Keine gültige E-Mail-Adresse: {{address}}",
+      "subject": "Bitte einen Betreff angeben.",
+      "text": "Bitte eine Nachricht angeben.",
+      "codes": {
+        "not_available": "Der E-Mail-Versand ist noch nicht eingerichtet. Der Beleg bleibt unverändert.",
+        "recipient_not_allowed": "Im Testmodus gehen Mails nur an freigegebene Testadressen. Diese Adresse ist nicht freigegeben.",
+        "legal_footer_incomplete": "Es fehlen Pflichtangaben deines Betriebs für die Fußzeile. Bitte in den Einstellungen ergänzen.",
+        "send_limit_exceeded": "Das Versandlimit deines Betriebs ist erreicht. Bitte später noch einmal versuchen.",
+        "mail_not_configured": "Der E-Mail-Versand ist für deinen Betrieb noch nicht eingerichtet.",
+        "provider_failed": "Der Mail-Dienst hat die E-Mail nicht angenommen. Bitte später noch einmal versuchen.",
+        "forbidden": "Du darfst Belege nicht versenden.",
+        "unknown": "Unbekannter Fehler. Bitte noch einmal versuchen."
+      }
+    }
   }
 }

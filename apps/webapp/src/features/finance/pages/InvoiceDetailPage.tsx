@@ -33,6 +33,7 @@ import {
   DocumentPdfRegular,
   EditRegular,
   MailCheckmarkRegular,
+  MailRegular,
   PrintRegular,
   WalletRegular,
 } from '@fluentui/react-icons';
@@ -64,6 +65,7 @@ import { EInvoiceBadge } from '../EInvoiceBadge';
 import { PaymentSheet } from '../PaymentSheet';
 import { PdfViewer } from '../PdfViewer';
 import { ReleaseDialog } from '../ReleaseDialog';
+import { SendDialog } from '../SendDialog';
 import { useFinalizeBlockers } from '../useFinalizeBlockers';
 import { useFinanceAccess } from '../useFinanceAccess';
 import {
@@ -112,6 +114,7 @@ export function InvoiceDetailPage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [releaseOpen, setReleaseOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
+  const [sendOpen, setSendOpen] = useState(false);
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -195,6 +198,8 @@ export function InvoiceDetailPage() {
 
   const fileBaseName = documentFileBaseName(data.document_number, data.customer_label);
   const archivedBytes = archivedPdf.data ?? null;
+  // Per Mail geht nur das Archiv-Original hinaus (#186), also nur mit Original.
+  const canSendMail = access.canWriteSalesDocuments && isArchived && data.status !== 'cancelled';
   const canMarkSent =
     access.canWriteSalesDocuments && !isDraft && data.status !== 'cancelled' && !data.sent_at;
   // Wie `cancel_sales_document`: nur freigegebene, nicht stornierte Rechnungen.
@@ -319,6 +324,12 @@ export function InvoiceDetailPage() {
                   </MenuList>
                 </MenuPopover>
               </Menu>
+            ) : null}
+
+            {canSendMail ? (
+              <Button icon={<MailRegular />} onClick={() => setSendOpen(true)}>
+                {t('domain:send.action')}
+              </Button>
             ) : null}
 
             {canMarkSent ? (
@@ -707,6 +718,10 @@ export function InvoiceDetailPage() {
 
       {canCancel ? (
         <CancelDialog documentId={data.id} open={cancelOpen} onOpenChange={setCancelOpen} />
+      ) : null}
+
+      {canSendMail ? (
+        <SendDialog open={sendOpen} document={data} onClose={() => setSendOpen(false)} />
       ) : null}
 
       {isDraft ? (

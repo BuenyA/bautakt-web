@@ -16,6 +16,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useLegalFooterMissing } from '@/features/company/useLegalFooter';
 import { useMembership } from '@/features/company/useMembership';
 import { SectionCard } from '@/features/contacts/SectionCard';
 import { readableDbError } from '@/lib/dbErrors';
@@ -34,6 +35,10 @@ import {
   isValidTaxNumber,
   isValidTradeRegister,
   isValidVatId,
+  LEGAL_FORMS,
+  legalFormNeedsDirectors,
+  legalFormNeedsRegister,
+  legalFormShowsDirectors,
   normalizeIban,
   PLACEHOLDERS,
   toCompanyCountry,
@@ -52,6 +57,10 @@ export type CompanyMasterData = {
   tax_number: string | null;
   vat_id: string | null;
   trade_register: string | null;
+  legal_form: string | null;
+  register_court: string | null;
+  managing_directors: string[] | null;
+  registered_office: string | null;
   is_small_business: boolean | null;
   iban: string | null;
   bic: string | null;
@@ -81,9 +90,13 @@ function useUpdateCompany() {
     onSuccess: async () => {
       // Steuer-IDs und Kleinunternehmer lesen Editor und Belegseite getrennt.
       await Promise.all(
-        ['company-settings', 'company-tax-ids', 'company-tax-profile'].map((key) =>
-          queryClient.invalidateQueries({ queryKey: [key, companyId] }),
-        ),
+        [
+          'company-settings',
+          'company-tax-ids',
+          'company-tax-profile',
+          'company-legal-missing',
+          'company-legal-details',
+        ].map((key) => queryClient.invalidateQueries({ queryKey: [key, companyId] })),
       );
       await queryClient.invalidateQueries({ queryKey: ['membership'] });
     },
@@ -346,6 +359,154 @@ export function CompanyCard({
 
 // ---------------------------------------------------------------------------
 
+/** Mehrere Geschäftsführer in einem Feld, durch Komma getrennt. */
+const splitNames = (value: string) =>
+  value
+    .split(',')
+    .map((name) => name.trim())
+    .filter(Boolean);
+
+/**
+ * Rechtsform und Register: die Pflichtangaben in Geschäftsbriefen und Mails
+ * (§ 35a GmbHG, § 37a HGB, #186). Welche Felder erscheinen, hängt an der
+ * Rechtsform; die Registernummer (`trade_register`) steht seit #186 hier.
+ */
+export function RegisterCard({
+  company,
+  canEdit,
+}: {
+  company: CompanyMasterData;
+  canEdit: boolean;
+}) {
+  const { t } = useTranslation();
+  const update = useUpdateCompany();
+  const missing = useLegalFooterMissing();
+  const country = toCompanyCountry(company.country);
+  const form = useCardForm(
+    {
+      legal_form: text(company.legal_form),
+      register_court: text(company.register_court),
+      trade_register: text(company.trade_register),
+      managing_directors: (company.managing_directors ?? []).join(', '),
+      registered_office: text(company.registered_office),
+    },
+    (v) => ({
+      trade_register: !isValidTradeRegister(v.trade_register, country)
+        ? t(`domain:settings.errors.tradeRegister.${country}`)
+        : undefined,
+    }),
+  );
+  const save = useSave(update, form.reset);
+  const v = form.values;
+  const needsRegister = legalFormNeedsRegister(v.legal_form);
+  const showDirectors = legalFormShowsDirectors(v.legal_form);
+  // Gespeicherter Stand: der Hinweis sagt, was beim Versenden fehlt.
+  const missingFields = missing.data ?? [];
+
+  return (
+    <FormCard
+      title={t('domain:settings.register.title')}
+      description={t('domain:settings.register.description')}
+      canEdit={canEdit}
+      dirty={form.dirty}
+      saving={update.isPending}
+      onSave={() => {
+        form.submit();
+        if (form.hasErrors) return;
+        // Ohne Registerpflicht nichts Altes stehen lassen, das sonst in der
+        // Fußzeile landen würde.
+        void save({
+          legal_form: v.legal_form || null,
+          register_court: needsRegister ? v.register_court.trim() || null : null,
+          trade_register: needsRegister ? v.trade_register.trim() : '',
+          registered_office: needsRegister ? v.registered_office.trim() || null : null,
+          managing_directors: showDirectors ? splitNames(v.managing_directors) : [],
+        });
+      }}
+    >
+      {missingFields.length > 0 ? (
+        <MessageBar intent="warning" layout="multiline">
+          <MessageBarBody>
+            {t('domain:settings.register.missing', {
+              fields: missingFields
+                .map((field) => t(`domain:settings.register.fields.${field}`))
+                .join(', '),
+            })}
+          </MessageBarBody>
+        </MessageBar>
+      ) : null}
+      <Field label={t('domain:settings.register.legalForm')} required>
+        <Select
+          value={v.legal_form}
+          disabled={!canEdit}
+          onChange={(_, d) => form.set({ legal_form: d.value })}
+        >
+          <option value="" disabled>
+            {t('domain:settings.register.legalFormPlaceholder')}
+          </option>
+          {LEGAL_FORMS.map((legalForm) => (
+            <option key={legalForm} value={legalForm}>
+              {t(`domain:settings.register.legalForms.${legalForm}`)}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      {needsRegister ? (
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label={t('domain:settings.register.court')} required>
+            <Input
+              value={v.register_court}
+              placeholder={t('domain:settings.register.courtPlaceholder')}
+              disabled={!canEdit}
+              onChange={(_, d) => form.set({ register_court: d.value })}
+            />
+          </Field>
+          <Field
+            label={t('domain:settings.tradeRegister')}
+            required
+            validationMessage={form.errorFor('trade_register')}
+          >
+            <Input
+              value={v.trade_register}
+              placeholder={PLACEHOLDERS[country].tradeRegister}
+              disabled={!canEdit}
+              onChange={(_, d) => form.set({ trade_register: d.value })}
+            />
+          </Field>
+          <Field
+            label={t('domain:settings.register.office')}
+            hint={t('domain:settings.register.officeHint')}
+            className="md:col-span-2"
+          >
+            <Input
+              value={v.registered_office}
+              placeholder={company.city ?? ''}
+              disabled={!canEdit}
+              onChange={(_, d) => form.set({ registered_office: d.value })}
+            />
+          </Field>
+        </div>
+      ) : null}
+      {showDirectors ? (
+        <Field
+          label={t('domain:settings.register.directors')}
+          required={legalFormNeedsDirectors(v.legal_form)}
+          hint={t('domain:settings.register.directorsHint')}
+        >
+          <Input
+            value={v.managing_directors}
+            placeholder={t('domain:settings.register.directorsPlaceholder')}
+            disabled={!canEdit}
+            onChange={(_, d) => form.set({ managing_directors: d.value })}
+          />
+        </Field>
+      ) : null}
+    </FormCard>
+  );
+}
+
+// ---------------------------------------------------------------------------
+
 export function LegalCard({ company, canEdit }: { company: CompanyMasterData; canEdit: boolean }) {
   const { t } = useTranslation();
   const update = useUpdateCompany();
@@ -354,7 +515,6 @@ export function LegalCard({ company, canEdit }: { company: CompanyMasterData; ca
     {
       tax_number: text(company.tax_number),
       vat_id: text(company.vat_id),
-      trade_register: text(company.trade_register),
       is_small_business: Boolean(company.is_small_business),
     },
     (v) => ({
@@ -365,9 +525,6 @@ export function LegalCard({ company, canEdit }: { company: CompanyMasterData; ca
         v.vat_id.trim() && !isValidVatId(v.vat_id, country)
           ? t(`domain:settings.errors.vatId.${country}`)
           : undefined,
-      trade_register: !isValidTradeRegister(v.trade_register, country)
-        ? t(`domain:settings.errors.tradeRegister.${country}`)
-        : undefined,
     }),
   );
   const save = useSave(update, form.reset);
@@ -388,7 +545,6 @@ export function LegalCard({ company, canEdit }: { company: CompanyMasterData; ca
         void save({
           tax_number: v.tax_number.trim(),
           vat_id: v.vat_id.trim().toUpperCase(),
-          trade_register: v.trade_register.trim(),
           is_small_business: v.is_small_business,
         });
       }}
@@ -418,17 +574,6 @@ export function LegalCard({ company, canEdit }: { company: CompanyMasterData; ca
           onChange={(_, d) =>
             form.set({ vat_id: d.value.toUpperCase().replace(/[^A-Z0-9.\-\s]/g, '') })
           }
-        />
-      </Field>
-      <Field
-        label={t('domain:settings.tradeRegister')}
-        validationMessage={form.errorFor('trade_register')}
-      >
-        <Input
-          value={v.trade_register}
-          placeholder={PLACEHOLDERS[country].tradeRegister}
-          disabled={!canEdit}
-          onChange={(_, d) => form.set({ trade_register: d.value })}
         />
       </Field>
       <Field hint={t('domain:settings.smallBusinessHint')}>
