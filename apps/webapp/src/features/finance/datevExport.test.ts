@@ -2,13 +2,18 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
+import { unzipSync } from 'fflate';
+
 import {
+  buildZip,
   monthOptions,
   monthValue,
   parseMonthValue,
   previousMonth,
   readCheckResponse,
   readExportResponse,
+  zipEntryNames,
+  zipFileName,
 } from './datevExport.ts';
 
 describe('Monatsauswahl', () => {
@@ -45,6 +50,7 @@ describe('Antwort von datev-export', () => {
       findings: [
         { code: 'collective_debtor', severity: 'warning', document: 'RE00011', value: '69999' },
       ],
+      documents: [{ id: 'd1', document_number: 'RE00011', document_field1: 'RE00011' }],
     });
     assert.equal(outcome.kind, 'file');
     if (outcome.kind !== 'file') return;
@@ -52,6 +58,9 @@ describe('Antwort von datev-export', () => {
     assert.deepEqual([...outcome.bytes], [...Buffer.from('"EXTF";700', 'latin1')]);
     assert.deepEqual(outcome.findings, [
       { code: 'collective_debtor', severity: 'warning', document: 'RE00011', value: '69999' },
+    ]);
+    assert.deepEqual(outcome.documents, [
+      { id: 'd1', documentNumber: 'RE00011', documentField1: 'RE00011' },
     ]);
   });
 
@@ -115,6 +124,7 @@ describe('Prüfung vor dem Download', () => {
         findings: [
           { code: 'chars_replaced', severity: 'warning', document: 'RE00002', value: 'Ł' },
         ],
+        documents: [{ id: 'd2', document_number: 'RE00002', document_field1: 'RE00002' }],
       }),
       {
         kind: 'checked',
@@ -123,6 +133,7 @@ describe('Prüfung vor dem Download', () => {
         findings: [
           { code: 'chars_replaced', severity: 'warning', document: 'RE00002', value: 'Ł' },
         ],
+        documents: [{ id: 'd2', documentNumber: 'RE00002', documentField1: 'RE00002' }],
       },
     );
   });
@@ -134,6 +145,7 @@ describe('Prüfung vor dem Download', () => {
       importable: false,
       bookings: 0,
       findings: [{ code: 'debtor_missing', severity: 'error', document: 'RE00003' }],
+      documents: [],
     });
     assert.equal(outcome.kind, 'checked');
     assert.equal(outcome.kind === 'checked' && outcome.importable, false);
@@ -145,5 +157,51 @@ describe('Prüfung vor dem Download', () => {
       reason: 'unknown',
     });
     assert.deepEqual(readCheckResponse(403, {}), { kind: 'failed', reason: 'forbidden' });
+  });
+});
+
+describe('Beleg-ZIP', () => {
+  const ref = (id: string, field1: string) => ({
+    id,
+    documentNumber: field1,
+    documentField1: field1,
+  });
+
+  it('Dateiname = Belegfeld 1, verbotene Zeichen ersetzt, Dubletten nummeriert', () => {
+    const names = zipEntryNames([
+      ref('a', 'RE00010'),
+      ref('b', 'RE-2026/0001'),
+      ref('c', 'X*1'),
+      ref('d', 're00010'),
+      ref('e1234567-0000', ''),
+    ]);
+    assert.deepEqual(
+      [...names.values()],
+      ['RE00010.pdf', 'RE-2026_0001.pdf', 'X_1.pdf', 're00010_2.pdf', 'Beleg_e1234567.pdf'],
+    );
+  });
+
+  it('Name des ZIP je Monat', () => {
+    assert.equal(zipFileName({ year: 2026, month: 3 }), 'Belege_Ausgang_2026-03.zip');
+  });
+
+  it('ZIP enthält die Bytes unverändert', () => {
+    const pdf = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0xff, 0x00]);
+    const files = unzipSync(buildZip([{ name: 'RE00010.pdf', bytes: pdf }]));
+    assert.deepEqual(Object.keys(files), ['RE00010.pdf']);
+    assert.deepEqual([...files['RE00010.pdf']!], [...pdf]);
+  });
+
+  it('Antwort ohne Belegliste gilt als Fehler', () => {
+    assert.deepEqual(
+      readCheckResponse(200, {
+        ok: true,
+        check_only: true,
+        importable: true,
+        bookings: 1,
+        findings: [],
+      }),
+      { kind: 'failed', reason: 'unknown' },
+    );
   });
 });

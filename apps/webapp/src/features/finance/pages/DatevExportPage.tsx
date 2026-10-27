@@ -21,7 +21,9 @@ import { supabase } from '@/lib/supabase';
 
 import { downloadBytes } from '../archiveFiles';
 import {
+  buildZip,
   type CheckOutcome,
+  type ExportDocumentRef,
   type ExportMonth,
   type ExportOutcome,
   type FailureReason,
@@ -32,6 +34,8 @@ import {
   previousMonth,
   readCheckResponse,
   readExportResponse,
+  zipEntryNames,
+  zipFileName,
 } from '../datevExport';
 import { FinanceHeader } from '../FinanceHeader';
 
@@ -51,6 +55,55 @@ async function invokeExport(body: object): Promise<{ status: number; body: unkno
   const response: unknown = (error as { context?: unknown }).context;
   if (!(response instanceof Response)) throw error;
   return { status: response.status, body: await response.json().catch(() => null) };
+}
+
+type DownloadResult =
+  | { kind: 'downloaded'; csvName: string; zipName: string; documents: number }
+  | Exclude<ExportOutcome, { kind: 'file' }>;
+
+/** Festgeschriebene Belege ohne Archiv-PDF: ohne Original kein Beleg-ZIP. */
+class ArchiveMissingError extends Error {
+  readonly documents: string[];
+  constructor(documents: string[]) {
+    super('ARCHIVE_MISSING');
+    this.documents = documents;
+  }
+}
+
+/**
+ * Archiv-PDFs der Belege laden und als ZIP packen, jede Datei benannt nach
+ * Belegfeld 1. Pfad und PDF kommen mit den Rechten des Nutzers (RLS auf
+ * `sales_documents`, Storage-Policy auf `finance-documents`), wie beim
+ * Öffnen eines Belegs.
+ */
+async function buildBelegZip(
+  companyId: string,
+  documents: readonly ExportDocumentRef[],
+): Promise<Uint8Array> {
+  const ids = documents.map((document) => document.id);
+  const { data, error } = await supabase
+    .from('sales_documents')
+    .select('id, storage_path')
+    .eq('company_id', companyId)
+    .in('id', ids);
+  if (error) throw error;
+  const paths = new Map((data ?? []).map((row) => [row.id, row.storage_path]));
+  const missing = documents.filter((document) => !paths.get(document.id));
+  if (missing.length > 0) {
+    throw new ArchiveMissingError(missing.map((document) => document.documentNumber));
+  }
+
+  const names = zipEntryNames(documents);
+  const entries = await Promise.all(
+    documents.map(async (document) => {
+      const { data: file, error: fileError } = await supabase.storage
+        .from('finance-documents')
+        .download(paths.get(document.id)!);
+      if (fileError || !file) throw fileError ?? new Error('ARCHIVE_MISSING');
+      return { name: names.get(document.id)!, bytes: new Uint8Array(await file.arrayBuffer()) };
+    }),
+  );
+  return buildZip(entries);
 }
 
 function FindingList({ findings }: { findings: Finding[] }) {
@@ -154,16 +207,26 @@ export function DatevExportPage() {
   });
 
   const download = useMutation({
-    mutationFn: async (target: ExportMonth): Promise<ExportOutcome> => {
+    mutationFn: async (target: ExportMonth): Promise<DownloadResult> => {
       const response = await invokeExport({ company_id: companyId, ...target });
       const outcome = readExportResponse(response.status, response.body);
-      if (outcome.kind === 'file') {
-        downloadBytes(outcome.bytes, outcome.fileName, 'text/csv;charset=windows-1252');
-      } else {
+      if (outcome.kind !== 'file') {
         // Zwischen Prüfung und Download hat sich etwas geändert: neu prüfen.
         void check.refetch();
+        return outcome;
       }
-      return outcome;
+      // Erst alles bauen, dann beide Dateien geben: Scheitert ein PDF, gibt
+      // es auch keinen Buchungsstapel ohne seine Belege.
+      const zip = await buildBelegZip(companyId!, outcome.documents);
+      const zipName = zipFileName(target);
+      downloadBytes(outcome.bytes, outcome.fileName, 'text/csv;charset=windows-1252');
+      downloadBytes(zip, zipName, 'application/zip');
+      return {
+        kind: 'downloaded',
+        csvName: outcome.fileName,
+        zipName,
+        documents: outcome.documents.length,
+      };
     },
   });
 
@@ -199,7 +262,7 @@ export function DatevExportPage() {
             disabled={!ready || download.isPending}
             onClick={start}
           >
-            {t('domain:datevExport.downloadCsv')}
+            {t('domain:datevExport.download')}
           </Button>
         </div>
 
@@ -211,14 +274,28 @@ export function DatevExportPage() {
           <CheckResult check={check.data} onRetry={() => void check.refetch()} />
         ) : null}
 
-        {download.isError ? <FailureBar reason="unknown" onRetry={start} /> : null}
+        {download.error instanceof ArchiveMissingError ? (
+          <MessageBar intent="error" layout="multiline">
+            <MessageBarBody>
+              {t('domain:datevExport.archiveMissing', {
+                documents: download.error.documents.join(', '),
+              })}
+            </MessageBarBody>
+          </MessageBar>
+        ) : download.isError ? (
+          <FailureBar reason="unknown" onRetry={start} />
+        ) : null}
         {download.data?.kind === 'failed' ? (
           <FailureBar reason={download.data.reason} onRetry={start} />
         ) : null}
-        {download.data?.kind === 'file' ? (
+        {download.data?.kind === 'downloaded' ? (
           <MessageBar intent="success" layout="multiline">
             <MessageBarBody>
-              {t('domain:datevExport.downloaded', { fileName: download.data.fileName })}
+              {t('domain:datevExport.downloaded', {
+                csvName: download.data.csvName,
+                zipName: download.data.zipName,
+                count: download.data.documents,
+              })}
             </MessageBarBody>
           </MessageBar>
         ) : null}

@@ -8,7 +8,12 @@
  * erklärt, warum ein Export nicht geht.
  */
 
+import { zipSync } from 'fflate';
+
 export type ExportMonth = { year: number; month: number };
+
+/** Beleg im Export: ID und Belegfeld 1, wie es im Buchungsstapel steht. */
+export type ExportDocumentRef = { id: string; documentNumber: string; documentField1: string };
 
 /** Befund-Codes von `datev-export` (`bookings.ts`). */
 export const FINDING_CODES = [
@@ -39,7 +44,14 @@ export type Finding = {
 };
 
 export type ExportOutcome =
-  | { kind: 'file'; fileName: string; bytes: Uint8Array; bookings: number; findings: Finding[] }
+  | {
+      kind: 'file';
+      fileName: string;
+      bytes: Uint8Array;
+      bookings: number;
+      findings: Finding[];
+      documents: ExportDocumentRef[];
+    }
   | { kind: 'empty'; findings: Finding[] }
   | { kind: 'blocked'; findings: Finding[] }
   | { kind: 'failed'; reason: FailureReason };
@@ -48,7 +60,13 @@ export type FailureReason = 'auth' | 'forbidden' | 'unknown';
 
 /** Prüfung vor dem Download (`check_only`, #169). */
 export type CheckOutcome =
-  | { kind: 'checked'; importable: boolean; bookings: number; findings: Finding[] }
+  | {
+      kind: 'checked';
+      importable: boolean;
+      bookings: number;
+      findings: Finding[];
+      documents: ExportDocumentRef[];
+    }
   | { kind: 'failed'; reason: FailureReason };
 
 /**
@@ -124,6 +142,25 @@ function readFindings(value: unknown): { findings: Finding[]; unknown: number } 
   return { findings, unknown };
 }
 
+/** Belegliste der Function; `null`, wenn sie fehlt oder kaputt ist. */
+function readDocuments(value: unknown): ExportDocumentRef[] | null {
+  if (!Array.isArray(value)) return null;
+  const out: ExportDocumentRef[] = [];
+  for (const entry of value) {
+    if (!entry || typeof entry !== 'object') return null;
+    const { id, document_number, document_field1 } = entry as Record<string, unknown>;
+    if (
+      typeof id !== 'string' ||
+      typeof document_number !== 'string' ||
+      typeof document_field1 !== 'string'
+    ) {
+      return null;
+    }
+    out.push({ id, documentNumber: document_number, documentField1: document_field1 });
+  }
+  return out;
+}
+
 /**
  * Antwort von `datev-export` einordnen. `status` ist der HTTP-Status,
  * `body` das gelesene JSON (oder `null`, wenn keins kam).
@@ -134,6 +171,7 @@ export function readExportResponse(status: number, body: unknown): ExportOutcome
   if (status === 403) return { kind: 'failed', reason: 'forbidden' };
 
   const { findings, unknown } = readFindings(payload.findings);
+  const documents = readDocuments(payload.documents);
   if (status === 422 && payload.error === 'export_blocked') {
     return { kind: 'blocked', findings };
   }
@@ -147,7 +185,8 @@ export function readExportResponse(status: number, body: unknown): ExportOutcome
     typeof payload.content_base64 !== 'string' ||
     typeof payload.file_name !== 'string' ||
     typeof payload.bookings !== 'number' ||
-    payload.bookings <= 0
+    payload.bookings <= 0 ||
+    documents === null
   ) {
     return { kind: 'failed', reason: 'unknown' };
   }
@@ -157,6 +196,7 @@ export function readExportResponse(status: number, body: unknown): ExportOutcome
     bytes: base64ToBytes(payload.content_base64),
     bookings: payload.bookings,
     findings,
+    documents,
   };
 }
 
@@ -169,15 +209,57 @@ export function readCheckResponse(status: number, body: unknown): CheckOutcome {
   if (status === 401) return { kind: 'failed', reason: 'auth' };
   if (status === 403) return { kind: 'failed', reason: 'forbidden' };
   const { findings, unknown } = readFindings(payload.findings);
+  const documents = readDocuments(payload.documents);
   if (
     status !== 200 ||
     payload.ok !== true ||
     payload.check_only !== true ||
     typeof payload.importable !== 'boolean' ||
     typeof payload.bookings !== 'number' ||
-    unknown > 0
+    unknown > 0 ||
+    documents === null
   ) {
     return { kind: 'failed', reason: 'unknown' };
   }
-  return { kind: 'checked', importable: payload.importable, bookings: payload.bookings, findings };
+  return {
+    kind: 'checked',
+    importable: payload.importable,
+    bookings: payload.bookings,
+    findings,
+    documents,
+  };
+}
+
+export function zipFileName({ year, month }: ExportMonth): string {
+  return `Belege_Ausgang_${year}-${String(month).padStart(2, '0')}.zip`;
+}
+
+/**
+ * Dateiname je Beleg im ZIP: Belegfeld 1 + `.pdf`, damit die Steuerberatung
+ * Buchung und Beleg zusammenbringt. `/` und `*` erlaubt DATEV im Belegfeld,
+ * Windows aber nicht im Dateinamen; sie werden zu `_`. Doppelte Namen
+ * bekommen `_2`, `_3` …, statt sich im ZIP zu überschreiben.
+ */
+export function zipEntryNames(documents: readonly ExportDocumentRef[]): Map<string, string> {
+  const names = new Map<string, string>();
+  const used = new Set<string>();
+  for (const document of documents) {
+    const base =
+      document.documentField1.replace(/[/*]/g, '_') || `Beleg_${document.id.slice(0, 8)}`;
+    let name = `${base}.pdf`;
+    for (let index = 2; used.has(name.toLowerCase()); index += 1) name = `${base}_${index}.pdf`;
+    used.add(name.toLowerCase());
+    names.set(document.id, name);
+  }
+  return names;
+}
+
+/**
+ * ZIP ohne Kompression: PDFs sind schon komprimiert, ein zweites Mal
+ * spart nichts und kostet nur Zeit im Browser.
+ */
+export function buildZip(entries: readonly { name: string; bytes: Uint8Array }[]): Uint8Array {
+  return zipSync(
+    Object.fromEntries(entries.map((entry) => [entry.name, [entry.bytes, { level: 0 }]])),
+  );
 }
