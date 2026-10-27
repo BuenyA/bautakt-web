@@ -84,7 +84,13 @@ describe('Rechtsseiten ohne Sitzung', () => {
 
     expect(privacy).toContain('Datenschutzerklärung');
     expect(privacy).toContain(MAPS_SENTENCE);
-    expect(privacy).toContain('<table');
+    expect(privacy.match(/<table/g)).toHaveLength(2);
+    expect(privacy.match(/overflow-x-auto/g)).toHaveLength(2);
+    expect(privacy).toContain('bautakt_sidebar_state');
+    expect(privacy).toContain('bautakt-theme');
+    expect(privacy).toContain('bautakt-calendar-settings:');
+    expect(privacy).toContain('sb-…-auth-token');
+    expect(privacy).toContain('sb-…-code-verifier');
     expect(privacy).toContain('<br');
     expect(privacy).not.toContain('{{ANSCHRIFT}}');
     expect(privacy).not.toContain('{{TELEFON}}');

@@ -56,7 +56,17 @@ Für Verträge mit Betrieben verarbeiten wir Firmen- und Kontaktdaten der Anspre
 
 ## 8. Cookies und lokale Speicherung
 
-Wir setzen keine Cookies und keine Analyse-, Tracking- oder Marketing-Dienste ein. Damit Sie angemeldet bleiben, speichert die Anwendung technisch notwendige Sitzungsinformationen (Zugriffs- und Erneuerungstoken) im lokalen Speicher (Local Storage) Ihres Browsers. Diese Speicherung ist für den von Ihnen gewünschten Dienst unbedingt erforderlich und daher nach § 25 Abs. 2 Nr. 2 TDDDG ohne Einwilligung zulässig. Beim Abmelden wird der Eintrag entfernt; das Zugriffstoken läuft zudem nach kurzer Zeit ab und wird während der Nutzung automatisch erneuert.
+Wir setzen keine Analyse-, Tracking- oder Marketing-Dienste ein und keine Cookies oder Speichertechniken von Drittanbietern. Die Anwendung speichert auf Ihrem Endgerät ausschließlich folgende technisch notwendige Informationen:
+
+| Name | Art | Zweck | Speicherdauer |
+|---|---|---|---|
+| sb-…-auth-token | Local Storage | Anmeldesitzung (Zugriffs- und Erneuerungstoken) | bis zum Abmelden |
+| sb-…-code-verifier | Local Storage | Absicherung des Anmeldevorgangs | nur während der Anmeldung |
+| bautakt_sidebar_state | Cookie (nur von uns, kein Drittanbieter) | merkt, ob die Seitenleiste eingeklappt ist | 1 Jahr |
+| bautakt-theme | Local Storage | gewählte Darstellung (hell, dunkel oder System) | bis Sie sie ändern oder den Browserspeicher löschen |
+| bautakt-calendar-settings:… | Local Storage | von Ihnen gewählte Farben und sichtbare Eintragsarten im Kalender | bis Sie sie ändern oder den Browserspeicher löschen |
+
+Diese Speicherungen sind erforderlich, damit wir den von Ihnen ausdrücklich gewünschten Dienst bereitstellen können: die Anmeldung und die von Ihnen selbst gewählten Einstellungen. Sie sind deshalb nach § 25 Abs. 2 Nr. 2 TDDDG ohne Einwilligung zulässig. Eine Auswertung zu anderen Zwecken findet nicht statt. Sie können die Einträge jederzeit über die Einstellungen Ihres Browsers löschen. Danach müssen Sie sich neu anmelden, und die Einstellungen werden zurückgesetzt.
 
 ## 9. Empfänger und Dienstleister
 

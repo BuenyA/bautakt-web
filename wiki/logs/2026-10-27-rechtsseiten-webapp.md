@@ -24,7 +24,9 @@ Die Marketing-App ist unverändert. `apps/webapp/vercel.json` hatte den
 Catch-all schon.
 
 Der Wortlaut der beiden Markdown-Dateien ist 1:1 der gelieferte Text.
-`{{TELEFON}}` bleibt der offene Platzhalter im Impressum.
+`{{TELEFON}}` bleibt der offene Platzhalter im Impressum. Abschnitt 8
+zählt die Speichereinträge in einer eigenen Tabelle, Abschnitt 9 die
+Dienstleister. Beide Tabellen sitzen in `overflow-x-auto`.
 
 ## Warum
 
