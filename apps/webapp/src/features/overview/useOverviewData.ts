@@ -1,23 +1,10 @@
-import {
-  buildReceivables,
-  computeOpenTasks,
-  computeOverviewKpis,
-  computeYearResult,
-  monthlyRevenue,
-  monthlyTotals,
-  monthRange,
-  type ReceivableItem,
-} from '@bautakt/finance';
+import { buildReceivables, computeOpenTasks, type ReceivableItem } from '@bautakt/finance';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 import { useMembership } from '@/features/company/useMembership';
 import { usePermission } from '@/features/company/usePermission';
-import {
-  expenseEntries,
-  useExpenses,
-  useIncomingInvoiceList,
-} from '@/features/finance/useExpenses';
+import { useIncomingInvoiceList } from '@/features/finance/useExpenses';
 import { useFinanceAccess } from '@/features/finance/useFinanceAccess';
 import {
   INVOICE_TYPE_LIST,
@@ -35,7 +22,6 @@ import {
   parseLocalIso,
 } from './today';
 import {
-  useLaborInputs,
   useOrderEndDates,
   useOverviewAbsences,
   useSubcontractorExemptions,
@@ -76,7 +62,6 @@ const DEADLINE_HORIZON_DAYS = 7;
 export function useOverviewData() {
   const access = useFinanceAccess();
   const canManageAbsences = usePermission('canManageAbsences');
-  const canViewWageCosts = usePermission('canViewWageCosts');
   const canPlan = usePermission('canManageWorkAssignments');
   const canManageSuppliers = usePermission('canManageSuppliers');
   const finance = access.canViewCompanyFinance;
@@ -91,9 +76,7 @@ export function useOverviewData() {
   const documents = useSalesDocuments(INVOICE_TYPE_LIST);
   const payments = usePayments();
   const dunned = useDunnedDocumentIds(finance);
-  const expenses = useExpenses();
   const incoming = useIncomingInvoiceList();
-  const labor = useLaborInputs(finance && canViewWageCosts);
   const orderEnds = useOrderEndDates(canPlan || finance, horizonIso);
   const subcontractors = useSubcontractorExemptions(canManageSuppliers);
 
@@ -115,38 +98,16 @@ export function useOverviewData() {
   const financeView = useMemo(() => {
     const docs = documents.data ?? [];
     const pays = payments.data ?? [];
-    const incomingRows = incoming.data ?? [];
-    const month = todayIso.slice(0, 7);
-    const months = monthRange(month, Number(month.slice(5, 7)));
     const receivables = buildReceivables(docs, pays, todayIso);
 
     return {
-      kpis: computeOverviewKpis(docs, pays, month, todayIso),
-      tasks: computeOpenTasks(docs, pays, incomingRows, new Set(dunned.data ?? [])),
-      result: computeYearResult({
-        documents: docs,
-        expenses: expenses.data ?? [],
-        incoming: incomingRows,
-        labor: canViewWageCosts && labor.data ? labor.data : null,
-        referenceIso: todayIso,
-      }),
-      revenueByMonth: monthlyRevenue(docs, months),
-      expensesByMonth: monthlyTotals(expenseEntries(expenses.data ?? [], incomingRows), months),
+      tasks: computeOpenTasks(docs, pays, incoming.data ?? [], new Set(dunned.data ?? [])),
       overdue: receivables
         .filter((item) => item.daysOverdue > 0)
         .sort((a, b) => b.daysOverdue - a.daysOverdue),
       upcomingInvoices: receivables.filter((item) => item.daysOverdue === 0),
     };
-  }, [
-    documents.data,
-    payments.data,
-    incoming.data,
-    dunned.data,
-    expenses.data,
-    labor.data,
-    canViewWageCosts,
-    todayIso,
-  ]);
+  }, [documents.data, payments.data, incoming.data, dunned.data, todayIso]);
 
   const incomingView = useMemo(() => {
     if (!access.canViewExpenses) return [];
@@ -190,7 +151,7 @@ export function useOverviewData() {
   );
 
   return {
-    access: { ...access, canManageAbsences, canViewWageCosts, canPlan },
+    access: { ...access, canManageAbsences, canPlan },
     today: {
       assignments: assignments.data ?? [],
       events: events.data ?? [],
@@ -207,19 +168,6 @@ export function useOverviewData() {
       tasks: finance ? financeView.tasks : null,
       isLoading: absences.isPending || incoming.isPending,
     },
-    finance: finance
-      ? {
-          ...financeView,
-          laborIncluded: canViewWageCosts,
-          isLoading:
-            documents.isPending ||
-            payments.isPending ||
-            expenses.isPending ||
-            incoming.isPending ||
-            (canViewWageCosts && labor.isPending),
-          isError: documents.isError || payments.isError || expenses.isError || incoming.isError,
-        }
-      : null,
   };
 }
 

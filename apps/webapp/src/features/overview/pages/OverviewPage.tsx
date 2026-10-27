@@ -6,7 +6,6 @@ import { CrewPlanSection } from '../components/CrewPlanSection';
 import { OverviewGreeting } from '../components/OverviewGreeting';
 import { TodayPlanCard } from '../components/TodayPlanCard';
 import { TodoPanel } from '../components/TodoPanel';
-import { YearKpiRow } from '../components/YearKpiRow';
 import { useOverviewData } from '../useOverviewData';
 import { useMyFirstName } from '../useTodayData';
 
@@ -15,17 +14,16 @@ import { useMyFirstName } from '../useTodayData';
  *
  * Oben in einer Reihe: Einsatzplan (eine Kachel je Einsatz), was jemand
  * anfassen muss, und schmal der Tag als Zeitleiste mit Abwesenden und Terminen.
- * Darunter die Zahlen des Jahres.
- * „Heute zuerst“, weil sich das über den Tag ändert; die Jahreszahlen nicht.
+ * Die Jahreszahlen stehen in den Auswertungen, nicht hier.
  *
- * ⚠️ Ohne Finanzrecht entfällt die Zahlenzeile ganz — nicht mit Nullen darin.
- * Eine Null sähe aus wie „keine Forderungen“ und wäre eine Falschaussage.
- * Dasselbe gilt für jeden Abschnitt in „Zu erledigen“.
+ * ⚠️ Ohne Finanzrecht entfällt jeder Finanzabschnitt in „Zu erledigen“ ganz —
+ * nicht mit Nullen darin. Eine Null sähe aus wie „keine Forderungen“ und wäre
+ * eine Falschaussage.
  */
 export function OverviewPage() {
   const data = useOverviewData();
   const firstName = useMyFirstName();
-  const { today, todo, finance, access } = data;
+  const { today, todo, access } = data;
 
   const imagePaths = useMemo(
     () => [
@@ -40,15 +38,18 @@ export function OverviewPage() {
   const urls = useProfileImageUrls(imagePaths).data ?? {};
 
   return (
-    <div className="flex flex-col gap-6">
+    // Auf breiten Bildschirmen reicht die Seite genau bis zum unteren Rand:
+    // Höhe des Fensters minus Kopfzeile (h-14) und Innenabstand von `main` (2 × p-6).
+    <div className="flex flex-col gap-6 xl:h-[calc(100svh-3.5rem-3rem)] xl:min-h-[560px]">
       <OverviewGreeting firstName={firstName.data ?? ''} />
 
       {/*
         Eine Reihe auf breiten Bildschirmen: links der Einsatzplan (wer ist wo —
         die erste Frage am Morgen), in der Mitte, gleich breit, was zu tun ist,
         rechts schmal der Kalender — er zeigt ohnehin nur den heutigen Tag.
+        Die Reihe füllt den Rest der Seite; volle Karten scrollen in sich.
       */}
-      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-[5fr_5fr_3fr]">
+      <div className="grid gap-4 lg:grid-cols-2 xl:min-h-0 xl:flex-1 xl:grid-cols-[5fr_5fr_3fr] xl:grid-rows-[minmax(0,1fr)]">
         <div className="min-w-0">
           <CrewPlanSection
             assignments={today.assignments}
@@ -80,18 +81,6 @@ export function OverviewPage() {
           />
         </div>
       </div>
-
-      {finance ? (
-        <YearKpiRow
-          result={finance.result}
-          kpis={finance.kpis}
-          revenueByMonth={finance.revenueByMonth}
-          expensesByMonth={finance.expensesByMonth}
-          laborIncluded={finance.laborIncluded}
-          isLoading={finance.isLoading}
-          isError={finance.isError}
-        />
-      ) : null}
     </div>
   );
 }

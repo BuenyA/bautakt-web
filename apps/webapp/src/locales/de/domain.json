@@ -783,24 +783,6 @@
       "exemptionValidUntil": "gültig bis {{date}}",
       "exemptionExpired": "abgelaufen am {{date}}"
     },
-    "year": {
-      "title": "Zahlen {{year}}",
-      "subtitle": "Seit 1. Januar, netto",
-      "revenue": "Umsatz",
-      "expenses": "Aufwände",
-      "result": "Ergebnis",
-      "receivables": "Offene Forderungen",
-      "versusPreviousYear": "{{value}} zum Vorjahreszeitraum",
-      "noPreviousYear": "Kein Vorjahr zum Vergleich",
-      "expensesSplit": "{{material}} Material & Gemeinkosten · {{labor}} Lohn",
-      "expensesWithoutLabor": "Ohne Lohnkosten (keine Berechtigung)",
-      "margin": "{{value}} % vom Umsatz",
-      "noMargin": "Noch kein Umsatz",
-      "overdueShare": "davon {{amount}} überfällig",
-      "noneOverdue": "Nichts überfällig",
-      "chartA11y": "Verlauf je Monat",
-      "loadError": "Die Zahlen konnten nicht geladen werden."
-    },
     "crew": {
       "title": "Einsatzplan heute",
       "count_one": "{{count}} Einsatz",

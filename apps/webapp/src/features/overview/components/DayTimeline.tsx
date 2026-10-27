@@ -120,7 +120,9 @@ export function DayTimeline({
   return (
     <div
       ref={viewportRef}
-      className="overflow-x-hidden overflow-y-auto overscroll-contain"
+      // Auf breiten Bildschirmen füllt die Leiste die Karte bis zum
+      // Bildschirmrand; darunter zeigt sie das feste Fenster von zwölf Stunden.
+      className="overflow-x-hidden overflow-y-auto overscroll-contain xl:h-auto! xl:min-h-0 xl:flex-1"
       style={{ height: VISIBLE_HOURS * HOUR_PX + 2 * EDGE_PX }}
       role="region"
       aria-label={t('domain:overview.today.timelineA11y')}
