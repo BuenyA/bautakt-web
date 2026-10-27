@@ -6,7 +6,6 @@ import { CrewPlanSection } from '../components/CrewPlanSection';
 import { OverviewGreeting } from '../components/OverviewGreeting';
 import { TodayPlanCard } from '../components/TodayPlanCard';
 import { TodoPanel } from '../components/TodoPanel';
-import { YearKpiRow } from '../components/YearKpiRow';
 import { useOverviewData } from '../useOverviewData';
 import { useMyFirstName } from '../useTodayData';
 
@@ -15,17 +14,16 @@ import { useMyFirstName } from '../useTodayData';
  *
  * Oben in einer Reihe: Einsatzplan (eine Kachel je Einsatz), was jemand
  * anfassen muss, und schmal der Tag als Zeitleiste mit Abwesenden und Terminen.
- * Darunter die Zahlen des Jahres.
- * „Heute zuerst“, weil sich das über den Tag ändert; die Jahreszahlen nicht.
+ * Die Jahreszahlen stehen in den Auswertungen, nicht hier.
  *
- * ⚠️ Ohne Finanzrecht entfällt die Zahlenzeile ganz — nicht mit Nullen darin.
- * Eine Null sähe aus wie „keine Forderungen“ und wäre eine Falschaussage.
- * Dasselbe gilt für jeden Abschnitt in „Zu erledigen“.
+ * ⚠️ Ohne Finanzrecht entfällt jeder Finanzabschnitt in „Zu erledigen“ ganz —
+ * nicht mit Nullen darin. Eine Null sähe aus wie „keine Forderungen“ und wäre
+ * eine Falschaussage.
  */
 export function OverviewPage() {
   const data = useOverviewData();
   const firstName = useMyFirstName();
-  const { today, todo, finance, access } = data;
+  const { today, todo, access } = data;
 
   const imagePaths = useMemo(
     () => [
@@ -80,18 +78,6 @@ export function OverviewPage() {
           />
         </div>
       </div>
-
-      {finance ? (
-        <YearKpiRow
-          result={finance.result}
-          kpis={finance.kpis}
-          revenueByMonth={finance.revenueByMonth}
-          expensesByMonth={finance.expensesByMonth}
-          laborIncluded={finance.laborIncluded}
-          isLoading={finance.isLoading}
-          isError={finance.isError}
-        />
-      ) : null}
     </div>
   );
 }
