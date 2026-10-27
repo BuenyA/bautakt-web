@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 
 import { RouterLink } from '@/components/common/RouterLink';
 import { useCompanyLegalDetails, useLegalFooterMissing } from '@/features/company/useLegalFooter';
+import { effectiveReplyTo, useMailSettings } from '@/features/company/useMailSettings';
 import { useMembership } from '@/features/company/useMembership';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
@@ -109,9 +110,10 @@ type Draft = { to: string; subject: string; text: string };
  * Vorschau der ganzen Mail mit Fußzeile und Anhang. Gesendet wird nur nach
  * ausdrücklicher Bestätigung in der Vorschau.
  *
- * Testmodus: Bis AVV und Pilotvertrag stehen, lässt der Server höchstens
- * `allowlist` zu. Die Oberfläche zeigt das immer an, bis sie `mail_mode`
- * aus `company_mail_settings` lesen kann (#220 Teil A).
+ * Versandmodus aus `company_mail_settings` (#220): Im Probelauf und im
+ * Testmodus steht ein Hinweis oben, im Testmodus mit den freigegebenen
+ * Adressen. Bis AVV und Pilotvertrag stehen, lässt der Server höchstens
+ * `allowlist` zu, auch wenn der Betrieb schon auf `live` steht.
  */
 export function SendDialog({
   open,
@@ -127,6 +129,8 @@ export function SendDialog({
   const companyName = membership?.companyName ?? '';
   const legal = useCompanyLegalDetails();
   const missing = useLegalFooterMissing();
+  const mail = useMailSettings();
+  const mailMode = mail.data?.mail_mode;
   const send = useSendDocument(document.id);
 
   const initialDraft = (): Draft => {
@@ -215,12 +219,29 @@ export function SendDialog({
               : t('domain:send.previewTitle')}
           </DialogTitle>
           <DialogContent className="flex flex-col gap-4">
-            <MessageBar intent="info">
-              <MessageBarBody>
-                <MessageBarTitle>{t('domain:send.testMode.title')}</MessageBarTitle>
-                {t('domain:send.testMode.description')}
-              </MessageBarBody>
-            </MessageBar>
+            {mailMode === 'dry_run' ? (
+              <MessageBar intent="info" layout="multiline">
+                <MessageBarBody>
+                  <MessageBarTitle>{t('domain:send.testMode.dryRunTitle')}</MessageBarTitle>
+                  {t('domain:send.testMode.dryRunDescription')}
+                </MessageBarBody>
+              </MessageBar>
+            ) : mailMode !== 'live' ? (
+              <MessageBar intent="info" layout="multiline">
+                <MessageBarBody>
+                  <MessageBarTitle>{t('domain:send.testMode.title')}</MessageBarTitle>
+                  {t('domain:send.testMode.description')}
+                  {mail.data?.test_recipient_allowlist.length ? (
+                    <>
+                      {' '}
+                      {t('domain:send.testMode.allowlist', {
+                        addresses: mail.data.test_recipient_allowlist.join(', '),
+                      })}
+                    </>
+                  ) : null}
+                </MessageBarBody>
+              </MessageBar>
+            ) : null}
 
             {step === 'edit' ? (
               <>
@@ -270,7 +291,7 @@ export function SendDialog({
             ) : (
               <MailPreview
                 companyName={companyName}
-                replyTo={legal.data?.email ?? ''}
+                replyTo={effectiveReplyTo(mail.data, legal.data?.email)}
                 to={recipients.valid}
                 subject={draft.subject.trim()}
                 text={draft.text.trim()}
