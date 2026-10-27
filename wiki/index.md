@@ -116,6 +116,7 @@ verlinkt, nie kopiert.
 | 2026-10-12 | [Kalender: Einstellungen hinter dem Zahnrad, Einsätze blau](logs/2026-10-12-kalender-einstellungen.md) |
 | 2026-10-16 | [Ansprache: „du“ und „mein“](logs/2026-10-16-ansprache-du-mein.md)                                     |
 | 2026-10-26 | [Leerzustand im Einsatzplan mittig](logs/2026-10-26-einsatzplan-leerzustand.md)                        |
+| 2026-10-27 | [Leerzustand in „Zu erledigen“ mittig](logs/2026-10-27-zu-erledigen-leerzustand.md)                    |
 
 ## Die drei wichtigsten Sätze
 

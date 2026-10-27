@@ -746,7 +746,8 @@
     },
     "todo": {
       "title": "Zu erledigen",
-      "empty": "Nichts offen — alles erledigt.",
+      "emptyTitle": "Alles erledigt für heute",
+      "emptyHint": "Keine offenen Aufgaben",
       "showAll": "Alle anzeigen",
       "pendingAbsences": "Anträge",
       "approve": "Genehmigen",

@@ -25,6 +25,7 @@ import { routes, withCreate } from '@/lib/routes';
 import { mapsSearchUrl } from '../today';
 import type { TodayAssignment } from '../useTodayData';
 import { CrewAvatars } from './CrewAvatars';
+import { DashboardEmptyIcon, DashboardEmptyState } from './DashboardEmptyState';
 import { COLUMN_SCROLL } from './layout';
 
 const useStyles = makeStyles({
@@ -45,30 +46,6 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     flexGrow: 1,
     minHeight: 0,
-  },
-  empty: {
-    display: 'flex',
-    flexDirection: 'column',
-    flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: tokens.spacingVerticalS,
-    minHeight: 0,
-    textAlign: 'center',
-  },
-  emptyIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '48px',
-    height: '48px',
-    borderRadius: tokens.borderRadiusCircular,
-    backgroundColor: tokens.colorNeutralBackground3,
-    color: tokens.colorNeutralForeground3,
-  },
-  // Der Spaltenabstand allein lässt den Knopf am Hinweis kleben.
-  emptyAction: {
-    marginTop: tokens.spacingVerticalS,
   },
 });
 
@@ -116,13 +93,15 @@ export function CrewPlanSection({
             <SkeletonBlock className="h-36 w-full" />
           </div>
         ) : assignments.length === 0 ? (
-          <div className={styles.empty}>
-            <span className={styles.emptyIcon}>
-              <PeopleTeamRegular fontSize={24} aria-hidden />
-            </span>
-            <Text className="text-muted-foreground">{t('domain:overview.crew.empty')}</Text>
-            {canPlan ? (
-              <span className={styles.emptyAction}>
+          <DashboardEmptyState
+            icon={
+              <DashboardEmptyIcon>
+                <PeopleTeamRegular fontSize={24} aria-hidden />
+              </DashboardEmptyIcon>
+            }
+            title={t('domain:overview.crew.empty')}
+            action={
+              canPlan ? (
                 <LinkButton
                   to={withCreate(routes.assignments)}
                   appearance="primary"
@@ -130,9 +109,9 @@ export function CrewPlanSection({
                 >
                   {t('domain:overview.today.plan')}
                 </LinkButton>
-              </span>
-            ) : null}
-          </div>
+              ) : undefined
+            }
+          />
         ) : (
           <ul className="flex flex-col gap-3">
             {assignments.map((assignment) => (

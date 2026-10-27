@@ -5,8 +5,18 @@ import {
   type ReceivableItem,
 } from '@bautakt/finance';
 import { SkeletonBlock, toast } from '@bautakt/ui';
-import { Button, Card, CardHeader, Text } from '@fluentui/react-components';
 import {
+  Body1Strong,
+  Button,
+  Card,
+  CardHeader,
+  makeStyles,
+  mergeClasses,
+  Text,
+  tokens,
+} from '@fluentui/react-components';
+import {
+  CheckmarkCircle48Regular,
   CheckmarkRegular,
   ChevronRightRegular,
   DismissRegular,
@@ -27,7 +37,26 @@ import { routes } from '@/lib/routes';
 import type { Deadline, ExpiringExemption } from '../today';
 import type { OverviewAbsence } from '../useTodayData';
 import { MemberAvatar } from './CrewAvatars';
+import { DashboardEmptyState } from './DashboardEmptyState';
 import { COLUMN_SCROLL } from './layout';
+
+const useStyles = makeStyles({
+  // Die Karte ist in der Zeile so hoch wie der Einsatzplan. Der Körper füllt
+  // diese Höhe, sonst klebt der leere Zustand unter dem Kopf.
+  card: {
+    height: '100%',
+  },
+  body: {
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+    minHeight: 0,
+  },
+  // Umriss in der Erfolgsfarbe, 48 px wie der Kreis im Einsatzplan.
+  doneIcon: {
+    color: tokens.colorStatusSuccessForeground1,
+  },
+});
 
 /** Je Abschnitt so viele Zeilen; der Rest steckt hinter „Alle anzeigen“. */
 const VISIBLE_ROWS = 4;
@@ -57,6 +86,7 @@ export function TodoPanel({
   isLoading: boolean;
 }) {
   const { t } = useTranslation();
+  const styles = useStyles();
   const hasTasks = Boolean(tasks && tasks.dunnable + tasks.draftDocuments > 0);
   const isEmpty =
     pendingAbsences.length === 0 &&
@@ -67,7 +97,7 @@ export function TodoPanel({
     !hasTasks;
 
   return (
-    <Card size="large" className="h-full" id="zu-erledigen">
+    <Card size="large" className={styles.card} id="zu-erledigen">
       <CardHeader
         image={<TaskListLtrRegular fontSize={20} aria-hidden />}
         header={
@@ -77,13 +107,15 @@ export function TodoPanel({
         }
       />
 
-      <div className={COLUMN_SCROLL}>
+      <div className={mergeClasses(COLUMN_SCROLL, styles.body)}>
         {isLoading ? (
           <SkeletonBlock className="h-48 w-full" />
         ) : isEmpty ? (
-          <Text size={300} className="text-muted-foreground py-6 text-center">
-            {t('domain:overview.todo.empty')}
-          </Text>
+          <DashboardEmptyState
+            icon={<CheckmarkCircle48Regular className={styles.doneIcon} aria-hidden />}
+            title={<Body1Strong>{t('domain:overview.todo.emptyTitle')}</Body1Strong>}
+            description={t('domain:overview.todo.emptyHint')}
+          />
         ) : (
           <div className="flex flex-col gap-5">
             {pendingAbsences.length > 0 ? (
