@@ -153,6 +153,8 @@ describe('Markdown', () => {
   it('macht die Tabelle horizontal scrollbar', () => {
     const rendered = html('| A | B |\n| --- | --- |\n| 1 | 2 |');
     expect(rendered).toContain('overflow-x-auto');
+    expect(rendered).toContain('w-full');
+    expect(rendered).not.toContain('w-max');
     expect(rendered).toContain('<table');
   });
 });

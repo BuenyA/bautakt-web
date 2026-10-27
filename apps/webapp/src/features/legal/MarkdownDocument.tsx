@@ -111,17 +111,27 @@ export function MarkdownDocument({ source }: { source: string }) {
       return <ExternalLink href={href}>{children}</ExternalLink>;
     },
     table: ({ children }) => (
+      // w-full statt w-max: die Zellen umbrechen, Pflichtspalten bleiben auf
+      // dem Desktop sichtbar. min(36rem, 100%) lässt die Tabelle auf sehr
+      // schmalen Breiten höchstens leicht scrollen; overflow-x-auto ist der Fallback.
       <div className="max-w-full overflow-x-auto">
-        <table className="w-max min-w-full border-collapse text-sm">{children}</table>
+        <table className="w-full min-w-[min(36rem,100%)] table-fixed border-collapse text-sm">
+          {children}
+        </table>
       </div>
     ),
     th: ({ children }) => (
-      <th scope="col" className="border-border border-b px-3 py-2 text-left font-semibold">
+      <th
+        scope="col"
+        className="border-border [overflow-wrap:anywhere] border-b px-3 py-2 text-left align-top font-semibold break-words whitespace-normal"
+      >
         {markTokens(children)}
       </th>
     ),
     td: ({ children }) => (
-      <td className="border-border border-b px-3 py-2 align-top">{markTokens(children)}</td>
+      <td className="border-border [overflow-wrap:anywhere] border-b px-3 py-2 align-top break-words whitespace-normal">
+        {markTokens(children)}
+      </td>
     ),
   };
 
