@@ -12,10 +12,8 @@ import {
   makeStyles,
   mergeClasses,
   Text,
-  tokens,
 } from '@fluentui/react-components';
 import {
-  CheckmarkCircleRegular,
   CheckmarkRegular,
   ChevronRightRegular,
   DismissRegular,
@@ -36,7 +34,7 @@ import { routes } from '@/lib/routes';
 import type { Deadline, ExpiringExemption } from '../today';
 import type { OverviewAbsence } from '../useTodayData';
 import { MemberAvatar } from './CrewAvatars';
-import { DashboardEmptyState, EMPTY_ICON_SIZE } from './DashboardEmptyState';
+import { DashboardEmptyIcon, DashboardEmptyState, EMPTY_ICON_SIZE } from './DashboardEmptyState';
 import { COLUMN_FILL_SCROLL } from './layout';
 
 const useStyles = makeStyles({
@@ -50,10 +48,6 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     flexGrow: 1,
     minHeight: 0,
-  },
-  // Umriss in der Erfolgsfarbe, so groß wie der Kreis im Einsatzplan.
-  doneIcon: {
-    color: tokens.colorStatusSuccessForeground1,
   },
 });
 
@@ -112,17 +106,11 @@ export function TodoPanel({
         ) : isEmpty ? (
           <DashboardEmptyState
             icon={
-              <CheckmarkCircleRegular
-                fontSize={EMPTY_ICON_SIZE}
-                className={styles.doneIcon}
-                aria-hidden
-              />
+              <DashboardEmptyIcon>
+                <CheckmarkRegular fontSize={EMPTY_ICON_SIZE / 2} aria-hidden />
+              </DashboardEmptyIcon>
             }
-            title={
-              <Text size={500} weight="semibold">
-                {t('domain:overview.todo.emptyTitle')}
-              </Text>
-            }
+            title={t('domain:overview.todo.emptyTitle')}
             description={t('domain:overview.todo.emptyHint')}
           />
         ) : (

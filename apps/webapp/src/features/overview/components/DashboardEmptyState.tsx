@@ -50,8 +50,8 @@ const useStyles = makeStyles({
  * Groß gesetzt, weil die Karten auf der Startseite bis zum Bildschirmrand
  * reichen: ein kleiner Hinweis ginge in der leeren Fläche unter.
  *
- * Ein String als Titel wird gedämpft gesetzt — so bleibt der Einsatzplan.
- * „Zu erledigen“ übergibt eine starke Zeile und eine Beschreibung.
+ * Ein String als Titel wird gedämpft gesetzt; Einsatzplan und „Zu erledigen“
+ * nutzen beide diesen Weg, damit ihre Leerzustände gleich aussehen.
  */
 export function DashboardEmptyState({
   icon,
