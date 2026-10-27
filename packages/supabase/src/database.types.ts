@@ -2,7 +2,7 @@
  * GENERIERT — nicht von Hand bearbeiten.
  *
  * Quelle:  Supabase-Projekt "Bautakt" (bxivzvmlcnaxqlytumvz, eu-central-1)
- * Stand:   2026-10-20
+ * Stand:   2026-10-27
  *
  * Neu erzeugen:
  *   npx supabase gen types typescript --project-id bxivzvmlcnaxqlytumvz \
@@ -652,6 +652,89 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "company_finance_settings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_mail_settings: {
+        Row: {
+          company_id: string
+          created_at: string
+          custom_domain: string | null
+          custom_sender_email: string | null
+          dkim_verified_at: string | null
+          dmarc_verified_at: string | null
+          domain_checked_at: string | null
+          domain_status: string
+          inbound_forwarding_address: string | null
+          inbound_slug: string | null
+          mail_mode: string
+          mail_provider: string
+          modified_at: string
+          modified_by: string | null
+          provider_project_id: string | null
+          provider_token_secret_id: string | null
+          reply_to_email: string | null
+          send_limit_per_day: number
+          send_limit_per_hour: number
+          sender_mode: string
+          spf_verified_at: string | null
+          test_recipient_allowlist: string[]
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          custom_domain?: string | null
+          custom_sender_email?: string | null
+          dkim_verified_at?: string | null
+          dmarc_verified_at?: string | null
+          domain_checked_at?: string | null
+          domain_status?: string
+          inbound_forwarding_address?: string | null
+          inbound_slug?: string | null
+          mail_mode?: string
+          mail_provider?: string
+          modified_at?: string
+          modified_by?: string | null
+          provider_project_id?: string | null
+          provider_token_secret_id?: string | null
+          reply_to_email?: string | null
+          send_limit_per_day?: number
+          send_limit_per_hour?: number
+          sender_mode?: string
+          spf_verified_at?: string | null
+          test_recipient_allowlist?: string[]
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          custom_domain?: string | null
+          custom_sender_email?: string | null
+          dkim_verified_at?: string | null
+          dmarc_verified_at?: string | null
+          domain_checked_at?: string | null
+          domain_status?: string
+          inbound_forwarding_address?: string | null
+          inbound_slug?: string | null
+          mail_mode?: string
+          mail_provider?: string
+          modified_at?: string
+          modified_by?: string | null
+          provider_project_id?: string | null
+          provider_token_secret_id?: string | null
+          reply_to_email?: string | null
+          send_limit_per_day?: number
+          send_limit_per_hour?: number
+          sender_mode?: string
+          spf_verified_at?: string | null
+          test_recipient_allowlist?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_mail_settings_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: true
             referencedRelation: "companies"
@@ -2184,6 +2267,148 @@ export type Database = {
           },
         ]
       }
+      mail_message_events: {
+        Row: {
+          company_id: string
+          created_at: string
+          error_code: string | null
+          error_message: string | null
+          id: string
+          kind: string
+          mail_id: string
+          message_id: string | null
+          payload: Json | null
+          provider_message_id: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          kind: string
+          mail_id: string
+          message_id?: string | null
+          payload?: Json | null
+          provider_message_id?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          kind?: string
+          mail_id?: string
+          message_id?: string | null
+          payload?: Json | null
+          provider_message_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mail_message_events_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mail_message_events_mail_id_fkey"
+            columns: ["mail_id"]
+            isOneToOne: false
+            referencedRelation: "mail_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mail_messages: {
+        Row: {
+          attachments: Json
+          company_id: string
+          created_at: string
+          created_by: string
+          from_email: string
+          from_name: string
+          html: string
+          id: string
+          idempotency_key: string
+          incoming_invoice_id: string | null
+          mail_provider: string
+          mode: string
+          provider_project_id: string | null
+          purpose: string
+          reply_to: string | null
+          request_sha256: string
+          sales_document_id: string | null
+          subject: string
+          to_addresses: string[]
+        }
+        Insert: {
+          attachments?: Json
+          company_id: string
+          created_at?: string
+          created_by: string
+          from_email: string
+          from_name: string
+          html: string
+          id?: string
+          idempotency_key: string
+          incoming_invoice_id?: string | null
+          mail_provider: string
+          mode: string
+          provider_project_id?: string | null
+          purpose: string
+          reply_to?: string | null
+          request_sha256: string
+          sales_document_id?: string | null
+          subject: string
+          to_addresses: string[]
+        }
+        Update: {
+          attachments?: Json
+          company_id?: string
+          created_at?: string
+          created_by?: string
+          from_email?: string
+          from_name?: string
+          html?: string
+          id?: string
+          idempotency_key?: string
+          incoming_invoice_id?: string | null
+          mail_provider?: string
+          mode?: string
+          provider_project_id?: string | null
+          purpose?: string
+          reply_to?: string | null
+          request_sha256?: string
+          sales_document_id?: string | null
+          subject?: string
+          to_addresses?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mail_messages_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mail_messages_incoming_invoice_id_fkey"
+            columns: ["incoming_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mail_messages_sales_document_id_fkey"
+            columns: ["sales_document_id"]
+            isOneToOne: false
+            referencedRelation: "sales_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notes: {
         Row: {
           body: string
@@ -3265,6 +3490,60 @@ export type Database = {
           },
         ]
       }
+      sales_document_datev_accounts: {
+        Row: {
+          account_source: string
+          company_id: string
+          created_at: string
+          document_id: string
+          id: string
+          net_amount: number
+          revenue_account: string
+          tax_key: string
+          tax_mode: string
+          tax_rate_percent: number
+        }
+        Insert: {
+          account_source?: string
+          company_id: string
+          created_at?: string
+          document_id: string
+          id?: string
+          net_amount: number
+          revenue_account?: string
+          tax_key?: string
+          tax_mode: string
+          tax_rate_percent: number
+        }
+        Update: {
+          account_source?: string
+          company_id?: string
+          created_at?: string
+          document_id?: string
+          id?: string
+          net_amount?: number
+          revenue_account?: string
+          tax_key?: string
+          tax_mode?: string
+          tax_rate_percent?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_document_datev_accounts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_document_datev_accounts_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "sales_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sales_document_lines: {
         Row: {
           company_id: string
@@ -3380,6 +3659,7 @@ export type Database = {
       sales_documents: {
         Row: {
           buyer_city: string
+          buyer_contact_name: string
           buyer_country: string
           buyer_customer_number: string
           buyer_email: string
@@ -3395,6 +3675,9 @@ export type Database = {
           credited_total: number
           currency: string
           customer_id: string | null
+          datev_chart_of_accounts: string
+          datev_debtor_account: string
+          datev_debtor_source: string
           document_number: string | null
           due_date: string | null
           e_invoice: boolean
@@ -3423,6 +3706,7 @@ export type Database = {
         }
         Insert: {
           buyer_city?: string
+          buyer_contact_name?: string
           buyer_country?: string
           buyer_customer_number?: string
           buyer_email?: string
@@ -3438,6 +3722,9 @@ export type Database = {
           credited_total?: number
           currency?: string
           customer_id?: string | null
+          datev_chart_of_accounts?: string
+          datev_debtor_account?: string
+          datev_debtor_source?: string
           document_number?: string | null
           due_date?: string | null
           e_invoice?: boolean
@@ -3466,6 +3753,7 @@ export type Database = {
         }
         Update: {
           buyer_city?: string
+          buyer_contact_name?: string
           buyer_country?: string
           buyer_customer_number?: string
           buyer_email?: string
@@ -3481,6 +3769,9 @@ export type Database = {
           credited_total?: number
           currency?: string
           customer_id?: string | null
+          datev_chart_of_accounts?: string
+          datev_debtor_account?: string
+          datev_debtor_source?: string
           document_number?: string | null
           due_date?: string | null
           e_invoice?: boolean
@@ -3938,6 +4229,7 @@ export type Database = {
         Args: { p_document_id: string }
         Returns: {
           buyer_city: string
+          buyer_contact_name: string
           buyer_country: string
           buyer_customer_number: string
           buyer_email: string
@@ -3953,6 +4245,9 @@ export type Database = {
           credited_total: number
           currency: string
           customer_id: string | null
+          datev_chart_of_accounts: string
+          datev_debtor_account: string
+          datev_debtor_source: string
           document_number: string | null
           due_date: string | null
           e_invoice: boolean
@@ -4056,6 +4351,10 @@ export type Database = {
         }
         Returns: string
       }
+      datev_account_fits: {
+        Args: { p_account: string; p_account_length: number; p_purpose: string }
+        Returns: boolean
+      }
       datev_effective_settings: {
         Args: { p_company_id: string }
         Returns: {
@@ -4136,6 +4435,7 @@ export type Database = {
         Args: { p_document_id: string }
         Returns: {
           buyer_city: string
+          buyer_contact_name: string
           buyer_country: string
           buyer_customer_number: string
           buyer_email: string
@@ -4151,6 +4451,9 @@ export type Database = {
           credited_total: number
           currency: string
           customer_id: string | null
+          datev_chart_of_accounts: string
+          datev_debtor_account: string
+          datev_debtor_source: string
           document_number: string | null
           due_date: string | null
           e_invoice: boolean
@@ -4226,6 +4529,46 @@ export type Database = {
         }
         Returns: undefined
       }
+      mail_archive_message: {
+        Args: {
+          p_attachments: Json
+          p_company_id: string
+          p_created_by: string
+          p_from_email: string
+          p_from_name: string
+          p_html: string
+          p_idempotency_key: string
+          p_incoming_invoice_id: string
+          p_mode: string
+          p_purpose: string
+          p_reply_to: string
+          p_request_sha256: string
+          p_sales_document_id: string
+          p_subject: string
+          p_to_addresses: string[]
+        }
+        Returns: {
+          mail_id: string
+          replayed: boolean
+        }[]
+      }
+      mail_can_read: {
+        Args: { p_company_id: string; p_purpose: string }
+        Returns: boolean
+      }
+      mail_provider_token: { Args: { p_company_id: string }; Returns: string }
+      mail_record_event: {
+        Args: {
+          p_error_code: string
+          p_error_message: string
+          p_kind: string
+          p_mail_id: string
+          p_message_id: string
+          p_payload: Json
+          p_provider_message_id: string
+        }
+        Returns: string
+      }
       merge_contacts: {
         Args: { p_drop: string; p_keep: string }
         Returns: undefined
@@ -4271,6 +4614,7 @@ export type Database = {
         Args: { p_customer_id: string }
         Returns: {
           buyer_city: string
+          buyer_contact_name: string
           buyer_country: string
           buyer_customer_number: string
           buyer_email: string

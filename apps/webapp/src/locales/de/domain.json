@@ -1894,7 +1894,10 @@
     "footerIncomplete": "Für den Versand fehlen Pflichtangaben deines Betriebs:",
     "testMode": {
       "title": "Testmodus",
-      "description": "Mails gehen nur an freigegebene Testadressen. Der Versand an Kunden wird erst nach Unterzeichnung von AVV und Pilotvertrag freigeschaltet."
+      "description": "Mails gehen nur an freigegebene Testadressen. Der Versand an Kunden wird erst nach Unterzeichnung von AVV und Pilotvertrag freigeschaltet.",
+      "dryRunTitle": "Probelauf",
+      "dryRunDescription": "Für deinen Betrieb ist nur ein Probelauf eingestellt. Die E-Mail wird geprüft und archiviert, aber nicht verschickt.",
+      "allowlist": "Freigegeben: {{addresses}}"
     },
     "preview": {
       "from": "Von",
@@ -1940,5 +1943,32 @@
         "unknown": "Unbekannter Fehler. Bitte noch einmal versuchen."
       }
     }
+  },
+  "mailSettings": {
+    "title": "E-Mail",
+    "description": "Wie Bautakt Rechnungen und andere Belege für deinen Betrieb verschickt.",
+    "loadError": "Die E-Mail-Einstellungen konnten nicht geladen werden.",
+    "notSetUp": "Der E-Mail-Versand ist für deinen Betrieb noch nicht eingerichtet. Bis dahin kannst du Belege herunterladen und selbst verschicken.",
+    "mode": "Versandmodus",
+    "modes": {
+      "dry_run": "Probelauf",
+      "allowlist": "Testmodus",
+      "live": "Aktiv"
+    },
+    "modeHints": {
+      "dry_run": "Es wird keine E-Mail verschickt. Bautakt prüft und archiviert sie nur.",
+      "allowlist": "Mails gehen nur an die freigegebenen Testadressen. Der Versand an Kunden wird erst nach Unterzeichnung von AVV und Pilotvertrag freigeschaltet.",
+      "live": "Mails gehen an die Empfänger, die du beim Versenden angibst."
+    },
+    "allowlist": "Freigegebene Testadressen",
+    "allowlistEmpty": "Noch keine Testadresse freigegeben.",
+    "sender": "Absender",
+    "limits": "Versandlimit",
+    "limitsValue": "Höchstens {{hour}} Mails pro Stunde und {{day}} pro Tag",
+    "replyTo": "Antworten gehen an",
+    "replyToHint": "Leer lassen, dann gehen Antworten an die E-Mail-Adresse deines Betriebs ({{email}}).",
+    "replyToHintNoEmail": "Leer lassen, dann gehen Antworten an die E-Mail-Adresse deines Betriebs. Dafür fehlt dort noch eine Adresse.",
+    "replyToInvalid": "Bitte eine gültige E-Mail-Adresse angeben.",
+    "nothingWritten": "Du darfst die E-Mail-Einstellungen nicht ändern."
   }
 }

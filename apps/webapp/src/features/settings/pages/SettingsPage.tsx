@@ -12,6 +12,7 @@ import { supabase } from '@/lib/supabase';
 
 import { BankCard, CompanyCard, LegalCard, RegisterCard } from '../CompanyForms';
 import { DatevSettingsCard } from '../DatevSettingsCard';
+import { MailSettingsCard } from '../MailSettingsCard';
 
 /** Stammdaten des Betriebs und die Rollen, die es hier gibt. */
 function useCompanySettings() {
@@ -52,7 +53,8 @@ function useCompanySettings() {
  *
  * Nummernkreis und Zahlungsziel bleiben hier vorerst lesend.
  *
- * Die DATEV-Karte (#167) prüft ihre Rechte selbst und fehlt ohne sie ganz.
+ * Die Karten für E-Mail (#220) und DATEV (#167) prüfen ihre Rechte selbst und
+ * fehlen ohne sie ganz.
  */
 export function SettingsPage() {
   const { t } = useTranslation();
@@ -100,6 +102,8 @@ export function SettingsPage() {
           </DetailCard>
 
           <ContactNumberSettingsCard />
+
+          <MailSettingsCard />
 
           <DatevSettingsCard />
 
