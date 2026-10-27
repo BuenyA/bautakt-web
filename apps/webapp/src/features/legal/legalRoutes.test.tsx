@@ -85,8 +85,9 @@ describe('Rechtsseiten ohne Sitzung', () => {
     expect(privacy).toContain('Datenschutzerklärung');
     expect(privacy).toContain(MAPS_SENTENCE);
     expect(privacy).toContain('<table');
-    expect(privacy).toContain('{{TELEFON}}');
+    expect(privacy).toContain('<br');
     expect(privacy).not.toContain('{{ANSCHRIFT}}');
+    expect(privacy).not.toContain('{{TELEFON}}');
     expect(privacy).not.toContain('Melde dich mit deinem Bautakt-Konto');
   });
 

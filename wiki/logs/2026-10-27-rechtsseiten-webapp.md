@@ -23,10 +23,8 @@ Datenschutz.
 Die Marketing-App ist unverändert. `apps/webapp/vercel.json` hatte den
 Catch-all schon.
 
-Die Dateien `uploads/impressum.md` und `uploads/datenschutz.md` lagen in der
-Umgebung nicht vor. Die Straßen- und PLZ-Zeilen daraus stehen deshalb nicht
-in den Markdown-Dateien. Offen im Quelltext ist `{{TELEFON}}`. Die Anschrift
-wird hier nicht wiedergegeben.
+Der Wortlaut der beiden Markdown-Dateien ist 1:1 der gelieferte Text.
+`{{TELEFON}}` bleibt der offene Platzhalter im Impressum.
 
 ## Warum
 

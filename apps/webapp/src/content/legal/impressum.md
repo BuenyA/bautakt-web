@@ -3,9 +3,17 @@
 ## Angaben gemäß § 5 DDG
 
 Bautakt UG (haftungsbeschränkt) i. G.
-Vertreten durch: Bünyamin Aydemir, Geschäftsführer
-E-Mail: [support@bautakt.com](mailto:support@bautakt.com)
+Maria-Merian-Str. 8
+74321 Bietigheim-Bissingen
+
+## Vertreten durch
+
+Bünyamin Aydemir, Geschäftsführer
+
+## Kontakt
+
 Telefon: {{TELEFON}}
+E-Mail: [support@bautakt.com](mailto:support@bautakt.com)
 
 ## Registereintrag
 
