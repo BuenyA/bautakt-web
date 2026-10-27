@@ -2,7 +2,7 @@ import { makeStyles, Text, tokens } from '@fluentui/react-components';
 import type { ReactNode } from 'react';
 
 /** Kantenlänge des Symbols im Leerzustand — Kreis oder freistehendes Symbol. */
-export const EMPTY_ICON_SIZE = 72;
+export const EMPTY_ICON_SIZE = 60;
 
 const useStyles = makeStyles({
   // Die Fläche unter dem Kartenkopf füllen und den Inhalt darin mittig setzen.
@@ -16,7 +16,7 @@ const useStyles = makeStyles({
     minHeight: 0,
     textAlign: 'center',
   },
-  // 72-px-Kreis; das Symbol darin ist 36 px (`EMPTY_ICON_SIZE / 2`).
+  // 60-px-Kreis; das Symbol darin ist 30 px (`EMPTY_ICON_SIZE / 2`).
   iconFrame: {
     display: 'flex',
     alignItems: 'center',
@@ -67,7 +67,7 @@ export function DashboardEmptyState({
   const styles = useStyles();
   const titleNode =
     typeof title === 'string' ? (
-      <Text size={500} className="text-muted-foreground">
+      <Text size={400} className="text-muted-foreground">
         {title}
       </Text>
     ) : (
@@ -75,7 +75,7 @@ export function DashboardEmptyState({
     );
   const descriptionNode =
     description == null ? null : typeof description === 'string' ? (
-      <Text size={400} className={styles.description}>
+      <Text size={300} className={styles.description}>
         {description}
       </Text>
     ) : (
