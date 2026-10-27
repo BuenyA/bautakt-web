@@ -14,7 +14,6 @@ import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { RouterLink } from '@/components/common/RouterLink';
-import { COLUMN_SCROLL } from '@/features/overview/components/layout';
 
 /** So viele Zeilen je Gruppe; der Rest steckt hinter „Alle anzeigen“. */
 const VISIBLE_ROWS = 6;
@@ -124,7 +123,9 @@ export function DeskCard<K extends string, T>({
             </RouterLink>
           </div>
 
-          <div className={COLUMN_SCROLL}>
+          {/* Ab `lg` ist die Karte so hoch wie die Seite bis zum Fensterrand;
+              die Liste füllt den Rest und scrollt in sich. */}
+          <div className="min-h-0 flex-1 lg:overflow-x-hidden lg:overflow-y-auto lg:pr-1">
             {current.items.length === 0 ? (
               // Ein `<p>` statt Fluent-`Text`: dessen Inline-Span sprengte mit
               // Innenabstand die Scrollfläche und zeigte einen Mini-Scrollbalken.

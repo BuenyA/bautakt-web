@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { LinkButton } from '@/components/common/LinkButton';
+import { FILL_VIEWPORT_LG } from '@/components/layout/fillViewport';
 import { usePermission } from '@/features/company/usePermission';
 import { Row } from '@/features/overview/components/TodoPanel';
 import { formatDate } from '@/lib/format';
@@ -47,7 +48,8 @@ export function FinanceOverviewPage() {
   const columns = [outgoing, incoming].filter(Boolean).length;
 
   return (
-    <div className="flex flex-col gap-6">
+    // Ab `lg` reichen die Rechnungskarten bis zum unteren Fensterrand.
+    <div className={cn('flex flex-col gap-6', columns > 0 && FILL_VIEWPORT_LG)}>
       <FinanceHeader
         description={t('domain:invoiceDesk.description')}
         actions={
@@ -77,7 +79,12 @@ export function FinanceOverviewPage() {
           description={t('domain:invoiceDesk.nothingVisible')}
         />
       ) : (
-        <div className={cn('grid gap-4', columns === 2 && 'lg:grid-cols-2')}>
+        <div
+          className={cn(
+            'grid gap-4 lg:min-h-0 lg:flex-1 lg:grid-rows-[minmax(0,1fr)]',
+            columns === 2 && 'lg:grid-cols-2',
+          )}
+        >
           {/* Erst was reinkommt, dann was rausgeht (Owner 17.10.2026). */}
           {incoming ? (
             <div className="min-w-0">

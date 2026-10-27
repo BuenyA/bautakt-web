@@ -10,4 +10,5 @@
  * im Quelltext finden muss.
  */
 export const FILL_VIEWPORT_SM = 'sm:h-[calc(100svh-3.5rem-3rem)] sm:min-h-[560px]';
+export const FILL_VIEWPORT_LG = 'lg:h-[calc(100svh-3.5rem-3rem)] lg:min-h-[560px]';
 export const FILL_VIEWPORT_XL = 'xl:h-[calc(100svh-3.5rem-3rem)] xl:min-h-[560px]';
