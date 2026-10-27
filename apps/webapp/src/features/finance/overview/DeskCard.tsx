@@ -15,8 +15,12 @@ import { useTranslation } from 'react-i18next';
 
 import { RouterLink } from '@/components/common/RouterLink';
 
-/** So viele Zeilen je Gruppe; der Rest steckt hinter „Alle anzeigen“. */
-const VISIBLE_ROWS = 6;
+/**
+ * So viele Zeilen je Gruppe; der Rest steckt hinter „Alle anzeigen“. Ab `lg`
+ * reicht die Karte bis zum Fensterrand und die Liste scrollt in sich — so
+ * füllt sie auch hohe Bildschirme, ohne endlos zu werden.
+ */
+const VISIBLE_ROWS = 12;
 
 export type DeskGroupView = {
   label: string;

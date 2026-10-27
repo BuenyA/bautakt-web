@@ -31,7 +31,7 @@ import {
   Settings20Regular,
   SignOut20Regular,
 } from '@fluentui/react-icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router';
 
@@ -69,9 +69,22 @@ function writeExpanded(expanded: boolean) {
  * gibt es nur für die eingeklappte Icon-Leiste: Fluent setzt die Breite des
  * Drawers fest auf 260 px, eine schmale Variante kennt er nicht.
  */
+/** Dauer des Ein- und Ausklappens; gleich `tokens.durationNormal`. */
+const COLLAPSE_MS = 200;
+
 const useStyles = makeStyles({
   drawer: {
     height: '100%',
+    // Ein- und Ausklappen gleitet über die Breite. Während der Bewegung wird
+    // nichts umbrochen, sondern abgeschnitten — sonst springen die Zeilen.
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    transitionProperty: 'width, min-width',
+    transitionDuration: tokens.durationNormal,
+    transitionTimingFunction: tokens.curveEasyEase,
+    '@media (prefers-reduced-motion: reduce)': {
+      transitionDuration: '0.01ms',
+    },
   },
   rail: {
     width: '68px',
@@ -309,24 +322,34 @@ export function AppShell() {
   const { pathname } = useLocation();
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [expanded, setExpanded] = useState(readExpanded);
+  // Die Icon-Darstellung folgt `expanded` beim Einklappen erst, wenn die Leiste
+  // schmal ist: so gleitet der volle Inhalt hinaus, statt vorher umzuspringen.
+  // Beim Ausklappen wechselt sie sofort, die Texte werden beim Gleiten sichtbar.
+  const [railLayout, setRailLayout] = useState(() => !readExpanded());
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const collapsed = !isMobile && !expanded;
+  useEffect(() => {
+    if (expanded) return;
+    const timer = window.setTimeout(() => setRailLayout(true), COLLAPSE_MS);
+    return () => window.clearTimeout(timer);
+  }, [expanded]);
+
+  const narrow = !isMobile && !expanded;
+  const collapsed = !isMobile && railLayout;
   const visible = navItems.filter((item) => maySee(item, membership?.permissions));
   const selected = [...visible, calendarNavItem].find((item) => isNavActive(pathname, item))?.to;
   const closeMobile = isMobile ? () => setMobileOpen(false) : undefined;
   const toggleLabel = t('common:nav.toggleSidebar');
-  const collapseLabel = collapsed ? t('common:nav.expandSidebar') : t('common:nav.collapseSidebar');
+  const collapseLabel = narrow ? t('common:nav.expandSidebar') : t('common:nav.collapseSidebar');
 
   function toggle() {
     if (isMobile) {
       setMobileOpen((open) => !open);
       return;
     }
-    setExpanded((current) => {
-      writeExpanded(!current);
-      return !current;
-    });
+    if (!expanded) setRailLayout(false);
+    setExpanded(!expanded);
+    writeExpanded(!expanded);
   }
 
   const drawer = (
@@ -335,7 +358,7 @@ export function AppShell() {
       open={isMobile ? mobileOpen : true}
       onOpenChange={(_, data) => setMobileOpen(data.open)}
       selectedValue={selected ?? ''}
-      className={mergeClasses(styles.drawer, collapsed && styles.rail)}
+      className={mergeClasses(styles.drawer, narrow && styles.rail)}
     >
       <NavDrawerHeader className={mergeClasses(styles.header, collapsed && styles.headerRail)}>
         <AppTitle
@@ -346,7 +369,7 @@ export function AppShell() {
         <Tooltip content={collapseLabel} relationship="label" positioning="after">
           <Button
             appearance="subtle"
-            icon={collapsed ? <PanelLeftExpand20Regular /> : <PanelLeftContract20Regular />}
+            icon={narrow ? <PanelLeftExpand20Regular /> : <PanelLeftContract20Regular />}
             onClick={toggle}
             aria-expanded={isMobile ? mobileOpen : expanded}
           />
