@@ -84,7 +84,10 @@ export function TimeGridBody({ dayCount, children }: { dayCount: number; childre
   return (
     <div
       ref={viewportRef}
-      className="border-border overflow-x-hidden overflow-y-auto overscroll-contain border-t"
+      // Ab `sm` füllt das Raster den Platz, den die Seite ihm lässt (Eltern sind
+      // Flex-Spalten bis zur Seite mit `FILL_VIEWPORT_SM`); darunter das feste
+      // Fenster von zwölf Stunden.
+      className="border-border overflow-x-hidden overflow-y-auto overscroll-contain border-t sm:h-auto! sm:min-h-0 sm:flex-1"
       style={{ height: VISIBLE_HOURS * HOUR_PX + 16 }}
     >
       <div

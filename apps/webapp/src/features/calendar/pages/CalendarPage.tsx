@@ -1,3 +1,4 @@
+import { cn } from '@bautakt/ui';
 import { Button, MessageBar, Tab, TabList } from '@fluentui/react-components';
 import { AddRegular, ChevronLeftRegular, ChevronRightRegular } from '@fluentui/react-icons';
 import { useMemo, useState } from 'react';
@@ -6,6 +7,7 @@ import { useSearchParams } from 'react-router';
 
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { FILL_VIEWPORT_SM } from '@/components/layout/fillViewport';
 import { useAssignments } from '@/features/assignments/useAssignments';
 import { useAuth } from '@/features/auth/useAuth';
 import { useMembership } from '@/features/company/useMembership';
@@ -202,8 +204,12 @@ export function CalendarPage() {
 
   const isLoading = events.isPending || (show.assignment && assignments.isPending);
 
+  // Tag, Woche und Monat reichen bis zum unteren Fensterrand; das Jahr ist eine
+  // lange Liste von Monaten und läuft mit der Seite.
+  const fillViewport = view !== 'jahr';
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className={cn('flex flex-col gap-6', fillViewport && FILL_VIEWPORT_SM)}>
       <PageHeader
         title={t('domain:calendar.title')}
         description={t('domain:calendar.description')}
@@ -220,10 +226,9 @@ export function CalendarPage() {
         }
       />
 
-      {/* Werkzeugleiste und Raster enger zusammen, damit die Woche auch mit
-          Ganztägig-Zeile ohne Scrollen ins Bild passt (Raster so hoch wie in
-          der Einsatzplanung). */}
-      <div className="flex flex-col gap-3">
+      {/* Werkzeugleiste und Raster enger zusammen; das Raster füllt den Rest
+          der Seite bis zum Fensterrand und scrollt in sich. */}
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <TabList
             size="small"

@@ -1,5 +1,7 @@
+import { cn } from '@bautakt/ui';
 import { useMemo } from 'react';
 
+import { FILL_VIEWPORT_XL } from '@/components/layout/fillViewport';
 import { useProfileImageUrls } from '@/features/team/useProfileImageUrls';
 
 import { CrewPlanSection } from '../components/CrewPlanSection';
@@ -38,9 +40,8 @@ export function OverviewPage() {
   const urls = useProfileImageUrls(imagePaths).data ?? {};
 
   return (
-    // Auf breiten Bildschirmen reicht die Seite genau bis zum unteren Rand:
-    // Höhe des Fensters minus Kopfzeile (h-14) und Innenabstand von `main` (2 × p-6).
-    <div className="flex flex-col gap-6 xl:h-[calc(100svh-3.5rem-3rem)] xl:min-h-[560px]">
+    // Auf breiten Bildschirmen reicht die Seite genau bis zum unteren Rand.
+    <div className={cn('flex flex-col gap-6', FILL_VIEWPORT_XL)}>
       <OverviewGreeting firstName={firstName.data ?? ''} />
 
       {/*

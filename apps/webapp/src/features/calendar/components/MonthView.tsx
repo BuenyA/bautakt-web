@@ -35,7 +35,7 @@ export function MonthView({
   const { t } = useTranslation();
 
   return (
-    <div className="border-border overflow-hidden rounded-lg border">
+    <div className="border-border flex min-h-0 flex-col overflow-hidden rounded-lg border sm:flex-1">
       <div className="bg-surface text-muted-foreground grid grid-cols-7 text-xs font-medium">
         {WEEKDAYS.map((day) => (
           <span key={day} className="px-2 py-2 text-center">
@@ -44,7 +44,8 @@ export function MonthView({
         ))}
       </div>
 
-      <div className="grid grid-cols-7">
+      {/* Ab `sm` teilen sich die Wochen die Höhe bis zum Fensterrand gleichmäßig. */}
+      <div className="grid grid-cols-7 sm:min-h-0 sm:flex-1 sm:auto-rows-[minmax(0,1fr)]">
         {days.map((iso) => {
           const date = parseIsoDay(iso);
           const inMonth = date.getMonth() === month;
@@ -56,7 +57,7 @@ export function MonthView({
             <div
               key={iso}
               className={cn(
-                'group border-border min-h-16 min-w-0 border-t border-r p-1 sm:min-h-28 sm:p-1.5 [&:nth-child(7n)]:border-r-0',
+                'group border-border min-h-16 min-w-0 border-t border-r p-1 sm:min-h-0 sm:overflow-hidden sm:p-1.5 [&:nth-child(7n)]:border-r-0',
                 inMonth ? 'bg-background' : 'bg-surface/40',
               )}
             >

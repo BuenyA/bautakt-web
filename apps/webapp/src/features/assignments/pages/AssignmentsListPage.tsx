@@ -1,3 +1,4 @@
+import { cn } from '@bautakt/ui';
 import { Button, Link as FluentLink } from '@fluentui/react-components';
 import { AddRegular, ChevronLeftRegular, ChevronRightRegular } from '@fluentui/react-icons';
 import { useState } from 'react';
@@ -8,6 +9,7 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
+import { FILL_VIEWPORT_SM } from '@/components/layout/fillViewport';
 import {
   addDays,
   combineLocal,
@@ -116,12 +118,13 @@ export function AssignmentsListPage() {
   const isThisWeek = monday === startOfWeek(todayIso);
 
   return (
-    <div className="flex flex-col gap-6">
+    // Ab `sm` reicht der Wochenplan bis zum unteren Fensterrand.
+    <div className={cn('flex flex-col gap-6', FILL_VIEWPORT_SM)}>
       {header}
 
       {/* Werkzeugleiste rechtsbündig (von rechts: „Diese Woche“, Pfeile, Woche),
           eng am Raster wie im Kalender. */}
-      <div className="flex flex-col gap-3">
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
         <div
           className="flex flex-wrap items-center justify-end gap-2"
           role="group"

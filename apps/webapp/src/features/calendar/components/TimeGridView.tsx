@@ -50,7 +50,7 @@ export function TimeGridView({
   const hasAllDay = allDayByDay.some((list) => list.length > 0);
 
   return (
-    <div className="border-border overflow-hidden rounded-lg border">
+    <div className="border-border flex min-h-0 flex-col overflow-hidden rounded-lg border sm:flex-1">
       <TimeGridHeader days={days} todayIso={todayIso} onOpenDay={onOpenDay} />
 
       {hasAllDay ? (

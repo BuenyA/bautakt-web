@@ -96,7 +96,7 @@ function forDay(assignments: readonly AssignmentListRow[], dayIso: string) {
 export function AssignmentWeekView(props: Props) {
   return (
     <>
-      <div className="hidden sm:block">
+      <div className="hidden sm:flex sm:min-h-0 sm:flex-1 sm:flex-col">
         <WeekGrid {...props} />
       </div>
       <div className="sm:hidden">
@@ -113,7 +113,7 @@ function WeekGrid({ days, todayIso, now, assignments, urls, onCreate }: Props) {
   const label = useAssignmentLabel();
 
   return (
-    <div className="border-border overflow-hidden rounded-lg border">
+    <div className="border-border flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border">
       <TimeGridHeader days={days} todayIso={todayIso} />
       <TimeGridBody dayCount={days.length}>
         {days.map((iso) => {
