@@ -38,15 +38,18 @@ export function OverviewPage() {
   const urls = useProfileImageUrls(imagePaths).data ?? {};
 
   return (
-    <div className="flex flex-col gap-6">
+    // Auf breiten Bildschirmen reicht die Seite genau bis zum unteren Rand:
+    // Höhe des Fensters minus Kopfzeile (h-14) und Innenabstand von `main` (2 × p-6).
+    <div className="flex flex-col gap-6 xl:h-[calc(100svh-3.5rem-3rem)] xl:min-h-[560px]">
       <OverviewGreeting firstName={firstName.data ?? ''} />
 
       {/*
         Eine Reihe auf breiten Bildschirmen: links der Einsatzplan (wer ist wo —
         die erste Frage am Morgen), in der Mitte, gleich breit, was zu tun ist,
         rechts schmal der Kalender — er zeigt ohnehin nur den heutigen Tag.
+        Die Reihe füllt den Rest der Seite; volle Karten scrollen in sich.
       */}
-      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-[5fr_5fr_3fr]">
+      <div className="grid gap-4 lg:grid-cols-2 xl:min-h-0 xl:flex-1 xl:grid-cols-[5fr_5fr_3fr] xl:grid-rows-[minmax(0,1fr)]">
         <div className="min-w-0">
           <CrewPlanSection
             assignments={today.assignments}

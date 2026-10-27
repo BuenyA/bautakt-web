@@ -1,5 +1,8 @@
-import { Caption1, makeStyles, Text, tokens } from '@fluentui/react-components';
+import { makeStyles, Text, tokens } from '@fluentui/react-components';
 import type { ReactNode } from 'react';
+
+/** Kantenlänge des Symbols im Leerzustand — Kreis oder freistehendes Symbol. */
+export const EMPTY_ICON_SIZE = 72;
 
 const useStyles = makeStyles({
   // Die Fläche unter dem Kartenkopf füllen und den Inhalt darin mittig setzen.
@@ -9,24 +12,24 @@ const useStyles = makeStyles({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: tokens.spacingVerticalS,
+    gap: tokens.spacingVerticalM,
     minHeight: 0,
     textAlign: 'center',
   },
-  // 48-px-Kreis, bisher direkt im Einsatzplan. Das Symbol darin bleibt 24 px.
+  // 72-px-Kreis; das Symbol darin ist 36 px (`EMPTY_ICON_SIZE / 2`).
   iconFrame: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '48px',
-    height: '48px',
+    width: `${EMPTY_ICON_SIZE}px`,
+    height: `${EMPTY_ICON_SIZE}px`,
     borderRadius: tokens.borderRadiusCircular,
     backgroundColor: tokens.colorNeutralBackground3,
     color: tokens.colorNeutralForeground3,
   },
   // Der Spaltenabstand allein lässt den Knopf am Hinweis kleben.
   action: {
-    marginTop: tokens.spacingVerticalS,
+    marginTop: tokens.spacingVerticalM,
   },
   description: {
     color: tokens.colorNeutralForeground3,
@@ -36,7 +39,7 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: tokens.spacingVerticalXXS,
+    gap: tokens.spacingVerticalXS,
   },
 });
 
@@ -44,8 +47,11 @@ const useStyles = makeStyles({
  * Leerzustand einer Übersichtskarte: Symbol, Titel, optional eine zweite
  * Zeile, optional eine Aktion. Dieselben Abstände wie bisher im Einsatzplan.
  *
+ * Groß gesetzt, weil die Karten auf der Startseite bis zum Bildschirmrand
+ * reichen: ein kleiner Hinweis ginge in der leeren Fläche unter.
+ *
  * Ein String als Titel wird gedämpft gesetzt — so bleibt der Einsatzplan.
- * „Zu erledigen“ übergibt eine starke Zeile und die Caption als Beschreibung.
+ * „Zu erledigen“ übergibt eine starke Zeile und eine Beschreibung.
  */
 export function DashboardEmptyState({
   icon,
@@ -60,10 +66,18 @@ export function DashboardEmptyState({
 }) {
   const styles = useStyles();
   const titleNode =
-    typeof title === 'string' ? <Text className="text-muted-foreground">{title}</Text> : title;
+    typeof title === 'string' ? (
+      <Text size={500} className="text-muted-foreground">
+        {title}
+      </Text>
+    ) : (
+      title
+    );
   const descriptionNode =
     description == null ? null : typeof description === 'string' ? (
-      <Caption1 className={styles.description}>{description}</Caption1>
+      <Text size={400} className={styles.description}>
+        {description}
+      </Text>
     ) : (
       description
     );
