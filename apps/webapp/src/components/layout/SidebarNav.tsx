@@ -1,30 +1,31 @@
-import { NavItem, Tooltip } from '@fluentui/react-components';
+import { mergeClasses, NavItem, Tooltip } from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';
 
 import { useRouterLink } from '@/components/common/useRouterLink';
 
 import type { NavItem as NavItemConfig } from './navItems';
+import { useSidebarStyles } from './sidebarStyles';
 
 /**
  * Ein Eintrag der Seitenleiste als Fluent-`NavItem`, der clientseitig
  * navigiert.
  *
- * Eingeklappt (Icon-Leiste) bleibt der Text für Screenreader im Eintrag und
- * erscheint sichtbar als Tooltip. Der aktive Eintrag bekommt Fluents neutrale
+ * Eingeklappt (Icon-Leiste) bleibt der Text im Eintrag, nur ausgeblendet —
+ * Screenreader lesen ihn weiter, sichtbar erscheint er als Tooltip.
+ * Icon und Text stehen in beiden Zuständen gleich (`sidebarStyles`). Der aktive Eintrag bekommt Fluents neutrale
  * Fläche und den Brand-Indikator; das steuert `selectedValue` am `NavDrawer`.
  */
 export function SidebarNavItem({
   item,
   collapsed,
   onNavigate,
-  className,
 }: {
   item: NavItemConfig;
   collapsed: boolean;
   onNavigate?: () => void;
-  className?: string;
 }) {
   const { t } = useTranslation();
+  const sidebar = useSidebarStyles();
   const link = useRouterLink(item.to);
   const Icon = item.icon;
   const label = t(item.labelKey);
@@ -34,13 +35,13 @@ export function SidebarNavItem({
       value={item.to}
       href={link.href}
       icon={<Icon />}
-      className={className}
+      className={sidebar.item}
       onClick={(event) => {
         link.onClick(event);
         onNavigate?.();
       }}
     >
-      {collapsed ? <span className="sr-only">{label}</span> : label}
+      <span className={mergeClasses(sidebar.label, collapsed && sidebar.labelHidden)}>{label}</span>
     </NavItem>
   );
 
