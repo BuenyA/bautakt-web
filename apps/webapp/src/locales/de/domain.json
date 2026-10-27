@@ -887,6 +887,44 @@
     "noData": "Keine Daten im Zeitraum",
     "noDataDescription": "Für diesen Zeitraum sind keine Belege erfasst."
   },
+  "datevExport": {
+    "title": "Export im DATEV-Format",
+    "description": "Buchungsstapel und Belege meiner Ausgangsrechnungen, Stornos und Gutschriften für die Steuerberatung, je Monat.",
+    "monthLabel": "Monat",
+    "checking": "Monat wird geprüft …",
+    "ready_one": "Bereit: 1 Buchung.",
+    "ready_other": "Bereit: {{count}} Buchungen.",
+    "download": "Buchungsstapel und Belege herunterladen",
+    "downloaded_one": "{{csvName}} und {{zipName}} mit 1 Beleg wurden heruntergeladen.",
+    "downloaded_other": "{{csvName}} und {{zipName}} mit {{count}} Belegen wurden heruntergeladen.",
+    "archiveMissing": "Für {{documents}} fehlt das Archiv-PDF. Ohne Original gibt es kein Beleg-ZIP; es wurde nichts heruntergeladen.",
+    "empty": "In diesem Monat gibt es keine festgeschriebenen Ausgangsrechnungen, also nichts zu exportieren.",
+    "blocked": "So lässt sich der Monat nicht in DATEV importieren. Bitte behebe zuerst diese Punkte:",
+    "warnings": "Bitte prüfe vor dem Import:",
+    "toSettings": "Zu den DATEV-Einstellungen",
+    "failed": {
+      "auth": "Deine Anmeldung ist abgelaufen. Bitte melde dich neu an.",
+      "forbidden": "Dir fehlt die Berechtigung für den Export.",
+      "unknown": "Der Export ist fehlgeschlagen. Bitte prüfe die Verbindung und versuche es erneut."
+    },
+    "findings": {
+      "numbers_missing": "Berater- und Mandantennummer fehlen in den DATEV-Einstellungen.",
+      "currency": "{{document}}: Nur Belege in Euro lassen sich exportieren (Währung {{value}}).",
+      "issue_date_missing": "{{document}}: Das Rechnungsdatum fehlt.",
+      "chart_mismatch": "{{document}}: Der Beleg wurde mit {{value}} festgeschrieben, eingestellt ist ein anderer Kontenrahmen.",
+      "debtor_missing": "{{document}}: Für den Kunden ist kein Debitorenkonto hinterlegt.",
+      "debtor_length": "{{document}}: Das Debitorenkonto {{value}} passt nicht zur eingestellten Kontenlänge.",
+      "account_missing": "{{document}}: Für einen Steuersatz fehlt das Erlöskonto.",
+      "account_length": "{{document}}: Das Erlöskonto {{value}} passt nicht zur eingestellten Kontenlänge.",
+      "split_mismatch": "{{document}}: Die Positionen ergeben nicht die Summen je Steuersatz.",
+      "total_mismatch": "{{document}}: Die Buchungen ergeben nicht den Bruttobetrag des Belegs.",
+      "cost_center_invalid": "{{document}}: Die Kostenstelle {{value}} enthält Zeichen, die DATEV nicht annimmt.",
+      "collective_debtor": "{{document}}: wird auf den Sammel-Debitor {{value}} gebucht.",
+      "document_number_changed": "{{document}}: Die Belegnummer enthält Zeichen, die DATEV nicht annimmt. Sie wird ohne diese Zeichen übergeben.",
+      "chars_replaced": "{{document}}: Die Zeichen {{value}} gibt es in DATEV nicht. Sie werden durch ? ersetzt.",
+      "no_bookings": "{{document}}: Der Betrag ist 0, es entsteht keine Buchung."
+    }
+  },
   "employees": {
     "title": "Mitarbeiter",
     "description": "Beschäftigte meines Betriebs.",

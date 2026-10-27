@@ -76,6 +76,8 @@ export const routes = {
   expenses: '/rechnungen/eingang',
   dunning: '/mahnwesen',
   reports: '/auswertungen',
+  /** Buchungsstapel und Belege eines Monats für die Steuerberatung (#169). */
+  datevExport: '/rechnungen/datev-export',
 
   // Team — Hub `/personal`, Verzeichnis bleibt `/mitarbeiter`.
   personalHub: '/personal',

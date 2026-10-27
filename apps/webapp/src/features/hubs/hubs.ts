@@ -1,5 +1,6 @@
 import { hasPermission, type PermissionKey } from '@bautakt/core';
 import {
+  ArrowDownloadRegular,
   BeachRegular,
   BoxMultipleRegular,
   BoxRegular,
@@ -117,6 +118,13 @@ export const financeHub: Hub = {
       to: routes.reports,
       icon: DataHistogramRegular,
       permission: 'canViewCompanyFinance',
+    },
+    {
+      // Dieselben Rechte wie `datev_sales_export`.
+      titleKey: 'common:hub.finance.tabs.datevExport',
+      to: routes.datevExport,
+      icon: ArrowDownloadRegular,
+      anyPermission: ['canUseBillingModule', 'canViewCompanyFinance', 'canViewManagementInvoices'],
     },
   ],
 };
