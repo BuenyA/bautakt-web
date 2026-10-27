@@ -27,6 +27,13 @@ export const invoiceFromOrderParam = 'auftrag';
 /** Query von `/rechnungen/neu?gutschrift=…`: Gutschrift zu dieser Rechnung. */
 export const creditNoteFromParam = 'gutschrift';
 
+/**
+ * Query, der auf der Belegseite den Versanddialog öffnet (`?versenden=1`),
+ * etwa nach „Festschreiben und danach versenden“ (#186). Die Seite entfernt
+ * ihn danach.
+ */
+export const sendParam = 'versenden';
+
 export const routes = {
   // Oeffentlich
   login: '/login',
@@ -54,6 +61,7 @@ export const routes = {
   quoteNew: '/angebote/neu',
   invoices: '/rechnungen/ausgang',
   invoice: (id: string) => `/rechnungen/${id}`,
+  invoiceSend: (id: string) => `/rechnungen/${id}?${sendParam}=1`,
   invoiceNew: '/rechnungen/neu',
   /** Neue Rechnung mit Kunde und Positionen eines Auftrags (`?auftrag=`). */
   invoiceNewFromOrder: (orderId: string) =>

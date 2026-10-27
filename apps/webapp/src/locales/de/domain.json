@@ -1426,7 +1426,8 @@
         },
         "debtorUnresolved": "Es gibt keinen Debitor. Ergänze die Kundennummer am Kontakt oder einen Sammel-Debitor in den DATEV-Einstellungen.",
         "accountMissing": "Für {{tax}} ist kein Erlöskonto hinterlegt. Ergänze es in den DATEV-Einstellungen, sonst fehlt es im Export."
-      }
+      },
+      "sendAfter": "Danach per E-Mail versenden"
     },
     "discard": {
       "title": "Änderungen verwerfen?",
@@ -1905,11 +1906,6 @@
       "replyTo": "Antwort an",
       "senderAddress": "rechnungen@bautakt.com"
     },
-    "footer": {
-      "office": "Sitz",
-      "directors": "Geschäftsführer",
-      "missing": "{{field}} fehlt"
-    },
     "template": {
       "invoice": {
         "subject": "Rechnung {{number}} von {{company}}",
@@ -1934,15 +1930,25 @@
       "subject": "Bitte einen Betreff angeben.",
       "text": "Bitte eine Nachricht angeben.",
       "codes": {
-        "not_available": "Der E-Mail-Versand ist noch nicht eingerichtet. Der Beleg bleibt unverändert.",
         "recipient_not_allowed": "Im Testmodus gehen Mails nur an freigegebene Testadressen. Diese Adresse ist nicht freigegeben.",
         "legal_footer_incomplete": "Es fehlen Pflichtangaben deines Betriebs für die Fußzeile. Bitte in den Einstellungen ergänzen.",
         "send_limit_exceeded": "Das Versandlimit deines Betriebs ist erreicht. Bitte später noch einmal versuchen.",
         "mail_not_configured": "Der E-Mail-Versand ist für deinen Betrieb noch nicht eingerichtet.",
         "provider_failed": "Der Mail-Dienst hat die E-Mail nicht angenommen. Bitte später noch einmal versuchen.",
         "forbidden": "Du darfst Belege nicht versenden.",
-        "unknown": "Unbekannter Fehler. Bitte noch einmal versuchen."
+        "unknown": "Unbekannter Fehler. Bitte noch einmal versuchen.",
+        "provider_outcome_unknown": "Unklar, ob die E-Mail angekommen ist. Frag beim Empfänger nach, bevor du sie noch einmal sendest.",
+        "send_in_progress": "Die E-Mail wird gerade versendet. Bitte einen Moment warten.",
+        "idempotency_conflict": "Die Bestätigung passt nicht mehr zu dieser E-Mail. Bitte zurück und die Vorschau neu öffnen.",
+        "invalid_request": "Die E-Mail konnte so nicht versendet werden. Bitte Empfänger, Betreff und Text prüfen."
       }
+    },
+    "previewLoading": "Vorschau wird erstellt …",
+    "previewError": "Die Vorschau konnte nicht erstellt werden.",
+    "result": {
+      "sent": "E-Mail an {{to}} versendet",
+      "dryRun": "Probelauf: Die E-Mail wurde geprüft und archiviert, aber nicht verschickt.",
+      "bookkeepingFailed": "Der Beleg konnte danach nicht als versendet markiert werden. Bitte „Als versendet markieren“ nutzen."
     }
   },
   "mailSettings": {
