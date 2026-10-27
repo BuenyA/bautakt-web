@@ -16,13 +16,16 @@ Ziel: der ganze Betrieb auf einen Blick.
      Alle Kacheln sehen gleich aus: laufende nicht farbig hervorgehoben (Farbe zog
      den Blick zu stark), vergangene nicht gedämpft (Owner-Vorgabe). „Zum Einsatz“
      steht rechtsbündig. Ohne Einsätze stehen Icon, Hinweis und „Einsatz planen“
-     in der Mitte des Kartenkörpers — der füllt die Zeilenhöhe (`flex: 1`,
-     `min-height: 0`). „Zu erledigen“ nutzt diesen Baustein nicht; dort bleibt
-     der Satz oben.
+     in der Mitte des Kartenkörpers. Der Körper füllt die Zeilenhöhe
+     (`height: 100%` an der Karte, `flex-grow: 1` am Körper, `min-height: 0`).
+     Denselben Baustein `DashboardEmptyState` nutzt „Zu erledigen“.
    - **Zu erledigen** (Mitte, `TodoPanel`, so breit wie der Einsatzplan): Anträge (mit
      „Genehmigen“ über `approve_absence` und „Ablehnen“ mit Grund, siehe
      [abwesenheiten.md](abwesenheiten.md)), neu eingegangene Eingangsrechnungen, Fristen
      (7 Tage + Überfälliges), überfällige Rechnungen, mahnfähige Belege und Entwürfe.
+     Ist nichts offen, stehen Häkchen (`CheckmarkCircle48Regular` in
+     `colorStatusSuccessForeground1`, 48 px), „Alles erledigt für heute“ und
+     „Keine offenen Aufgaben“ in der Mitte derselben Kartenhöhe.
    - **Heute** (rechts, `TodayPlanCard`, schmalste Spalte): Abwesende mit Profilbild,
      ganztägige Termine, darunter die Zeitleiste (`DayTimeline`, 32 px je Stunde) für den
      ganzen Tag 0–24 Uhr in einem Fenster von zwölf Stunden, in dem die Uhrzeit scrollt.

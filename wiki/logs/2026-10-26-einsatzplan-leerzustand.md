@@ -22,3 +22,5 @@ Gemessen im Browser an den echten Karten (`CrewPlanSection`, `TodoPanel`,
 unter dem Knopf, Mitte bei 0. Bei 390 und 1100 px ist die Karte nur so hoch
 wie der Inhalt, der Block horizontal mittig, der Knopf übersteht nicht.
 Mit einem Einsatz bleibt die Kachel oben. Hell und dunkel.
+
+Nachgezogen am 2026-10-27: [Leerzustand in „Zu erledigen“](2026-10-27-zu-erledigen-leerzustand.md).
