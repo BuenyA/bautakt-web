@@ -16,9 +16,11 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 
+import { DatevExportCard } from '../DatevExportCard';
 import { FinanceHeader } from '../FinanceHeader';
 import { FinanceKpiCards } from '../FinanceKpiCards';
 import { expenseEntries, useExpenses, useIncomingInvoiceList } from '../useExpenses';
+import { useFinanceAccess } from '../useFinanceAccess';
 import { useFinanceNumbers } from '../useFinanceNumbers';
 import { INVOICE_TYPE_LIST, useSalesDocuments } from '../useSalesDocuments';
 
@@ -39,6 +41,7 @@ export function ReportsPage() {
   const labels = useDataTableLabels();
   const [months, setMonths] = useState<number>(12);
   const numbers = useFinanceNumbers();
+  const access = useFinanceAccess();
 
   const documents = useSalesDocuments(INVOICE_TYPE_LIST);
   const expenses = useExpenses();
@@ -180,6 +183,9 @@ export function ReportsPage() {
           }
         />
       </div>
+
+      {/* Dieselben Rechte wie `datev_sales_export`; die Grenze zieht die Datenbank. */}
+      {access.canReadSalesDocuments || access.canViewCompanyFinance ? <DatevExportCard /> : null}
     </div>
   );
 }
