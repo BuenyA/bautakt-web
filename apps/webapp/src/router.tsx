@@ -18,6 +18,7 @@ import { ContactDetailPage } from '@/features/contacts/pages/ContactDetailPage';
 import { ContactsListPage } from '@/features/contacts/pages/ContactsListPage';
 import { LegacyCustomerRedirect } from '@/features/contacts/pages/LegacyCustomerRedirect';
 import { LegacyExpensesRedirect } from '@/features/finance/LegacyExpensesRedirect';
+import { DatevExportPage } from '@/features/finance/pages/DatevExportPage';
 import { DocumentEditorPage } from '@/features/finance/pages/DocumentEditorPage';
 import { DunningPage } from '@/features/finance/pages/DunningPage';
 import { ExpensesPage } from '@/features/finance/pages/ExpensesPage';
@@ -148,6 +149,20 @@ export const router = createBrowserRouter([
                 element: (
                   <RequirePermission anyOf={['canViewCompanyFinance']}>
                     <ReportsPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.datevExport,
+                element: (
+                  <RequirePermission
+                    anyOf={[
+                      'canUseBillingModule',
+                      'canViewCompanyFinance',
+                      'canViewManagementInvoices',
+                    ]}
+                  >
+                    <DatevExportPage />
                   </RequirePermission>
                 ),
               },

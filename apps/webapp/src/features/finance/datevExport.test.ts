@@ -7,6 +7,7 @@ import {
   monthValue,
   parseMonthValue,
   previousMonth,
+  readCheckResponse,
   readExportResponse,
 } from './datevExport.ts';
 
@@ -100,5 +101,49 @@ describe('Antwort von datev-export', () => {
       }).kind,
       'failed',
     );
+  });
+});
+
+describe('Prüfung vor dem Download', () => {
+  it('importierbar mit Warnungen', () => {
+    assert.deepEqual(
+      readCheckResponse(200, {
+        ok: true,
+        check_only: true,
+        importable: true,
+        bookings: 2,
+        findings: [
+          { code: 'chars_replaced', severity: 'warning', document: 'RE00002', value: 'Ł' },
+        ],
+      }),
+      {
+        kind: 'checked',
+        importable: true,
+        bookings: 2,
+        findings: [
+          { code: 'chars_replaced', severity: 'warning', document: 'RE00002', value: 'Ł' },
+        ],
+      },
+    );
+  });
+
+  it('nicht importierbar bleibt eine Prüfung, kein Fehler', () => {
+    const outcome = readCheckResponse(200, {
+      ok: true,
+      check_only: true,
+      importable: false,
+      bookings: 0,
+      findings: [{ code: 'debtor_missing', severity: 'error', document: 'RE00003' }],
+    });
+    assert.equal(outcome.kind, 'checked');
+    assert.equal(outcome.kind === 'checked' && outcome.importable, false);
+  });
+
+  it('Antwort ohne check_only (alte Function) gilt als Fehler', () => {
+    assert.deepEqual(readCheckResponse(200, { ok: true, bookings: 2, findings: [] }), {
+      kind: 'failed',
+      reason: 'unknown',
+    });
+    assert.deepEqual(readCheckResponse(403, {}), { kind: 'failed', reason: 'forbidden' });
   });
 });

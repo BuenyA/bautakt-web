@@ -93,7 +93,8 @@
         "incoming": "Eingangsrechnungen",
         "quotes": "Angebote",
         "dunning": "Mahnwesen",
-        "reports": "Auswertungen"
+        "reports": "Auswertungen",
+        "datevExport": "DATEV-Export"
       }
     },
     "personal": {

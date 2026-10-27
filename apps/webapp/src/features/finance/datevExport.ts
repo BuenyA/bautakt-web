@@ -42,7 +42,14 @@ export type ExportOutcome =
   | { kind: 'file'; fileName: string; bytes: Uint8Array; bookings: number; findings: Finding[] }
   | { kind: 'empty'; findings: Finding[] }
   | { kind: 'blocked'; findings: Finding[] }
-  | { kind: 'failed'; reason: 'auth' | 'forbidden' | 'unknown' };
+  | { kind: 'failed'; reason: FailureReason };
+
+export type FailureReason = 'auth' | 'forbidden' | 'unknown';
+
+/** Prüfung vor dem Download (`check_only`, #169). */
+export type CheckOutcome =
+  | { kind: 'checked'; importable: boolean; bookings: number; findings: Finding[] }
+  | { kind: 'failed'; reason: FailureReason };
 
 /**
  * Vorgabe ist der Vormonat: Exportiert wird, wenn der Monat abgeschlossen
@@ -151,4 +158,26 @@ export function readExportResponse(status: number, body: unknown): ExportOutcome
     bookings: payload.bookings,
     findings,
   };
+}
+
+/**
+ * Antwort der Prüfung (`check_only: true`) einordnen. Die Function antwortet
+ * dabei immer mit 200; ob der Monat importierbar ist, steht in `importable`.
+ */
+export function readCheckResponse(status: number, body: unknown): CheckOutcome {
+  const payload = (body && typeof body === 'object' ? body : {}) as Record<string, unknown>;
+  if (status === 401) return { kind: 'failed', reason: 'auth' };
+  if (status === 403) return { kind: 'failed', reason: 'forbidden' };
+  const { findings, unknown } = readFindings(payload.findings);
+  if (
+    status !== 200 ||
+    payload.ok !== true ||
+    payload.check_only !== true ||
+    typeof payload.importable !== 'boolean' ||
+    typeof payload.bookings !== 'number' ||
+    unknown > 0
+  ) {
+    return { kind: 'failed', reason: 'unknown' };
+  }
+  return { kind: 'checked', importable: payload.importable, bookings: payload.bookings, findings };
 }
