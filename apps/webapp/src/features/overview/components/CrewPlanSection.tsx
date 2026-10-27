@@ -105,7 +105,6 @@ export function CrewPlanSection({
                 <LinkButton
                   to={withCreate(routes.assignments)}
                   appearance="primary"
-                  size="large"
                   icon={<AddRegular />}
                 >
                   {t('domain:overview.today.plan')}
