@@ -26,7 +26,8 @@ alles auf `index.html`. Siehe [fallstricke.md](fallstricke.md).
 
 `rewrites`, nicht `redirects`. Vercel liefert statische Dateien vor den Rewrites aus,
 der Catch-all verdeckt `/assets/*` also nicht. Nicht mit einem Negative-Lookahead
-„reparieren".
+„reparieren". Derselbe Eintrag `/(.*) → /index.html` fängt auch `/impressum` und
+`/datenschutz`. Dafür war keine Änderung an `vercel.json` nötig.
 
 ## Die Webapp gehört nicht in den Index
 

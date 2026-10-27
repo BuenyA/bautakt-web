@@ -9,3 +9,7 @@ package-lock.json
 *.tsbuildinfo
 # Generiert — nie formatieren, sonst rauscht jede Neugenerierung im Diff
 packages/supabase/src/database.types.ts
+
+# Rechtstexte wörtlich lassen. Prettier würde Zeilenumbrüche im Adressblock umbrechen.
+apps/webapp/src/content/legal/impressum.md
+apps/webapp/src/content/legal/datenschutz.md

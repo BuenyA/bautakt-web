@@ -1,37 +1,41 @@
 /**
- * Impressum, Datenschutz und AGB leben auf der Marketing-Seite — eine Quelle,
- * kein zweiter Text in der Web-App (#81). Die Web-App verlinkt nur dorthin.
+ * Impressum und Datenschutz liegen in der Web-App (`/impressum`,
+ * `/datenschutz`). Den Wortlaut tauscht man nur in
+ * `src/content/legal/*.md` — siehe die README dort.
  *
- * ⚠️ Pre-go-live derselbe Fallback wie `SITE_URL` in
- * `apps/marketing/lib/site.ts`: der Vercel-Alias, nicht bautakt.com (dort
- * liegt noch die Parkseite). Go-live setzt `VITE_SITE_URL=https://bautakt.com`
- * im Vercel-Projekt `bautakt-webapp` — Vite ersetzt den Wert beim Build, es
- * braucht also einen Redeploy.
+ * AGB: in der Web-App gibt es keine Seite. `published: false` nimmt den
+ * Link aus der Oberfläche, statt auf eine tote Adresse zu zeigen. Sobald
+ * eine echte Seite existiert, hier `published` setzen und die Route
+ * ergänzen.
+ *
+ * Früher zeigten die Links auf die Marketing-Seite
+ * (`bautakt-web-marketing.vercel.app`, #81). Die Marketing-App bleibt
+ * unverändert und behält ihre eigenen Gerüste.
  */
-const FALLBACK_SITE_URL = 'https://bautakt-web-marketing.vercel.app';
+import { routes } from '@/lib/routes';
 
-function siteUrl(raw: string | undefined): string {
-  const trimmed = raw?.trim();
-  if (!trimmed) return FALLBACK_SITE_URL;
-  try {
-    return new URL(trimmed).origin;
-  } catch {
-    return FALLBACK_SITE_URL;
-  }
-}
+export type LegalPageId = 'imprint' | 'privacy' | 'terms';
 
-const SITE_URL = siteUrl(import.meta.env.VITE_SITE_URL);
-
-export type LegalPage = 'imprint' | 'privacy' | 'terms';
-
-const LEGAL_PATHS: Record<LegalPage, string> = {
-  imprint: '/impressum',
-  privacy: '/datenschutz',
-  terms: '/agb',
+type LegalEntry = {
+  id: LegalPageId;
+  /** Pfad in der Web-App. `null`, solange es die Seite nicht gibt. */
+  path: string | null;
+  published: boolean;
 };
 
-export const LEGAL_PAGES: readonly LegalPage[] = ['imprint', 'privacy', 'terms'];
+const LEGAL_CATALOG: readonly LegalEntry[] = [
+  { id: 'imprint', path: routes.imprint, published: true },
+  { id: 'privacy', path: routes.privacy, published: true },
+  { id: 'terms', path: null, published: false },
+];
 
-export function legalUrl(page: LegalPage): string {
-  return `${SITE_URL}${LEGAL_PATHS[page]}`;
+/** Seiten, die verlinkt werden. AGB ist absichtlich nicht dabei. */
+export const LEGAL_PAGES: readonly LegalPageId[] = LEGAL_CATALOG.filter(
+  (entry) => entry.published && entry.path,
+).map((entry) => entry.id);
+
+export function legalPath(page: LegalPageId): string | null {
+  const entry = LEGAL_CATALOG.find((item) => item.id === page);
+  if (!entry?.published || !entry.path) return null;
+  return entry.path;
 }

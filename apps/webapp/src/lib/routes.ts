@@ -28,11 +28,14 @@ export const invoiceFromOrderParam = 'auftrag';
 export const creditNoteFromParam = 'gutschrift';
 
 export const routes = {
-  // Oeffentlich
+  // Oeffentlich. Impressum und Datenschutz liegen ausserhalb der
+  // Auth-Guards, damit sie ohne Sitzung und auch angemeldet erreichbar sind.
   login: '/login',
   register: '/registrieren',
   forgotPassword: '/passwort-vergessen',
   resetPassword: '/passwort-zuruecksetzen',
+  imprint: '/impressum',
+  privacy: '/datenschutz',
 
   // Geschuetzt. Die Top-Nav ist flach (zehn Punkte). Drei davon sind Hubs;
   // die Listen dahinter behalten ihre Pfade.

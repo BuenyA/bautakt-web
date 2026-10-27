@@ -3,13 +3,17 @@ import '@/index.css';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { RouterProvider } from 'react-router';
+import { createBrowserRouter, RouterProvider } from 'react-router';
 
 import { Providers } from '@/app/Providers';
 import { ThemeProvider } from '@/app/ThemeProvider';
 import { BootErrorPage } from '@/components/common/BootErrorPage';
 import { supabaseBootError } from '@/lib/supabase';
-import { router } from '@/router';
+import { appRoutes } from '@/router';
+
+// Erst hier, nicht im Modul der Routentabelle: createBrowserRouter braucht
+// `document`. Der Test der Rechtsseiten importiert nur `appRoutes`.
+const router = createBrowserRouter(appRoutes);
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('#root nicht gefunden.');
