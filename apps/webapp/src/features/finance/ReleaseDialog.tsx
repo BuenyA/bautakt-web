@@ -1,5 +1,6 @@
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogBody,
@@ -11,6 +12,7 @@ import {
   MessageBarTitle,
   Spinner,
 } from '@fluentui/react-components';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { DatevReleaseHint } from './datevAccounts';
@@ -28,6 +30,10 @@ import { useDatevReleaseHints } from './useDatevReleaseHints';
  * Bei Rechnungen zeigt er außerdem, was DATEV vom gespeicherten Stand
  * bekommt, wenn etwas fehlt (#187). Das sperrt nicht: festgeschrieben wird
  * dann mit Sammel-Debitor bzw. ohne Erlöskonto.
+ *
+ * „Danach per E-Mail versenden“ (#186): Nach dem Festschreiben öffnet die
+ * Belegseite den Versanddialog. Versendet wird erst dort, nach Vorschau und
+ * Bestätigung.
  */
 export function ReleaseDialog({
   open,
@@ -46,14 +52,20 @@ export function ReleaseDialog({
   preview?: 'ready' | 'pending' | 'failed';
   /** Gespeicherter Entwurf, dessen DATEV-Angaben geprüft werden; leer = keine Hinweise. */
   datevDocumentId?: string | null;
-  onConfirm: () => void;
+  /** `sendAfter`: danach den Versanddialog öffnen. */
+  onConfirm: (sendAfter: boolean) => void;
   onClose: () => void;
 }) {
   const { t } = useTranslation();
   const datev = useDatevReleaseHints(datevDocumentId, open && kind === 'invoice');
   const hints = datev.data ?? [];
+  const [sendAfter, setSendAfter] = useState(false);
+  const close = () => {
+    setSendAfter(false);
+    onClose();
+  };
   return (
-    <Dialog open={open} onOpenChange={(_, data) => !data.open && !pending && onClose()}>
+    <Dialog open={open} onOpenChange={(_, data) => !data.open && !pending && close()}>
       <DialogSurface>
         <DialogBody>
           <DialogTitle>{t(`domain:editor.release.title.${kind}`)}</DialogTitle>
@@ -81,9 +93,15 @@ export function ReleaseDialog({
                 </MessageBarBody>
               </MessageBar>
             ) : null}
+            <Checkbox
+              checked={sendAfter}
+              disabled={pending}
+              label={t('domain:editor.release.sendAfter')}
+              onChange={(_, data) => setSendAfter(data.checked === true)}
+            />
           </DialogContent>
           <DialogActions>
-            <Button disabled={pending} onClick={onClose}>
+            <Button disabled={pending} onClick={close}>
               {t('common:action.cancel')}
             </Button>
             <Button
@@ -91,7 +109,7 @@ export function ReleaseDialog({
               disabled={pending || preview !== 'ready'}
               aria-busy={pending}
               icon={pending ? <Spinner size="tiny" /> : undefined}
-              onClick={onConfirm}
+              onClick={() => onConfirm(sendAfter)}
             >
               {t('domain:editor.actions.release')}
             </Button>

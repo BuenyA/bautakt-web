@@ -39,7 +39,7 @@ import {
 } from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
 
 import { DetailCard, DetailRow } from '@/components/common/DetailCard';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -50,7 +50,7 @@ import { RouterLink } from '@/components/common/RouterLink';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
-import { routes } from '@/lib/routes';
+import { routes, sendParam } from '@/lib/routes';
 
 import {
   documentFileBaseName,
@@ -117,6 +117,24 @@ export function InvoiceDetailPage() {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const sendRequested = searchParams.get(sendParam) === '1';
+  const sendReady = Boolean(
+    data &&
+    access.canWriteSalesDocuments &&
+    data.status !== 'cancelled' &&
+    data.status !== 'draft' &&
+    data.storage_path &&
+    data.content_hash,
+  );
+
+  // `?versenden=1` (nach „Festschreiben und danach versenden“): Der Dialog
+  // ist offen, sobald das Archiv-Original geladen ist; Schließen entfernt den Query.
+  const sendDialogOpen = sendOpen || (sendRequested && sendReady);
+  const closeSend = () => {
+    setSendOpen(false);
+    if (sendRequested) setSearchParams({}, { replace: true });
+  };
 
   if (isLoading) {
     return (
@@ -178,7 +196,7 @@ export function InvoiceDetailPage() {
       ? 'failed'
       : 'pending';
 
-  async function onFinalize() {
+  async function onFinalize(sendAfter: boolean) {
     if (!previewFingerprint) {
       toast.error(t('domain:editor.release.previewFailed'));
       return;
@@ -197,6 +215,7 @@ export function InvoiceDetailPage() {
           description: t('domain:editor.release.originalDiffersDescription'),
         });
       else toast.success(t('domain:invoices.finalizeSuccess', { number: documentNumber }));
+      if (sendAfter && archived) setSearchParams({ [sendParam]: '1' }, { replace: true });
     } catch (error) {
       if (error instanceof PreviewMismatchError) {
         // Etwa in der App geändert, während die Seite offen war.
@@ -799,7 +818,7 @@ export function InvoiceDetailPage() {
       ) : null}
 
       {canSendMail ? (
-        <SendDialog open={sendOpen} document={data} onClose={() => setSendOpen(false)} />
+        <SendDialog open={sendDialogOpen} document={data} onClose={closeSend} />
       ) : null}
 
       {isDraft ? (
@@ -809,7 +828,7 @@ export function InvoiceDetailPage() {
           pending={finalize.isPending}
           preview={releasePreview}
           datevDocumentId={data.id}
-          onConfirm={() => void onFinalize()}
+          onConfirm={(sendAfter) => void onFinalize(sendAfter)}
           onClose={() => setReleaseOpen(false)}
         />
       ) : null}

@@ -1,4 +1,5 @@
 import { formatMoney } from '@bautakt/finance';
+import { toast } from '@bautakt/ui';
 import {
   Button,
   Checkbox,
@@ -17,20 +18,20 @@ import {
   Textarea,
 } from '@fluentui/react-components';
 import { AttachRegular } from '@fluentui/react-icons';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { RouterLink } from '@/components/common/RouterLink';
-import { useCompanyLegalDetails, useLegalFooterMissing } from '@/features/company/useLegalFooter';
-import { effectiveReplyTo, useMailSettings } from '@/features/company/useMailSettings';
+import { useLegalFooterMissing } from '@/features/company/useLegalFooter';
+import { useMailSettings } from '@/features/company/useMailSettings';
 import { useMembership } from '@/features/company/useMembership';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 import { supabase } from '@/lib/supabase';
 
 import { documentFileBaseName } from './archiveFiles';
-import { attachmentFileName, footerSegments, parseRecipients } from './sendMail';
+import { attachmentFileName, parseRecipients } from './sendMail';
 import { chargeableMinorOf, type SalesDocumentDetail } from './useSalesDocument';
 
 type SendableDocument = Pick<
@@ -54,6 +55,10 @@ const SEND_ERRORS = new Set([
   'send_limit_exceeded',
   'mail_not_configured',
   'provider_failed',
+  'provider_outcome_unknown',
+  'send_in_progress',
+  'idempotency_conflict',
+  'invalid_request',
   'forbidden',
 ]);
 
@@ -63,6 +68,49 @@ class SendError extends Error {
     super(code);
     this.code = code;
   }
+}
+
+type SendBody = { to: string[]; subject: string; text: string };
+
+/** Antwort von `mail-send` auf `preview: true`, durchgereicht von `finance-document-send`. */
+type MailPreviewResult = {
+  html: string;
+  mode: string;
+  from: string;
+  replyTo: string | null;
+  missingLegalFields: string[];
+};
+
+/** Antwort beim Versand; `bookkeeping`: Protokoll und Status danach. */
+type SendResult = { mailId: string; mode: string; bookkeeping?: 'done' | 'failed' };
+
+/** `finance-document-send` aufrufen; Fehler als `SendError` mit Code. */
+async function invokeSend<T>(body: Record<string, unknown>): Promise<T> {
+  const { data, error } = await supabase.functions.invoke('finance-document-send', { body });
+  if (!error) return data as T;
+  // FunctionsHttpError trägt die Antwort der Function in `context`.
+  const response: unknown = (error as { context?: unknown }).context;
+  if (response instanceof Response) {
+    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+    if (payload?.error && SEND_ERRORS.has(payload.error)) throw new SendError(payload.error);
+  }
+  throw new SendError('unknown');
+}
+
+/**
+ * Vorschau vom Server (#186): genau die Mail, die `mail-send` verschicken
+ * würde, mit Absender, Reply-To, Fußzeile und fehlenden Pflichtangaben.
+ * Nichts wird archiviert oder versendet.
+ */
+function useMailPreview(documentId: string, body: SendBody, enabled: boolean) {
+  return useQuery({
+    queryKey: ['mail-preview', documentId, body],
+    enabled,
+    staleTime: 0,
+    gcTime: 0,
+    retry: false,
+    queryFn: () => invokeSend<MailPreviewResult>({ documentId, ...body, preview: true }),
+  });
 }
 
 /**
@@ -76,26 +124,8 @@ function useSendDocument(documentId: string) {
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
   return useMutation({
-    mutationFn: async (body: {
-      to: string[];
-      subject: string;
-      text: string;
-      idempotencyKey: string;
-    }) => {
-      const { error } = await supabase.functions.invoke('finance-document-send', {
-        body: { documentId, ...body },
-      });
-      if (!error) return;
-      // FunctionsHttpError trägt die Antwort der Function in `context`.
-      const response: unknown = (error as { context?: unknown }).context;
-      if (response instanceof Response) {
-        const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-        if (payload?.error && SEND_ERRORS.has(payload.error)) throw new SendError(payload.error);
-        // 501: Die Function ist noch der Platzhalter ohne Mail-Adapter.
-        if (response.status === 501) throw new SendError('not_available');
-      }
-      throw new SendError('unknown');
-    },
+    mutationFn: (body: SendBody & { idempotencyKey: string }) =>
+      invokeSend<SendResult>({ documentId, ...body }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['sales-document', companyId, documentId] });
       await queryClient.invalidateQueries({ queryKey: ['sales-documents', companyId] });
@@ -127,7 +157,6 @@ export function SendDialog({
   const { t } = useTranslation();
   const { data: membership } = useMembership();
   const companyName = membership?.companyName ?? '';
-  const legal = useCompanyLegalDetails();
   const missing = useLegalFooterMissing();
   const mail = useMailSettings();
   const mailMode = mail.data?.mail_mode;
@@ -167,7 +196,15 @@ export function SendDialog({
         ? t('domain:send.errors.noRecipient')
         : undefined;
   const editInvalid = Boolean(recipientError) || !draft.subject.trim() || !draft.text.trim();
-  const missingFields = missing.data ?? [];
+  const body: SendBody = {
+    to: recipients.valid,
+    subject: draft.subject.trim(),
+    text: draft.text.trim(),
+  };
+  const preview = useMailPreview(document.id, body, open && step === 'preview');
+  // Verbindlich ist, was der Server meldet; bis dahin die Prüfung der Firmendaten.
+  const missingFields = preview.data?.missingLegalFields ?? missing.data ?? [];
+  const previewErrorCode = preview.error instanceof SendError ? preview.error.code : null;
   const attachment = attachmentFileName(
     documentFileBaseName(document.document_number, document.customer_label),
     document,
@@ -195,12 +232,14 @@ export function SendDialog({
 
   async function onSend() {
     try {
-      await send.mutateAsync({
-        to: recipients.valid,
-        subject: draft.subject.trim(),
-        text: draft.text.trim(),
-        idempotencyKey,
-      });
+      const result = await send.mutateAsync({ ...body, idempotencyKey });
+      const to = body.to.join(', ');
+      if (result.mode === 'dry_run') toast.info(t('domain:send.result.dryRun'));
+      else if (result.bookkeeping === 'failed')
+        toast.warning(t('domain:send.result.sent', { to }), {
+          description: t('domain:send.result.bookkeepingFailed'),
+        });
+      else toast.success(t('domain:send.result.sent', { to }));
       close();
     } catch {
       // Die Meldung steht im Dialog (send.error), der Dialog bleibt offen.
@@ -289,22 +328,30 @@ export function SendDialog({
                 </p>
               </>
             ) : (
-              <MailPreview
-                companyName={companyName}
-                replyTo={effectiveReplyTo(mail.data, legal.data?.email)}
-                to={recipients.valid}
-                subject={draft.subject.trim()}
-                text={draft.text.trim()}
-                attachment={attachment}
-                footer={
-                  legal.data
-                    ? footerSegments(legal.data, missingFields, {
-                        office: t('domain:send.footer.office'),
-                        directors: t('domain:send.footer.directors'),
-                      })
-                    : []
-                }
-              />
+              <>
+                {preview.isLoading ? (
+                  <div className="flex items-center gap-2 py-6">
+                    <Spinner size="tiny" />
+                    <span className="text-muted-foreground text-sm">
+                      {t('domain:send.previewLoading')}
+                    </span>
+                  </div>
+                ) : preview.data ? (
+                  <MailPreview
+                    preview={preview.data}
+                    to={body.to}
+                    subject={body.subject}
+                    attachment={attachment}
+                  />
+                ) : (
+                  <MessageBar intent="error" layout="multiline">
+                    <MessageBarBody>
+                      <MessageBarTitle>{t('domain:send.previewError')}</MessageBarTitle>
+                      {t(`domain:send.errors.codes.${previewErrorCode ?? 'unknown'}`)}
+                    </MessageBarBody>
+                  </MessageBar>
+                )}
+              </>
             )}
 
             {step === 'preview' && missingFields.length > 0 ? (
@@ -321,7 +368,7 @@ export function SendDialog({
               </MessageBar>
             ) : null}
 
-            {step === 'preview' && missingFields.length === 0 ? (
+            {step === 'preview' && preview.data && missingFields.length === 0 ? (
               <Checkbox
                 checked={confirmed}
                 disabled={send.isPending}
@@ -354,7 +401,9 @@ export function SendDialog({
                 </Button>
                 <Button
                   appearance="primary"
-                  disabled={!confirmed || missingFields.length > 0 || send.isPending}
+                  disabled={
+                    !confirmed || !preview.data || missingFields.length > 0 || send.isPending
+                  }
                   aria-busy={send.isPending}
                   icon={send.isPending ? <Spinner size="tiny" /> : undefined}
                   onClick={() => void onSend()}
@@ -371,31 +420,25 @@ export function SendDialog({
 }
 
 /**
- * Die Mail, wie der Empfänger sie sieht. Absender und Reply-To zeigt die
- * Vorschau nach der Regel des Adapters (Standardabsender des Dienstes,
- * Antworten an den Betrieb); verbindlich bestimmt sie der Server.
+ * Die Mail, wie der Empfänger sie sieht: Kopf aus der Server-Vorschau, der
+ * Inhalt samt Fußzeile als HTML von `mail-send` in einem abgeschotteten
+ * iframe (kein Skript, keine Formulare, kein Zugriff auf die Seite).
  */
 function MailPreview({
-  companyName,
-  replyTo,
+  preview,
   to,
   subject,
-  text,
   attachment,
-  footer,
 }: {
-  companyName: string;
-  replyTo: string;
+  preview: MailPreviewResult;
   to: string[];
   subject: string;
-  text: string;
   attachment: string;
-  footer: ReturnType<typeof footerSegments>;
 }) {
   const { t } = useTranslation();
   const rows: [string, string][] = [
-    [t('domain:send.preview.from'), `${companyName} <${t('domain:send.preview.senderAddress')}>`],
-    [t('domain:send.preview.replyTo'), replyTo],
+    [t('domain:send.preview.from'), preview.from],
+    [t('domain:send.preview.replyTo'), preview.replyTo ?? '–'],
     [t('domain:send.to'), to.join(', ')],
     [t('domain:send.subject'), subject],
   ];
@@ -409,33 +452,16 @@ function MailPreview({
           </div>
         ))}
       </dl>
-      <div className="flex flex-col gap-4 px-4 py-4">
-        <p className="text-foreground text-sm whitespace-pre-wrap">{text}</p>
-        <p className="text-muted-foreground flex items-center gap-2 text-sm">
-          <AttachRegular aria-hidden />
-          {attachment}
-        </p>
-        <div className="border-border text-muted-foreground flex flex-col gap-1 border-t pt-3 text-xs">
-          {footer.map((line, index) => (
-            <p key={index}>
-              {line.map((segment, position) => (
-                <span key={position}>
-                  {position > 0 ? ' · ' : null}
-                  {segment.kind === 'text' ? (
-                    segment.value
-                  ) : (
-                    <span className="text-destructive font-medium">
-                      {t('domain:send.footer.missing', {
-                        field: t(`domain:settings.register.fields.${segment.field}`),
-                      })}
-                    </span>
-                  )}
-                </span>
-              ))}
-            </p>
-          ))}
-        </div>
-      </div>
+      <iframe
+        title={t('domain:send.previewTitle')}
+        sandbox=""
+        srcDoc={preview.html}
+        className="block h-80 w-full bg-white"
+      />
+      <p className="text-muted-foreground border-border flex items-center gap-2 border-t px-4 py-3 text-sm">
+        <AttachRegular aria-hidden />
+        {attachment}
+      </p>
     </div>
   );
 }
