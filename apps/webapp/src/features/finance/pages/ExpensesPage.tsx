@@ -1,5 +1,5 @@
 import { daysBetween, eurosToMinor, formatMoney, todayIso } from '@bautakt/finance';
-import { cn, DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
+import { cn, DataTable, type DataTableColumn, StatusBadge, type StatusTone } from '@bautakt/ui';
 import { Button, Text } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useMemo, useState } from 'react';
@@ -16,6 +16,7 @@ import { isEInvoiceIncoming } from '../archiveFiles';
 import { EInvoiceBadge } from '../EInvoiceBadge';
 import { ExpenseSheet } from '../ExpenseSheet';
 import { FinanceHeader } from '../FinanceHeader';
+import { IncomingInvoiceSheet } from '../IncomingInvoiceSheet';
 import {
   type ExpenseRow,
   type IncomingInvoiceListRow,
@@ -37,6 +38,8 @@ export function ExpensesPage() {
 
   const canManage = usePermission('canManageOverheadCosts');
   const [sheetOpen, setSheetOpen] = useState(false);
+  // `undefined`: zu, `null`: neue Eingangsrechnung, sonst die geöffnete.
+  const [incomingId, setIncomingId] = useState<string | null | undefined>(undefined);
   // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel.
   useCreateFromUrl(canManage, () => setSheetOpen(true));
   const incoming = useIncomingInvoiceList();
@@ -74,6 +77,17 @@ export function ExpensesPage() {
         accessorKey: 'due_date',
         header: t('domain:expenses.columns.due'),
         cell: ({ row }) => <DueCell dueDate={row.original.due_date} status={row.original.status} />,
+      },
+      {
+        accessorKey: 'status',
+        header: t('domain:incomingInvoiceForm.status'),
+        cell: ({ row }) => (
+          <StatusBadge tone={STATUS_TONE[row.original.status] ?? 'neutral'}>
+            {t(`domain:incomingInvoiceStatus.${row.original.status}`, {
+              defaultValue: row.original.status,
+            })}
+          </StatusBadge>
+        ),
       },
       {
         accessorKey: 'gross_total',
@@ -132,9 +146,18 @@ export function ExpensesPage() {
         description={t('domain:expenses.description')}
         actions={
           canManage ? (
-            <Button appearance="primary" onClick={() => setSheetOpen(true)} icon={<AddRegular />}>
-              {t('domain:expenseForm.title')}
-            </Button>
+            <>
+              <Button onClick={() => setSheetOpen(true)} icon={<AddRegular />}>
+                {t('domain:expenseForm.title')}
+              </Button>
+              <Button
+                appearance="primary"
+                onClick={() => setIncomingId(null)}
+                icon={<AddRegular />}
+              >
+                {t('domain:incomingInvoiceForm.title')}
+              </Button>
+            </>
           ) : null
         }
       />
@@ -147,6 +170,7 @@ export function ExpensesPage() {
             isLoading={isLoading}
             labels={labels}
             exportFileName="eingangsrechnungen"
+            onRowClick={canManage ? (row) => setIncomingId(row.id) : undefined}
             empty={
               <EmptyState
                 title={t('domain:expenses.emptyIncomingTitle')}
@@ -176,9 +200,24 @@ export function ExpensesPage() {
       </div>
 
       <ExpenseSheet open={sheetOpen} onOpenChange={setSheetOpen} />
+      <IncomingInvoiceSheet
+        open={incomingId !== undefined}
+        invoiceId={incomingId ?? null}
+        onOpenChange={(open) => {
+          if (!open) setIncomingId(undefined);
+        }}
+      />
     </div>
   );
 }
+
+const STATUS_TONE: Record<string, StatusTone> = {
+  draft: 'outline',
+  open: 'brand',
+  partially_paid: 'warning',
+  paid: 'success',
+  overdue: 'danger',
+};
 
 /** Faellig, bald faellig oder ueberfaellig — bezahlt ist neutral. */
 function DueCell({ dueDate, status }: { dueDate: string | null; status: string }) {
