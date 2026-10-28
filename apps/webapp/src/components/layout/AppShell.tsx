@@ -30,9 +30,9 @@ import {
   Settings20Regular,
   SignOut20Regular,
 } from '@fluentui/react-icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useLocation } from 'react-router';
+import { matchPath, Outlet, useLocation } from 'react-router';
 
 import { type Theme } from '@/app/ThemeContext';
 import { useTheme } from '@/app/useTheme';
@@ -43,7 +43,7 @@ import { useMyProfile } from '@/features/auth/useMyProfile';
 import { useMembership } from '@/features/company/useMembership';
 import { useProfileImageUrls } from '@/features/team/useProfileImageUrls';
 import { LEGAL_PAGES, legalUrl } from '@/lib/legal';
-import { HOME_ROUTE } from '@/lib/routes';
+import { HOME_ROUTE, routes } from '@/lib/routes';
 
 import { calendarNavItem, isNavActive, maySee, navItems, settingsNavItem } from './navItems';
 import { NotificationsBell } from './NotificationsBell';
@@ -78,6 +78,18 @@ function readExpanded(): boolean {
 
 function writeExpanded(expanded: boolean) {
   document.cookie = `${COOKIE}=${expanded}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+}
+
+/**
+ * Beleg-Editoren (neue Rechnung, neues Angebot, Rechnung bearbeiten) brauchen
+ * die Breite: Dort fährt die Leiste ein. Wer sie aufklappt, tut das nur für
+ * diesen Besuch — der gespeicherte Zustand bleibt, und nach dem Editor gilt
+ * wieder, wie die Leiste vorher stand.
+ */
+const EDITOR_PATHS = [routes.invoiceNew, routes.quoteNew, routes.invoiceEdit(':id')];
+
+function isEditorPath(pathname: string): boolean {
+  return EDITOR_PATHS.some((path) => matchPath(path, pathname) !== null);
 }
 
 /**
@@ -364,7 +376,16 @@ export function AppShell() {
   const { data: membership } = useMembership();
   const { pathname } = useLocation();
   const isMobile = useMediaQuery('(max-width: 767px)');
-  const [expanded, setExpanded] = useState(readExpanded);
+  const [savedExpanded, setSavedExpanded] = useState(readExpanded);
+  const inEditor = isEditorPath(pathname);
+  // Im Editor eigener Zustand, bei jedem Betreten wieder eingefahren.
+  const [editorExpanded, setEditorExpanded] = useState(false);
+  const [wasInEditor, setWasInEditor] = useState(inEditor);
+  if (inEditor !== wasInEditor) {
+    setWasInEditor(inEditor);
+    setEditorExpanded(false);
+  }
+  const expanded = inEditor ? editorExpanded : savedExpanded;
   const [mobileOpen, setMobileOpen] = useState(false);
   const sidebar = useSidebarStyles();
 
@@ -380,9 +401,19 @@ export function AppShell() {
       setMobileOpen((open) => !open);
       return;
     }
-    setExpanded(!expanded);
-    writeExpanded(!expanded);
+    setDesktopExpanded(!expanded);
   }
+
+  function setDesktopExpanded(next: boolean) {
+    if (inEditor) {
+      setEditorExpanded(next);
+      return;
+    }
+    setSavedExpanded(next);
+    writeExpanded(next);
+  }
+
+  const toggleByShortcut = useEffectEvent(() => setDesktopExpanded(!expanded));
 
   // Strg+B (Mac: ⌘B) klappt die Leiste um, wie in VS Code. Nicht in
   // Eingabefeldern, dort kann es „fett“ heißen.
@@ -395,10 +426,7 @@ export function AppShell() {
         return;
       }
       event.preventDefault();
-      setExpanded((current) => {
-        writeExpanded(!current);
-        return !current;
-      });
+      toggleByShortcut();
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
