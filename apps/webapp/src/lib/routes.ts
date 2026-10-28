@@ -14,11 +14,8 @@
 export const createParam = 'neu';
 
 /** Listenpfad mit geöffnetem Anlege-Panel. */
-/** Wert für `withCreate` auf `/ausgaben`: öffnet die Eingangsrechnung statt der Ausgabe. */
-export const createIncomingInvoice = 'eingangsrechnung';
-
-export function withCreate(path: string, what = '1'): string {
-  return `${path}${path.includes('?') ? '&' : '?'}${createParam}=${what}`;
+export function withCreate(path: string): string {
+  return `${path}${path.includes('?') ? '&' : '?'}${createParam}=1`;
 }
 
 /** Query der alten Zeitenliste `/zeiten?order=…`; die Umleitung liest ihn noch. */
@@ -77,6 +74,9 @@ export const routes = {
   receivables: '/offene-posten',
   /** Eingangsrechnungen und sonstige Ausgaben (zwei Register). */
   expenses: '/rechnungen/eingang',
+  /** Eingangsrechnung erfassen bzw. öffnen: eigene Seite wie der Rechnungs-Editor. */
+  incomingInvoiceNew: '/rechnungen/eingang/neu',
+  incomingInvoice: (id: string) => `/rechnungen/eingang/${id}`,
   dunning: '/mahnwesen',
   reports: '/auswertungen',
   /** Buchungsstapel und Belege eines Monats für die Steuerberatung (#169). */

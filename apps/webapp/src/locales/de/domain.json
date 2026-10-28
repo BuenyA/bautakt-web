@@ -1783,6 +1783,17 @@
       "negativeAmount": "Beträge dürfen nicht negativ sein.",
       "sumMismatch": "Netto + USt ergibt nicht den Bruttobetrag.",
       "dueBeforeDate": "Die Fälligkeit liegt vor dem Rechnungsdatum."
+    },
+    "sections": {
+      "invoice": "Rechnung",
+      "amounts": "Beträge",
+      "assignment": "Zuordnung"
+    },
+    "original": {
+      "title": "Beleg",
+      "none": "Zu dieser Rechnung ist kein Beleg hinterlegt.",
+      "loadError": "Der Beleg konnte nicht geladen werden.",
+      "xml": "Diese E-Rechnung ist reines XML und hat kein Druckbild. Die Angaben stehen im Formular."
     }
   },
   "incomingInvoiceStatus": {

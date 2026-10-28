@@ -4,8 +4,7 @@ import { useSearchParams } from 'react-router';
 import { createParam } from '@/lib/routes';
 
 /**
- * Öffnet das Anlege-Panel einer Liste, wenn die Adresse `?neu=1` trägt (oder
- * `?neu=<what>`, wenn eine Seite mehrere Panels hat), und
+ * Öffnet das Anlege-Panel einer Liste, wenn die Adresse `?neu=1` trägt, und
  * nimmt den Parameter danach wieder heraus (sonst öffnete ein Neuladen das
  * Panel erneut).
  *
@@ -18,9 +17,9 @@ import { createParam } from '@/lib/routes';
  * eine Render-Schleife, gemessen 2026-10-10 mit Dutzenden `open()` pro
  * Sekunde und einem Panel, das sofort wieder zuging.
  */
-export function useCreateFromUrl(enabled: boolean, open: () => void, what = '1') {
+export function useCreateFromUrl(enabled: boolean, open: () => void) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const wanted = searchParams.get(createParam) === what;
+  const wanted = searchParams.get(createParam) === '1';
   const openRef = useRef(open);
   const handledRef = useRef(false);
 

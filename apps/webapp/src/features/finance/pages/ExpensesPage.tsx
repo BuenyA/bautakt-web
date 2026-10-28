@@ -4,20 +4,21 @@ import { Button, Text } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
-import { createIncomingInvoice } from '@/lib/routes';
+import { routes } from '@/lib/routes';
 
 import { isEInvoiceIncoming } from '../archiveFiles';
 import { EInvoiceBadge } from '../EInvoiceBadge';
 import { ExpenseSheet } from '../ExpenseSheet';
 import { FinanceHeader } from '../FinanceHeader';
-import { IncomingInvoiceSheet } from '../IncomingInvoiceSheet';
 import {
   type ExpenseRow,
   type IncomingInvoiceListRow,
@@ -36,15 +37,12 @@ import {
 export function ExpensesPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
+  const navigate = useNavigate();
 
   const canManage = usePermission('canManageOverheadCosts');
   const [sheetOpen, setSheetOpen] = useState(false);
-  // `undefined`: zu, `null`: neue Eingangsrechnung, sonst die geöffnete.
-  const [incomingId, setIncomingId] = useState<string | null | undefined>(undefined);
   // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel.
   useCreateFromUrl(canManage, () => setSheetOpen(true));
-  // `?neu=eingangsrechnung` (Rechnungs-Übersicht) öffnet das Eingangsrechnungs-Panel.
-  useCreateFromUrl(canManage, () => setIncomingId(null), createIncomingInvoice);
   const incoming = useIncomingInvoiceList();
   const expenses = useExpenses();
 
@@ -153,13 +151,9 @@ export function ExpensesPage() {
               <Button onClick={() => setSheetOpen(true)} icon={<AddRegular />}>
                 {t('domain:expenseForm.title')}
               </Button>
-              <Button
-                appearance="primary"
-                onClick={() => setIncomingId(null)}
-                icon={<AddRegular />}
-              >
+              <LinkButton appearance="primary" to={routes.incomingInvoiceNew} icon={<AddRegular />}>
                 {t('domain:incomingInvoiceForm.title')}
-              </Button>
+              </LinkButton>
             </div>
           ) : null
         }
@@ -173,7 +167,9 @@ export function ExpensesPage() {
             isLoading={isLoading}
             labels={labels}
             exportFileName="eingangsrechnungen"
-            onRowClick={canManage ? (row) => setIncomingId(row.id) : undefined}
+            onRowClick={
+              canManage ? (row) => void navigate(routes.incomingInvoice(row.id)) : undefined
+            }
             empty={
               <EmptyState
                 title={t('domain:expenses.emptyIncomingTitle')}
@@ -203,13 +199,6 @@ export function ExpensesPage() {
       </div>
 
       <ExpenseSheet open={sheetOpen} onOpenChange={setSheetOpen} />
-      <IncomingInvoiceSheet
-        open={incomingId !== undefined}
-        invoiceId={incomingId ?? null}
-        onOpenChange={(open) => {
-          if (!open) setIncomingId(undefined);
-        }}
-      />
     </div>
   );
 }

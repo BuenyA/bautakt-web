@@ -23,6 +23,7 @@ import { DocumentEditorPage } from '@/features/finance/pages/DocumentEditorPage'
 import { DunningPage } from '@/features/finance/pages/DunningPage';
 import { ExpensesPage } from '@/features/finance/pages/ExpensesPage';
 import { FinanceOverviewPage } from '@/features/finance/pages/FinanceOverviewPage';
+import { IncomingInvoicePage } from '@/features/finance/pages/IncomingInvoicePage';
 import { InvoiceDetailPage } from '@/features/finance/pages/InvoiceDetailPage';
 import { InvoicePrintPage } from '@/features/finance/pages/InvoicePrintPage';
 import { InvoicesListPage } from '@/features/finance/pages/InvoicesListPage';
@@ -133,6 +134,22 @@ export const router = createBrowserRouter([
                 element: (
                   <RequirePermission anyOf={['canViewCompanyFinance', 'canManageOverheadCosts']}>
                     <ExpensesPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.incomingInvoiceNew,
+                element: (
+                  <RequirePermission anyOf={['canManageOverheadCosts']}>
+                    <IncomingInvoicePage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.incomingInvoice(':id'),
+                element: (
+                  <RequirePermission anyOf={['canManageOverheadCosts']}>
+                    <IncomingInvoicePage />
                   </RequirePermission>
                 ),
               },

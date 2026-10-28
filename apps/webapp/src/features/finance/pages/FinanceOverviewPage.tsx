@@ -11,7 +11,7 @@ import { LinkButton } from '@/components/common/LinkButton';
 import { FILL_VIEWPORT_LG } from '@/components/layout/fillViewport';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
-import { createIncomingInvoice, routes, withCreate } from '@/lib/routes';
+import { routes, withCreate } from '@/lib/routes';
 
 import { FinanceHeader } from '../FinanceHeader';
 import { DeskCard, DeskRow } from '../overview/DeskCard';
@@ -156,16 +156,11 @@ function IncomingCard({
       icon={DocumentArrowDownRegular}
       minor={minor}
       sumLabel={t('domain:invoiceDesk.incoming.sumLabel')}
-      // Eine Detailseite für Eingangsrechnungen gibt es noch nicht.
       allTo={routes.expenses}
       empty={t('domain:invoiceDesk.incoming.empty')}
       emptyAction={
         canCreate ? (
-          <LinkButton
-            to={withCreate(routes.expenses, createIncomingInvoice)}
-            appearance="primary"
-            icon={<AddRegular />}
-          >
+          <LinkButton to={routes.incomingInvoiceNew} appearance="primary" icon={<AddRegular />}>
             {t('domain:invoiceDesk.incoming.create')}
           </LinkButton>
         ) : undefined
@@ -176,7 +171,7 @@ function IncomingCard({
       rows={entries.map(({ item, minor: amount, due }) => (
         <DeskRow
           key={item.id}
-          to={routes.expenses}
+          to={canCreate ? routes.incomingInvoice(item.id) : routes.expenses}
           title={item.vendor_name || t('domain:invoiceDesk.incoming.noVendor')}
           subtitle={[
             item.invoice_number,

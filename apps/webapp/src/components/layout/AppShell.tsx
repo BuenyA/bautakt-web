@@ -80,12 +80,19 @@ function writeExpanded(expanded: boolean) {
 }
 
 /**
- * Beleg-Editoren (neue Rechnung, neues Angebot, Rechnung bearbeiten) brauchen
+ * Beleg-Editoren (neue Rechnung, neues Angebot, Rechnung bearbeiten,
+ * Eingangsrechnung) brauchen
  * die Breite: Dort fährt die Leiste ein. Wer sie aufklappt, tut das nur für
  * diesen Besuch — der gespeicherte Zustand bleibt, und nach dem Editor gilt
  * wieder, wie die Leiste vorher stand.
  */
-const EDITOR_PATHS = [routes.invoiceNew, routes.quoteNew, routes.invoiceEdit(':id')];
+const EDITOR_PATHS = [
+  routes.invoiceNew,
+  routes.quoteNew,
+  routes.invoiceEdit(':id'),
+  routes.incomingInvoiceNew,
+  routes.incomingInvoice(':id'),
+];
 
 function isEditorPath(pathname: string): boolean {
   return EDITOR_PATHS.some((path) => matchPath(path, pathname) !== null);
