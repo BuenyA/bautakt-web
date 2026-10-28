@@ -8,7 +8,7 @@
  */
 export function BootErrorPage({ message }: { message: string }) {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background p-6 text-center">
+    <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-canvas p-6 text-center">
       <p className="text-sm font-medium text-primary">Bautakt</p>
       <h1 className="text-2xl font-semibold tracking-tight">Konfiguration fehlt</h1>
       <p className="max-w-lg text-muted-foreground">

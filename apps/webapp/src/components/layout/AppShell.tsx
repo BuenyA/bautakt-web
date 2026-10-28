@@ -492,7 +492,7 @@ export function AppShell() {
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="border-border bg-background sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b px-4 sm:px-6">
+        <header className="border-border bg-canvas sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b px-4 sm:px-6">
           {isMobile ? (
             <Hamburger onClick={toggle} aria-label={toggleLabel} aria-expanded={mobileOpen} />
           ) : null}

@@ -122,6 +122,22 @@
 }
 
 /**
+ * Seitenfläche hinter Karten, Kopfzeile und Vollbild-Seiten.
+ *
+ * Hell ist sie wie die Karten weiss (`colorNeutralBackground1`), dunkel eine
+ * Stufe dunkler (`colorNeutralBackground2`), damit Karten sich abheben
+ * (Owner-Wunsch 2026-10-28). Eine Klasse statt eines Tailwind-Tokens, weil der
+ * Unterschied nur im Dunkeln gilt; `data-theme` setzt der ThemeProvider.
+ */
+@utility bg-canvas {
+  background-color: var(--colorNeutralBackground1);
+}
+
+:root[data-theme='dark'] .bg-canvas {
+  background-color: var(--colorNeutralBackground2);
+}
+
+/**
  * Rahmen um Dialoge und Drawer im Dunkelmodus (Owner-Entscheidung 2026-10-10).
  *
  * Im Dunkeln liegt die Fläche fast ununterscheidbar auf dem Overlay. Ein

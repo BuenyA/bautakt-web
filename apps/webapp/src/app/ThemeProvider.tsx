@@ -45,7 +45,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const root = document.documentElement;
     root.dataset.theme = resolved;
     root.style.colorScheme = resolved;
-    root.style.backgroundColor = fluentTheme.colorNeutralBackground1;
+    root.style.backgroundColor =
+      resolved === 'dark'
+        ? fluentTheme.colorNeutralBackground2
+        : fluentTheme.colorNeutralBackground1;
   }, [resolved, fluentTheme]);
 
   const setTheme = React.useCallback((next: Theme) => {
@@ -60,7 +63,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       {/* ⚠️ Keine Klassen an den Provider: Fluent kopiert sie auf die Portal-Knoten
           (Popover, Menü), und ein `min-h-svh` dort deckt die ganze Seite zu. */}
       <FluentProvider theme={fluentTheme}>
-        <div className="min-h-svh">{children}</div>
+        <div className="bg-canvas min-h-svh">{children}</div>
       </FluentProvider>
     </ThemeContext.Provider>
   );
