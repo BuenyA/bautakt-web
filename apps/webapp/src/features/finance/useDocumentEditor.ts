@@ -420,8 +420,8 @@ export function useCompanyTaxProfile() {
  *
  * Die Positionen werden beim Speichern ersetzt statt einzeln abgeglichen: eine
  * Positionsliste ist kurz, und ein Abgleich brauchte stabile Zeilen-Ids, die
- * das Formular nicht hat. Beleg und Positionen haengen am selben
- * `document_id` — die Zeilen verschwinden mit dem Beleg.
+ * das Formular nicht hat. Kopf und Positionen schreibt
+ * `save_sales_document_draft` in einer Transaktion.
  */
 /**
  * Kopf und Positionen eines Entwurfs, genau so, wie `useSaveDraft` sie
@@ -517,41 +517,17 @@ export function useSaveDraft() {
       state: EditorState;
       documentId: string | null;
     }): Promise<string> => {
-      const { header, lines: rows } = buildDraftRows(state, companyId!);
+      const { header, lines } = buildDraftRows(state, companyId!);
 
-      let id = documentId;
-
-      if (id) {
-        const { error } = await supabase
-          .from('sales_documents')
-          .update(header)
-          .eq('id', id)
-          .eq('company_id', companyId!);
-        if (error) throw error;
-
-        const { error: deleteError } = await supabase
-          .from('sales_document_lines')
-          .delete()
-          .eq('document_id', id)
-          .eq('company_id', companyId!);
-        if (deleteError) throw deleteError;
-      } else {
-        const { data, error } = await supabase
-          .from('sales_documents')
-          .insert(header)
-          .select('id')
-          .single();
-        if (error) throw error;
-        id = data.id;
-      }
-
-      const lines = rows.map((row) => ({ ...row, document_id: id! }));
-      if (lines.length > 0) {
-        const { error } = await supabase.from('sales_document_lines').insert(lines);
-        if (error) throw error;
-      }
-
-      return id!;
+      // Eine Transaktion (bautakt-web#158): bricht das Speichern ab, bleibt
+      // der vorherige Stand vollständig erhalten.
+      const { data, error } = await supabase.rpc('save_sales_document_draft', {
+        p_document_id: documentId,
+        p_header: header,
+        p_lines: lines,
+      });
+      if (error) throw error;
+      return data;
     },
     onSuccess: async (id) => {
       await queryClient.invalidateQueries({ queryKey: ['sales-documents', companyId] });
