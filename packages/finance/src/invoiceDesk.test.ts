@@ -4,10 +4,8 @@ import {
   buildIncomingDesk,
   buildOutgoingDesk,
   type DeskIncomingRow,
-  firstFilledGroup,
-  INCOMING_GROUP_ORDER,
+  dueOf,
   netRevenueMonth,
-  OUTGOING_GROUP_ORDER,
 } from './invoiceDesk';
 import { monthlyRevenue } from './monthly';
 import type { SalesDocumentRow } from './receivables';
@@ -40,12 +38,22 @@ function eingang(overrides: Partial<DeskIncomingRow> & { id: string }): DeskInco
   };
 }
 
+describe('dueOf', () => {
+  it('unterscheidet überfällig, bald fällig und offen', () => {
+    expect(dueOf(HEUTE, '2026-10-11')).toEqual({ kind: 'overdue', days: 3 });
+    expect(dueOf(HEUTE, '2026-10-14')).toEqual({ kind: 'dueSoon', days: 0 });
+    expect(dueOf(HEUTE, '2026-10-21')).toEqual({ kind: 'dueSoon', days: 7 });
+    expect(dueOf(HEUTE, '2026-10-22')).toEqual({ kind: 'open' });
+    expect(dueOf(HEUTE, null)).toEqual({ kind: 'open' });
+  });
+});
+
 describe('buildOutgoingDesk', () => {
-  it('ordnet Überfällige auch unter Offen ein und summiert offene Beträge', () => {
+  it('listet Offene nach Fälligkeit, Entwürfe am Ende, und summiert ohne Entwürfe', () => {
     const desk = buildOutgoingDesk(
       [
-        beleg({ id: 'a', due_date: '2026-10-01' }),
         beleg({ id: 'b', due_date: '2026-10-25' }),
+        beleg({ id: 'a', due_date: '2026-10-01' }),
         beleg({ id: 'c', status: 'draft', issue_date: null, gross_total: 238 }),
         beleg({ id: 'd', status: 'paid' }),
         beleg({ id: 'e', type: 'quote', status: 'draft' }),
@@ -54,42 +62,35 @@ describe('buildOutgoingDesk', () => {
       HEUTE,
     );
 
-    expect(desk.overdue.items.map((item) => item.document.id)).toEqual(['a']);
-    expect(desk.overdue.minor).toBe(10000);
-    expect(desk.open.items.map((item) => item.document.id)).toEqual(['a', 'b']);
-    expect(desk.open.minor).toBe(10000 + 11900);
-    expect(desk.draft.items.map((item) => item.document.id)).toEqual(['c']);
-    expect(desk.draft.minor).toBe(23800);
-  });
-
-  it('wählt die erste Gruppe mit Inhalt vor', () => {
-    const desk = buildOutgoingDesk([beleg({ id: 'x', status: 'draft' })], [], HEUTE);
-    expect(firstFilledGroup(OUTGOING_GROUP_ORDER, desk)).toBe('draft');
-    const leer = buildOutgoingDesk([], [], HEUTE);
-    expect(firstFilledGroup(OUTGOING_GROUP_ORDER, leer)).toBe('overdue');
+    expect(desk.entries.map((entry) => [entry.item.id, entry.due.kind, entry.minor])).toEqual([
+      ['a', 'overdue', 10000],
+      ['b', 'open', 11900],
+      ['c', 'draft', 23800],
+    ]);
+    expect(desk.minor).toBe(10000 + 11900);
   });
 });
 
 describe('buildIncomingDesk', () => {
-  it('trennt neu, überfällig, bald fällig und offen; bezahlte fallen raus', () => {
+  it('listet Unbezahlte nach Fälligkeit; bezahlte fallen raus', () => {
     const desk = buildIncomingDesk(
       [
-        eingang({ id: 'neu', created_at: '2026-10-13T09:00:00.000Z', due_date: '2026-11-30' }),
+        eingang({ id: 'spaeter', due_date: '2026-11-30' }),
         eingang({ id: 'spaet', due_date: '2026-10-10' }),
         eingang({ id: 'bald', due_date: '2026-10-21' }),
         eingang({ id: 'ohne', due_date: null }),
         eingang({ id: 'bezahlt', status: 'paid', due_date: '2026-10-01' }),
       ],
       HEUTE,
-      '2026-10-13T00:00:00.000Z',
     );
 
-    expect(desk.new.items.map((row) => row.id)).toEqual(['neu']);
-    expect(desk.overdue.items.map((row) => row.id)).toEqual(['spaet']);
-    expect(desk.dueSoon.items.map((row) => row.id)).toEqual(['bald']);
-    expect(desk.open.items.map((row) => row.id)).toEqual(['spaet', 'bald', 'neu', 'ohne']);
-    expect(desk.open.minor).toBe(4 * 5000);
-    expect(firstFilledGroup(INCOMING_GROUP_ORDER, desk)).toBe('new');
+    expect(desk.entries.map((entry) => [entry.item.id, entry.due.kind])).toEqual([
+      ['spaet', 'overdue'],
+      ['bald', 'dueSoon'],
+      ['spaeter', 'open'],
+      ['ohne', 'open'],
+    ]);
+    expect(desk.minor).toBe(4 * 5000);
   });
 });
 

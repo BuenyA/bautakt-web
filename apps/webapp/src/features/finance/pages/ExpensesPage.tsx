@@ -11,6 +11,7 @@ import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
+import { createIncomingInvoice } from '@/lib/routes';
 
 import { isEInvoiceIncoming } from '../archiveFiles';
 import { EInvoiceBadge } from '../EInvoiceBadge';
@@ -42,6 +43,8 @@ export function ExpensesPage() {
   const [incomingId, setIncomingId] = useState<string | null | undefined>(undefined);
   // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel.
   useCreateFromUrl(canManage, () => setSheetOpen(true));
+  // `?neu=eingangsrechnung` (Rechnungs-Übersicht) öffnet das Eingangsrechnungs-Panel.
+  useCreateFromUrl(canManage, () => setIncomingId(null), createIncomingInvoice);
   const incoming = useIncomingInvoiceList();
   const expenses = useExpenses();
 

@@ -9,18 +9,14 @@ export {
 export {
   buildIncomingDesk,
   buildOutgoingDesk,
-  type DeskGroup,
+  type DeskDue,
+  type DeskEntry,
   type DeskIncomingRow,
-  firstFilledGroup,
-  INCOMING_GROUP_ORDER,
-  type IncomingDesk,
-  type IncomingGroupKey,
+  type DeskList,
+  DUE_SOON_DAYS,
+  dueOf,
   type MonthComparison,
   netRevenueMonth,
-  OUTGOING_GROUP_ORDER,
-  type OutgoingDesk,
-  type OutgoingDeskItem,
-  type OutgoingGroupKey,
 } from './invoiceDesk';
 export {
   computeOpenTasks,

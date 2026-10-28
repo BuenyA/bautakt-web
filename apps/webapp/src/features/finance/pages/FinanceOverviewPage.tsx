@@ -1,12 +1,3 @@
-import {
-  eurosToMinor,
-  formatMoney,
-  INCOMING_GROUP_ORDER,
-  type IncomingGroupKey,
-  OUTGOING_GROUP_ORDER,
-  type OutgoingDeskItem,
-  type OutgoingGroupKey,
-} from '@bautakt/finance';
 import { cn } from '@bautakt/ui';
 import {
   AddRegular,
@@ -19,13 +10,11 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { LinkButton } from '@/components/common/LinkButton';
 import { FILL_VIEWPORT_LG } from '@/components/layout/fillViewport';
 import { usePermission } from '@/features/company/usePermission';
-import { Row } from '@/features/overview/components/TodoPanel';
 import { formatDate } from '@/lib/format';
-import { routes, withCreate } from '@/lib/routes';
+import { createIncomingInvoice, routes, withCreate } from '@/lib/routes';
 
 import { FinanceHeader } from '../FinanceHeader';
-import { DeskCard, type DeskGroupView } from '../overview/DeskCard';
-import type { IncomingInvoiceListRow } from '../useExpenses';
+import { DeskCard, DeskRow } from '../overview/DeskCard';
 import { useFinanceOverviewData } from '../useFinanceOverviewData';
 
 /**
@@ -88,12 +77,12 @@ export function FinanceOverviewPage() {
           {/* Erst was reinkommt, dann was rausgeht (Owner 17.10.2026). */}
           {incoming ? (
             <div className="min-w-0">
-              <IncomingCard incoming={incoming} />
+              <IncomingCard incoming={incoming} canCreate={canManageOverheadCosts} />
             </div>
           ) : null}
           {outgoing ? (
             <div className="min-w-0">
-              <OutgoingCard outgoing={outgoing} />
+              <OutgoingCard outgoing={outgoing} canWrite={access.canWriteSalesDocuments} />
             </div>
           ) : null}
         </div>
@@ -104,122 +93,103 @@ export function FinanceOverviewPage() {
 
 function OutgoingCard({
   outgoing,
+  canWrite,
 }: {
   outgoing: NonNullable<ReturnType<typeof useFinanceOverviewData>['outgoing']>;
+  canWrite: boolean;
 }) {
   const { t } = useTranslation();
-  const views: Record<OutgoingGroupKey, DeskGroupView> = {
-    overdue: {
-      label: t('domain:invoiceDesk.outgoing.groups.overdue'),
-      empty: t('domain:invoiceDesk.outgoing.empty.overdue'),
-      to: routes.receivables,
-      urgent: true,
-    },
-    open: {
-      label: t('domain:invoiceDesk.outgoing.groups.open'),
-      empty: t('domain:invoiceDesk.outgoing.empty.open'),
-      to: routes.receivables,
-    },
-    draft: {
-      label: t('domain:invoiceDesk.outgoing.groups.draft'),
-      empty: t('domain:invoiceDesk.outgoing.empty.draft'),
-      to: `${routes.invoices}?status=entwurf`,
-    },
-  };
-
-  const subtitleOf = (item: OutgoingDeskItem) => {
-    const customer =
-      outgoing.customerById.get(item.document.id) ||
-      t('domain:invoiceDesk.outgoing.unknownCustomer');
-    const { document } = item;
-    const when =
-      document.status === 'draft'
-        ? null
-        : item.daysOverdue > 0
-          ? t('domain:invoiceDesk.outgoing.daysOverdue', { count: item.daysOverdue })
-          : document.due_date
-            ? t('domain:invoiceDesk.outgoing.due', { date: formatDate(document.due_date) })
-            : t('domain:invoiceDesk.outgoing.noDue');
-    return [customer, when].filter(Boolean).join(' · ');
-  };
+  const { entries, minor } = outgoing.desk;
 
   return (
     <DeskCard
       title={t('domain:invoiceDesk.outgoing.title')}
       icon={DocumentArrowUpRegular}
-      order={OUTGOING_GROUP_ORDER}
-      groups={outgoing.desk}
-      views={views}
+      minor={minor}
+      sumLabel={t('domain:invoiceDesk.outgoing.sumLabel')}
+      allTo={routes.receivables}
+      empty={t('domain:invoiceDesk.outgoing.empty')}
+      emptyAction={
+        canWrite ? (
+          <LinkButton to={routes.invoiceNew} appearance="primary" icon={<AddRegular />}>
+            {t('domain:invoiceDesk.outgoing.create')}
+          </LinkButton>
+        ) : undefined
+      }
       isLoading={outgoing.isLoading}
       isError={outgoing.isError}
       errorText={t('domain:invoiceDesk.loadError')}
-      renderRow={(item) => (
-        <Row
-          key={item.document.id}
-          to={
-            item.document.status === 'draft'
-              ? routes.invoiceEdit(item.document.id)
-              : routes.invoice(item.document.id)
-          }
-          title={item.document.document_number || t('domain:invoiceDesk.outgoing.noNumber')}
-          subtitle={subtitleOf(item)}
-          trailing={
-            <span className={cn('font-semibold', item.daysOverdue > 0 && 'text-destructive')}>
-              {formatMoney(item.minor)}
-            </span>
-          }
+      rows={entries.map(({ item, minor: amount, due }) => (
+        <DeskRow
+          key={item.id}
+          to={item.status === 'draft' ? routes.invoiceEdit(item.id) : routes.invoice(item.id)}
+          title={item.document_number || t('domain:invoiceDesk.outgoing.noNumber')}
+          subtitle={[
+            outgoing.customerById.get(item.id) || t('domain:invoiceDesk.outgoing.unknownCustomer'),
+            item.status !== 'draft' && item.due_date
+              ? t('domain:invoiceDesk.outgoing.due', { date: formatDate(item.due_date) })
+              : null,
+          ]
+            .filter(Boolean)
+            .join(' · ')}
+          minor={amount}
+          due={due}
         />
-      )}
+      ))}
     />
   );
 }
 
 function IncomingCard({
   incoming,
+  canCreate,
 }: {
   incoming: NonNullable<ReturnType<typeof useFinanceOverviewData>['incoming']>;
+  canCreate: boolean;
 }) {
   const { t } = useTranslation();
-  const view = (key: IncomingGroupKey, urgent?: boolean): DeskGroupView => ({
-    label: t(`domain:invoiceDesk.incoming.groups.${key}`),
-    empty: t(`domain:invoiceDesk.incoming.empty.${key}`),
-    // Eine Detailseite für Eingangsrechnungen gibt es noch nicht.
-    to: routes.expenses,
-    urgent,
-  });
-  const views: Record<IncomingGroupKey, DeskGroupView> = {
-    new: view('new'),
-    overdue: view('overdue', true),
-    dueSoon: view('dueSoon'),
-    open: view('open'),
-  };
+  const { entries, minor } = incoming.desk;
 
   return (
     <DeskCard
       title={t('domain:invoiceDesk.incoming.title')}
       icon={DocumentArrowDownRegular}
-      order={INCOMING_GROUP_ORDER}
-      groups={incoming.desk}
-      views={views}
+      minor={minor}
+      sumLabel={t('domain:invoiceDesk.incoming.sumLabel')}
+      // Eine Detailseite für Eingangsrechnungen gibt es noch nicht.
+      allTo={routes.expenses}
+      empty={t('domain:invoiceDesk.incoming.empty')}
+      emptyAction={
+        canCreate ? (
+          <LinkButton
+            to={withCreate(routes.expenses, createIncomingInvoice)}
+            appearance="primary"
+            icon={<AddRegular />}
+          >
+            {t('domain:invoiceDesk.incoming.create')}
+          </LinkButton>
+        ) : undefined
+      }
       isLoading={incoming.isLoading}
       isError={incoming.isError}
       errorText={t('domain:invoiceDesk.loadError')}
-      renderRow={(row: IncomingInvoiceListRow) => (
-        <Row
-          key={row.id}
+      rows={entries.map(({ item, minor: amount, due }) => (
+        <DeskRow
+          key={item.id}
           to={routes.expenses}
-          title={row.vendor_name || t('domain:invoiceDesk.incoming.noVendor')}
+          title={item.vendor_name || t('domain:invoiceDesk.incoming.noVendor')}
           subtitle={[
-            row.invoice_number,
-            row.due_date ? t('domain:overview.todo.due', { date: formatDate(row.due_date) }) : null,
+            item.invoice_number,
+            item.due_date
+              ? t('domain:overview.todo.due', { date: formatDate(item.due_date) })
+              : null,
           ]
             .filter(Boolean)
             .join(' · ')}
-          trailing={
-            <span className="font-semibold">{formatMoney(eurosToMinor(row.gross_total))}</span>
-          }
+          minor={amount}
+          due={due}
         />
-      )}
+      ))}
     />
   );
 }

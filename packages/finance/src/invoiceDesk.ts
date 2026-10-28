@@ -11,67 +11,73 @@ import {
 } from './receivables';
 
 /**
- * Die Rechnungs-Übersicht der Webapp (`/rechnungen`): Ausgangs- und
- * Eingangsrechnungen in Gruppen, die man in der Karte umschaltet, dazu ein
- * paar Zahlen.
+ * Die Rechnungs-Übersicht der Webapp (`/rechnungen`): je eine Liste der
+ * Ausgangs- und der Eingangsrechnungen mit ihrer offenen Summe.
  *
- * Eine Gruppe ist eine Teilmenge, kein Status: „Überfällig“ steckt auch in
- * „Offen“. So zeigt „Offen“ immer die ganze Summe, die noch hereinkommen muss.
+ * Keine Gruppen mehr (Owner 28.10.2026): Jede Zeile trägt ihren Stand selbst
+ * (überfällig, bald fällig, offen, Entwurf), sortiert nach Fälligkeit — was
+ * zuerst fällig war, steht oben.
  */
 
-export type DeskGroup<T> = {
-  items: T[];
-  /** Summe der Gruppe in Cent. */
+/** Stand einer Rechnung in der Liste. */
+export type DeskDue =
+  | { kind: 'overdue'; days: number }
+  /** Fällig heute (`days` 0) bis in `DUE_SOON_DAYS` Tagen. */
+  | { kind: 'dueSoon'; days: number }
+  | { kind: 'open' }
+  | { kind: 'draft' };
+
+export type DeskEntry<T> = {
+  item: T;
+  /** Offener Betrag in Cent; bei Entwürfen das Brutto. */
+  minor: number;
+  due: DeskDue;
+};
+
+export type DeskList<T> = {
+  entries: DeskEntry<T>[];
+  /** Offene Summe in Cent, ohne Entwürfe. */
   minor: number;
 };
 
-export type OutgoingGroupKey = 'overdue' | 'open' | 'draft';
+/** Bis so viele Tage vor Fälligkeit gilt eine Rechnung als „bald fällig“. */
+export const DUE_SOON_DAYS = 7;
 
-export type OutgoingDesk = Record<OutgoingGroupKey, DeskGroup<OutgoingDeskItem>>;
-
-export type OutgoingDeskItem = {
-  document: SalesDocumentRow;
-  /** Offener Betrag; bei Entwürfen das Brutto. */
-  minor: number;
-  daysOverdue: number;
-};
-
-/** Reihenfolge der Chips und der Vorauswahl: das Dringendste zuerst. */
-export const OUTGOING_GROUP_ORDER: readonly OutgoingGroupKey[] = ['overdue', 'open', 'draft'];
-
-function group<T>(items: T[], amount: (item: T) => number): DeskGroup<T> {
-  return { items, minor: items.reduce((sum, item) => sum + amount(item), 0) };
+export function dueOf(referenceIso: string, dueDate: string | null): DeskDue {
+  if (!dueDate) return { kind: 'open' };
+  const left = daysBetween(referenceIso, dueDate);
+  if (left < 0) return { kind: 'overdue', days: -left };
+  if (left <= DUE_SOON_DAYS) return { kind: 'dueSoon', days: left };
+  return { kind: 'open' };
 }
 
+const byDueDate = (a: string | null, b: string | null) => (a ?? '9999').localeCompare(b ?? '9999');
+
+/** Offene Ausgangsrechnungen nach Fälligkeit, Entwürfe am Ende. */
 export function buildOutgoingDesk(
   documents: readonly SalesDocumentRow[],
   payments: readonly PaymentRow[],
   referenceIso: string,
-): OutgoingDesk {
-  const receivables: OutgoingDeskItem[] = buildReceivables(documents, payments, referenceIso).map(
-    (item: ReceivableItem) => ({
-      document: item.document,
+): DeskList<SalesDocumentRow> {
+  const open: DeskEntry<SalesDocumentRow>[] = buildReceivables(documents, payments, referenceIso)
+    .map((item: ReceivableItem) => ({
+      item: item.document,
       minor: item.openMinor,
-      daysOverdue: item.daysOverdue,
-    }),
-  );
+      due: dueOf(referenceIso, item.document.due_date),
+    }))
+    .sort((a, b) => byDueDate(a.item.due_date, b.item.due_date));
 
-  const drafts: OutgoingDeskItem[] = documents
+  const drafts: DeskEntry<SalesDocumentRow>[] = documents
     .filter((document) => INVOICE_TYPES.has(document.type) && document.status === 'draft')
-    .map((document) => ({ document, minor: eurosToMinor(document.gross_total), daysOverdue: 0 }));
-
-  const overdue = receivables
-    .filter((item) => item.daysOverdue > 0)
-    .sort((a, b) => b.daysOverdue - a.daysOverdue);
-  // Offene nach Fälligkeit: was zuerst fällig wird, steht oben.
-  const open = [...receivables].sort((a, b) =>
-    (a.document.due_date ?? '9999').localeCompare(b.document.due_date ?? '9999'),
-  );
+    .map((document) => ({
+      item: document,
+      minor: eurosToMinor(document.gross_total),
+      due: { kind: 'draft' },
+    }));
 
   return {
-    overdue: group(overdue, (item) => item.minor),
-    open: group(open, (item) => item.minor),
-    draft: group(drafts, (item) => item.minor),
+    entries: [...open, ...drafts],
+    minor: open.reduce((sum, entry) => sum + entry.minor, 0),
   };
 }
 
@@ -85,19 +91,8 @@ export type DeskIncomingRow = {
   created_at: string;
 };
 
-export type IncomingGroupKey = 'new' | 'dueSoon' | 'overdue' | 'open';
-
-export const INCOMING_GROUP_ORDER: readonly IncomingGroupKey[] = [
-  'new',
-  'overdue',
-  'dueSoon',
-  'open',
-];
-
-export type IncomingDesk<T extends DeskIncomingRow> = Record<IncomingGroupKey, DeskGroup<T>>;
-
 /**
- * Eingangsrechnungen nach dem, was das Büro tun muss.
+ * Offene Eingangsrechnungen nach Fälligkeit.
  *
  * Offen ist alles außer `paid`, wie in `computeOpenTasks`. Teilbezahlte zählen
  * mit dem vollen Brutto: Zahlungen auf Eingangsrechnungen erfasst Bautakt noch
@@ -106,47 +101,16 @@ export type IncomingDesk<T extends DeskIncomingRow> = Record<IncomingGroupKey, D
 export function buildIncomingDesk<T extends DeskIncomingRow>(
   incoming: readonly T[],
   referenceIso: string,
-  /** Seit wann eine Eingangsrechnung „neu“ ist (ISO-Zeitstempel). */
-  newSinceIso: string,
-  dueWithinDays = 7,
-): IncomingDesk<T> {
-  const amount = (row: T) => eurosToMinor(row.gross_total);
-  const open = incoming
+): DeskList<T> {
+  const entries = incoming
     .filter((row) => row.status !== 'paid')
-    .sort((a, b) => (a.due_date ?? '9999').localeCompare(b.due_date ?? '9999'));
-  const daysLeft = (row: T) => (row.due_date ? daysBetween(referenceIso, row.due_date) : null);
-
-  return {
-    new: group(
-      open
-        .filter((row) => row.created_at >= newSinceIso)
-        .sort((a, b) => b.created_at.localeCompare(a.created_at)),
-      amount,
-    ),
-    overdue: group(
-      open.filter((row) => {
-        const left = daysLeft(row);
-        return left !== null && left < 0;
-      }),
-      amount,
-    ),
-    dueSoon: group(
-      open.filter((row) => {
-        const left = daysLeft(row);
-        return left !== null && left >= 0 && left <= dueWithinDays;
-      }),
-      amount,
-    ),
-    open: group(open, amount),
-  };
-}
-
-/** Erste Gruppe mit Inhalt, sonst die erste überhaupt. */
-export function firstFilledGroup<K extends string>(
-  order: readonly K[],
-  groups: Record<K, DeskGroup<unknown>>,
-): K {
-  return order.find((key) => groups[key].items.length > 0) ?? order[0];
+    .sort((a, b) => byDueDate(a.due_date, b.due_date))
+    .map((row) => ({
+      item: row,
+      minor: eurosToMinor(row.gross_total),
+      due: dueOf(referenceIso, row.due_date),
+    }));
+  return { entries, minor: entries.reduce((sum, entry) => sum + entry.minor, 0) };
 }
 
 export type MonthComparison = {

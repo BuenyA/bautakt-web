@@ -14,8 +14,11 @@
 export const createParam = 'neu';
 
 /** Listenpfad mit geöffnetem Anlege-Panel. */
-export function withCreate(path: string): string {
-  return `${path}${path.includes('?') ? '&' : '?'}${createParam}=1`;
+/** Wert für `withCreate` auf `/ausgaben`: öffnet die Eingangsrechnung statt der Ausgabe. */
+export const createIncomingInvoice = 'eingangsrechnung';
+
+export function withCreate(path: string, what = '1'): string {
+  return `${path}${path.includes('?') ? '&' : '?'}${createParam}=${what}`;
 }
 
 /** Query der alten Zeitenliste `/zeiten?order=…`; die Umleitung liest ihn noch. */
