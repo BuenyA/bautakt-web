@@ -30,7 +30,7 @@ import {
   Settings20Regular,
   SignOut20Regular,
 } from '@fluentui/react-icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router';
 
@@ -49,9 +49,21 @@ import { calendarNavItem, isNavActive, maySee, navItems, settingsNavItem } from 
 import { NotificationsBell } from './NotificationsBell';
 import { QuickSearch } from './QuickSearch';
 import { SidebarNavItem } from './SidebarNav';
-import { RAIL_WIDTH, SIDEBAR_INSET, useSidebarStyles } from './sidebarStyles';
+import {
+  RAIL_WIDTH,
+  SIDEBAR_DURATION,
+  SIDEBAR_EASE,
+  SIDEBAR_INSET,
+  useSidebarStyles,
+} from './sidebarStyles';
 import { useMediaQuery } from './useMediaQuery';
 import { useRailTooltip } from './useRailTooltip';
+
+/** Größe des Umschalters: ausgeklappt im Kopf, eingeklappt als Griff auf dem Rand. */
+const TOGGLE_SIZE = 32;
+const HANDLE_SIZE = 28;
+/** Mitte der ersten Zeile (Signet), auf Höhe der Kopfzeile rechts daneben. */
+const HEAD_CENTER = 28;
 
 const COOKIE = 'bautakt_sidebar_state';
 
@@ -90,7 +102,8 @@ const useStyles = makeStyles({
     // Fluent setzt `paddingInlineStart: 14px` und `paddingBlock: 5px` eigens;
     // dieselben Schlüssel hier, damit sie überschrieben werden.
     paddingInlineStart: `${SIDEBAR_INSET}px`,
-    paddingInlineEnd: `${SIDEBAR_INSET}px`,
+    // Rechts Platz für den Umschalter, der über dem Kopf liegt.
+    paddingInlineEnd: `${SIDEBAR_INSET + TOGGLE_SIZE + 4}px`,
     paddingBlock: tokens.spacingVerticalS,
     overflow: 'clip',
   },
@@ -109,25 +122,39 @@ const useStyles = makeStyles({
       flexShrink: 0,
     },
   },
-  // Ein- und Ausklappen: ein Knopf an fester Stelle unten, in beiden Zuständen
-  // sichtbar und gleich aufgebaut wie ein Eintrag. Icon 20 px mit 11 px Einzug
-  // plus 1 px Rand: Mitte auf der Mittellinie der Icon-Leiste.
-  toggleButton: {
-    width: '100%',
-    minWidth: 0,
-    maxWidth: 'none',
-    minHeight: '40px',
-    justifyContent: 'flex-start',
-    // Text steht bündig mit dem der Einträge darüber.
-    columnGap: '10px',
-    paddingInlineStart: '11px',
-    paddingInlineEnd: tokens.spacingHorizontalS,
-    fontWeight: tokens.fontWeightRegular,
-    color: tokens.colorNeutralForeground2,
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    '& .fui-Button__icon': {
-      flexShrink: 0,
+  // Ein- und Ausklappen: ein Knopf für beide Zustände. Ausgeklappt steht er
+  // rechts im Kopf; eingeklappt rutscht er mit der Kante mit und sitzt als
+  // runder Griff mittig auf dem Rand zwischen Leiste und Inhalt (wie in Jira).
+  // Er hängt am Rahmen um den Drawer, weil der Drawer selbst abschneidet.
+  toggle: {
+    position: 'absolute',
+    insetInlineEnd: `${SIDEBAR_INSET}px`,
+    top: `${HEAD_CENTER - TOGGLE_SIZE / 2}px`,
+    width: `${TOGGLE_SIZE}px`,
+    minWidth: `${TOGGLE_SIZE}px`,
+    height: `${TOGGLE_SIZE}px`,
+    padding: 0,
+    transitionProperty:
+      'inset-inline-end, top, width, min-width, height, border-radius, background-color, border-color, box-shadow',
+    transitionDuration: SIDEBAR_DURATION,
+    transitionTimingFunction: SIDEBAR_EASE,
+    '@media (prefers-reduced-motion: reduce)': {
+      transitionDuration: '0.01ms',
+    },
+  },
+  toggleOnEdge: {
+    insetInlineEnd: `${-HANDLE_SIZE / 2}px`,
+    top: `${HEAD_CENTER - HANDLE_SIZE / 2}px`,
+    width: `${HANDLE_SIZE}px`,
+    minWidth: `${HANDLE_SIZE}px`,
+    height: `${HANDLE_SIZE}px`,
+    borderRadius: tokens.borderRadiusCircular,
+    backgroundColor: tokens.colorNeutralBackground1,
+    border: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke1}`,
+    boxShadow: tokens.shadow4,
+    ':hover': {
+      backgroundColor: tokens.colorNeutralBackground1Hover,
+      border: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke1Hover}`,
     },
   },
   body: {
@@ -308,9 +335,9 @@ function AppTitle({
 /**
  * Rahmen der angemeldeten App: Seitenleiste, Kopfzeile, Inhalt.
  *
- * Kopf der Leiste: Signet und Name (`AppItem`). Desktop: Drawer inline,
- * einklappbar auf eine Icon-Leiste über den Knopf unten über dem Konto —
- * immer sichtbar, an derselben Stelle in beiden Zuständen. Zustand im Cookie. Unter 768 px: Overlay, geöffnet über den
+ * Kopf der Leiste: Signet und Name (`AppItem`), rechts das Einklappen.
+ * Desktop: Drawer inline, einklappbar auf eine Icon-Leiste; eingeklappt sitzt
+ * der Umschalter als Griff auf dem Rand. Dazu Strg+B. Zustand im Cookie. Unter 768 px: Overlay, geöffnet über den
  * Hamburger in der Kopfzeile, schließt nach dem Navigieren. Die Kopfzeile
  * trägt die Schnellsuche und die Glocke.
  */
@@ -325,11 +352,11 @@ export function AppShell() {
   const sidebar = useSidebarStyles();
 
   const collapsed = !isMobile && !expanded;
-  const toggleTooltip = useRailTooltip(collapsed);
   const visible = navItems.filter((item) => maySee(item, membership?.permissions));
   const selected = [...visible, calendarNavItem].find((item) => isNavActive(pathname, item))?.to;
   const closeMobile = isMobile ? () => setMobileOpen(false) : undefined;
   const toggleLabel = t('common:nav.toggleSidebar');
+  const toggleAction = t(collapsed ? 'common:nav.expandSidebar' : 'common:nav.collapseSidebar');
 
   function toggle() {
     if (isMobile) {
@@ -339,6 +366,26 @@ export function AppShell() {
     setExpanded(!expanded);
     writeExpanded(!expanded);
   }
+
+  // Strg+B (Mac: ⌘B) klappt die Leiste um, wie in VS Code. Nicht in
+  // Eingabefeldern, dort kann es „fett“ heißen.
+  useEffect(() => {
+    if (isMobile) return;
+    function onKey(event: KeyboardEvent) {
+      if (!(event.ctrlKey || event.metaKey) || event.shiftKey || event.altKey) return;
+      if (event.key.toLowerCase() !== 'b') return;
+      if ((event.target as HTMLElement | null)?.closest('input, textarea, [contenteditable]')) {
+        return;
+      }
+      event.preventDefault();
+      setExpanded((current) => {
+        writeExpanded(!current);
+        return !current;
+      });
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isMobile]);
 
   const drawer = (
     <NavDrawer
@@ -369,22 +416,6 @@ export function AppShell() {
 
       <NavDrawerFooter className={styles.footer}>
         <SidebarNavItem item={calendarNavItem} collapsed={collapsed} onNavigate={closeMobile} />
-        {isMobile ? null : (
-          <Tooltip content={t('common:nav.expandSidebar')} {...toggleTooltip}>
-            <Button
-              appearance="subtle"
-              icon={collapsed ? <PanelLeftExpand20Regular /> : <PanelLeftContract20Regular />}
-              onClick={toggle}
-              aria-expanded={expanded}
-              aria-label={t(collapsed ? 'common:nav.expandSidebar' : 'common:nav.collapseSidebar')}
-              className={styles.toggleButton}
-            >
-              <span className={mergeClasses(sidebar.label, collapsed && sidebar.labelHidden)}>
-                {t('common:nav.collapse')}
-              </span>
-            </Button>
-          </Tooltip>
-        )}
         <NavDivider />
         <UserMenu collapsed={collapsed} onNavigate={closeMobile} />
       </NavDrawerFooter>
@@ -393,7 +424,29 @@ export function AppShell() {
 
   return (
     <div className="flex min-h-svh">
-      {isMobile ? drawer : <div className="sticky top-0 h-svh shrink-0">{drawer}</div>}
+      {isMobile ? (
+        drawer
+      ) : (
+        // Über der Kopfzeile rechts (z-20), damit der Griff auf dem Rand darüber liegt.
+        <div className="sticky top-0 z-30 h-svh shrink-0">
+          {drawer}
+          <Tooltip
+            content={`${toggleAction} (${t('common:nav.sidebarShortcut')})`}
+            relationship="description"
+            positioning="after"
+          >
+            <Button
+              appearance="subtle"
+              icon={collapsed ? <PanelLeftExpand20Regular /> : <PanelLeftContract20Regular />}
+              onClick={toggle}
+              aria-label={toggleAction}
+              aria-expanded={expanded}
+              aria-keyshortcuts="Control+B"
+              className={mergeClasses(styles.toggle, collapsed && styles.toggleOnEdge)}
+            />
+          </Tooltip>
+        </div>
+      )}
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="border-border bg-background sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b px-4 sm:px-6">

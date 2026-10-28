@@ -16,7 +16,7 @@ export const SIDEBAR_INSET = 12;
  * Ausrollende Kurve ohne Nachfedern, wie sie iOS- und Web-Schubladen nutzen:
  * schneller Start, weiches Ende. `curveEasyEase` wirkte daneben mechanisch.
  */
-const EASE_OUT = 'cubic-bezier(0.32, 0.72, 0, 1)';
+export const SIDEBAR_EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
 export const SIDEBAR_DURATION = '280ms';
 
 export const useSidebarStyles = makeStyles({
@@ -58,7 +58,7 @@ export const useSidebarStyles = makeStyles({
   drawerMotion: {
     transitionProperty: 'width',
     transitionDuration: SIDEBAR_DURATION,
-    transitionTimingFunction: EASE_OUT,
+    transitionTimingFunction: SIDEBAR_EASE,
     '@media (prefers-reduced-motion: reduce)': {
       transitionDuration: '0.01ms',
     },
