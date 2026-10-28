@@ -146,7 +146,7 @@ export function ExpensesPage() {
         description={t('domain:expenses.description')}
         actions={
           canManage ? (
-            <>
+            <div className="flex flex-wrap items-center gap-2">
               <Button onClick={() => setSheetOpen(true)} icon={<AddRegular />}>
                 {t('domain:expenseForm.title')}
               </Button>
@@ -157,7 +157,7 @@ export function ExpensesPage() {
               >
                 {t('domain:incomingInvoiceForm.title')}
               </Button>
-            </>
+            </div>
           ) : null
         }
       />
