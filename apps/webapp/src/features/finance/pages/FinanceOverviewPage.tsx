@@ -1,9 +1,11 @@
 import { cn } from '@bautakt/ui';
+import { Button } from '@fluentui/react-components';
 import {
   AddRegular,
   DocumentArrowDownRegular,
   DocumentArrowUpRegular,
 } from '@fluentui/react-icons';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
@@ -11,8 +13,9 @@ import { LinkButton } from '@/components/common/LinkButton';
 import { FILL_VIEWPORT_LG } from '@/components/layout/fillViewport';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
-import { routes, withCreate } from '@/lib/routes';
+import { routes } from '@/lib/routes';
 
+import { ExpenseSheet } from '../ExpenseSheet';
 import { FinanceHeader } from '../FinanceHeader';
 import { DeskCard, DeskRow } from '../overview/DeskCard';
 import { useFinanceOverviewData } from '../useFinanceOverviewData';
@@ -33,6 +36,8 @@ export function FinanceOverviewPage() {
   const data = useFinanceOverviewData();
   const canManageOverheadCosts = usePermission('canManageOverheadCosts');
   const { access, outgoing, incoming } = data;
+  // Ausgabe direkt hier erfassen, damit man auf der Übersicht bleibt.
+  const [expenseOpen, setExpenseOpen] = useState(false);
 
   const columns = [outgoing, incoming].filter(Boolean).length;
 
@@ -44,9 +49,9 @@ export function FinanceOverviewPage() {
         actions={
           <div className="flex flex-wrap gap-2">
             {canManageOverheadCosts ? (
-              <LinkButton to={withCreate(routes.expenses)} icon={<AddRegular />}>
+              <Button onClick={() => setExpenseOpen(true)} icon={<AddRegular />}>
                 {t('domain:expenseForm.title')}
-              </LinkButton>
+              </Button>
             ) : null}
             {access.canWriteSalesDocuments ? (
               <>
@@ -87,6 +92,10 @@ export function FinanceOverviewPage() {
           ) : null}
         </div>
       )}
+
+      {canManageOverheadCosts ? (
+        <ExpenseSheet open={expenseOpen} onOpenChange={setExpenseOpen} />
+      ) : null}
     </div>
   );
 }

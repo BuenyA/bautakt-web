@@ -605,7 +605,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       ? routes.invoice(state.parentDocumentId)
       : state.type === 'quote'
         ? routes.quotes
-        : routes.invoices;
+        : routes.financeHub;
 
   async function onSaveDraft() {
     setError(null);

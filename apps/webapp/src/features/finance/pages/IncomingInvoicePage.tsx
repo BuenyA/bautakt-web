@@ -31,7 +31,7 @@ import {
 import { DocumentRegular } from '@fluentui/react-icons';
 import { type FormEvent, type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useBlocker, useLocation, useNavigate, useParams } from 'react-router';
+import { useBlocker, useNavigate, useParams } from 'react-router';
 
 import { PageHeader } from '@/components/common/PageHeader';
 import { DatePicker } from '@/components/form/dateTime';
@@ -119,16 +119,12 @@ export function IncomingInvoicePage() {
 }
 
 /**
- * Zurück, woher man kam (Übersicht oder Liste); wer die Seite direkt geöffnet
- * hat, landet in der Liste der Eingangsrechnungen.
+ * Nach Speichern, Löschen oder Abbrechen immer zurück auf die Übersicht der
+ * Rechnungen, egal ob man aus der Liste kam (Owner 28.10.2026).
  */
 function useLeave() {
   const navigate = useNavigate();
-  const location = useLocation();
-  return () => {
-    if (location.key === 'default') void navigate(routes.expenses);
-    else void navigate(-1);
-  };
+  return () => void navigate(routes.financeHub);
 }
 
 const toInput = (value: number | null | undefined) =>
