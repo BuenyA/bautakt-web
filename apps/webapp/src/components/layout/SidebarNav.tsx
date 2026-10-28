@@ -5,6 +5,7 @@ import { useRouterLink } from '@/components/common/useRouterLink';
 
 import type { NavItem as NavItemConfig } from './navItems';
 import { useSidebarStyles } from './sidebarStyles';
+import { useRailTooltip } from './useRailTooltip';
 
 /**
  * Ein Eintrag der Seitenleiste als Fluent-`NavItem`, der clientseitig
@@ -29,27 +30,22 @@ export function SidebarNavItem({
   const link = useRouterLink(item.to);
   const Icon = item.icon;
   const label = t(item.labelKey);
-
-  const entry = (
-    <NavItem
-      value={item.to}
-      href={link.href}
-      icon={<Icon />}
-      className={sidebar.item}
-      onClick={(event) => {
-        link.onClick(event);
-        onNavigate?.();
-      }}
-    >
-      <span className={mergeClasses(sidebar.label, collapsed && sidebar.labelHidden)}>{label}</span>
-    </NavItem>
-  );
-
-  if (!collapsed) return entry;
+  const tooltip = useRailTooltip(collapsed);
 
   return (
-    <Tooltip content={label} relationship="description" positioning="after">
-      {entry}
+    <Tooltip content={label} {...tooltip}>
+      <NavItem
+        value={item.to}
+        href={link.href}
+        icon={<Icon />}
+        className={sidebar.item}
+        onClick={(event) => {
+          link.onClick(event);
+          onNavigate?.();
+        }}
+      >
+        <span className={mergeClasses(sidebar.label, collapsed && sidebar.labelHidden)}>{label}</span>
+      </NavItem>
     </Tooltip>
   );
 }

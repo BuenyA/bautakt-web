@@ -30,7 +30,7 @@ import {
   Settings20Regular,
   SignOut20Regular,
 } from '@fluentui/react-icons';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router';
 
@@ -51,6 +51,7 @@ import { QuickSearch } from './QuickSearch';
 import { SidebarNavItem } from './SidebarNav';
 import { RAIL_WIDTH, SIDEBAR_INSET, useSidebarStyles } from './sidebarStyles';
 import { useMediaQuery } from './useMediaQuery';
+import { useRailTooltip } from './useRailTooltip';
 
 const COOKIE = 'bautakt_sidebar_state';
 
@@ -79,11 +80,9 @@ const useStyles = makeStyles({
   rail: {
     width: `${RAIL_WIDTH}px`,
   },
-  // Kopf: Signet und Name links, Einklappen rechts, eine Zeile in beiden
-  // Zuständen. Eingeklappt bleibt nur das Signet sichtbar, der Rest liegt
-  // abgeschnitten rechts davon.
+  // Kopf: Signet und Name. Eingeklappt bleibt nur das Signet sichtbar, der
+  // Name liegt abgeschnitten rechts davon.
   header: {
-    position: 'relative',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
@@ -110,19 +109,26 @@ const useStyles = makeStyles({
       flexShrink: 0,
     },
   },
-  collapseButton: {
-    flexShrink: 0,
-  },
-  // Eingeklappt liegt das Ausklappen genau auf dem Signet und erscheint beim
-  // Überfahren (wie bei ChatGPT/Claude) — eine Spalte, kein zweites Symbol.
-  expandButton: {
-    position: 'absolute',
-    insetInlineStart: `${SIDEBAR_INSET}px`,
-    top: '50%',
-    transform: 'translateY(-50%)',
-    width: '44px',
-    minWidth: '44px',
-    height: '44px',
+  // Ein- und Ausklappen: ein Knopf an fester Stelle unten, in beiden Zuständen
+  // sichtbar und gleich aufgebaut wie ein Eintrag. Icon 20 px mit 11 px Einzug
+  // plus 1 px Rand: Mitte auf der Mittellinie der Icon-Leiste.
+  toggleButton: {
+    width: '100%',
+    minWidth: 0,
+    maxWidth: 'none',
+    minHeight: '40px',
+    justifyContent: 'flex-start',
+    // Text steht bündig mit dem der Einträge darüber.
+    columnGap: '10px',
+    paddingInlineStart: '11px',
+    paddingInlineEnd: tokens.spacingHorizontalS,
+    fontWeight: tokens.fontWeightRegular,
+    color: tokens.colorNeutralForeground2,
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    '& .fui-Button__icon': {
+      flexShrink: 0,
+    },
   },
   body: {
     paddingInline: `${SIDEBAR_INSET}px`,
@@ -176,6 +182,7 @@ function UserMenu({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: 
     color: 'brand' as const,
   };
 
+  const tooltip = useRailTooltip(collapsed);
   const labelClass = mergeClasses(sidebar.label, collapsed && sidebar.labelHidden);
   const trigger = (
     <Button
@@ -203,13 +210,9 @@ function UserMenu({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: 
       }}
     >
       <MenuTrigger disableButtonEnhancement>
-        {collapsed ? (
-          <Tooltip content={email} relationship="description" positioning="after">
-            {trigger}
-          </Tooltip>
-        ) : (
-          trigger
-        )}
+        <Tooltip content={email} {...tooltip}>
+          {trigger}
+        </Tooltip>
       </MenuTrigger>
       <MenuPopover>
         <MenuList>
@@ -305,9 +308,9 @@ function AppTitle({
 /**
  * Rahmen der angemeldeten App: Seitenleiste, Kopfzeile, Inhalt.
  *
- * Kopf der Leiste in einer Zeile: Signet und Name (`AppItem`) links, rechts
- * das Einklapp-Symbol. Desktop: Drawer inline, einklappbar auf eine
- * Icon-Leiste, Zustand im Cookie. Unter 768 px: Overlay, geöffnet über den
+ * Kopf der Leiste: Signet und Name (`AppItem`). Desktop: Drawer inline,
+ * einklappbar auf eine Icon-Leiste über den Knopf unten über dem Konto —
+ * immer sichtbar, an derselben Stelle in beiden Zuständen. Zustand im Cookie. Unter 768 px: Overlay, geöffnet über den
  * Hamburger in der Kopfzeile, schließt nach dem Navigieren. Die Kopfzeile
  * trägt die Schnellsuche und die Glocke.
  */
@@ -320,18 +323,9 @@ export function AppShell() {
   const [expanded, setExpanded] = useState(readExpanded);
   const [mobileOpen, setMobileOpen] = useState(false);
   const sidebar = useSidebarStyles();
-  const collapseRef = useRef<HTMLButtonElement>(null);
-  const expandRef = useRef<HTMLButtonElement>(null);
-  const toggledByUser = useRef(false);
-
-  // Nach dem Umschalten wandert der Fokus auf den Knopf, der jetzt sichtbar
-  // ist — sonst bliebe er auf dem ausgeblendeten hängen.
-  useEffect(() => {
-    if (!toggledByUser.current) return;
-    (expanded ? collapseRef : expandRef).current?.focus({ preventScroll: true });
-  }, [expanded]);
 
   const collapsed = !isMobile && !expanded;
+  const toggleTooltip = useRailTooltip(collapsed);
   const visible = navItems.filter((item) => maySee(item, membership?.permissions));
   const selected = [...visible, calendarNavItem].find((item) => isNavActive(pathname, item))?.to;
   const closeMobile = isMobile ? () => setMobileOpen(false) : undefined;
@@ -342,7 +336,6 @@ export function AppShell() {
       setMobileOpen((open) => !open);
       return;
     }
-    toggledByUser.current = true;
     setExpanded(!expanded);
     writeExpanded(!expanded);
   }
@@ -359,51 +352,8 @@ export function AppShell() {
         collapsed && styles.rail,
       )}
     >
-      <NavDrawerHeader className={mergeClasses(styles.header, 'group/sidebar-head')}>
-        <AppTitle
-          collapsed={collapsed}
-          onNavigate={closeMobile}
-          className={mergeClasses(
-            styles.appItem,
-            // Eingeklappt weicht das Signet beim Überfahren (oder Tastaturfokus
-            // auf dem Ausklappen) dem Ausklappen-Symbol.
-            collapsed &&
-              'transition-opacity duration-150 group-hover/sidebar-head:opacity-0 group-has-[:focus-visible]/sidebar-head:opacity-0',
-          )}
-        />
-        <Tooltip content={t('common:nav.collapseSidebar')} relationship="label" positioning="after">
-          <Button
-            ref={collapseRef}
-            appearance="subtle"
-            icon={<PanelLeftContract20Regular />}
-            onClick={toggle}
-            aria-expanded={isMobile ? mobileOpen : expanded}
-            // Eingeklappt liegt der Knopf abgeschnitten neben dem Signet: aus
-            // der Tab-Reihenfolge nehmen, das Ausklappen übernimmt.
-            tabIndex={collapsed ? -1 : undefined}
-            aria-hidden={collapsed || undefined}
-            className={mergeClasses(
-              styles.collapseButton,
-              sidebar.label,
-              collapsed && sidebar.labelHidden,
-            )}
-          />
-        </Tooltip>
-        {collapsed ? (
-          <Tooltip content={t('common:nav.expandSidebar')} relationship="label" positioning="after">
-            <Button
-              ref={expandRef}
-              appearance="subtle"
-              icon={<PanelLeftExpand20Regular />}
-              onClick={toggle}
-              aria-expanded={false}
-              className={mergeClasses(
-                styles.expandButton,
-                'opacity-0 transition-opacity duration-150 group-hover/sidebar-head:opacity-100 focus-visible:opacity-100',
-              )}
-            />
-          </Tooltip>
-        ) : null}
+      <NavDrawerHeader className={styles.header}>
+        <AppTitle collapsed={collapsed} onNavigate={closeMobile} className={styles.appItem} />
       </NavDrawerHeader>
 
       <NavDrawerBody className={styles.body}>
@@ -419,6 +369,22 @@ export function AppShell() {
 
       <NavDrawerFooter className={styles.footer}>
         <SidebarNavItem item={calendarNavItem} collapsed={collapsed} onNavigate={closeMobile} />
+        {isMobile ? null : (
+          <Tooltip content={t('common:nav.expandSidebar')} {...toggleTooltip}>
+            <Button
+              appearance="subtle"
+              icon={collapsed ? <PanelLeftExpand20Regular /> : <PanelLeftContract20Regular />}
+              onClick={toggle}
+              aria-expanded={expanded}
+              aria-label={t(collapsed ? 'common:nav.expandSidebar' : 'common:nav.collapseSidebar')}
+              className={styles.toggleButton}
+            >
+              <span className={mergeClasses(sidebar.label, collapsed && sidebar.labelHidden)}>
+                {t('common:nav.collapse')}
+              </span>
+            </Button>
+          </Tooltip>
+        )}
         <NavDivider />
         <UserMenu collapsed={collapsed} onNavigate={closeMobile} />
       </NavDrawerFooter>
