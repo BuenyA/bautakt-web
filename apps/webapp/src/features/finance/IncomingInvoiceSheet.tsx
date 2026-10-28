@@ -14,6 +14,7 @@ import {
   toast,
 } from '@bautakt/ui';
 import {
+  Badge,
   Button,
   Dialog,
   DialogActions,
@@ -33,6 +34,7 @@ import {
   Textarea,
   Tooltip,
 } from '@fluentui/react-components';
+import { DocumentRegular } from '@fluentui/react-icons';
 import { type FormEvent, useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -42,6 +44,7 @@ import type { ContactListRow } from '@/features/contacts/useContacts';
 import { useOrders } from '@/features/orders/useOrders';
 import { readableDbError } from '@/lib/dbErrors';
 
+import { IncomingInvoiceDropzone } from './IncomingInvoiceDropzone';
 import {
   canDelete,
   canEditFields,
@@ -51,12 +54,24 @@ import {
   suggestGross,
   validateIncomingInvoice,
 } from './incomingInvoiceForm';
+import {
+  applySuggestion,
+  type InvoiceSuggestion,
+  MAX_UPLOAD_BYTES,
+  type SuggestibleField,
+  type SuggestibleValues,
+  type UploadKind,
+  uploadKind,
+} from './incomingInvoiceUpload';
 import { useCostCategories } from './useCostCategories';
 import {
   type IncomingInvoiceRow,
+  IncomingUploadError,
+  parseIncomingFile,
   useDeleteIncomingDraft,
   useIncomingInvoice,
   useSaveIncomingInvoice,
+  useStoreIncomingFile,
 } from './useIncomingInvoice';
 
 /**
@@ -129,6 +144,19 @@ function IncomingInvoiceLoader({
 const toInput = (value: number | null | undefined) =>
   value === null || value === undefined ? '' : formatMoneyInput(value);
 
+/** Stand des Auslesens nach einem Upload. */
+type ReadState =
+  | { state: 'idle' }
+  | { state: 'running' }
+  | {
+      state: 'suggested';
+      format: InvoiceSuggestion['sourceFormat'];
+      foreignCurrency: string | null;
+    }
+  /** Kein E-Rechnungs-XML; bei Fotos wird gar nicht erst gelesen. */
+  | { state: 'none'; photo: boolean }
+  | { state: 'error'; file: File; kind: UploadKind };
+
 function IncomingInvoiceForm({
   saved,
   onDone,
@@ -139,6 +167,7 @@ function IncomingInvoiceForm({
   const { t } = useTranslation();
   const save = useSaveIncomingInvoice();
   const remove = useDeleteIncomingDraft();
+  const storeFile = useStoreIncomingFile();
   const categories = useCostCategories();
   const orders = useOrders();
   const ids = {
@@ -176,6 +205,34 @@ function IncomingInvoiceForm({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
 
+  // Upload (#88, Teil 2). `attached`: die Datei, die in dieser Sitzung abgelegt
+  // wurde; bei einer neuen Rechnung entsteht dabei der Entwurf.
+  const [attached, setAttached] = useState<{ id: string; fileName: string } | null>(null);
+  const [uploadError, setUploadError] = useState<{ message: string; file: File | null } | null>(
+    null,
+  );
+  const [read, setRead] = useState<ReadState>({ state: 'idle' });
+  const [suggested, setSuggested] = useState<ReadonlySet<SuggestibleField>>(new Set());
+  const [eInvoice, setEInvoice] = useState<Pick<
+    InvoiceSuggestion,
+    'vendorVatId' | 'sourceFormat'
+  > | null>(null);
+
+  const invoiceId = saved?.id ?? attached?.id ?? null;
+  const hasOriginal = Boolean(saved?.storage_path) || attached !== null;
+  const draftStatus: IncomingInvoiceStatus | null = savedStatus ?? (attached ? 'draft' : null);
+  const uploading = storeFile.isPending || read.state === 'running';
+
+  /** Wer ein vorgeschlagenes Feld ändert, hat es geprüft: Markierung weg. */
+  function touched(field: SuggestibleField) {
+    if (!suggested.has(field)) return;
+    setSuggested((current) => {
+      const next = new Set(current);
+      next.delete(field);
+      return next;
+    });
+  }
+
   // Die Meldung steht unter dem letzten Feld; ohne Scrollen sähe sie keiner.
   useEffect(() => {
     if (error) errorRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -200,11 +257,90 @@ function IncomingInvoiceForm({
     }
   }
 
+  async function onFile(file: File) {
+    setUploadError(null);
+    const kind = uploadKind(file.name, file.type);
+    if (!kind) {
+      setUploadError({
+        message: t('domain:incomingInvoiceForm.upload.errors.unsupported'),
+        file: null,
+      });
+      return;
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setUploadError({
+        message: t('domain:incomingInvoiceForm.upload.errors.tooLarge'),
+        file: null,
+      });
+      return;
+    }
+    try {
+      const stored = await storeFile.mutateAsync({ invoiceId, file });
+      setAttached({ id: stored.id, fileName: file.name });
+    } catch (caught) {
+      const key = caught instanceof IncomingUploadError ? caught.key : 'unknown';
+      // Wiederholen hilft nur, wenn der Fehler nicht an der Datei selbst liegt.
+      const retry = key === 'unknown' ? file : null;
+      setUploadError({
+        message: t(`domain:incomingInvoiceForm.upload.errors.${key}`),
+        file: retry,
+      });
+      return;
+    }
+    await readEInvoice(file, kind);
+  }
+
+  async function readEInvoice(file: File, kind: UploadKind) {
+    setRead({ state: 'running' });
+    try {
+      const outcome = await parseIncomingFile(file, kind);
+      if (outcome.status === 'none') {
+        setRead({ state: 'none', photo: kind === 'image' });
+        return;
+      }
+      const current: SuggestibleValues = {
+        vendorName,
+        invoiceNumber,
+        invoiceDate,
+        dueDate,
+        net,
+        vat,
+        gross,
+      };
+      const { values, filled } = applySuggestion(current, outcome.suggestion, todayIso(), (minor) =>
+        formatMoneyInput(fromMinorUnits(minor)),
+      );
+      setVendorName(values.vendorName);
+      setInvoiceNumber(values.invoiceNumber);
+      setInvoiceDate(values.invoiceDate);
+      setDueDate(values.dueDate);
+      setNet(values.net);
+      setVat(values.vat);
+      setGross(values.gross);
+      setSuggested(new Set(filled));
+      setEInvoice({
+        vendorVatId: outcome.suggestion.vendorVatId,
+        sourceFormat: outcome.suggestion.sourceFormat,
+      });
+      setRead({
+        state: 'suggested',
+        format: outcome.suggestion.sourceFormat,
+        foreignCurrency: outcome.foreignCurrency,
+      });
+    } catch (caught) {
+      console.error('finance-inbound-parse', caught);
+      setRead({ state: 'error', file, kind });
+    }
+  }
+
   // Brutto aus Netto + USt, sobald beides da ist und Brutto noch leer.
   function fillGross() {
     if (gross.trim()) return;
     const suggested = suggestGross(fields);
-    if (suggested !== null) setGross(formatMoneyInput(fromMinorUnits(suggested)));
+    if (suggested !== null) {
+      setGross(formatMoneyInput(fromMinorUnits(suggested)));
+      touched('gross');
+    }
   }
 
   async function onSubmit(event: FormEvent) {
@@ -221,7 +357,7 @@ function IncomingInvoiceForm({
 
     try {
       await save.mutateAsync({
-        id: saved?.id ?? null,
+        id: invoiceId,
         onlyStatus: !editable,
         values: {
           status,
@@ -236,6 +372,9 @@ function IncomingInvoiceForm({
           order_id: orderId || null,
           cost_category_id: categoryId || null,
           notes: notes.trim(),
+          ...(eInvoice
+            ? { vendor_vat_id: eInvoice.vendorVatId ?? '', source_format: eInvoice.sourceFormat }
+            : {}),
         },
       });
       toast.success(t('domain:incomingInvoiceForm.saved'));
@@ -246,9 +385,9 @@ function IncomingInvoiceForm({
   }
 
   async function onDelete() {
-    if (!saved) return;
+    if (!invoiceId) return;
     try {
-      await remove.mutateAsync(saved.id);
+      await remove.mutateAsync(invoiceId);
       toast.success(t('domain:incomingInvoiceForm.deleted'));
       setConfirmDelete(false);
       onDone();
@@ -282,7 +421,38 @@ function IncomingInvoiceForm({
         </FormDrawerDescription>
       </DrawerHeader>
 
-      <DrawerBody className="flex flex-col gap-4">
+      {/* Ohne shrink-0 drückt die scrollende Spalte Meldungen zusammen, und ihre
+          Knöpfe rutschen über das nächste Feld. */}
+      <DrawerBody className="flex flex-col gap-4 *:shrink-0">
+        {editable && !hasOriginal ? (
+          <IncomingInvoiceDropzone busy={uploading} onFile={(file) => void onFile(file)} />
+        ) : null}
+        {hasOriginal ? (
+          <p className="text-muted-foreground flex items-center gap-2 text-sm">
+            <DocumentRegular fontSize={16} />
+            {attached
+              ? t('domain:incomingInvoiceForm.upload.attachedName', { name: attached.fileName })
+              : t('domain:incomingInvoiceForm.upload.attached')}
+          </p>
+        ) : null}
+        {uploadError ? (
+          <MessageBar intent="error" layout="multiline">
+            <MessageBarBody>{uploadError.message}</MessageBarBody>
+            {uploadError.file ? (
+              <MessageBarActions>
+                <Button
+                  onClick={() => {
+                    if (uploadError.file) void onFile(uploadError.file);
+                  }}
+                >
+                  {t('common:action.retry')}
+                </Button>
+              </MessageBarActions>
+            ) : null}
+          </MessageBar>
+        ) : null}
+        <ReadMessage read={read} onRetry={(file, kind) => void readEInvoice(file, kind)} />
+
         <div className="grid gap-2">
           <Label htmlFor={ids.supplier}>{t('domain:expenses.columns.vendor')}</Label>
           <ContactPicker
@@ -299,22 +469,32 @@ function IncomingInvoiceForm({
         <div className="grid gap-2">
           <Label htmlFor={ids.vendor} required={status !== 'draft'}>
             {t('domain:expenseForm.vendorOnReceipt')}
+            <SuggestedMark show={suggested.has('vendorName')} />
           </Label>
           <Input
             id={ids.vendor}
             value={vendorName}
             disabled={!editable}
-            onChange={(event) => setVendorName(event.target.value)}
+            onChange={(event) => {
+              setVendorName(event.target.value);
+              touched('vendorName');
+            }}
           />
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor={ids.number}>{t('domain:expenses.columns.number')}</Label>
+          <Label htmlFor={ids.number}>
+            {t('domain:expenses.columns.number')}
+            <SuggestedMark show={suggested.has('invoiceNumber')} />
+          </Label>
           <Input
             id={ids.number}
             value={invoiceNumber}
             disabled={!editable}
-            onChange={(event) => setInvoiceNumber(event.target.value)}
+            onChange={(event) => {
+              setInvoiceNumber(event.target.value);
+              touched('invoiceNumber');
+            }}
           />
         </div>
 
@@ -322,24 +502,32 @@ function IncomingInvoiceForm({
           <div className="grid gap-2">
             <Label htmlFor={ids.date} required={status !== 'draft'}>
               {t('domain:expenses.columns.date')}
+              <SuggestedMark show={suggested.has('invoiceDate')} />
             </Label>
             <DatePicker
               id={ids.date}
               aria-label={t('domain:expenses.columns.date')}
               value={invoiceDate}
-              onChange={setInvoiceDate}
+              onChange={(value) => {
+                setInvoiceDate(value);
+                touched('invoiceDate');
+              }}
               disabled={!editable}
             />
           </div>
           <div className="grid gap-2">
             <Label htmlFor={ids.due} required={status !== 'draft'}>
               {t('domain:expenses.columns.due')}
+              <SuggestedMark show={suggested.has('dueDate')} />
             </Label>
             <DatePicker
               id={ids.due}
               aria-label={t('domain:expenses.columns.due')}
               value={dueDate}
-              onChange={setDueDate}
+              onChange={(value) => {
+                setDueDate(value);
+                touched('dueDate');
+              }}
               disabled={!editable}
             />
           </div>
@@ -350,7 +538,11 @@ function IncomingInvoiceForm({
             id={ids.net}
             label={t('domain:invoices.net')}
             value={net}
-            onChange={setNet}
+            onChange={(value) => {
+              setNet(value);
+              touched('net');
+            }}
+            suggested={suggested.has('net')}
             onBlur={fillGross}
             required={status !== 'draft'}
             disabled={!editable}
@@ -359,7 +551,11 @@ function IncomingInvoiceForm({
             id={ids.vat}
             label={t('domain:invoices.vat')}
             value={vat}
-            onChange={setVat}
+            onChange={(value) => {
+              setVat(value);
+              touched('vat');
+            }}
+            suggested={suggested.has('vat')}
             onBlur={fillGross}
             required={status !== 'draft'}
             disabled={!editable}
@@ -368,7 +564,11 @@ function IncomingInvoiceForm({
             id={ids.gross}
             label={t('domain:invoices.gross')}
             value={gross}
-            onChange={setGross}
+            onChange={(value) => {
+              setGross(value);
+              touched('gross');
+            }}
+            suggested={suggested.has('gross')}
             required={status !== 'draft'}
             disabled={!editable}
           />
@@ -459,8 +659,8 @@ function IncomingInvoiceForm({
       </DrawerBody>
 
       <FormDrawerFooter>
-        {saved ? (
-          canDelete(savedStatus) ? (
+        {invoiceId ? (
+          canDelete(draftStatus) ? (
             <DangerButton type="button" onClick={() => setConfirmDelete(true)}>
               {t('common:action.delete')}
             </DangerButton>
@@ -479,7 +679,7 @@ function IncomingInvoiceForm({
         <Button type="button" onClick={onDone}>
           {t('common:action.cancel')}
         </Button>
-        <Button appearance="primary" type="submit" disabled={save.isPending}>
+        <Button appearance="primary" type="submit" disabled={save.isPending || uploading}>
           {t('common:action.save')}
         </Button>
       </FormDrawerFooter>
@@ -510,6 +710,7 @@ function MoneyField({
   onBlur,
   required,
   disabled,
+  suggested,
 }: {
   id: string;
   label: string;
@@ -518,11 +719,13 @@ function MoneyField({
   onBlur?: () => void;
   required: boolean;
   disabled: boolean;
+  suggested: boolean;
 }) {
   return (
     <div className="grid gap-2">
       <Label htmlFor={id} required={required}>
         {label}
+        <SuggestedMark show={suggested} />
       </Label>
       <Input
         id={id}
@@ -536,4 +739,73 @@ function MoneyField({
       />
     </div>
   );
+}
+
+/** Markiert einen Wert aus der E-Rechnung, bis jemand das Feld ändert. */
+function SuggestedMark({ show }: { show: boolean }) {
+  const { t } = useTranslation();
+  if (!show) return null;
+  return (
+    <Badge appearance="tint" color="informative" size="small" className="ml-2">
+      {t('domain:incomingInvoiceForm.upload.suggested')}
+    </Badge>
+  );
+}
+
+function ReadMessage({
+  read,
+  onRetry,
+}: {
+  read: ReadState;
+  onRetry: (file: File, kind: UploadKind) => void;
+}) {
+  const { t } = useTranslation();
+  switch (read.state) {
+    case 'idle':
+      return null;
+    case 'running':
+      return <Spinner size="tiny" label={t('domain:incomingInvoiceForm.upload.reading')} />;
+    case 'suggested':
+      return (
+        <>
+          <MessageBar intent="info" layout="multiline">
+            <MessageBarBody>
+              {t('domain:incomingInvoiceForm.upload.suggestedInfo', {
+                format: t(`domain:incomingInvoiceForm.upload.format.${read.format}`),
+              })}
+            </MessageBarBody>
+          </MessageBar>
+          {read.foreignCurrency ? (
+            <MessageBar intent="warning" layout="multiline">
+              <MessageBarBody>
+                {t('domain:incomingInvoiceForm.upload.foreignCurrency', {
+                  currency: read.foreignCurrency,
+                })}
+              </MessageBarBody>
+            </MessageBar>
+          ) : null}
+        </>
+      );
+    case 'none':
+      return (
+        <MessageBar intent="info" layout="multiline">
+          <MessageBarBody>
+            {read.photo
+              ? t('domain:incomingInvoiceForm.upload.photo')
+              : t('domain:incomingInvoiceForm.upload.noEInvoice')}
+          </MessageBarBody>
+        </MessageBar>
+      );
+    case 'error':
+      return (
+        <MessageBar intent="warning" layout="multiline">
+          <MessageBarBody>{t('domain:incomingInvoiceForm.upload.readError')}</MessageBarBody>
+          <MessageBarActions>
+            <Button onClick={() => onRetry(read.file, read.kind)}>
+              {t('common:action.retry')}
+            </Button>
+          </MessageBarActions>
+        </MessageBar>
+      );
+  }
 }
