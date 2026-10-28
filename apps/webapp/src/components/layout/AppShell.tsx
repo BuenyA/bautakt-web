@@ -59,9 +59,12 @@ import {
 import { useMediaQuery } from './useMediaQuery';
 import { useRailTooltip } from './useRailTooltip';
 
-/** Größe des Umschalters: ausgeklappt im Kopf, eingeklappt als Griff auf dem Rand. */
+/** Größe des Umschalters. */
 const TOGGLE_SIZE = 32;
-const HANDLE_SIZE = 28;
+/** Höhe der Kopfzeile der Leiste (Signet-Zeile). */
+const HEAD_HEIGHT = 56;
+/** Eingeklappt: Zeile unter dem Signet mit Ausklappen und Trennlinie. */
+const RAIL_ROW_HEIGHT = TOGGLE_SIZE + 8 + 1 + 8;
 /** Mitte der ersten Zeile (Signet), auf Höhe der Kopfzeile rechts daneben. */
 const HEAD_CENTER = 28;
 
@@ -123,9 +126,8 @@ const useStyles = makeStyles({
     },
   },
   // Ein- und Ausklappen: ein Knopf für beide Zustände. Ausgeklappt steht er
-  // rechts im Kopf; eingeklappt rutscht er mit der Kante mit und sitzt als
-  // runder Griff mittig auf dem Rand zwischen Leiste und Inhalt (wie in Jira).
-  // Er hängt am Rahmen um den Drawer, weil der Drawer selbst abschneidet.
+  // rechts im Kopf; eingeklappt gleitet er unter das Signet. Er liegt über dem
+  // Drawer, damit er beim Umschalten derselbe bleibt (Fokus, Bewegung).
   toggle: {
     position: 'absolute',
     insetInlineEnd: `${SIDEBAR_INSET}px`,
@@ -134,28 +136,43 @@ const useStyles = makeStyles({
     minWidth: `${TOGGLE_SIZE}px`,
     height: `${TOGGLE_SIZE}px`,
     padding: 0,
-    transitionProperty:
-      'inset-inline-end, top, width, min-width, height, border-radius, background-color, border-color, box-shadow',
+    transitionProperty: 'inset-inline-end, top',
     transitionDuration: SIDEBAR_DURATION,
     transitionTimingFunction: SIDEBAR_EASE,
     '@media (prefers-reduced-motion: reduce)': {
       transitionDuration: '0.01ms',
     },
   },
-  toggleOnEdge: {
-    insetInlineEnd: `${-HANDLE_SIZE / 2}px`,
-    top: `${HEAD_CENTER - HANDLE_SIZE / 2}px`,
-    width: `${HANDLE_SIZE}px`,
-    minWidth: `${HANDLE_SIZE}px`,
-    height: `${HANDLE_SIZE}px`,
-    borderRadius: tokens.borderRadiusCircular,
-    backgroundColor: tokens.colorNeutralBackground1,
-    border: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke1}`,
-    boxShadow: tokens.shadow4,
-    ':hover': {
-      backgroundColor: tokens.colorNeutralBackground1Hover,
-      border: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke1Hover}`,
+  // Mitte auf der Mittellinie der Icon-Leiste, direkt unter dem Signet.
+  toggleInRail: {
+    insetInlineEnd: `${(RAIL_WIDTH - TOGGLE_SIZE) / 2}px`,
+    top: `${HEAD_HEIGHT}px`,
+  },
+  // Platz für das Ausklappen samt Trennlinie darunter; wächst beim Einklappen
+  // auf, damit die Einträge weich nach unten rutschen statt zu springen.
+  railRow: {
+    flexShrink: 0,
+    height: 0,
+    overflow: 'hidden',
+    display: 'flex',
+    alignItems: 'flex-end',
+    paddingInline: `${SIDEBAR_INSET}px`,
+    transitionProperty: 'height',
+    transitionDuration: SIDEBAR_DURATION,
+    transitionTimingFunction: SIDEBAR_EASE,
+    '@media (prefers-reduced-motion: reduce)': {
+      transitionDuration: '0.01ms',
     },
+  },
+  railRowOpen: {
+    height: `${RAIL_ROW_HEIGHT}px`,
+  },
+  // Gleicher Abstand über und unter der Linie (8 px).
+  railDivider: {
+    flexGrow: 1,
+    marginBottom: tokens.spacingVerticalS,
+    height: tokens.strokeWidthThin,
+    backgroundColor: tokens.colorNeutralStroke2,
   },
   body: {
     paddingInline: `${SIDEBAR_INSET}px`,
@@ -337,7 +354,7 @@ function AppTitle({
  *
  * Kopf der Leiste: Signet und Name (`AppItem`), rechts das Einklappen.
  * Desktop: Drawer inline, einklappbar auf eine Icon-Leiste; eingeklappt sitzt
- * der Umschalter als Griff auf dem Rand. Dazu Strg+B. Zustand im Cookie. Unter 768 px: Overlay, geöffnet über den
+ * das Ausklappen unter dem Signet, darunter eine Trennlinie. Dazu Strg+B. Zustand im Cookie. Unter 768 px: Overlay, geöffnet über den
  * Hamburger in der Kopfzeile, schließt nach dem Navigieren. Die Kopfzeile
  * trägt die Schnellsuche und die Glocke.
  */
@@ -402,6 +419,11 @@ export function AppShell() {
       <NavDrawerHeader className={styles.header}>
         <AppTitle collapsed={collapsed} onNavigate={closeMobile} className={styles.appItem} />
       </NavDrawerHeader>
+      {isMobile ? null : (
+        <div className={mergeClasses(styles.railRow, collapsed && styles.railRowOpen)}>
+          <div className={styles.railDivider} />
+        </div>
+      )}
 
       <NavDrawerBody className={styles.body}>
         {visible.map((item) => (
@@ -427,8 +449,7 @@ export function AppShell() {
       {isMobile ? (
         drawer
       ) : (
-        // Über der Kopfzeile rechts (z-20), damit der Griff auf dem Rand darüber liegt.
-        <div className="sticky top-0 z-30 h-svh shrink-0">
+        <div className="sticky top-0 h-svh shrink-0">
           {drawer}
           <Tooltip
             content={`${toggleAction} (${t('common:nav.sidebarShortcut')})`}
@@ -442,7 +463,7 @@ export function AppShell() {
               aria-label={toggleAction}
               aria-expanded={expanded}
               aria-keyshortcuts="Control+B"
-              className={mergeClasses(styles.toggle, collapsed && styles.toggleOnEdge)}
+              className={mergeClasses(styles.toggle, collapsed && styles.toggleInRail)}
             />
           </Tooltip>
         </div>
