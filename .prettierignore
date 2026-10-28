@@ -9,3 +9,6 @@ package-lock.json
 *.tsbuildinfo
 # Generiert — nie formatieren, sonst rauscht jede Neugenerierung im Diff
 packages/supabase/src/database.types.ts
+# Wörtliche Kopie aus bautakt-app (Deno-Stil), Abgleich per `npm run check:sync`
+packages/document-render/src/core
+packages/document-render/golden

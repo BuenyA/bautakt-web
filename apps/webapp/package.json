@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@bautakt/core": "*",
+    "@bautakt/document-render": "*",
     "@bautakt/finance": "*",
     "@bautakt/supabase": "*",
     "@bautakt/ui": "*",
