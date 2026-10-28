@@ -1,6 +1,7 @@
 /**
  * Optionaler Deep-Link `?status=`. Die Belegliste hat keine Filter-Reiter
  * (weder Status noch Art), der Param bleibt für Links aus der Übersicht.
+ * Die Eingangsrechnungen filtern mit denselben Werten (`matchesIncomingStatus`).
  */
 export type InvoiceStatusFilter = 'all' | 'open' | 'overdue' | 'draft' | 'paid';
 
@@ -22,6 +23,19 @@ export function invoiceStatusFromSearch(value: string | null): InvoiceStatusFilt
     default:
       return 'all';
   }
+}
+
+const SEARCH_SLUG: Record<InvoiceStatusFilter, string | null> = {
+  all: null,
+  open: 'offen',
+  overdue: 'ueberfaellig',
+  draft: 'entwurf',
+  paid: 'bezahlt',
+};
+
+/** Gegenstück zu `invoiceStatusFromSearch`; `null` heißt: Param weglassen. */
+export function invoiceStatusToSearch(filter: InvoiceStatusFilter): string | null {
+  return SEARCH_SLUG[filter];
 }
 
 export function matchesInvoiceStatus(

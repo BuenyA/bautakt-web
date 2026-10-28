@@ -34,7 +34,7 @@ import {
   Textarea,
   Tooltip,
 } from '@fluentui/react-components';
-import { DocumentRegular } from '@fluentui/react-icons';
+import { DocumentRegular, EyeRegular } from '@fluentui/react-icons';
 import { type FormEvent, useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -63,6 +63,7 @@ import {
   type UploadKind,
   uploadKind,
 } from './incomingInvoiceUpload';
+import { IncomingOriginalDialog } from './IncomingOriginalDialog';
 import { useCostCategories } from './useCostCategories';
 import {
   type IncomingInvoiceRow,
@@ -207,7 +208,12 @@ function IncomingInvoiceForm({
 
   // Upload (#88, Teil 2). `attached`: die Datei, die in dieser Sitzung abgelegt
   // wurde; bei einer neuen Rechnung entsteht dabei der Entwurf.
-  const [attached, setAttached] = useState<{ id: string; fileName: string } | null>(null);
+  const [attached, setAttached] = useState<{
+    id: string;
+    fileName: string;
+    storagePath: string;
+  } | null>(null);
+  const [showOriginal, setShowOriginal] = useState(false);
   const [uploadError, setUploadError] = useState<{ message: string; file: File | null } | null>(
     null,
   );
@@ -219,7 +225,8 @@ function IncomingInvoiceForm({
   > | null>(null);
 
   const invoiceId = saved?.id ?? attached?.id ?? null;
-  const hasOriginal = Boolean(saved?.storage_path) || attached !== null;
+  const originalPath = attached?.storagePath ?? saved?.storage_path ?? null;
+  const hasOriginal = originalPath !== null;
   const draftStatus: IncomingInvoiceStatus | null = savedStatus ?? (attached ? 'draft' : null);
   const uploading = storeFile.isPending || read.state === 'running';
 
@@ -276,7 +283,7 @@ function IncomingInvoiceForm({
     }
     try {
       const stored = await storeFile.mutateAsync({ invoiceId, file });
-      setAttached({ id: stored.id, fileName: file.name });
+      setAttached({ id: stored.id, fileName: file.name, storagePath: stored.storagePath });
     } catch (caught) {
       const key = caught instanceof IncomingUploadError ? caught.key : 'unknown';
       // Wiederholen hilft nur, wenn der Fehler nicht an der Datei selbst liegt.
@@ -427,13 +434,26 @@ function IncomingInvoiceForm({
         {editable && !hasOriginal ? (
           <IncomingInvoiceDropzone busy={uploading} onFile={(file) => void onFile(file)} />
         ) : null}
-        {hasOriginal ? (
-          <p className="text-muted-foreground flex items-center gap-2 text-sm">
-            <DocumentRegular fontSize={16} />
-            {attached
-              ? t('domain:incomingInvoiceForm.upload.attachedName', { name: attached.fileName })
-              : t('domain:incomingInvoiceForm.upload.attached')}
-          </p>
+        {originalPath ? (
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-muted-foreground flex min-w-0 items-center gap-2 text-sm">
+              <DocumentRegular fontSize={16} className="shrink-0" />
+              <span className="truncate">
+                {attached
+                  ? t('domain:incomingInvoiceForm.upload.attachedName', { name: attached.fileName })
+                  : t('domain:incomingInvoiceForm.upload.attached')}
+              </span>
+            </p>
+            <Button size="small" icon={<EyeRegular />} onClick={() => setShowOriginal(true)}>
+              {t('domain:incomingInvoiceForm.original.open')}
+            </Button>
+            <IncomingOriginalDialog
+              open={showOriginal}
+              onOpenChange={setShowOriginal}
+              storagePath={originalPath}
+              invoice={{ vendor_name: vendorName, invoice_number: invoiceNumber }}
+            />
+          </div>
         ) : null}
         {uploadError ? (
           <MessageBar intent="error" layout="multiline">

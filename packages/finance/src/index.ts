@@ -15,6 +15,9 @@ export {
   type DeskList,
   DUE_SOON_DAYS,
   dueOf,
+  type IncomingStatusFilter,
+  isIncomingOverdue,
+  matchesIncomingStatus,
   type MonthComparison,
   netRevenueMonth,
 } from './invoiceDesk';

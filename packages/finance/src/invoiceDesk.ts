@@ -92,6 +92,45 @@ export type DeskIncomingRow = {
 };
 
 /**
+ * Überfällig: nicht bezahlt und das Fälligkeitsdatum liegt vor dem Stichtag.
+ * Gleiche Regel wie der Stand „überfällig“ (`dueOf`) auf der Übersicht, damit
+ * Übersicht und Listenfilter dieselben Belege zählen. Den Status `overdue` setzt kein Job; er
+ * zählt nur, wenn auch das Datum passt.
+ */
+export function isIncomingOverdue(
+  row: Pick<DeskIncomingRow, 'status' | 'due_date'>,
+  referenceIso: string,
+): boolean {
+  return row.status !== 'paid' && row.due_date !== null && row.due_date < referenceIso;
+}
+
+/** Filter der Eingangsrechnungs-Liste; dieselben Werte wie `?status=` der Belegliste. */
+export type IncomingStatusFilter = 'all' | 'open' | 'overdue' | 'draft' | 'paid';
+
+/**
+ * Offen heißt hier: erfasst und noch zu zahlen. Ein Entwurf ist noch nicht
+ * erfasst und hat einen eigenen Filter; überfällig wie `isIncomingOverdue`.
+ */
+export function matchesIncomingStatus(
+  row: Pick<DeskIncomingRow, 'status' | 'due_date'>,
+  filter: IncomingStatusFilter,
+  referenceIso: string,
+): boolean {
+  switch (filter) {
+    case 'open':
+      return row.status !== 'paid' && row.status !== 'draft';
+    case 'overdue':
+      return isIncomingOverdue(row, referenceIso);
+    case 'draft':
+      return row.status === 'draft';
+    case 'paid':
+      return row.status === 'paid';
+    default:
+      return true;
+  }
+}
+
+/**
  * Offene Eingangsrechnungen nach Fälligkeit.
  *
  * Offen ist alles außer `paid`, wie in `computeOpenTasks`. Teilbezahlte zählen
