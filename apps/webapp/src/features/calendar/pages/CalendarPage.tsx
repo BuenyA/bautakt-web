@@ -37,11 +37,30 @@ import { useCalendarSettings } from '../useCalendarSettings';
 
 type View = 'jahr' | 'monat' | 'woche' | 'tag';
 const VIEWS: readonly View[] = ['jahr', 'monat', 'woche', 'tag'];
+const VIEW_STORAGE_PREFIX = 'bautakt-calendar-view:';
 /** Abwesenheiten, die im Kalender stehen: genehmigt oder noch offen, nicht abgelehnt. */
 const SHOWN_ABSENCE = new Set(['genehmigt', 'ausstehend']);
 
-function viewFromSearch(value: string | null): View {
-  return VIEWS.includes(value as View) ? (value as View) : 'woche';
+function isView(value: string | null): value is View {
+  return VIEWS.includes(value as View);
+}
+
+/** Zuletzt gewählte Ansicht dieses Nutzers in diesem Browser, sonst die Woche. */
+function readStoredView(userKey: string): View {
+  try {
+    const stored = window.localStorage.getItem(VIEW_STORAGE_PREFIX + userKey);
+    return isView(stored) ? stored : 'woche';
+  } catch {
+    return 'woche';
+  }
+}
+
+function writeStoredView(userKey: string, view: View) {
+  try {
+    window.localStorage.setItem(VIEW_STORAGE_PREFIX + userKey, view);
+  } catch {
+    // Ohne Storage (privates Fenster) gilt die Wahl nur, solange die URL sie trägt.
+  }
 }
 
 function dayFromSearch(value: string | null): string {
@@ -107,7 +126,9 @@ function rangeLabel(view: View, dayIso: string, days: readonly string[]): string
  * (`useCalendarSettings`). Termine lassen sich hier anlegen, ändern und löschen.
  *
  * Ansicht und Datum stehen in der URL (`?ansicht=monat&datum=2026-10-12`),
- * damit ein Neuladen dieselbe Stelle zeigt. Ohne Parameter: diese Woche.
+ * damit ein Neuladen dieselbe Stelle zeigt. Ohne Ansicht in der URL gilt die
+ * zuletzt gewählte (localStorage je Nutzer, wie `useCalendarSettings`), sonst
+ * die Woche; ohne Datum heute.
  */
 export function CalendarPage() {
   const { t } = useTranslation();
@@ -117,7 +138,10 @@ export function CalendarPage() {
   const now = useNow();
   const todayIso = localIsoDay(now);
   const [searchParams, setSearchParams] = useSearchParams();
-  const view = viewFromSearch(searchParams.get('ansicht'));
+  const userKey = user?.id ?? 'anon';
+  const [storedView] = useState(() => readStoredView(userKey));
+  const viewParam = searchParams.get('ansicht');
+  const view = isView(viewParam) ? viewParam : storedView;
   const dayIso = dayFromSearch(searchParams.get('datum'));
   const [draft, setDraft] = useState<CalendarEventDraft | null>(null);
 
@@ -130,8 +154,9 @@ export function CalendarPage() {
 
   function go(nextView: View, nextDay: string) {
     const params = new URLSearchParams(searchParams);
-    if (nextView === 'woche') params.delete('ansicht');
-    else params.set('ansicht', nextView);
+    // Immer ausdrücklich: Ohne Parameter griffe sonst die gespeicherte Ansicht.
+    params.set('ansicht', nextView);
+    writeStoredView(userKey, nextView);
     if (nextDay === todayIso) params.delete('datum');
     else params.set('datum', nextDay);
     setSearchParams(params, { replace: true });
