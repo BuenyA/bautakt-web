@@ -57,7 +57,6 @@ import {
   useSidebarStyles,
 } from './sidebarStyles';
 import { useMediaQuery } from './useMediaQuery';
-import { useRailTooltip } from './useRailTooltip';
 
 /** Größe des Umschalters. */
 const TOGGLE_SIZE = 32;
@@ -238,7 +237,6 @@ function UserMenu({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: 
     color: 'brand' as const,
   };
 
-  const tooltip = useRailTooltip(collapsed);
   const labelClass = mergeClasses(sidebar.label, collapsed && sidebar.labelHidden);
   const trigger = (
     <Button
@@ -265,11 +263,7 @@ function UserMenu({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: 
         if (data.name === 'theme' && data.checkedItems[0]) setTheme(data.checkedItems[0] as Theme);
       }}
     >
-      <MenuTrigger disableButtonEnhancement>
-        <Tooltip content={email} {...tooltip}>
-          {trigger}
-        </Tooltip>
-      </MenuTrigger>
+      <MenuTrigger disableButtonEnhancement>{trigger}</MenuTrigger>
       <MenuPopover>
         <MenuList>
           <MenuGroup>
