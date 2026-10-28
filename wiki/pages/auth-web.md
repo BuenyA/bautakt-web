@@ -91,3 +91,29 @@ dann eine Beschäftigung an. Sie erzeugt keinen Auth-Benutzer. Die Web-App ruft 
 nicht auf. Passwort setzen auf `/passwort-zuruecksetzen` geht über `updateUser`. Der
 Hinweis im Mitarbeiter-Sheet, dass die Einladung in die App über die Handy-App läuft,
 bleibt.
+
+## Betrieb einrichten
+
+Ein angemeldeter Nutzer ohne Beschäftigung landet auf `/betrieb-einrichten`
+(`MembershipGate`), nicht in der Shell. Die Query muss fertig sein, bevor
+umgeleitet wird — sonst sieht ein Reload kurz keine Mitgliedschaft. Ein Fehler
+der Query ist kein leeres Ergebnis: die Seite zeigt „Erneut versuchen“, legt
+aber keine Firma an.
+
+Das Formular sammelt dieselben drei Pflichtwerte wie der Chef-Zweig der App
+(`company-name`, `company-trade`, `company-size`): Betriebsname (mindestens
+zwei Zeichen), Gewerk (Liste oder eigener Text ab zwei Zeichen), Teamgröße
+`solo` / `small` / `medium` / `large`. Angelegt wird über dieselben Aufrufe wie
+`createCompany` mit `setAsPrimary: true`: Firma, bisherige primäre
+Beschäftigung zurücksetzen, Beschäftigung mit Rolle `Geschäftsführer`.
+Adresse, Kontakt und Land gehen als leere Zeichenketten bzw. `DE` mit, wie
+`createCompanyFromDraft`. Seed-RPCs ruft die Oberfläche nicht auf.
+
+Danach setzt das Web `profiles.onboarding_complete` auf `true` (in der App der
+Willkommensscreen über die Outbox `profile.onboarding`) und lädt die
+Mitgliedschaft neu. Mit Betrieb ist `/betrieb-einrichten` gesperrt und führt
+auf die Übersicht.
+
+Profilfoto, Einladung, QR und Sprachwahl gibt es hier nicht. Vor- und
+Nachname schreibt die App beim Sign-up; `/registrieren` bleibt bei E-Mail und
+Passwort.

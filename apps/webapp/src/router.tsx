@@ -13,6 +13,8 @@ import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { PublicOnlyRoute } from '@/features/auth/PublicOnlyRoute';
 import { CalendarPage } from '@/features/calendar/pages/CalendarPage';
+import { MembershipGate } from '@/features/company/MembershipGate';
+import { CompanySetupPage } from '@/features/company/pages/CompanySetupPage';
 import { RequirePermission } from '@/features/company/RequirePermission';
 import { ContactDetailPage } from '@/features/contacts/pages/ContactDetailPage';
 import { ContactsListPage } from '@/features/contacts/pages/ContactsListPage';
@@ -78,207 +80,231 @@ export const router = createBrowserRouter([
       {
         element: <ProtectedRoute />,
         children: [
-          // Druckansicht bewusst ausserhalb der Shell: auf Papier gehoert kein
-          // Menue. Der Schutz durch ProtectedRoute bleibt.
           {
-            path: `${routes.financeHub}/:id/druck`,
-            element: (
-              <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
-                <InvoicePrintPage />
-              </RequirePermission>
-            ),
-          },
-          {
-            element: <AppShell />,
+            element: <MembershipGate />,
             children: [
-              { index: true, element: <Navigate to={HOME_ROUTE} replace /> },
-              { path: routes.overview, element: <OverviewPage /> },
-
-              // --- Arbeit ---
-              { path: routes.orders, element: <OrdersListPage /> },
-              { path: `${routes.orders}/:id`, element: <OrderDetailPage /> },
-              { path: routes.assignments, element: <AssignmentsListPage /> },
-              { path: `${routes.assignments}/:id`, element: <AssignmentDetailPage /> },
-              { path: routes.calendar, element: <CalendarPage /> },
-
-              // --- Rechnungen: Übersicht und Listen. Die Reiter stehen im Kopf
-              // jeder Seite (`FinanceHeader`), unter der Überschrift. ---
-              { path: routes.financeHub, element: <FinanceOverviewPage /> },
+              // Ohne Beschaeftigung bleibt nur die Betriebsanlage erreichbar.
+              { path: routes.companySetup, element: <CompanySetupPage /> },
+              // Druckansicht bewusst ausserhalb der Shell: auf Papier gehoert kein
+              // Menue. Der Schutz durch ProtectedRoute bleibt.
               {
-                path: routes.quotes,
+                path: `${routes.financeHub}/:id/druck`,
                 element: (
                   <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
-                    <QuotesListPage />
+                    <InvoicePrintPage />
                   </RequirePermission>
                 ),
               },
               {
-                path: routes.invoices,
-                element: (
-                  <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
-                    <InvoicesListPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.receivables,
-                element: (
-                  <RequirePermission anyOf={['canViewCompanyFinance']}>
-                    <ReceivablesPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.expenses,
-                element: (
-                  <RequirePermission anyOf={['canViewCompanyFinance', 'canManageOverheadCosts']}>
-                    <ExpensesPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.dunning,
-                element: (
-                  <RequirePermission anyOf={['canUseBillingModule', 'canViewCompanyFinance']}>
-                    <DunningPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.reports,
-                element: (
-                  <RequirePermission anyOf={['canViewCompanyFinance']}>
-                    <ReportsPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.datevExport,
-                element: (
-                  <RequirePermission
-                    anyOf={[
-                      'canUseBillingModule',
-                      'canViewCompanyFinance',
-                      'canViewManagementInvoices',
-                    ]}
-                  >
-                    <DatevExportPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.invoiceNew,
-                element: (
-                  <RequirePermission anyOf={['canUseBillingModule']}>
-                    <DocumentEditorPage type="invoice" />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.quoteNew,
-                element: (
-                  <RequirePermission anyOf={['canUseBillingModule']}>
-                    <DocumentEditorPage type="quote" />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: `${routes.financeHub}/:id/bearbeiten`,
-                element: (
-                  <RequirePermission anyOf={['canUseBillingModule']}>
-                    <DocumentEditorPage type="invoice" />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: `${routes.financeHub}/:id`,
-                element: (
-                  <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
-                    <InvoiceDetailPage />
-                  </RequirePermission>
-                ),
-              },
+                element: <AppShell />,
+                children: [
+                  { index: true, element: <Navigate to={HOME_ROUTE} replace /> },
+                  { path: routes.overview, element: <OverviewPage /> },
 
-              // --- Team: Hub, Verzeichnis bleibt `/mitarbeiter` ---
-              { path: routes.personalHub, element: <PersonalHubPage /> },
-              {
-                path: routes.employees,
-                element: (
-                  <RequirePermission anyOf={['canManageEmployees']}>
-                    <EmployeesListPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: `${routes.employees}/:id`,
-                element: (
-                  <RequirePermission anyOf={['canManageEmployees']}>
-                    <EmployeeDetailPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.absences,
-                element: (
-                  <RequirePermission anyOf={['canManageAbsences']}>
-                    <AbsencesPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: `${routes.absences}/:id`,
-                element: (
-                  <RequirePermission anyOf={['canManageAbsences']}>
-                    <AbsenceDetailPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.payroll,
-                element: (
-                  <RequirePermission anyOf={['canViewWageCosts', 'canManageRates']}>
-                    <PayrollPage />
-                  </RequirePermission>
-                ),
-              },
+                  // --- Arbeit ---
+                  { path: routes.orders, element: <OrdersListPage /> },
+                  { path: `${routes.orders}/:id`, element: <OrderDetailPage /> },
+                  { path: routes.assignments, element: <AssignmentsListPage /> },
+                  { path: `${routes.assignments}/:id`, element: <AssignmentDetailPage /> },
+                  { path: routes.calendar, element: <CalendarPage /> },
 
-              // --- Kontakte direkt, Material als Hub ---
-              // Lesen dürfen alle Mitglieder (RLS); Anlegen und Ändern prüft
-              // die Seite über canManageCustomers / canManageSuppliers.
-              { path: routes.materialHub, element: <MaterialHubPage /> },
-              { path: routes.contacts, element: <ContactsListPage /> },
-              { path: `${routes.contacts}/:id`, element: <ContactDetailPage /> },
-              {
-                path: routes.catalog,
-                element: (
-                  <RequirePermission anyOf={['canManageCatalog']}>
-                    <CatalogPage />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.costCenters,
-                element: (
-                  <RequirePermission anyOf={['canManageCostCenters']}>
-                    <CostCentersPage />
-                  </RequirePermission>
-                ),
-              },
+                  // --- Rechnungen: Übersicht und Listen. Die Reiter stehen im Kopf
+                  // jeder Seite (`FinanceHeader`), unter der Überschrift. ---
+                  { path: routes.financeHub, element: <FinanceOverviewPage /> },
+                  {
+                    path: routes.quotes,
+                    element: (
+                      <RequirePermission
+                        anyOf={['canUseBillingModule', 'canViewManagementInvoices']}
+                      >
+                        <QuotesListPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.invoices,
+                    element: (
+                      <RequirePermission
+                        anyOf={['canUseBillingModule', 'canViewManagementInvoices']}
+                      >
+                        <InvoicesListPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.receivables,
+                    element: (
+                      <RequirePermission anyOf={['canViewCompanyFinance']}>
+                        <ReceivablesPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.expenses,
+                    element: (
+                      <RequirePermission
+                        anyOf={['canViewCompanyFinance', 'canManageOverheadCosts']}
+                      >
+                        <ExpensesPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.dunning,
+                    element: (
+                      <RequirePermission anyOf={['canUseBillingModule', 'canViewCompanyFinance']}>
+                        <DunningPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.reports,
+                    element: (
+                      <RequirePermission anyOf={['canViewCompanyFinance']}>
+                        <ReportsPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.datevExport,
+                    element: (
+                      <RequirePermission
+                        anyOf={[
+                          'canUseBillingModule',
+                          'canViewCompanyFinance',
+                          'canViewManagementInvoices',
+                        ]}
+                      >
+                        <DatevExportPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.invoiceNew,
+                    element: (
+                      <RequirePermission anyOf={['canUseBillingModule']}>
+                        <DocumentEditorPage type="invoice" />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.quoteNew,
+                    element: (
+                      <RequirePermission anyOf={['canUseBillingModule']}>
+                        <DocumentEditorPage type="quote" />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: `${routes.financeHub}/:id/bearbeiten`,
+                    element: (
+                      <RequirePermission anyOf={['canUseBillingModule']}>
+                        <DocumentEditorPage type="invoice" />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: `${routes.financeHub}/:id`,
+                    element: (
+                      <RequirePermission
+                        anyOf={['canUseBillingModule', 'canViewManagementInvoices']}
+                      >
+                        <InvoiceDetailPage />
+                      </RequirePermission>
+                    ),
+                  },
 
-              { path: routes.settings, element: <SettingsPage /> },
+                  // --- Team: Hub, Verzeichnis bleibt `/mitarbeiter` ---
+                  { path: routes.personalHub, element: <PersonalHubPage /> },
+                  {
+                    path: routes.employees,
+                    element: (
+                      <RequirePermission anyOf={['canManageEmployees']}>
+                        <EmployeesListPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: `${routes.employees}/:id`,
+                    element: (
+                      <RequirePermission anyOf={['canManageEmployees']}>
+                        <EmployeeDetailPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.absences,
+                    element: (
+                      <RequirePermission anyOf={['canManageAbsences']}>
+                        <AbsencesPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: `${routes.absences}/:id`,
+                    element: (
+                      <RequirePermission anyOf={['canManageAbsences']}>
+                        <AbsenceDetailPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.payroll,
+                    element: (
+                      <RequirePermission anyOf={['canViewWageCosts', 'canManageRates']}>
+                        <PayrollPage />
+                      </RequirePermission>
+                    ),
+                  },
 
-              // Alte Pfade umleiten, damit Bookmarks nicht leer laufen.
-              { path: routes.legacyFinance, element: <Navigate to={routes.financeHub} replace /> },
-              { path: routes.legacyExpenses, element: <LegacyExpensesRedirect /> },
-              { path: routes.legacyNotifications, element: <Navigate to={HOME_ROUTE} replace /> },
-              {
-                path: routes.legacyAssignments,
-                element: <Navigate to={routes.assignments} replace />,
+                  // --- Kontakte direkt, Material als Hub ---
+                  // Lesen dürfen alle Mitglieder (RLS); Anlegen und Ändern prüft
+                  // die Seite über canManageCustomers / canManageSuppliers.
+                  { path: routes.materialHub, element: <MaterialHubPage /> },
+                  { path: routes.contacts, element: <ContactsListPage /> },
+                  { path: `${routes.contacts}/:id`, element: <ContactDetailPage /> },
+                  {
+                    path: routes.catalog,
+                    element: (
+                      <RequirePermission anyOf={['canManageCatalog']}>
+                        <CatalogPage />
+                      </RequirePermission>
+                    ),
+                  },
+                  {
+                    path: routes.costCenters,
+                    element: (
+                      <RequirePermission anyOf={['canManageCostCenters']}>
+                        <CostCentersPage />
+                      </RequirePermission>
+                    ),
+                  },
+
+                  { path: routes.settings, element: <SettingsPage /> },
+
+                  // Alte Pfade umleiten, damit Bookmarks nicht leer laufen.
+                  {
+                    path: routes.legacyFinance,
+                    element: <Navigate to={routes.financeHub} replace />,
+                  },
+                  { path: routes.legacyExpenses, element: <LegacyExpensesRedirect /> },
+                  {
+                    path: routes.legacyNotifications,
+                    element: <Navigate to={HOME_ROUTE} replace />,
+                  },
+                  {
+                    path: routes.legacyAssignments,
+                    element: <Navigate to={routes.assignments} replace />,
+                  },
+                  {
+                    path: `${routes.legacyAssignments}/:id`,
+                    element: <LegacyAssignmentRedirect />,
+                  },
+                  { path: routes.legacyTimes, element: <LegacyTimesRedirect /> },
+                  { path: routes.legacyCustomers, element: <LegacyCustomerRedirect /> },
+                  { path: `${routes.legacyCustomers}/:id`, element: <LegacyCustomerRedirect /> },
+                ],
               },
-              { path: `${routes.legacyAssignments}/:id`, element: <LegacyAssignmentRedirect /> },
-              { path: routes.legacyTimes, element: <LegacyTimesRedirect /> },
-              { path: routes.legacyCustomers, element: <LegacyCustomerRedirect /> },
-              { path: `${routes.legacyCustomers}/:id`, element: <LegacyCustomerRedirect /> },
             ],
           },
         ],

@@ -76,6 +76,19 @@ dem Mandanten (`companyId`) bzw. der `userId`. In diesem Projekt gab es bereits 
 echtes mandantenübergreifendes Leck (`resolve_labor_rate`, dokumentiert im Wiki von
 `bautakt-app`) — das ist keine hypothetische Fehlerklasse.
 
+## Nutzer mit Betrieb landen kurz auf „Betrieb einrichten“
+
+**Symptom:** Nach einem Reload auf `/auftraege` blitzt `/betrieb-einrichten` auf,
+obwohl der Nutzer längst eine Beschäftigung hat. Oder ein Netzfehler öffnet das
+Formular und ein zweiter Klick legt eine weitere Firma an.
+
+`useMembership` ist beim ersten Render noch leer. Wer `data == null` sofort als
+„kein Betrieb“ liest, leitet in genau diesem Moment um. Ein Query-Fehler ist
+dasselbe `data == null`, bedeutet aber nicht, dass keine Zeile existiert.
+
+**Lösung:** `MembershipGate` wartet `isPending` ab und behandelt `isError` als
+Fehlerseite mit „Erneut versuchen“, nicht als leere Mitgliedschaft.
+
 ## Direktaufruf einer Unterroute gibt in Produktion 404
 
 **Symptom:** `https://app.bautakt.com/auftraege` funktioniert per Klick, aber ein Reload

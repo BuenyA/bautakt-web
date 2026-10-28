@@ -43,6 +43,8 @@ export const routes = {
 
   // Geschuetzt. Die Top-Nav ist flach (zehn Punkte). Drei davon sind Hubs;
   // die Listen dahinter behalten ihre Pfade.
+  /** Betrieb anlegen, solange der Nutzer noch keine Beschaeftigung hat. */
+  companySetup: '/betrieb-einrichten',
   overview: '/uebersicht',
 
   // Arbeit — direkt in der Leiste
