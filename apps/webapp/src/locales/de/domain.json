@@ -1727,6 +1727,44 @@
     "reverseChargeHint": "Subunternehmer mit §13b: Die Rechnung kommt ohne Umsatzsteuer, die Steuer schuldet dein Betrieb. Umsatzsteuer ist deshalb auf 0 % gesetzt.",
     "withholdingWarning": "Für diesen Subunternehmer liegt zum Rechnungsdatum keine gültige Freistellungsbescheinigung (§48b EStG) vor. Bei Zahlung müssen {{amount}} (15 %) als Bauabzugsteuer einbehalten und ans Finanzamt abgeführt werden."
   },
+  "incomingInvoiceForm": {
+    "title": "Eingangsrechnung erfassen",
+    "editTitle": "Eingangsrechnung",
+    "description": "Rechnung eines Lieferanten oder Subunternehmers. Als Entwurf darf sie unvollständig sein, ab „Offen“ sind die markierten Felder Pflicht.",
+    "retainedDescription": "Diese Rechnung ist erfasst und aufbewahrungspflichtig. Ändern lässt sich nur noch der Status.",
+    "order": "Auftrag",
+    "noOrder": "Ohne Auftrag",
+    "noCategory": "Ohne Kostenart",
+    "status": "Status",
+    "sumOk": "Netto + USt ergibt Brutto.",
+    "sumHint": "Netto + USt ergibt {{expected}}, nicht den eingetragenen Bruttobetrag.",
+    "saved": "Eingangsrechnung gespeichert.",
+    "saveError": "Die Eingangsrechnung konnte nicht gespeichert werden.",
+    "loadError": "Die Eingangsrechnung konnte nicht geladen werden.",
+    "deleteTitle": "Entwurf löschen?",
+    "deleteText": "Der Entwurf wird endgültig gelöscht.",
+    "deleted": "Entwurf gelöscht.",
+    "deleteError": "Der Entwurf konnte nicht gelöscht werden.",
+    "deleteRetained": "Erfasste Eingangsrechnungen sind aufbewahrungspflichtig und lassen sich nicht löschen. Gelöscht werden nur Entwürfe.",
+    "errors": {
+      "vendorRequired": "Bitte den Lieferanten angeben.",
+      "dateRequired": "Bitte das Rechnungsdatum angeben.",
+      "dueRequired": "Bitte das Fälligkeitsdatum angeben.",
+      "netRequired": "Bitte den Nettobetrag angeben.",
+      "vatRequired": "Bitte die Umsatzsteuer angeben (0, wenn keine).",
+      "grossRequired": "Bitte den Bruttobetrag angeben.",
+      "negativeAmount": "Beträge dürfen nicht negativ sein.",
+      "sumMismatch": "Netto + USt ergibt nicht den Bruttobetrag.",
+      "dueBeforeDate": "Die Fälligkeit liegt vor dem Rechnungsdatum."
+    }
+  },
+  "incomingInvoiceStatus": {
+    "draft": "Entwurf",
+    "open": "Offen",
+    "partially_paid": "Teilbezahlt",
+    "paid": "Bezahlt",
+    "overdue": "Überfällig"
+  },
   "employeeForm": {
     "newTitle": "Neuer Mitarbeiter",
     "editTitle": "Mitarbeiter bearbeiten",

@@ -70,6 +70,11 @@ const MESSAGES: Record<string, string> = {
   contact_bank_accounts_contact_id_iban_key: 'Diese IBAN ist bei dem Kontakt schon hinterlegt.',
   contacts_name_required: 'Bitte einen Namen angeben.',
   MERGE_INVALID: 'Diese beiden Kontakte lassen sich nicht zusammenführen.',
+  // Eingangsrechnungen (enforce_incoming_invoice_retention, bautakt-web#161).
+  RETAINED_RECEIPT:
+    'Erfasste Eingangsrechnungen sind aufbewahrungspflichtig: nicht löschbar, nicht zurück zum Entwurf, das Original bleibt.',
+  INCOMING_FILE_SERVER_ONLY:
+    'Die Originaldatei legt nur der Server ab. Bitte die Datei über „Hochladen“ hinzufügen.',
   CONTACT_IN_USE:
     'Der Kontakt hängt noch an Aufträgen oder Belegen. Archiviere ihn stattdessen – dann verschwindet er aus Listen und Auswahlfeldern.',
 };
