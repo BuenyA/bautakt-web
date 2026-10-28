@@ -1728,6 +1728,33 @@
     "withholdingWarning": "Für diesen Subunternehmer liegt zum Rechnungsdatum keine gültige Freistellungsbescheinigung (§48b EStG) vor. Bei Zahlung müssen {{amount}} (15 %) als Bauabzugsteuer einbehalten und ans Finanzamt abgeführt werden."
   },
   "incomingInvoiceForm": {
+    "upload": {
+      "dropTitle": "Rechnung hier ablegen oder auswählen",
+      "dropHint": "PDF, E-Rechnung (XRechnung, ZUGFeRD) oder Foto, höchstens 20 MB. XRechnung und ZUGFeRD füllen die Felder vor.",
+      "uploading": "Wird abgelegt …",
+      "reading": "E-Rechnung wird gelesen …",
+      "attached": "Original angehängt",
+      "attachedName": "Original angehängt: {{name}}",
+      "suggested": "Vorschlag",
+      "suggestedInfo": "Aus der E-Rechnung ({{format}}) vorbefüllt. Markierte Felder bitte prüfen. Felder, die schon ausgefüllt waren, bleiben unverändert.",
+      "format": {
+        "zugferd": "ZUGFeRD",
+        "xrechnung": "XRechnung"
+      },
+      "foreignCurrency": "Die Rechnung ist in {{currency}} ausgestellt. Beträge werden nur in Euro erfasst und deshalb nicht übernommen.",
+      "noEInvoice": "Keine E-Rechnungsdaten gefunden. Bitte die Felder von Hand ausfüllen.",
+      "photo": "Foto abgelegt. Aus Fotos wird nichts gelesen, bitte die Felder von Hand ausfüllen.",
+      "readError": "Die Datei ist abgelegt, aber die E-Rechnung konnte nicht gelesen werden.",
+      "errors": {
+        "forbidden": "Keine Berechtigung für Eingangsrechnungen dieses Betriebs.",
+        "tooLarge": "Die Datei ist zu groß. Höchstens 20 MB je Beleg.",
+        "unsupported": "Nur PDF, XML, JPEG, PNG oder WebP.",
+        "fileExists": "Diese Rechnung hat schon eine andere Originaldatei. Ein Original wird nicht ausgetauscht.",
+        "notDraft": "Eine Datei lässt sich nur an einen Entwurf anhängen.",
+        "invalid": "Die Datei fehlt oder ist leer.",
+        "unknown": "Die Datei konnte nicht abgelegt werden."
+      }
+    },
     "title": "Eingangsrechnung erfassen",
     "editTitle": "Eingangsrechnung",
     "description": "Rechnung eines Lieferanten oder Subunternehmers. Als Entwurf darf sie unvollständig sein, ab „Offen“ sind die markierten Felder Pflicht.",
