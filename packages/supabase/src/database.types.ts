@@ -2,7 +2,7 @@
  * GENERIERT — nicht von Hand bearbeiten.
  *
  * Quelle:  Supabase-Projekt "Bautakt" (bxivzvmlcnaxqlytumvz, eu-central-1)
- * Stand:   2026-10-27
+ * Stand:   2026-10-29
  *
  * Neu erzeugen:
  *   npx supabase gen types typescript --project-id bxivzvmlcnaxqlytumvz \
@@ -2035,6 +2035,57 @@ export type Database = {
           },
         ]
       }
+      incoming_invoice_events: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_name: string
+          company_id: string
+          created_at: string
+          id: string
+          invoice_id: string
+          mail_reference: string | null
+          reason: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_name?: string
+          company_id: string
+          created_at?: string
+          id?: string
+          invoice_id: string
+          mail_reference?: string | null
+          reason?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_name?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          invoice_id?: string
+          mail_reference?: string | null
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incoming_invoice_events_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incoming_invoice_events_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       incoming_invoice_payments: {
         Row: {
           amount: number
@@ -2101,6 +2152,7 @@ export type Database = {
           notes: string
           order_id: string | null
           parsed_payload: Json | null
+          review_status: string
           source_format: string
           status: string
           storage_path: string | null
@@ -2127,6 +2179,7 @@ export type Database = {
           notes?: string
           order_id?: string | null
           parsed_payload?: Json | null
+          review_status?: string
           source_format?: string
           status?: string
           storage_path?: string | null
@@ -2153,6 +2206,7 @@ export type Database = {
           notes?: string
           order_id?: string | null
           parsed_payload?: Json | null
+          review_status?: string
           source_format?: string
           status?: string
           storage_path?: string | null
@@ -3695,6 +3749,19 @@ export type Database = {
           notes: string
           parent_document_id: string | null
           payment_term_days: number | null
+          seller_bank_name: string
+          seller_bic: string
+          seller_city: string
+          seller_country: string
+          seller_email: string
+          seller_iban: string
+          seller_name: string
+          seller_phone: string
+          seller_postal_code: string
+          seller_street: string
+          seller_tax_number: string
+          seller_trade_register: string
+          seller_vat_id: string
           service_date: string | null
           skonto_days: number | null
           skonto_percent: number | null
@@ -3742,6 +3809,19 @@ export type Database = {
           notes?: string
           parent_document_id?: string | null
           payment_term_days?: number | null
+          seller_bank_name?: string
+          seller_bic?: string
+          seller_city?: string
+          seller_country?: string
+          seller_email?: string
+          seller_iban?: string
+          seller_name?: string
+          seller_phone?: string
+          seller_postal_code?: string
+          seller_street?: string
+          seller_tax_number?: string
+          seller_trade_register?: string
+          seller_vat_id?: string
           service_date?: string | null
           skonto_days?: number | null
           skonto_percent?: number | null
@@ -3789,6 +3869,19 @@ export type Database = {
           notes?: string
           parent_document_id?: string | null
           payment_term_days?: number | null
+          seller_bank_name?: string
+          seller_bic?: string
+          seller_city?: string
+          seller_country?: string
+          seller_email?: string
+          seller_iban?: string
+          seller_name?: string
+          seller_phone?: string
+          seller_postal_code?: string
+          seller_street?: string
+          seller_tax_number?: string
+          seller_trade_register?: string
+          seller_vat_id?: string
           service_date?: string | null
           skonto_days?: number | null
           skonto_percent?: number | null
@@ -4265,6 +4358,19 @@ export type Database = {
           notes: string
           parent_document_id: string | null
           payment_term_days: number | null
+          seller_bank_name: string
+          seller_bic: string
+          seller_city: string
+          seller_country: string
+          seller_email: string
+          seller_iban: string
+          seller_name: string
+          seller_phone: string
+          seller_postal_code: string
+          seller_street: string
+          seller_tax_number: string
+          seller_trade_register: string
+          seller_vat_id: string
           service_date: string | null
           skonto_days: number | null
           skonto_percent: number | null
@@ -4407,6 +4513,10 @@ export type Database = {
           warnings: string[]
         }[]
       }
+      datev_sales_export: {
+        Args: { p_company_id: string; p_from: string; p_to: string }
+        Returns: Json
+      }
       delete_company_as_chef: {
         Args: { p_company_id: string }
         Returns: undefined
@@ -4471,6 +4581,19 @@ export type Database = {
           notes: string
           parent_document_id: string | null
           payment_term_days: number | null
+          seller_bank_name: string
+          seller_bic: string
+          seller_city: string
+          seller_country: string
+          seller_email: string
+          seller_iban: string
+          seller_name: string
+          seller_phone: string
+          seller_postal_code: string
+          seller_street: string
+          seller_tax_number: string
+          seller_trade_register: string
+          seller_vat_id: string
           service_date: string | null
           skonto_days: number | null
           skonto_percent: number | null
@@ -4605,6 +4728,26 @@ export type Database = {
           billing_rate: number
           cost_rate: number
         }[]
+      }
+      review_incoming_invoice: {
+        Args: { p_decision: string; p_invoice_id: string; p_reason?: string }
+        Returns: {
+          action: string
+          actor_id: string | null
+          actor_name: string
+          company_id: string
+          created_at: string
+          id: string
+          invoice_id: string
+          mail_reference: string | null
+          reason: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "incoming_invoice_events"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       revoke_employment_invitation: {
         Args: { p_invitation_id: string }
