@@ -1,6 +1,6 @@
 # Datenschutzerklärung
 
-Stand: 28. Oktober 2026
+Stand: 29. Oktober 2026
 
 Diese Datenschutzerklärung informiert Sie nach Art. 13 DSGVO darüber, welche personenbezogenen Daten wir verarbeiten, wenn Sie app.bautakt.com nutzen.
 
@@ -10,7 +10,7 @@ Bautakt UG (haftungsbeschränkt) i. G.
 Maria-Merian-Str. 8
 74321 Bietigheim-Bissingen
 Vertreten durch den Geschäftsführer Bünyamin Aydemir
-E-Mail: [support@bautakt.com](mailto:support@bautakt.com)
+E-Mail: [info@bautakt.com](mailto:info@bautakt.com)
 
 Einen Datenschutzbeauftragten haben wir nicht benannt, weil die gesetzlichen Voraussetzungen dafür (§ 38 BDSG, Art. 37 DSGVO) nicht vorliegen. Für Fragen zum Datenschutz erreichen Sie uns unter der oben genannten E-Mail-Adresse.
 
@@ -64,13 +64,13 @@ Wir setzen keine Analyse-, Tracking- oder Marketing-Dienste ein und keine Cookie
 | sb-…-code-verifier | Local Storage | Absicherung des Anmeldevorgangs | nur während der Anmeldung |
 | bautakt_sidebar_state | Cookie (nur von uns, kein Drittanbieter) | merkt, ob die Seitenleiste eingeklappt ist | 1 Jahr |
 | bautakt-theme | Local Storage | gewählte Darstellung (hell, dunkel oder System) | bis Sie sie ändern oder den Browserspeicher löschen |
-| bautakt-calendar-settings:… | Local Storage | von Ihnen gewählte Farben und sichtbare Eintragsarten im Kalender | bis Sie sie ändern oder den Browserspeicher löschen |
+| bautakt-calendar-settings:…, bautakt-calendar-view:… | Local Storage | von Ihnen gewählte Farben, sichtbare Eintragsarten und zuletzt gewählte Ansicht im Kalender | bis Sie sie ändern oder den Browserspeicher löschen |
 
 Diese Speicherungen sind erforderlich, damit wir den von Ihnen ausdrücklich gewünschten Dienst bereitstellen können: die Anmeldung und die von Ihnen selbst gewählten Einstellungen. Sie sind deshalb nach § 25 Abs. 2 Nr. 2 TDDDG ohne Einwilligung zulässig. Eine Auswertung zu anderen Zwecken findet nicht statt. Sie können die Einträge jederzeit über die Einstellungen Ihres Browsers löschen. Danach müssen Sie sich neu anmelden, und die Einstellungen werden zurückgesetzt.
 
 ## 9. Empfänger und Dienstleister
 
-Wir setzen folgende Dienstleister als Auftragsverarbeiter nach Art. 28 DSGVO ein. Mit allen bestehen Verträge zur Auftragsverarbeitung.
+Wir setzen folgende Dienstleister als Auftragsverarbeiter nach Art. 28 DSGVO ein. Mit unseren Dienstleistern bestehen Verträge zur Auftragsverarbeitung bzw. werden vor Verarbeitung echter Kundendaten geschlossen.
 
 | Dienstleister | Zweck | Verarbeitungsort |
 |---|---|---|
@@ -100,7 +100,7 @@ Sie haben gegenüber uns folgende Rechte hinsichtlich Ihrer personenbezogenen Da
 - Datenübertragbarkeit (Art. 20 DSGVO)
 - **Widerspruch (Art. 21 DSGVO):** Soweit wir Daten auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO verarbeiten, können Sie aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit widersprechen.
 
-Wenden Sie sich dazu an [support@bautakt.com](mailto:support@bautakt.com). Betrifft Ihr Anliegen Daten, die ein Betrieb in Bautakt verarbeitet, leiten wir es an diesen Betrieb weiter und unterstützen ihn bei der Beantwortung.
+Wenden Sie sich dazu an [info@bautakt.com](mailto:info@bautakt.com). Betrifft Ihr Anliegen Daten, die ein Betrieb in Bautakt verarbeitet, leiten wir es an diesen Betrieb weiter und unterstützen ihn bei der Beantwortung.
 
 ## 12. Beschwerderecht
 
