@@ -31,6 +31,29 @@ export function isCompanyTeamSize(value: string): value is CompanyTeamSize {
   return (COMPANY_TEAM_SIZES as readonly string[]).includes(value);
 }
 
+/**
+ * Namen und Geburtsdatum, bevor die Firma entsteht. `language` bleibt
+ * unangetastet. `.select('id')` macht ein von RLS verschlucktes Update zum
+ * Fehler, statt still weiter die Firma anzulegen.
+ */
+export async function updateOwnerProfile(
+  userId: string,
+  profile: { firstName: string; lastName: string; birthday: string },
+) {
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      first_name: profile.firstName.trim(),
+      last_name: profile.lastName.trim(),
+      birthday: profile.birthday,
+    })
+    .eq('id', userId)
+    .select('id')
+    .single();
+
+  if (error) throw error;
+}
+
 export async function createOwnerCompany(userId: string, input: OwnerCompanyInput) {
   const { data, error } = await supabase
     .from('companies')

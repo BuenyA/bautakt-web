@@ -114,6 +114,10 @@ Willkommensscreen über die Outbox `profile.onboarding`) und lädt die
 Mitgliedschaft neu. Mit Betrieb ist `/betrieb-einrichten` gesperrt und führt
 auf die Übersicht.
 
-Profilfoto, Einladung, QR und Sprachwahl gibt es hier nicht. Vor- und
-Nachname schreibt die App beim Sign-up; `/registrieren` bleibt bei E-Mail und
-Passwort.
+Profilfoto, Einladung, QR und Sprachwahl gibt es hier nicht. `/registrieren`
+bleibt bei E-Mail und Passwort. Sind `profiles.first_name` oder `last_name`
+leer, fragt die Seite Vorname, Nachname und Geburtsdatum ab (dieselben
+Pflichtregeln wie `validateBirthDate` beim Sign-up der App) und schreibt sie
+vor dem Firmen-Insert nach `profiles`. `language` bleibt unverändert. Das
+Datum wird als `TT.MM.JJJJ` eingegeben, auch als acht Ziffern, und als
+`yyyy-mm-dd` in `birthday` gespeichert.

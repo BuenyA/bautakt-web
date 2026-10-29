@@ -10,9 +10,12 @@ Teamgröße) und legt die Firma mit denselben Supabase-Aufrufen an wie
 leer, das Land ist `DE`, die Rolle ist `Geschäftsführer`. Die Seed-RPCs ruft
 die Oberfläche nicht auf; das tun die Trigger auf `companies`.
 
-`/registrieren` bleibt bei E-Mail und Passwort. Profilfoto, Einladung und QR
-fehlen bewusst. `profiles.onboarding_complete` wird nach der Anlage gesetzt,
-weil die App das vor dem Einstieg in die Hauptansicht tut.
+`/registrieren` bleibt bei E-Mail und Passwort. Sind Vor- oder Nachname leer,
+fragt die Seite sie zusammen mit dem Geburtsdatum ab und schreibt `profiles`
+vor dem Firmen-Insert. Profilfoto, Einladung und QR fehlen bewusst.
+`profiles.onboarding_complete` wird nach der Anlage gesetzt, weil die App das
+vor dem Einstieg in die Hauptansicht tut. Die Mitgliedschaftsprüfung sitzt in
+`ProtectedRoute`, damit `router.tsx` nur die neue Route dazu bekommt.
 
 Warum ein Gate und keine Prüfung in der Shell: ohne Beschäftigung darf keine
 geschützte Route Daten laden, auch nicht die Druckansicht.

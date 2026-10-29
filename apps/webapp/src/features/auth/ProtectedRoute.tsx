@@ -1,6 +1,7 @@
-import { Navigate, Outlet, useLocation } from 'react-router';
+import { Navigate, useLocation } from 'react-router';
 
 import { FullPageSpinner } from '@/components/common/FullPageSpinner';
+import { MembershipGate } from '@/features/company/MembershipGate';
 import { routes } from '@/lib/routes';
 
 import { useAuth } from './useAuth';
@@ -14,6 +15,9 @@ import { useAuth } from './useAuth';
  *
  * ⚠️ Die initializing-Abfrage muss vor der session-Abfrage stehen. Sonst wird
  * bei jedem Reload umgeleitet, waehrend die Sitzung noch geladen wird.
+ *
+ * Die Mitgliedschaft prueft `MembershipGate` hier und nicht als zusaetzliche
+ * Route-Ebene: `router.tsx` bleibt damit fuer andere Aenderungen ruhig.
  */
 export function ProtectedRoute() {
   const { session, initializing } = useAuth();
@@ -22,5 +26,5 @@ export function ProtectedRoute() {
   if (initializing) return <FullPageSpinner />;
   if (!session) return <Navigate to={routes.login} replace state={{ from: location.pathname }} />;
 
-  return <Outlet />;
+  return <MembershipGate />;
 }

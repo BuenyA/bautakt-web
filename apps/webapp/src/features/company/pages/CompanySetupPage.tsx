@@ -1,3 +1,4 @@
+import { parseIsoDay } from '@bautakt/ui';
 import {
   Button,
   Card,
@@ -12,34 +13,47 @@ import {
   RadioGroup,
   Text,
 } from '@fluentui/react-components';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { FullPageSpinner } from '@/components/common/FullPageSpinner';
+import { DatePicker } from '@/components/form/dateTime';
 import { useAuth } from '@/features/auth/useAuth';
 import { COMPANY_TYPES } from '@/features/settings/companyValidation';
 import { HOME_ROUTE } from '@/lib/routes';
+import { supabase } from '@/lib/supabase';
 
+import { type BirthDateIssue, birthDateIssue } from '../birthDate';
 import {
   COMPANY_TEAM_SIZES,
   type CompanyTeamSize,
   createOwnerCompany,
   isCompanyTeamSize,
   markOnboardingComplete,
+  updateOwnerProfile,
 } from '../createCompany';
 
 type FieldErrors = {
+  firstName?: string;
+  lastName?: string;
+  birthday?: string;
   name?: string;
   type?: string;
   teamSize?: string;
 };
 
+type ProfileRow = {
+  first_name: string | null;
+  last_name: string | null;
+  birthday: string | null;
+};
+
 /**
  * Eine Seite fuer die drei Pflichtfragen des Chef-Onboardings
- * (Name, Gewerk, Groesse). Dieselben Grenzen wie
- * `company-name` (mindestens 2 Zeichen) und `company-trade`
- * (Gewerk aus der Liste oder eigener Text ab 2 Zeichen).
+ * (Name, Gewerk, Groesse). Fehlen Vor- oder Nachname, kommen dieselben
+ * Pflichtfelder dazu wie beim Sign-up der App.
  */
 export function CompanySetupPage() {
   const { t } = useTranslation();
@@ -47,6 +61,36 @@ export function CompanySetupPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const submitting = useRef(false);
+
+  const profile = useQuery({
+    queryKey: ['my-profile', user?.id, 'setup'],
+    enabled: Boolean(user?.id),
+    queryFn: async (): Promise<ProfileRow | null> => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, birthday')
+        .eq('id', user!.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const needsName =
+    profile.isSuccess && (!profile.data?.first_name?.trim() || !profile.data?.last_name?.trim());
+
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [birthday, setBirthday] = useState('');
+  const [seeded, setSeeded] = useState(false);
+  if (needsName && !seeded && profile.data) {
+    setFirstName(profile.data.first_name ?? '');
+    setLastName(profile.data.last_name ?? '');
+    setBirthday(parseIsoDay(profile.data.birthday) ?? '');
+    setSeeded(true);
+  } else if (needsName && !seeded && profile.isSuccess) {
+    setSeeded(true);
+  }
 
   const [name, setName] = useState('');
   const [trade, setTrade] = useState('');
@@ -56,8 +100,20 @@ export function CompanySetupPage() {
   const [pending, setPending] = useState(false);
   const [companyId, setCompanyId] = useState<string | null>(null);
 
+  function birthdayMessage(issue: BirthDateIssue): string {
+    if (issue === 'future') return t('auth:setup.errors.birthdayFuture');
+    if (issue === 'age') return t('auth:setup.errors.birthdayAge');
+    return t('auth:setup.errors.birthday');
+  }
+
   function validate(): FieldErrors {
     const next: FieldErrors = {};
+    if (needsName) {
+      if (!firstName.trim()) next.firstName = t('auth:setup.errors.firstName');
+      if (!lastName.trim()) next.lastName = t('auth:setup.errors.lastName');
+      const issue = birthDateIssue(birthday);
+      if (issue) next.birthday = birthdayMessage(issue);
+    }
     if (name.trim().length < 2) next.name = t('auth:setup.errors.name');
     if (trade.trim().length < 2) next.type = t('auth:setup.errors.type');
     if (!isCompanyTeamSize(teamSize)) next.teamSize = t('auth:setup.errors.teamSize');
@@ -76,6 +132,14 @@ export function CompanySetupPage() {
     submitting.current = true;
     setPending(true);
     try {
+      if (needsName) {
+        await updateOwnerProfile(user.id, {
+          firstName,
+          lastName,
+          birthday,
+        });
+        await queryClient.invalidateQueries({ queryKey: ['my-profile', user.id] });
+      }
       let createdId = companyId;
       if (!createdId) {
         const created = await createOwnerCompany(user.id, {
@@ -97,8 +161,30 @@ export function CompanySetupPage() {
     }
   }
 
+  if (profile.isPending) return <FullPageSpinner />;
+
+  if (profile.isError) {
+    return (
+      <main className="flex min-h-svh items-center justify-center p-6">
+        <div className="flex w-full max-w-md flex-col gap-4">
+          <MessageBar intent="error" role="alert">
+            <MessageBarBody>{t('errors:generic')}</MessageBarBody>
+          </MessageBar>
+          <Button appearance="primary" onClick={() => void profile.refetch()}>
+            {t('common:action.retry')}
+          </Button>
+          <Button appearance="subtle" onClick={() => void signOut()}>
+            {t('common:action.signOut')}
+          </Button>
+        </div>
+      </main>
+    );
+  }
+
+  const locked = pending || companyId != null;
+
   return (
-    <main className="flex min-h-svh items-center justify-center p-6">
+    <main className="flex min-h-svh items-center justify-center overflow-auto p-6">
       <div className="w-full max-w-md">
         <Card size="large">
           <CardHeader
@@ -120,6 +206,69 @@ export function CompanySetupPage() {
               </MessageBar>
             ) : null}
 
+            {needsName ? (
+              <>
+                <Field
+                  label={t('auth:setup.firstName.label')}
+                  required
+                  validationMessage={errors.firstName}
+                  validationState={errors.firstName ? 'error' : 'none'}
+                >
+                  <Input
+                    name="given-name"
+                    autoComplete="given-name"
+                    value={firstName}
+                    disabled={locked}
+                    onChange={(_, data) => {
+                      setFirstName(data.value);
+                      if (errors.firstName && data.value.trim()) {
+                        setErrors((current) => ({ ...current, firstName: undefined }));
+                      }
+                    }}
+                    onBlur={() => setFirstName((current) => current.trim())}
+                  />
+                </Field>
+                <Field
+                  label={t('auth:setup.lastName.label')}
+                  required
+                  validationMessage={errors.lastName}
+                  validationState={errors.lastName ? 'error' : 'none'}
+                >
+                  <Input
+                    name="family-name"
+                    autoComplete="family-name"
+                    value={lastName}
+                    disabled={locked}
+                    onChange={(_, data) => {
+                      setLastName(data.value);
+                      if (errors.lastName && data.value.trim()) {
+                        setErrors((current) => ({ ...current, lastName: undefined }));
+                      }
+                    }}
+                    onBlur={() => setLastName((current) => current.trim())}
+                  />
+                </Field>
+                <Field
+                  label={t('auth:setup.birthDate.label')}
+                  required
+                  validationMessage={errors.birthday}
+                  validationState={errors.birthday ? 'error' : 'none'}
+                >
+                  <DatePicker
+                    aria-label={t('auth:setup.birthDate.label')}
+                    value={birthday}
+                    disabled={locked}
+                    onChange={(value) => {
+                      setBirthday(value);
+                      if (!birthDateIssue(value)) {
+                        setErrors((current) => ({ ...current, birthday: undefined }));
+                      }
+                    }}
+                  />
+                </Field>
+              </>
+            ) : null}
+
             <Field
               label={t('auth:setup.name.label')}
               required
@@ -131,7 +280,7 @@ export function CompanySetupPage() {
                 autoComplete="organization"
                 placeholder={t('auth:setup.name.placeholder')}
                 value={name}
-                disabled={pending || companyId != null}
+                disabled={locked}
                 onChange={(_, data) => {
                   setName(data.value);
                   if (errors.name && data.value.trim().length >= 2) {
@@ -153,7 +302,7 @@ export function CompanySetupPage() {
                 placeholder={t('auth:setup.trade.placeholder')}
                 value={trade}
                 selectedOptions={trade ? [trade] : []}
-                disabled={pending || companyId != null}
+                disabled={locked}
                 onChange={(event) => {
                   const value = event.target.value;
                   setTrade(value);
@@ -185,7 +334,7 @@ export function CompanySetupPage() {
             >
               <RadioGroup
                 value={teamSize}
-                disabled={pending || companyId != null}
+                disabled={locked}
                 onChange={(_, data) => {
                   if (!isCompanyTeamSize(data.value)) return;
                   setTeamSize(data.value);
