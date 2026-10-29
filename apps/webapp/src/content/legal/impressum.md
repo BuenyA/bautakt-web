@@ -17,7 +17,7 @@ E-Mail: [info@bautakt.com](mailto:info@bautakt.com)
 
 ## Registereintrag
 
-Die Eintragung in das Handelsregister ist beantragt.
+Die Gesellschaft ist noch nicht im Handelsregister eingetragen.
 
 ## Verbraucherstreitbeilegung
 
