@@ -1,32 +1,34 @@
 import { parseIsoDay } from '@bautakt/ui';
 
 /**
- * Dieselben drei Regeln wie `validateBirthDate` in der App
- * (`app/lib/utils/validationUtils.ts`, vom Sign-up aufgerufen): echtes Datum,
- * nicht in der Zukunft, plausibles Alter.
+ * `validateBirthDate` aus `app/lib/utils/dateUtils.ts`.
  *
- * Die Zahlen 14 und 120 stehen nicht in den kopierten Mobile-Dateien. 14 ist
- * das juengste Alter, das ein Konto in der App noch durchlassen sollte
- * (Ausbildung), 120 wirft Jahreszahlen wie 01.01.1000 raus. Der Server selbst
- * prueft `birthday` nicht.
+ * Tag 1–31, Monat 1–12, und der Tag muss im Kalender existieren (`31.02.`
+ * nicht). Nicht in der Zukunft, nicht älter als 150 Jahre. Kein Mindestalter.
  */
-export const MIN_BIRTH_AGE = 14;
-export const MAX_BIRTH_AGE = 120;
+export const MAX_BIRTH_AGE_YEARS = 150;
 
 export type BirthDateIssue = 'empty' | 'invalid' | 'future' | 'age';
 
 export function birthDateIssue(iso: string, today = new Date()): BirthDateIssue | null {
+  if (!iso.trim()) return 'empty';
+
   const day = parseIsoDay(iso);
-  if (!iso.trim() || !day) return iso.trim() ? 'invalid' : 'empty';
+  if (!day) return 'invalid';
 
   const [year, month, date] = day.split('-').map(Number);
+  if (month < 1 || month > 12 || date < 1 || date > 31) return 'invalid';
+
   const birth = new Date(year, month - 1, date);
+  if (birth.getFullYear() !== year || birth.getMonth() !== month - 1 || birth.getDate() !== date) {
+    return 'invalid';
+  }
+
   const current = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   if (birth > current) return 'future';
 
-  let age = current.getFullYear() - year;
-  const monthDelta = current.getMonth() - (month - 1);
-  if (monthDelta < 0 || (monthDelta === 0 && current.getDate() < date)) age -= 1;
-  if (age < MIN_BIRTH_AGE || age > MAX_BIRTH_AGE) return 'age';
+  const oldest = new Date(current);
+  oldest.setFullYear(oldest.getFullYear() - MAX_BIRTH_AGE_YEARS);
+  if (birth < oldest) return 'age';
   return null;
 }
