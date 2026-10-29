@@ -77,6 +77,15 @@ const MESSAGES: Record<string, string> = {
     'Erfasste Eingangsrechnungen sind aufbewahrungspflichtig: nicht löschbar, nicht zurück zum Entwurf, das Original bleibt.',
   INCOMING_FILE_SERVER_ONLY:
     'Die Originaldatei legt nur der Server ab. Bitte die Datei über „Hochladen“ hinzufügen.',
+  // Prüfung (bautakt-app 20261029120000_b_incoming_invoice_review, bautakt-web#164).
+  INCOMING_REJECT_REASON: 'Bitte begründe die Ablehnung.',
+  INCOMING_REVIEW_DONE:
+    'Über diese Rechnung wurde inzwischen schon entschieden. Bitte lade die Seite neu.',
+  INCOMING_REVIEW_DRAFT: 'Ein Entwurf wird erst erfasst, dann geprüft.',
+  INCOMING_REVIEW_RPC_ONLY:
+    'Freigeben und Ablehnen geht nur über die Knöpfe in der Prüfung. Bitte lade die Seite neu.',
+  INCOMING_NOT_FOUND:
+    'Diese Eingangsrechnung gibt es nicht, oder dir fehlt die Berechtigung, sie zu prüfen.',
   CONTACT_IN_USE:
     'Der Kontakt hängt noch an Aufträgen oder Belegen. Archiviere ihn stattdessen – dann verschwindet er aus Listen und Auswahlfeldern.',
 };

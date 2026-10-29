@@ -69,6 +69,8 @@ import {
   type UploadKind,
   uploadKind,
 } from '../incomingInvoiceUpload';
+import { isFrozen, isIncomingReviewStatus } from '../incomingReview';
+import { IncomingReviewSection } from '../IncomingReviewSection';
 import { checkOriginal, OriginalHashMismatch } from '../originalIntegrity';
 import { PdfViewer } from '../PdfViewer';
 import { useCostCategories } from '../useCostCategories';
@@ -180,6 +182,10 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
   const savedStatus: IncomingInvoiceStatus | null =
     saved && isIncomingInvoiceStatus(saved.status) ? saved.status : null;
   const editable = canEditFields(savedStatus);
+  const reviewStatus =
+    saved && isIncomingReviewStatus(saved.review_status) ? saved.review_status : null;
+  // Abgelehnt: auch der Zahlstand bleibt stehen (#164, Leitplanke L3).
+  const frozen = isFrozen(reviewStatus);
 
   const [supplierId, setSupplierId] = useState<string | null>(saved?.supplier_id ?? null);
   const [vendorName, setVendorName] = useState(saved?.vendor_name ?? '');
@@ -469,7 +475,7 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
       <Button type="button" onClick={done}>
         {t('common:action.cancel')}
       </Button>
-      <Button appearance="primary" type="submit" disabled={save.isPending || uploading}>
+      <Button appearance="primary" type="submit" disabled={frozen || save.isPending || uploading}>
         {t('common:action.save')}
       </Button>
     </div>
@@ -484,7 +490,9 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
         description={
           editable
             ? t('domain:incomingInvoiceForm.description')
-            : t('domain:incomingInvoiceForm.retainedDescription')
+            : frozen
+              ? t('domain:incomingInvoiceForm.rejectedDescription')
+              : t('domain:incomingInvoiceForm.retainedDescription')
         }
         actions={actions}
       />
@@ -495,6 +503,16 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
       <div className="grid gap-6 xl:grid-cols-2">
         <div className="@container flex min-w-0 flex-col gap-4">
           <ReadMessage read={read} onRetry={(file, kind) => void readEInvoice(file, kind)} />
+
+          {saved && savedStatus && savedStatus !== 'draft' && reviewStatus ? (
+            <Section title={t('domain:incomingReview.title')}>
+              <IncomingReviewSection
+                invoiceId={saved.id}
+                status={savedStatus}
+                reviewStatus={reviewStatus}
+              />
+            </Section>
+          ) : null}
 
           <Section title={t('domain:incomingInvoiceForm.sections.invoice')}>
             <div className="grid gap-4 @lg:grid-cols-2">
@@ -673,6 +691,7 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
                 <Select
                   id={ids.status}
                   value={status}
+                  disabled={frozen}
                   onChange={(_, { value }) => {
                     if (isIncomingInvoiceStatus(value)) setStatus(value);
                   }}

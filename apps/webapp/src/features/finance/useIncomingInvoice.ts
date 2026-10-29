@@ -14,6 +14,11 @@ import {
   storeErrorKey,
   type UploadKind,
 } from './incomingInvoiceUpload';
+import type {
+  IncomingInvoiceEvent,
+  IncomingReviewDecision,
+  IncomingReviewStatus,
+} from './incomingReview';
 
 export type IncomingInvoiceRow = {
   id: string;
@@ -36,6 +41,8 @@ export type IncomingInvoiceRow = {
   storage_path: string | null;
   /** SHA-256 des Originals (Hex), gesetzt von `finance-inbound-store`. */
   content_hash: string | null;
+  /** Prüfstand neben dem Zahlstand (#164); ändert sich nur per RPC. */
+  review_status: IncomingReviewStatus;
 };
 
 /** Felder, die das Formular schreibt. `storage_path`/`content_hash` setzt nur der Server (#161). */
@@ -68,7 +75,7 @@ export function useIncomingInvoice(id: string | null) {
       const { data, error } = await supabase
         .from('incoming_invoices')
         .select(
-          'id, status, supplier_id, vendor_name, vendor_vat_id, vendor_iban, invoice_number, invoice_date, due_date, net_total, vat_total, gross_total, currency, order_id, cost_category_id, notes, source_format, storage_path, content_hash',
+          'id, status, supplier_id, vendor_name, vendor_vat_id, vendor_iban, invoice_number, invoice_date, due_date, net_total, vat_total, gross_total, currency, order_id, cost_category_id, notes, source_format, storage_path, content_hash, review_status',
         )
         .eq('company_id', companyId!)
         .eq('id', id!)
@@ -153,6 +160,64 @@ export function useSaveIncomingInvoice() {
       return id;
     },
     onSuccess: () => invalidate(),
+  });
+}
+
+/** Prüfprotokoll einer Rechnung, älteste zuerst (#164). */
+export function useIncomingInvoiceEvents(invoiceId: string | null) {
+  const { data: membership } = useMembership();
+  const companyId = membership?.companyId;
+
+  return useQuery({
+    queryKey: ['incoming-invoice-events', companyId, invoiceId],
+    enabled: Boolean(companyId && invoiceId),
+    queryFn: async (): Promise<IncomingInvoiceEvent[]> => {
+      const { data, error } = await supabase
+        .from('incoming_invoice_events')
+        .select('id, action, reason, mail_reference, actor_name, created_at')
+        .eq('company_id', companyId!)
+        .eq('invoice_id', invoiceId!)
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      return data as IncomingInvoiceEvent[];
+    },
+  });
+}
+
+/**
+ * Freigeben oder ablehnen. Prüfstand und Protokolleintrag schreibt
+ * `review_incoming_invoice` in einer Transaktion; die Funktion meldet den
+ * neuen Eintrag zurück, fehlt er, ist das ein Fehler.
+ */
+export function useReviewIncomingInvoice() {
+  const queryClient = useQueryClient();
+  const { data: membership } = useMembership();
+  const companyId = membership?.companyId;
+  const invalidate = useInvalidateIncoming();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      decision,
+      reason,
+    }: {
+      id: string;
+      decision: IncomingReviewDecision;
+      reason: string;
+    }) => {
+      const { data, error } = await supabase.rpc('review_incoming_invoice', {
+        p_invoice_id: id,
+        p_decision: decision,
+        p_reason: reason.trim(),
+      });
+      if (error) throw error;
+      if (!data) throw new Error('INCOMING_REVIEW_NOT_SAVED');
+    },
+    onSuccess: (_, { id }) =>
+      Promise.all([
+        invalidate(),
+        queryClient.invalidateQueries({ queryKey: ['incoming-invoice-events', companyId, id] }),
+      ]),
   });
 }
 

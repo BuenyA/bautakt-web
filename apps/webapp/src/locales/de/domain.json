@@ -1768,6 +1768,7 @@
     "editTitle": "Eingangsrechnung",
     "description": "Rechnung eines Lieferanten oder Subunternehmers. Als Entwurf darf sie unvollständig sein, ab „Offen“ sind die markierten Felder Pflicht.",
     "retainedDescription": "Diese Rechnung ist erfasst und aufbewahrungspflichtig. Ändern lässt sich nur noch der Status.",
+    "rejectedDescription": "Diese Rechnung ist abgelehnt. Sie bleibt unverändert aufbewahrt, auch der Status ändert sich nicht mehr.",
     "order": "Auftrag",
     "noOrder": "Ohne Auftrag",
     "noCategory": "Ohne Kostenart",
@@ -1835,6 +1836,48 @@
       "payment": "Zahlung",
       "iban": "IBAN",
       "notes": "Hinweise"
+    }
+  },
+  "incomingReview": {
+    "title": "Prüfung",
+    "status": {
+      "in_review": "In Prüfung",
+      "approved": "Freigegeben",
+      "rejected": "Abgelehnt"
+    },
+    "approve": "Freigeben",
+    "reject": "Ablehnen",
+    "rejectedHint": "Abgelehnt heißt nicht gelöscht: Original, Prüfsumme und Beträge bleiben aufbewahrt.",
+    "log": "Protokoll",
+    "logEmpty": "Noch keine Einträge.",
+    "logError": "Das Protokoll konnte nicht geladen werden.",
+    "action": {
+      "approved": "Freigegeben",
+      "rejected": "Abgelehnt",
+      "mail_sent": "Mail an den Absender gesendet"
+    },
+    "by": "{{name}} · {{at}}",
+    "unknownActor": "Unbekannt",
+    "saveError": "Die Entscheidung konnte nicht gespeichert werden.",
+    "done": {
+      "approved": "Rechnung freigegeben.",
+      "rejected": "Rechnung abgelehnt."
+    },
+    "dialog": {
+      "approved": {
+        "title": "Rechnung freigeben?",
+        "text": "Die Freigabe steht danach im Protokoll und lässt sich nicht zurücknehmen.",
+        "reason": "Kommentar (optional)"
+      },
+      "rejected": {
+        "title": "Rechnung ablehnen?",
+        "text": "Die Rechnung bleibt mit Original und Beträgen aufbewahrt. Begründung und Ablehnung stehen danach im Protokoll und lassen sich nicht zurücknehmen.",
+        "reason": "Begründung"
+      }
+    },
+    "errors": {
+      "reasonRequired": "Bitte begründe die Ablehnung.",
+      "reasonTooLong": "Höchstens {{max}} Zeichen."
     }
   },
   "incomingInvoiceStatus": {
