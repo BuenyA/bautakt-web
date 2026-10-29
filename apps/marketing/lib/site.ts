@@ -105,7 +105,7 @@ export const site = {
   description:
     'Alles was Ihr Handwerksbetrieb auf der Baustelle und im Büro braucht. Übersichtlich, mobil und gemacht für den Takt.',
   locale: 'de_DE',
-  supportEmail: 'support@bautakt.de',
+  supportEmail: 'info@bautakt.com',
 } as const;
 
 /**
