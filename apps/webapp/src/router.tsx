@@ -13,6 +13,7 @@ import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { PublicOnlyRoute } from '@/features/auth/PublicOnlyRoute';
 import { CalendarPage } from '@/features/calendar/pages/CalendarPage';
+import { CompanySetupPage } from '@/features/company/pages/CompanySetupPage';
 import { RequirePermission } from '@/features/company/RequirePermission';
 import { ContactDetailPage } from '@/features/contacts/pages/ContactDetailPage';
 import { ContactsListPage } from '@/features/contacts/pages/ContactsListPage';
@@ -85,6 +86,7 @@ export const appRoutes: RouteObject[] = [
       {
         element: <ProtectedRoute />,
         children: [
+          { path: routes.companySetup, element: <CompanySetupPage /> },
           // Druckansicht bewusst ausserhalb der Shell: auf Papier gehoert kein
           // Menue. Der Schutz durch ProtectedRoute bleibt.
           {
