@@ -77,6 +77,8 @@ const MESSAGES: Record<string, string> = {
     'Erfasste Eingangsrechnungen sind aufbewahrungspflichtig: nicht löschbar, nicht zurück zum Entwurf, das Original bleibt.',
   INCOMING_FILE_SERVER_ONLY:
     'Die Originaldatei legt nur der Server ab. Bitte die Datei über „Hochladen“ hinzufügen.',
+  INCOMING_DRAFT_FILE_NOT_DELETED:
+    'Die Datei des Entwurfs ließ sich nicht löschen. Der Entwurf bleibt deshalb bestehen.',
   // Prüfung (bautakt-app 20261029120000_b_incoming_invoice_review, bautakt-web#164).
   INCOMING_REJECT_REASON: 'Bitte begründe die Ablehnung.',
   INCOMING_REVIEW_DONE:

@@ -221,7 +221,16 @@ export function useReviewIncomingInvoice() {
   });
 }
 
-/** Nur Entwürfe; der Filter auf `draft` steht zusätzlich zur Datenbank-Sperre. */
+/**
+ * Nur Entwürfe; der Filter auf `draft` steht zusätzlich zur Datenbank-Sperre.
+ *
+ * Erst die Originaldatei, dann der Entwurf: Die Storage-Policy gibt die Datei
+ * nur frei, solange ein Entwurf auf sie zeigt (bautakt-app
+ * 20261029150000_b_incoming_draft_file_delete). Scheitert danach das Löschen
+ * des Entwurfs, fehlt beim Wiederholen schon die Datei; das ist kein Fehler.
+ * Der Pfad kommt frisch aus der Datenbank, nicht aus dem Formular: Eine eben
+ * hochgeladene Datei stünde dort vielleicht noch nicht.
+ */
 export function useDeleteIncomingDraft() {
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
@@ -229,6 +238,16 @@ export function useDeleteIncomingDraft() {
 
   return useMutation({
     mutationFn: async (id: string) => {
+      const { data: draft, error: draftError } = await supabase
+        .from('incoming_invoices')
+        .select('storage_path')
+        .eq('company_id', companyId!)
+        .eq('id', id)
+        .eq('status', 'draft')
+        .maybeSingle();
+      if (draftError) throw draftError;
+      if (!draft) throw new Error('INCOMING_INVOICE_NOT_DELETED');
+      if (draft.storage_path) await removeDraftFile(draft.storage_path);
       const { data, error } = await supabase
         .from('incoming_invoices')
         .delete()
@@ -241,6 +260,17 @@ export function useDeleteIncomingDraft() {
     },
     onSuccess: (_, id) => invalidate(id),
   });
+}
+
+/** `remove` meldet bei verweigerter Policy keinen Fehler, nur eine leere Liste. */
+async function removeDraftFile(storagePath: string): Promise<void> {
+  const bucket = supabase.storage.from('finance-documents');
+  const { data, error } = await bucket.remove([storagePath]);
+  if (error) throw error;
+  if (data.length === 1) return;
+  const { data: stillThere, error: existsError } = await bucket.exists(storagePath);
+  if (existsError) throw existsError;
+  if (stillThere) throw new Error('INCOMING_DRAFT_FILE_NOT_DELETED');
 }
 
 /** Upload gescheitert; `key` liegt unter `domain:incomingInvoiceForm.upload.errors`. */
