@@ -24,11 +24,17 @@ import {
   MessageBarBody,
   Select,
   Spinner,
+  Tab,
+  TabList,
   Text,
   Textarea,
   Tooltip,
 } from '@fluentui/react-components';
-import { ArrowDownloadRegular, DocumentRegular } from '@fluentui/react-icons';
+import {
+  ArrowDownloadRegular,
+  CheckmarkCircleRegular,
+  DocumentRegular,
+} from '@fluentui/react-icons';
 import { type FormEvent, type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBlocker, useNavigate, useParams } from 'react-router';
@@ -41,7 +47,7 @@ import { useOrders } from '@/features/orders/useOrders';
 import { readableDbError } from '@/lib/dbErrors';
 import { routes } from '@/lib/routes';
 
-import { downloadBytes } from '../archiveFiles';
+import { downloadBytes, extractFacturX } from '../archiveFiles';
 import { EInvoiceXml } from '../EInvoiceReadable';
 import { originalDownload } from '../eInvoiceView';
 import { IncomingInvoiceDropzone } from '../IncomingInvoiceDropzone';
@@ -63,6 +69,7 @@ import {
   type UploadKind,
   uploadKind,
 } from '../incomingInvoiceUpload';
+import { checkOriginal, OriginalHashMismatch } from '../originalIntegrity';
 import { PdfViewer } from '../PdfViewer';
 import { useCostCategories } from '../useCostCategories';
 import {
@@ -198,6 +205,7 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
     file: File;
     kind: UploadKind;
     storagePath: string;
+    contentHash: string;
   } | null>(null);
   const [uploadError, setUploadError] = useState<{ message: string; file: File | null } | null>(
     null,
@@ -312,6 +320,7 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
         file,
         kind,
         storagePath: stored.storagePath,
+        contentHash: stored.contentHash,
       });
     } catch (caught) {
       const key = caught instanceof IncomingUploadError ? caught.key : 'unknown';
@@ -714,6 +723,7 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
                   ? t('domain:incomingInvoiceForm.upload.attachedName', { name: attached.fileName })
                   : t('domain:incomingInvoiceForm.upload.attached')
               }
+              contentHash={attached?.contentHash ?? saved?.content_hash ?? null}
               invoice={{ vendor_name: vendorName, invoice_number: invoiceNumber }}
             />
           ) : null}
@@ -857,12 +867,7 @@ function OriginalView({
   }, [file, kind]);
 
   if (kind === 'pdf') {
-    const pdf = bytes ?? fileBytes;
-    return (
-      <div className="flex h-[80vh] min-h-0 flex-col xl:h-auto xl:flex-1">
-        <PdfViewer data={pdf} loading={pdf === null} />
-      </div>
-    );
+    return <PdfOriginal pdf={bytes ?? fileBytes} />;
   }
   if (kind === 'image' && imageUrl) {
     return (
@@ -894,32 +899,91 @@ function OriginalView({
 }
 
 /**
- * Name des Belegs und Download des Originals -- Byte für Byte so, wie es im
- * Archiv liegt, auch direkt nach dem Hochladen.
+ * PDF als Druckbild. Trägt es eine E-Rechnung (ZUGFeRD/Factur-X), lassen sich
+ * deren Daten umschalten -- maßgeblich ist bei ZUGFeRD das XML, nicht das
+ * Druckbild.
+ */
+function PdfOriginal({ pdf }: { pdf: Uint8Array | null }) {
+  const { t } = useTranslation();
+  // Das gelesene XML gehört zu genau einem PDF; ein anderes PDF zeigt erst
+  // wieder das Druckbild.
+  const [read, setRead] = useState<{ pdf: Uint8Array; xml: Uint8Array | null } | null>(null);
+  const [view, setView] = useState<'print' | 'data'>('print');
+  const xml = read && read.pdf === pdf ? read.xml : null;
+
+  useEffect(() => {
+    if (!pdf) return;
+    let cancelled = false;
+    extractFacturX(pdf).then(
+      (found) => {
+        if (!cancelled) setRead({ pdf, xml: found });
+      },
+      () => {
+        // Kein lesbarer Anhang: es bleibt beim Druckbild, Fehler zeigt PdfViewer.
+        if (!cancelled) setRead({ pdf, xml: null });
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [pdf]);
+
+  return (
+    <div className="flex h-[80vh] min-h-0 flex-col gap-2 xl:h-auto xl:flex-1">
+      {xml ? (
+        <TabList
+          size="small"
+          selectedValue={view}
+          onTabSelect={(_, data) => setView(data.value as 'print' | 'data')}
+          className="shrink-0"
+        >
+          <Tab value="print">{t('domain:incomingInvoiceForm.original.viewPrint')}</Tab>
+          <Tab value="data">{t('domain:incomingInvoiceForm.original.viewData')}</Tab>
+        </TabList>
+      ) : null}
+      {xml && view === 'data' ? (
+        <div className="border-border min-h-0 flex-1 overflow-auto rounded-xl border p-4">
+          <EInvoiceXml bytes={xml} />
+        </div>
+      ) : (
+        <PdfViewer data={pdf} loading={pdf === null} />
+      )}
+    </div>
+  );
+}
+
+/**
+ * Name des Belegs, Prüfsumme und Download des Originals (#163). Heruntergeladen
+ * wird aus dem Archiv und nur, wenn die Bytes zur beim Hochladen abgelegten
+ * Prüfsumme passen.
  */
 function OriginalHeader({
   storagePath,
   label,
+  contentHash,
   invoice,
 }: {
   storagePath: string;
   label: string;
+  contentHash: string | null;
   invoice: { vendor_name: string; invoice_number: string };
 }) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState<'mismatch' | 'load' | null>(null);
+  const [verified, setVerified] = useState(false);
 
   async function download() {
     setBusy(true);
-    setFailed(false);
+    setFailed(null);
     try {
-      const bytes = await downloadIncomingOriginal(storagePath);
+      const checked = await checkOriginal(await downloadIncomingOriginal(storagePath), contentHash);
       const { fileName, mimeType } = originalDownload(storagePath, invoice);
-      downloadBytes(bytes, fileName, mimeType);
-    } catch {
-      // Netz oder Archiv: der Knopf bleibt, die Meldung bietet Wiederholen an.
-      setFailed(true);
+      downloadBytes(checked.bytes, fileName, mimeType);
+      setVerified(checked.verified);
+    } catch (caught) {
+      // Abweichende Prüfsumme ist kein Netzfehler: Wiederholen hilft dann nicht.
+      setFailed(caught instanceof OriginalHashMismatch ? 'mismatch' : 'load');
     } finally {
       setBusy(false);
     }
@@ -941,7 +1005,24 @@ function OriginalHeader({
           {t('domain:incomingInvoiceForm.original.download')}
         </Button>
       </div>
-      {failed ? (
+      {contentHash ? (
+        <Text size={100} className="text-muted-foreground flex items-start gap-1">
+          {verified ? (
+            <CheckmarkCircleRegular fontSize={14} className="text-success mt-px shrink-0" />
+          ) : null}
+          <span>
+            {verified
+              ? t('domain:incomingInvoiceForm.original.hashVerified')
+              : t('domain:incomingInvoiceForm.original.hash')}{' '}
+            <span className="font-mono break-all select-all">{contentHash}</span>
+          </span>
+        </Text>
+      ) : null}
+      {failed === 'mismatch' ? (
+        <MessageBar intent="error" layout="multiline">
+          <MessageBarBody>{t('domain:incomingInvoiceForm.original.hashMismatch')}</MessageBarBody>
+        </MessageBar>
+      ) : failed === 'load' ? (
         <MessageBar intent="error">
           <MessageBarBody>{t('domain:incomingInvoiceForm.original.downloadError')}</MessageBarBody>
           <MessageBarActions>

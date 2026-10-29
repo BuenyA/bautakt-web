@@ -37,7 +37,12 @@ export function uploadKind(name: string, mimeType: string): UploadKind | null {
 export type StoreErrorKey =
   'forbidden' | 'tooLarge' | 'unsupported' | 'fileExists' | 'notDraft' | 'invalid' | 'unknown';
 
-export type StoredFile = { id: string; storagePath: string; mimeType: string };
+export type StoredFile = {
+  id: string;
+  storagePath: string;
+  contentHash: string;
+  mimeType: string;
+};
 
 /** Antwort von `finance-inbound-store` auf einen Fehlerschlüssel abbilden. */
 export function storeErrorKey(status: number, body: unknown): StoreErrorKey {
@@ -59,7 +64,12 @@ export function storedFile(body: unknown): StoredFile | null {
   const { id, storage_path: storagePath, content_hash: hash, mime_type: mimeType } = body;
   if (typeof id !== 'string' || typeof storagePath !== 'string' || !storagePath) return null;
   if (typeof hash !== 'string' || !/^[0-9a-f]{64}$/.test(hash)) return null;
-  return { id, storagePath, mimeType: typeof mimeType === 'string' ? mimeType : '' };
+  return {
+    id,
+    storagePath,
+    contentHash: hash,
+    mimeType: typeof mimeType === 'string' ? mimeType : '',
+  };
 }
 
 /** Vorschlag aus der E-Rechnung. Beträge in Cent. */

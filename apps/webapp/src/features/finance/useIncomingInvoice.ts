@@ -34,6 +34,8 @@ export type IncomingInvoiceRow = {
   notes: string;
   source_format: string;
   storage_path: string | null;
+  /** SHA-256 des Originals (Hex), gesetzt von `finance-inbound-store`. */
+  content_hash: string | null;
 };
 
 /** Felder, die das Formular schreibt. `storage_path`/`content_hash` setzt nur der Server (#161). */
@@ -66,7 +68,7 @@ export function useIncomingInvoice(id: string | null) {
       const { data, error } = await supabase
         .from('incoming_invoices')
         .select(
-          'id, status, supplier_id, vendor_name, vendor_vat_id, vendor_iban, invoice_number, invoice_date, due_date, net_total, vat_total, gross_total, currency, order_id, cost_category_id, notes, source_format, storage_path',
+          'id, status, supplier_id, vendor_name, vendor_vat_id, vendor_iban, invoice_number, invoice_date, due_date, net_total, vat_total, gross_total, currency, order_id, cost_category_id, notes, source_format, storage_path, content_hash',
         )
         .eq('company_id', companyId!)
         .eq('id', id!)
