@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router';
+import { Navigate, type RouteObject } from 'react-router';
 
 import { ErrorBoundaryPage } from '@/components/common/ErrorBoundaryPage';
 import { NotFoundPage } from '@/components/common/NotFoundPage';
@@ -31,6 +31,7 @@ import { QuotesListPage } from '@/features/finance/pages/QuotesListPage';
 import { ReceivablesPage } from '@/features/finance/pages/ReceivablesPage';
 import { ReportsPage } from '@/features/finance/pages/ReportsPage';
 import { MaterialHubPage, PersonalHubPage } from '@/features/hubs/HubPage';
+import { LegalPage } from '@/features/legal/LegalPage';
 import { CatalogPage } from '@/features/masterdata/pages/CatalogPage';
 import { CostCentersPage } from '@/features/masterdata/pages/CostCentersPage';
 import { OrderDetailPage } from '@/features/orders/pages/OrderDetailPage';
@@ -59,7 +60,7 @@ import { HOME_ROUTE, routes } from '@/lib/routes';
  * Baum — samt Rechte-Waechter. So laesst sich die Navigation vollstaendig
  * pruefen, bevor die Seiten da sind.
  */
-export const router = createBrowserRouter([
+export const appRoutes: RouteObject[] = [
   {
     errorElement: <ErrorBoundaryPage />,
     children: [
@@ -75,6 +76,11 @@ export const router = createBrowserRouter([
       // Bewusst ohne PublicOnlyRoute: der Link aus der Mail traegt bereits eine
       // Recovery-Session, ein Redirect wuerde die Seite unerreichbar machen.
       { path: routes.resetPassword, element: <ResetPasswordPage /> },
+
+      // Rechtsseiten: weder PublicOnlyRoute (Angemeldete sollen sie öffnen
+      // können) noch ProtectedRoute (ohne Sitzung kein Sprung zum Login).
+      { path: routes.imprint, element: <LegalPage page="imprint" /> },
+      { path: routes.privacy, element: <LegalPage page="privacy" /> },
 
       {
         element: <ProtectedRoute />,
@@ -304,4 +310,4 @@ export const router = createBrowserRouter([
       { path: '*', element: <NotFoundPage /> },
     ],
   },
-]);
+];

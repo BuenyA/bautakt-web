@@ -115,7 +115,9 @@
     "imprint": "Impressum",
     "privacy": "Datenschutz",
     "terms": "AGB",
-    "newTab": "(öffnet in neuem Tab)"
+    "newTab": "(öffnet in neuem Tab)",
+    "backToSignIn": "Zur Anmeldung",
+    "backToApp": "Zur App"
   },
   "notFound": {
     "title": "Seite nicht gefunden",

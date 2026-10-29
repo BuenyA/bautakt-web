@@ -40,6 +40,12 @@ Loader-Guard müsste bei jeder Navigation erneut `getSession()` aufrufen.
 `ProtectedRoute` merkt sich das Ziel in `location.state.from`, damit nach der Anmeldung
 dorthin zurückgekehrt werden kann.
 
+`/impressum` und `/datenschutz` hängen an keinem der beiden Guards
+(`router.tsx`, Geschwister von `PublicOnlyRoute` und `ProtectedRoute`). Ohne
+Sitzung gibt es keinen Sprung zum Login, mit Sitzung keinen Sprung in die
+Übersicht. Zurück auf der Seite führt ohne Sitzung nach `/login`, mit Sitzung
+nach `HOME_ROUTE`.
+
 ## Passwort-Reset
 
 Anders als in der Mobile-App über einen echten Link, nicht per OTP:
