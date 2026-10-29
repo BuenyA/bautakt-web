@@ -9,7 +9,7 @@ import {
 import { useMemo } from 'react';
 
 import { usePermission } from '@/features/company/usePermission';
-import { localIsoDate, newSince, parseLocalIso } from '@/features/overview/today';
+import { localIsoDate } from '@/features/overview/today';
 import { useLaborInputs } from '@/features/overview/useTodayData';
 
 import { useExpenses, useIncomingInvoiceList } from './useExpenses';
@@ -40,11 +40,7 @@ export function useFinanceNumbers() {
     const docs = documents.data ?? [];
     const incomingRows = incoming.data ?? [];
     const receivables = buildReceivables(docs, payments.data ?? [], todayIso);
-    const incomingDesk = buildIncomingDesk(
-      incomingRows,
-      todayIso,
-      newSince(parseLocalIso(todayIso)).toISOString(),
-    );
+    const incomingDesk = buildIncomingDesk(incomingRows, todayIso);
 
     return {
       month: netRevenueMonth(docs, month),
@@ -57,7 +53,7 @@ export function useFinanceNumbers() {
       }),
       receivablesMinor: totalOpenMinor(receivables),
       overdueMinor: totalOverdueMinor(receivables),
-      payablesMinor: incomingDesk.open.minor,
+      payablesMinor: incomingDesk.minor,
     };
   }, [
     documents.data,

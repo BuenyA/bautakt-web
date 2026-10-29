@@ -1783,6 +1783,17 @@
       "negativeAmount": "Beträge dürfen nicht negativ sein.",
       "sumMismatch": "Netto + USt ergibt nicht den Bruttobetrag.",
       "dueBeforeDate": "Die Fälligkeit liegt vor dem Rechnungsdatum."
+    },
+    "sections": {
+      "invoice": "Rechnung",
+      "amounts": "Beträge",
+      "assignment": "Zuordnung"
+    },
+    "original": {
+      "title": "Beleg",
+      "none": "Zu dieser Rechnung ist kein Beleg hinterlegt.",
+      "loadError": "Der Beleg konnte nicht geladen werden.",
+      "xml": "Diese E-Rechnung ist reines XML und hat kein Druckbild. Die Angaben stehen im Formular."
     }
   },
   "incomingInvoiceStatus": {
@@ -1808,42 +1819,22 @@
     "newInvoice": "Neue Rechnung",
     "newQuote": "Neues Angebot",
     "showAll": "Alle anzeigen",
-    "groupsLabel": "Ansicht wählen",
     "outgoing": {
       "title": "Ausgangsrechnungen",
-      "groups": {
-        "overdue": "Überfällig",
-        "open": "Offen",
-        "draft": "Entwürfe"
-      },
-      "empty": {
-        "overdue": "Nichts überfällig.",
-        "open": "Keine offenen Rechnungen.",
-        "draft": "Keine Entwürfe."
-      },
+      "empty": "Keine offenen Ausgangsrechnungen.",
       "noNumber": "Entwurf ohne Nummer",
       "unknownCustomer": "Ohne Kunde",
-      "daysOverdue_one": "{{count}} Tag überfällig",
-      "daysOverdue_other": "{{count}} Tage überfällig",
       "due": "fällig {{date}}",
-      "noDue": "ohne Fälligkeit",
-      "created": "angelegt {{date}}"
+      "created": "angelegt {{date}}",
+      "sumLabel": "Offene Ausgangsrechnungen",
+      "create": "Ausgangsrechnung schreiben"
     },
     "incoming": {
       "title": "Eingangsrechnungen",
-      "groups": {
-        "new": "Neu",
-        "overdue": "Überfällig",
-        "dueSoon": "Fällig in 7 Tagen",
-        "open": "Offen"
-      },
-      "empty": {
-        "new": "Seit dem letzten Arbeitstag ist nichts eingegangen.",
-        "overdue": "Nichts überfällig.",
-        "dueSoon": "In den nächsten 7 Tagen wird nichts fällig.",
-        "open": "Alles bezahlt."
-      },
-      "noVendor": "Unbekannter Lieferant"
+      "empty": "Keine offenen Eingangsrechnungen.",
+      "noVendor": "Unbekannter Lieferant",
+      "sumLabel": "Offene Eingangsrechnungen",
+      "create": "Eingangsrechnung erfassen"
     },
     "kpis": {
       "subtitle": "netto",
@@ -1863,7 +1854,17 @@
       "loadError": "Die Zahlen konnten nicht geladen werden."
     },
     "loadError": "Die Rechnungen konnten nicht geladen werden.",
-    "nothingVisible": "Für dieses Konto ist in diesem Bereich nichts freigeschaltet."
+    "nothingVisible": "Für dieses Konto ist in diesem Bereich nichts freigeschaltet.",
+    "due": {
+      "overdue_one": "{{count}} Tag überfällig",
+      "overdue_other": "{{count}} Tage überfällig",
+      "today": "Heute fällig",
+      "tomorrow": "Morgen fällig",
+      "soon_one": "Fällig in {{count}} Tag",
+      "soon_other": "Fällig in {{count}} Tagen",
+      "open": "Offen",
+      "draft": "Entwurf"
+    }
   },
   "orderContacts": {
     "title": "Beteiligte",

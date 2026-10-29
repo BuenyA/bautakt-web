@@ -162,7 +162,7 @@ export function InvoiceDetailPage() {
                 {t('common:action.retry')}
               </FluentLink>
             ) : (
-              <LinkButton to={routes.invoices}>{t('common:action.back')}</LinkButton>
+              <LinkButton to={routes.financeHub}>{t('common:action.back')}</LinkButton>
             )
           }
         />
@@ -309,6 +309,9 @@ export function InvoiceDetailPage() {
     }
   }
 
+  // Angebote zurück in ihre Liste, Rechnungen auf die Übersicht (Owner 28.10.2026).
+  const backTo = data.type === 'quote' ? routes.quotes : routes.financeHub;
+
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
@@ -316,7 +319,7 @@ export function InvoiceDetailPage() {
         description={data.customer_label || t('domain:invoices.noCustomer')}
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            <LinkButton to={routes.invoices}>{t('common:action.back')}</LinkButton>
+            <LinkButton to={backTo}>{t('common:action.back')}</LinkButton>
 
             {isArchived && storagePath ? (
               <Button icon={<DocumentPdfRegular />} onClick={() => void onOpenArchive(storagePath)}>
@@ -838,7 +841,7 @@ export function InvoiceDetailPage() {
           documentId={data.id}
           open={deleteOpen}
           onOpenChange={setDeleteOpen}
-          onDeleted={() => void navigate(routes.invoices, { replace: true })}
+          onDeleted={() => void navigate(backTo, { replace: true })}
         />
       ) : null}
     </div>

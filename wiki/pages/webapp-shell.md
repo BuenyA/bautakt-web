@@ -25,7 +25,10 @@ baut die Leiste aus Fluents `NavDrawer`:
   (Firma, E-Mail, Avatar). Der Avatar zeigt das eigene Profilbild
   (`useMyProfile` + `useProfileImageUrls`), sonst die Initialen des Namens,
   ohne Namen die ersten zwei Buchstaben der E-Mail. Bis 2026-10-12 waren es
-  immer die E-Mail-Buchstaben, das Bild wurde nie geladen.
+  immer die E-Mail-Buchstaben, das Bild wurde nie geladen. Im Menü liegen
+  Impressum und Datenschutz direkt unter „Rechtliches“ (`LEGAL_PAGES`):
+  Persona öffnen, dann der Link. AGB ist nicht dabei (`published: false` in
+  `legal.ts`), solange es keine Seite gibt.
 
 Farben, Abstände und Auswahl (neutrale Fläche plus Brand-Indikator) sind
 Fluents Standard. Eigene Regeln gibt es für den Kopf, das Footer-Polster und

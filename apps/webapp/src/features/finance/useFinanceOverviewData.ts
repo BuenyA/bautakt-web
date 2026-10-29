@@ -1,7 +1,7 @@
 import { buildIncomingDesk, buildOutgoingDesk } from '@bautakt/finance';
 import { useMemo } from 'react';
 
-import { localIsoDate, newSince, parseLocalIso } from '@/features/overview/today';
+import { localIsoDate } from '@/features/overview/today';
 
 import { useIncomingInvoiceList } from './useExpenses';
 import { useFinanceAccess } from './useFinanceAccess';
@@ -30,12 +30,7 @@ export function useFinanceOverviewData() {
   );
 
   const incomingDesk = useMemo(
-    () =>
-      buildIncomingDesk(
-        incoming.data ?? [],
-        todayIso,
-        newSince(parseLocalIso(todayIso)).toISOString(),
-      ),
+    () => buildIncomingDesk(incoming.data ?? [], todayIso),
     [incoming.data, todayIso],
   );
 

@@ -35,11 +35,14 @@ export const creditNoteFromParam = 'gutschrift';
 export const sendParam = 'versenden';
 
 export const routes = {
-  // Oeffentlich
+  // Oeffentlich. Impressum und Datenschutz liegen ausserhalb der
+  // Auth-Guards, damit sie ohne Sitzung und auch angemeldet erreichbar sind.
   login: '/login',
   register: '/registrieren',
   forgotPassword: '/passwort-vergessen',
   resetPassword: '/passwort-zuruecksetzen',
+  imprint: '/impressum',
+  privacy: '/datenschutz',
 
   // Geschuetzt. Die Top-Nav ist flach (zehn Punkte). Drei davon sind Hubs;
   // die Listen dahinter behalten ihre Pfade.
@@ -76,6 +79,9 @@ export const routes = {
   receivables: '/offene-posten',
   /** Eingangsrechnungen und sonstige Ausgaben (zwei Register). */
   expenses: '/rechnungen/eingang',
+  /** Eingangsrechnung erfassen bzw. öffnen: eigene Seite wie der Rechnungs-Editor. */
+  incomingInvoiceNew: '/rechnungen/eingang/neu',
+  incomingInvoice: (id: string) => `/rechnungen/eingang/${id}`,
   dunning: '/mahnwesen',
   reports: '/auswertungen',
   /** Buchungsstapel und Belege eines Monats für die Steuerberatung (#169). */

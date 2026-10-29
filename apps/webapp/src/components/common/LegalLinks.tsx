@@ -1,15 +1,15 @@
 import { cn } from '@bautakt/ui';
-import { Link } from '@fluentui/react-components';
 import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { LEGAL_PAGES, legalUrl } from '@/lib/legal';
+import { RouterLink } from '@/components/common/RouterLink';
+import { LEGAL_PAGES, legalPath } from '@/lib/legal';
 
 /**
- * „Impressum · Datenschutz · AGB“ unter den Anmelde-Seiten.
+ * „Impressum · Datenschutz“ unter den Anmeldeseiten.
  *
- * Öffnet in einem neuen Tab, damit ein halb ausgefülltes Formular nicht
- * verloren geht. Der Hinweis darauf steht für Screenreader im Link.
+ * Nur Seiten, die `legal.ts` als veröffentlicht führt. AGB fehlt, solange
+ * es in der Web-App keine Seite gibt.
  */
 export function LegalLinks({ className }: { className?: string }) {
   const { t } = useTranslation();
@@ -17,26 +17,24 @@ export function LegalLinks({ className }: { className?: string }) {
   return (
     <nav aria-label={t('common:legal.label')} className={cn('text-xs', className)}>
       <ul className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
-        {LEGAL_PAGES.map((page, index) => (
-          <Fragment key={page}>
-            {index > 0 ? (
-              <li aria-hidden="true" className="text-text-subtle">
-                ·
+        {LEGAL_PAGES.map((page, index) => {
+          const path = legalPath(page);
+          if (!path) return null;
+          return (
+            <Fragment key={page}>
+              {index > 0 ? (
+                <li aria-hidden="true" className="text-text-subtle">
+                  ·
+                </li>
+              ) : null}
+              <li>
+                <RouterLink to={path} appearance="subtle">
+                  {t(`common:legal.${page}`)}
+                </RouterLink>
               </li>
-            ) : null}
-            <li>
-              <Link
-                href={legalUrl(page)}
-                target="_blank"
-                rel="noopener noreferrer"
-                appearance="subtle"
-              >
-                {t(`common:legal.${page}`)}
-                <span className="sr-only"> {t('common:legal.newTab')}</span>
-              </Link>
-            </li>
-          </Fragment>
-        ))}
+            </Fragment>
+          );
+        })}
       </ul>
     </nav>
   );

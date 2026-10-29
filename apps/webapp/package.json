@@ -8,11 +8,12 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "typecheck": "tsc -b --noEmit",
-    "test": "node --experimental-strip-types --test src/features/auth/authErrors.test.ts src/features/times/formatBreakLabel.test.ts src/features/overview/today.test.ts src/features/times/timeTotals.test.ts src/features/calendar/calendarModel.test.ts src/features/assignments/assignmentDraft.test.ts src/features/assignments/absenceConflict.test.ts src/features/contacts/contacts.test.ts src/features/finance/salesDocumentBuyer.test.ts src/features/finance/customerTerms.test.ts src/features/finance/archiveError.test.ts src/features/finance/sendMail.test.ts src/features/finance/datevExport.test.ts src/features/finance/incomingInvoiceForm.test.ts src/features/finance/incomingInvoiceUpload.test.ts src/features/settings/datevSettings.test.ts src/lib/dbErrors.test.ts",
+    "test": "node --experimental-strip-types --test src/features/auth/authErrors.test.ts src/features/times/formatBreakLabel.test.ts src/features/overview/today.test.ts src/features/times/timeTotals.test.ts src/features/calendar/calendarModel.test.ts src/features/assignments/assignmentDraft.test.ts src/features/assignments/absenceConflict.test.ts src/features/contacts/contacts.test.ts src/features/finance/salesDocumentBuyer.test.ts src/features/finance/customerTerms.test.ts src/features/finance/archiveError.test.ts src/features/finance/sendMail.test.ts src/features/finance/datevExport.test.ts src/features/finance/incomingInvoiceForm.test.ts src/features/finance/incomingInvoiceUpload.test.ts src/features/settings/datevSettings.test.ts src/lib/dbErrors.test.ts && vitest run",
     "preview": "vite preview --port 5173"
   },
   "dependencies": {
     "@bautakt/core": "*",
+    "@bautakt/document-render": "*",
     "@bautakt/finance": "*",
     "@bautakt/supabase": "*",
     "@bautakt/ui": "*",
@@ -27,7 +28,10 @@
     "react-dom": "^19.2.8",
     "react-hook-form": "^7.88.0",
     "react-i18next": "^15.7.4",
+    "react-markdown": "^10.1.0",
     "react-router": "^7.18.2",
+    "remark-breaks": "^4.0.0",
+    "remark-gfm": "^4.0.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -40,6 +44,7 @@
     "eslint": "^9",
     "eslint-plugin-react-refresh": "^0.4.26",
     "tailwindcss": "^4.3.3",
-    "vite": "^8.2.2"
+    "vite": "^8.2.2",
+    "vitest": "^5.0.5"
   }
 }

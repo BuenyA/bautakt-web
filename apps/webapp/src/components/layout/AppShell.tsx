@@ -24,7 +24,6 @@ import {
   Tooltip,
 } from '@fluentui/react-components';
 import {
-  Document20Regular,
   PanelLeftContract20Regular,
   PanelLeftExpand20Regular,
   Settings20Regular,
@@ -42,7 +41,7 @@ import { useAuth } from '@/features/auth/useAuth';
 import { useMyProfile } from '@/features/auth/useMyProfile';
 import { useMembership } from '@/features/company/useMembership';
 import { useProfileImageUrls } from '@/features/team/useProfileImageUrls';
-import { LEGAL_PAGES, legalUrl } from '@/lib/legal';
+import { LEGAL_PAGES, type LegalPageId, legalPath } from '@/lib/legal';
 import { HOME_ROUTE, routes } from '@/lib/routes';
 
 import { calendarNavItem, isNavActive, maySee, navItems, settingsNavItem } from './navItems';
@@ -80,12 +79,19 @@ function writeExpanded(expanded: boolean) {
 }
 
 /**
- * Beleg-Editoren (neue Rechnung, neues Angebot, Rechnung bearbeiten) brauchen
+ * Beleg-Editoren (neue Rechnung, neues Angebot, Rechnung bearbeiten,
+ * Eingangsrechnung) brauchen
  * die Breite: Dort fährt die Leiste ein. Wer sie aufklappt, tut das nur für
  * diesen Besuch — der gespeicherte Zustand bleibt, und nach dem Editor gilt
  * wieder, wie die Leiste vorher stand.
  */
-const EDITOR_PATHS = [routes.invoiceNew, routes.quoteNew, routes.invoiceEdit(':id')];
+const EDITOR_PATHS = [
+  routes.invoiceNew,
+  routes.quoteNew,
+  routes.invoiceEdit(':id'),
+  routes.incomingInvoiceNew,
+  routes.incomingInvoice(':id'),
+];
 
 function isEditorPath(pathname: string): boolean {
   return EDITOR_PATHS.some((path) => matchPath(path, pathname) !== null);
@@ -213,6 +219,25 @@ const useStyles = makeStyles({
   },
 });
 
+/** Impressum und Datenschutz direkt im Menü: Persona öffnen, dann der Link. */
+function LegalMenuLink({ page, onNavigate }: { page: LegalPageId; onNavigate?: () => void }) {
+  const { t } = useTranslation();
+  const path = legalPath(page);
+  const link = useRouterLink(path ?? '/');
+  if (!path) return null;
+  return (
+    <MenuItemLink
+      href={link.href}
+      onClick={(event) => {
+        link.onClick(event);
+        onNavigate?.();
+      }}
+    >
+      {t(`common:legal.${page}`)}
+    </MenuItemLink>
+  );
+}
+
 function UserMenu({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: () => void }) {
   const { t } = useTranslation();
   const styles = useStyles();
@@ -294,27 +319,12 @@ function UserMenu({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: 
             </MenuItemRadio>
           </MenuGroup>
           <MenuDivider />
-          {/* Rechtstexte leben auf der Marketing-Seite (#81), neuer Tab. */}
-          <Menu>
-            <MenuTrigger disableButtonEnhancement>
-              <MenuItem icon={<Document20Regular />}>{t('common:legal.label')}</MenuItem>
-            </MenuTrigger>
-            <MenuPopover>
-              <MenuList>
-                {LEGAL_PAGES.map((page) => (
-                  <MenuItemLink
-                    key={page}
-                    href={legalUrl(page)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {t(`common:legal.${page}`)}
-                    <span className="sr-only"> {t('common:legal.newTab')}</span>
-                  </MenuItemLink>
-                ))}
-              </MenuList>
-            </MenuPopover>
-          </Menu>
+          <MenuGroup>
+            <MenuGroupHeader>{t('common:legal.label')}</MenuGroupHeader>
+            {LEGAL_PAGES.map((page) => (
+              <LegalMenuLink key={page} page={page} onNavigate={onNavigate} />
+            ))}
+          </MenuGroup>
           <MenuDivider />
           <MenuItem icon={<SignOut20Regular />} onClick={() => void signOut()}>
             {t('common:action.signOut')}

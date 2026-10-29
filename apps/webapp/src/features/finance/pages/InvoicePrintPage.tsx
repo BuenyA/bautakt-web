@@ -90,7 +90,7 @@ export function InvoicePrintPage() {
                 {t('common:action.retry')}
               </FluentLink>
             ) : null}
-            <LinkButton to={routes.invoices}>{t('common:action.back')}</LinkButton>
+            <LinkButton to={routes.financeHub}>{t('common:action.back')}</LinkButton>
           </div>
         }
       />
