@@ -5,6 +5,8 @@ import {
   buildOutgoingDesk,
   type DeskIncomingRow,
   dueOf,
+  isIncomingOverdue,
+  matchesIncomingStatus,
   netRevenueMonth,
 } from './invoiceDesk';
 import { monthlyRevenue } from './monthly';
@@ -68,6 +70,48 @@ describe('buildOutgoingDesk', () => {
       ['c', 'draft', 23800],
     ]);
     expect(desk.minor).toBe(10000 + 11900);
+  });
+});
+
+describe('isIncomingOverdue', () => {
+  it('nur unbezahlt mit Fälligkeit vor dem Stichtag', () => {
+    expect(isIncomingOverdue({ status: 'open', due_date: '2026-10-13' }, HEUTE)).toBe(true);
+    expect(isIncomingOverdue({ status: 'partially_paid', due_date: '2026-10-01' }, HEUTE)).toBe(
+      true,
+    );
+    expect(isIncomingOverdue({ status: 'open', due_date: HEUTE }, HEUTE)).toBe(false);
+    expect(isIncomingOverdue({ status: 'paid', due_date: '2026-10-01' }, HEUTE)).toBe(false);
+    expect(isIncomingOverdue({ status: 'overdue', due_date: null }, HEUTE)).toBe(false);
+  });
+});
+
+describe('matchesIncomingStatus', () => {
+  const rows = [
+    { id: 'entwurf', status: 'draft', due_date: '2026-10-01' },
+    { id: 'offen', status: 'open', due_date: '2026-10-30' },
+    { id: 'spaet', status: 'open', due_date: '2026-10-01' },
+    { id: 'teil', status: 'partially_paid', due_date: null },
+    { id: 'bezahlt', status: 'paid', due_date: '2026-10-01' },
+  ];
+  const ids = (filter: Parameters<typeof matchesIncomingStatus>[1]) =>
+    rows.filter((row) => matchesIncomingStatus(row, filter, HEUTE)).map((row) => row.id);
+
+  it('teilt die Liste nach Status', () => {
+    expect(ids('all')).toHaveLength(5);
+    expect(ids('open')).toEqual(['offen', 'spaet', 'teil']);
+    expect(ids('draft')).toEqual(['entwurf']);
+    expect(ids('paid')).toEqual(['bezahlt']);
+  });
+
+  it('überfällig zählt wie die Übersicht, auch Entwürfe mit Datum', () => {
+    expect(ids('overdue')).toEqual(['entwurf', 'spaet']);
+    const desk = buildIncomingDesk(
+      rows.map((row) => ({ ...row, invoice_date: null, gross_total: 1, created_at: '' })),
+      HEUTE,
+    );
+    expect(
+      desk.entries.filter((entry) => entry.due.kind === 'overdue').map((entry) => entry.item.id),
+    ).toEqual(ids('overdue'));
   });
 });
 

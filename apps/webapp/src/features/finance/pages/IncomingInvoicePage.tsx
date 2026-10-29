@@ -28,7 +28,7 @@ import {
   Textarea,
   Tooltip,
 } from '@fluentui/react-components';
-import { DocumentRegular } from '@fluentui/react-icons';
+import { ArrowDownloadRegular, DocumentRegular } from '@fluentui/react-icons';
 import { type FormEvent, type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBlocker, useNavigate, useParams } from 'react-router';
@@ -41,6 +41,9 @@ import { useOrders } from '@/features/orders/useOrders';
 import { readableDbError } from '@/lib/dbErrors';
 import { routes } from '@/lib/routes';
 
+import { downloadBytes } from '../archiveFiles';
+import { EInvoiceXml } from '../EInvoiceReadable';
+import { originalDownload } from '../eInvoiceView';
 import { IncomingInvoiceDropzone } from '../IncomingInvoiceDropzone';
 import {
   canDelete,
@@ -63,6 +66,7 @@ import {
 import { PdfViewer } from '../PdfViewer';
 import { useCostCategories } from '../useCostCategories';
 import {
+  downloadIncomingOriginal,
   type IncomingInvoiceRow,
   IncomingUploadError,
   parseIncomingFile,
@@ -193,6 +197,7 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
     fileName: string;
     file: File;
     kind: UploadKind;
+    storagePath: string;
   } | null>(null);
   const [uploadError, setUploadError] = useState<{ message: string; file: File | null } | null>(
     null,
@@ -205,7 +210,7 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
   > | null>(null);
 
   const invoiceId = saved?.id ?? attached?.id ?? null;
-  const hasOriginal = Boolean(saved?.storage_path) || attached !== null;
+  const originalPath = attached?.storagePath ?? saved?.storage_path ?? null;
   const draftStatus: IncomingInvoiceStatus | null = savedStatus ?? (attached ? 'draft' : null);
   const uploading = storeFile.isPending || read.state === 'running';
 
@@ -301,7 +306,13 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
     }
     try {
       const stored = await storeFile.mutateAsync({ invoiceId, file });
-      setAttached({ id: stored.id, fileName: file.name, file, kind });
+      setAttached({
+        id: stored.id,
+        fileName: file.name,
+        file,
+        kind,
+        storagePath: stored.storagePath,
+      });
     } catch (caught) {
       const key = caught instanceof IncomingUploadError ? caught.key : 'unknown';
       // Wiederholen hilft nur, wenn der Fehler nicht an der Datei selbst liegt.
@@ -695,13 +706,16 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
           aria-label={t('domain:incomingInvoiceForm.original.title')}
           className="flex min-h-0 flex-col gap-3 xl:sticky xl:top-4 xl:h-[calc(100vh-2rem)]"
         >
-          {hasOriginal ? (
-            <Text size={200} className="text-muted-foreground flex shrink-0 items-center gap-2">
-              <DocumentRegular fontSize={16} />
-              {attached
-                ? t('domain:incomingInvoiceForm.upload.attachedName', { name: attached.fileName })
-                : t('domain:incomingInvoiceForm.upload.attached')}
-            </Text>
+          {originalPath ? (
+            <OriginalHeader
+              storagePath={originalPath}
+              label={
+                attached
+                  ? t('domain:incomingInvoiceForm.upload.attachedName', { name: attached.fileName })
+                  : t('domain:incomingInvoiceForm.upload.attached')
+              }
+              invoice={{ vendor_name: vendorName, invoice_number: invoiceNumber }}
+            />
           ) : null}
           {uploadError ? (
             <MessageBar intent="error" layout="multiline" className="shrink-0">
@@ -806,7 +820,7 @@ function StoredOriginal({ storagePath }: { storagePath: string }) {
   return <OriginalView bytes={original.data} kind={uploadKind(storagePath, '')} />;
 }
 
-/** PDF Seite für Seite, Fotos als Bild; reines XML hat kein Druckbild. */
+/** PDF Seite für Seite, Fotos als Bild, E-Rechnungs-XML lesbar aufbereitet. */
 function OriginalView({
   file,
   bytes,
@@ -817,7 +831,7 @@ function OriginalView({
   kind: UploadKind | null;
 }) {
   const { t } = useTranslation();
-  const [filePdf, setFilePdf] = useState<Uint8Array | null>(null);
+  const [fileBytes, setFileBytes] = useState<Uint8Array | null>(null);
   const imageUrl = useMemo(() => {
     if (kind !== 'image') return null;
     const blob = file ?? (bytes ? new Blob([bytes.slice()]) : null);
@@ -832,10 +846,10 @@ function OriginalView({
   );
 
   useEffect(() => {
-    if (kind !== 'pdf' || !file) return;
+    if ((kind !== 'pdf' && kind !== 'xml') || !file) return;
     let cancelled = false;
     void file.arrayBuffer().then((buffer) => {
-      if (!cancelled) setFilePdf(new Uint8Array(buffer));
+      if (!cancelled) setFileBytes(new Uint8Array(buffer));
     });
     return () => {
       cancelled = true;
@@ -843,7 +857,7 @@ function OriginalView({
   }, [file, kind]);
 
   if (kind === 'pdf') {
-    const pdf = bytes ?? filePdf;
+    const pdf = bytes ?? fileBytes;
     return (
       <div className="flex h-[80vh] min-h-0 flex-col xl:h-auto xl:flex-1">
         <PdfViewer data={pdf} loading={pdf === null} />
@@ -861,7 +875,82 @@ function OriginalView({
       </div>
     );
   }
-  return <OriginalEmpty text={t('domain:incomingInvoiceForm.original.xml')} />;
+  if (kind === 'xml') {
+    const xml = bytes ?? fileBytes;
+    if (!xml) {
+      return (
+        <div className="flex min-h-64 flex-1 items-center justify-center">
+          <Spinner />
+        </div>
+      );
+    }
+    return (
+      <div className="border-border min-h-0 flex-1 overflow-auto rounded-xl border p-4">
+        <EInvoiceXml bytes={xml} />
+      </div>
+    );
+  }
+  return <OriginalEmpty text={t('domain:incomingInvoiceForm.original.noPreview')} />;
+}
+
+/**
+ * Name des Belegs und Download des Originals -- Byte für Byte so, wie es im
+ * Archiv liegt, auch direkt nach dem Hochladen.
+ */
+function OriginalHeader({
+  storagePath,
+  label,
+  invoice,
+}: {
+  storagePath: string;
+  label: string;
+  invoice: { vendor_name: string; invoice_number: string };
+}) {
+  const { t } = useTranslation();
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  async function download() {
+    setBusy(true);
+    setFailed(false);
+    try {
+      const bytes = await downloadIncomingOriginal(storagePath);
+      const { fileName, mimeType } = originalDownload(storagePath, invoice);
+      downloadBytes(bytes, fileName, mimeType);
+    } catch {
+      // Netz oder Archiv: der Knopf bleibt, die Meldung bietet Wiederholen an.
+      setFailed(true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="flex shrink-0 flex-col gap-2">
+      <div className="flex items-center justify-between gap-2">
+        <Text size={200} className="text-muted-foreground flex min-w-0 items-center gap-2">
+          <DocumentRegular fontSize={16} className="shrink-0" />
+          <span className="truncate">{label}</span>
+        </Text>
+        <Button
+          size="small"
+          icon={busy ? <Spinner size="extra-tiny" /> : <ArrowDownloadRegular />}
+          disabled={busy}
+          onClick={() => void download()}
+        >
+          {t('domain:incomingInvoiceForm.original.download')}
+        </Button>
+      </div>
+      {failed ? (
+        <MessageBar intent="error">
+          <MessageBarBody>{t('domain:incomingInvoiceForm.original.downloadError')}</MessageBarBody>
+          <MessageBarActions>
+            <Button onClick={() => void download()}>{t('common:action.retry')}</Button>
+          </MessageBarActions>
+        </MessageBar>
+      ) : null}
+    </div>
+  );
 }
 
 function OriginalEmpty({ text }: { text: string }) {

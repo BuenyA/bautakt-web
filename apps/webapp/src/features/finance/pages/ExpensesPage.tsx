@@ -1,10 +1,17 @@
-import { daysBetween, eurosToMinor, formatMoney, todayIso } from '@bautakt/finance';
+import {
+  daysBetween,
+  eurosToMinor,
+  formatMoney,
+  type IncomingStatusFilter,
+  matchesIncomingStatus,
+  todayIso,
+} from '@bautakt/finance';
 import { cn, DataTable, type DataTableColumn, StatusBadge, type StatusTone } from '@bautakt/ui';
-import { Button, Text } from '@fluentui/react-components';
+import { Button, Tab, TabList, Text } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { LinkButton } from '@/components/common/LinkButton';
@@ -19,6 +26,7 @@ import { isEInvoiceIncoming } from '../archiveFiles';
 import { EInvoiceBadge } from '../EInvoiceBadge';
 import { ExpenseSheet } from '../ExpenseSheet';
 import { FinanceHeader } from '../FinanceHeader';
+import { invoiceStatusFromSearch, invoiceStatusToSearch } from '../invoiceListFilter';
 import {
   type ExpenseRow,
   type IncomingInvoiceListRow,
@@ -45,6 +53,32 @@ export function ExpensesPage() {
   useCreateFromUrl(canManage, () => setSheetOpen(true));
   const incoming = useIncomingInvoiceList();
   const expenses = useExpenses();
+
+  // `?status=` wie in der Belegliste; „überfällig“ zählt wie die Übersicht.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const statusFilter = invoiceStatusFromSearch(searchParams.get('status'));
+  const today = todayIso();
+  const counts = useMemo(() => {
+    const rows = incoming.data ?? [];
+    return Object.fromEntries(
+      INCOMING_FILTERS.map((filter) => [
+        filter,
+        rows.filter((row) => matchesIncomingStatus(row, filter, today)).length,
+      ]),
+    ) as Record<IncomingStatusFilter, number>;
+  }, [incoming.data, today]);
+  const incomingRows = useMemo(
+    () => (incoming.data ?? []).filter((row) => matchesIncomingStatus(row, statusFilter, today)),
+    [incoming.data, statusFilter, today],
+  );
+
+  function selectStatus(filter: IncomingStatusFilter) {
+    const params = new URLSearchParams(searchParams);
+    const slug = invoiceStatusToSearch(filter);
+    if (slug) params.set('status', slug);
+    else params.delete('status');
+    setSearchParams(params, { replace: true });
+  }
 
   const isLoading = useCompanyListLoading(incoming, expenses);
   // Sonstige Ausgaben nur zeigen, wenn wirklich welche angefallen sind.
@@ -161,9 +195,23 @@ export function ExpensesPage() {
 
       <div className={cn('grid gap-6', hasExpenses && 'xl:grid-cols-2')}>
         <ListSection title={t('domain:expenses.tabIncoming')}>
+          <TabList
+            size="small"
+            selectedValue={statusFilter}
+            onTabSelect={(_, { value }) => selectStatus(value as IncomingStatusFilter)}
+          >
+            {INCOMING_FILTERS.map((filter) => (
+              <Tab key={filter} value={filter}>
+                {t(`domain:expenses.statusFilter.${filter}`)}
+                {counts[filter] > 0 ? (
+                  <span className="text-muted-foreground ml-1 tabular-nums">{counts[filter]}</span>
+                ) : null}
+              </Tab>
+            ))}
+          </TabList>
           <DataTable
             columns={incomingColumns}
-            data={incoming.data ?? []}
+            data={incomingRows}
             isLoading={isLoading}
             labels={labels}
             exportFileName="eingangsrechnungen"
@@ -171,10 +219,17 @@ export function ExpensesPage() {
               canManage ? (row) => void navigate(routes.incomingInvoice(row.id)) : undefined
             }
             empty={
-              <EmptyState
-                title={t('domain:expenses.emptyIncomingTitle')}
-                description={t('domain:expenses.emptyIncomingDescription')}
-              />
+              statusFilter !== 'all' && counts.all > 0 ? (
+                <EmptyState
+                  title={t('domain:expenses.emptyFilterTitle')}
+                  description={t('domain:expenses.emptyFilterDescription')}
+                />
+              ) : (
+                <EmptyState
+                  title={t('domain:expenses.emptyIncomingTitle')}
+                  description={t('domain:expenses.emptyIncomingDescription')}
+                />
+              )
             }
           />
         </ListSection>
@@ -202,6 +257,14 @@ export function ExpensesPage() {
     </div>
   );
 }
+
+const INCOMING_FILTERS: readonly IncomingStatusFilter[] = [
+  'all',
+  'open',
+  'overdue',
+  'draft',
+  'paid',
+];
 
 const STATUS_TONE: Record<string, StatusTone> = {
   draft: 'outline',

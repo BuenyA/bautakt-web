@@ -78,6 +78,17 @@ export function useIncomingInvoice(id: string | null) {
 }
 
 /**
+ * Das abgelegte Original (PDF, XML oder Foto) unverändert aus dem Archiv. Lesen
+ * dürfen es, wer die Finanzen sieht oder Gemeinkosten verwaltet (Storage-Policy
+ * auf `finance-documents`).
+ */
+export async function downloadIncomingOriginal(storagePath: string): Promise<Uint8Array> {
+  const { data, error } = await supabase.storage.from('finance-documents').download(storagePath);
+  if (error || !data) throw error ?? new Error('ORIGINAL_MISSING');
+  return new Uint8Array(await data.arrayBuffer());
+}
+
+/**
  * Liste und offene Belege neu laden. Ein gelöschter Beleg fliegt aus dem Cache,
  * statt neu geladen zu werden: Sonst liefe seine Abfrage in den Fehler und die
  * Wiederholungen hielten das Löschen mehrere Sekunden auf.
