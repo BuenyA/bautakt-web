@@ -42,6 +42,7 @@ describe('Antwort von finance-inbound-store', () => {
     assert.deepEqual(storedFile(body), {
       id: 'id-1',
       storagePath: 'c/incoming/id-1.pdf',
+      contentHash: HASH,
       mimeType: 'application/pdf',
     });
     assert.equal(storedFile({ ...body, content_hash: 'kurz' }), null);
