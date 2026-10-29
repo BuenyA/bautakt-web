@@ -2,6 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { supabase } from '@/lib/supabase';
 
+import {
+  bundleKey,
+  clientRenderSupported,
+  type DraftBody,
+  loadBundle,
+  type LoadedBundle,
+  renderInWorker,
+} from './clientRender';
 import type { DraftRows } from './useDocumentEditor';
 
 /** Tipp-Pause, nach der neu gerendert wird (Owner F2: ~800 ms). */
@@ -62,6 +70,30 @@ export async function fetchFingerprint(documentId: string): Promise<string> {
   return data.fingerprint;
 }
 
+/**
+ * Formularstand rendern: im Browser, wenn möglich, sonst über die Function.
+ * Die Freigabe vergleicht den Fingerabdruck ohnehin mit dem Server (#217) —
+ * wiche die Kopie des Kerns ab, fiele es dort auf.
+ */
+async function renderDraft(
+  draft: DraftBody,
+  bundleRef: { current: { key: string; promise: Promise<LoadedBundle> } | null },
+): Promise<PreviewResult> {
+  if (clientRenderSupported()) {
+    try {
+      const key = bundleKey(draft);
+      if (bundleRef.current?.key !== key) {
+        bundleRef.current = { key, promise: loadBundle(draft) };
+      }
+      return await renderInWorker(draft, await bundleRef.current.promise);
+    } catch (cause) {
+      bundleRef.current = null;
+      console.warn('Live-Vorschau im Browser fehlgeschlagen, rendere über die Function', cause);
+    }
+  }
+  return invokePreview({ draft });
+}
+
 export type LivePreviewPhase = 'idle' | 'rendering';
 
 /**
@@ -71,6 +103,10 @@ export type LivePreviewPhase = 'idle' | 'rendering';
  * „Freigeben“; Owner 17.10.2026). Die Vorschau schickt deshalb Kopf und
  * Positionen so an die Render-Function, wie `useSaveDraft` sie speichern
  * würde (`buildDraftRows`) — das PDF ist dasselbe wie nach dem Speichern.
+ *
+ * Gerendert wird im Browser (Web Worker, derselbe Kern wie die Function,
+ * #160); die Function liefert dafür nur das Bündel aus Firma, Kunde und
+ * Abschlägen. Klappt das nicht, rendert wie bisher die Function selbst.
  *
  * Beim Öffnen kommt das PDF sofort, danach nach jeder Tipp-Pause. Antworten
  * eines überholten Laufs werden verworfen, damit nie ein älterer Stand den
@@ -104,6 +140,7 @@ export function useLivePreview({
     documentId,
   });
   const runRef = useRef(0);
+  const bundleRef = useRef<{ key: string; promise: Promise<LoadedBundle> } | null>(null);
   const renderedOnceRef = useRef(false);
   const json = rows ? JSON.stringify(rows) : null;
 
@@ -124,11 +161,12 @@ export function useLivePreview({
     const source = JSON.stringify(current);
     setPhase('rendering');
     try {
-      const result = await invokePreview(
-        savedId
-          ? { document_id: savedId }
-          : { draft: { document: { ...current.header, id }, lines: current.lines } },
-      );
+      const result = savedId
+        ? await invokePreview({ document_id: savedId })
+        : await renderDraft(
+            { document: { ...current.header, id }, lines: current.lines },
+            bundleRef,
+          );
       if (run !== runRef.current) return;
       renderedOnceRef.current = true;
       renderedJsonRef.current = source;

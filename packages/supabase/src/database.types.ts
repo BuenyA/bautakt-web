@@ -4624,6 +4624,10 @@ export type Database = {
           buyer_vat_id: string
         }[]
       }
+      save_sales_document_draft: {
+        Args: { p_document_id: string | null; p_header: Json; p_lines?: Json }
+        Returns: string
+      }
       seed_company_labor_rate: {
         Args: { p_company_id: string }
         Returns: undefined

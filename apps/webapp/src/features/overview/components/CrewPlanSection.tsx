@@ -25,8 +25,8 @@ import { routes, withCreate } from '@/lib/routes';
 import { mapsSearchUrl } from '../today';
 import type { TodayAssignment } from '../useTodayData';
 import { CrewAvatars } from './CrewAvatars';
-import { DashboardEmptyIcon, DashboardEmptyState } from './DashboardEmptyState';
-import { COLUMN_SCROLL } from './layout';
+import { DashboardEmptyIcon, DashboardEmptyState, EMPTY_ICON_SIZE } from './DashboardEmptyState';
+import { COLUMN_FILL_SCROLL } from './layout';
 
 const useStyles = makeStyles({
   timePill: {
@@ -86,7 +86,7 @@ export function CrewPlanSection({
         action={<RouterLink to={routes.assignments}>{t('domain:overview.crew.toPlan')}</RouterLink>}
       />
 
-      <div className={mergeClasses(COLUMN_SCROLL, styles.body)}>
+      <div className={mergeClasses(COLUMN_FILL_SCROLL, styles.body)}>
         {isLoading ? (
           <div className="flex flex-col gap-3">
             <SkeletonBlock className="h-36 w-full" />
@@ -96,7 +96,7 @@ export function CrewPlanSection({
           <DashboardEmptyState
             icon={
               <DashboardEmptyIcon>
-                <PeopleTeamRegular fontSize={24} aria-hidden />
+                <PeopleTeamRegular fontSize={EMPTY_ICON_SIZE / 2} aria-hidden />
               </DashboardEmptyIcon>
             }
             title={t('domain:overview.crew.empty')}

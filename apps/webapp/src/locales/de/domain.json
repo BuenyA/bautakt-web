@@ -783,24 +783,6 @@
       "exemptionValidUntil": "gültig bis {{date}}",
       "exemptionExpired": "abgelaufen am {{date}}"
     },
-    "year": {
-      "title": "Zahlen {{year}}",
-      "subtitle": "Seit 1. Januar, netto",
-      "revenue": "Umsatz",
-      "expenses": "Aufwände",
-      "result": "Ergebnis",
-      "receivables": "Offene Forderungen",
-      "versusPreviousYear": "{{value}} zum Vorjahreszeitraum",
-      "noPreviousYear": "Kein Vorjahr zum Vergleich",
-      "expensesSplit": "{{material}} Material & Gemeinkosten · {{labor}} Lohn",
-      "expensesWithoutLabor": "Ohne Lohnkosten (keine Berechtigung)",
-      "margin": "{{value}} % vom Umsatz",
-      "noMargin": "Noch kein Umsatz",
-      "overdueShare": "davon {{amount}} überfällig",
-      "noneOverdue": "Nichts überfällig",
-      "chartA11y": "Verlauf je Monat",
-      "loadError": "Die Zahlen konnten nicht geladen werden."
-    },
     "crew": {
       "title": "Einsatzplan heute",
       "count_one": "{{count}} Einsatz",
@@ -904,6 +886,44 @@
     },
     "noData": "Keine Daten im Zeitraum",
     "noDataDescription": "Für diesen Zeitraum sind keine Belege erfasst."
+  },
+  "datevExport": {
+    "title": "Export im DATEV-Format",
+    "description": "Buchungsstapel und Belege meiner Ausgangsrechnungen, Stornos und Gutschriften für die Steuerberatung, je Monat.",
+    "monthLabel": "Monat",
+    "checking": "Monat wird geprüft …",
+    "ready_one": "Bereit: 1 Buchung.",
+    "ready_other": "Bereit: {{count}} Buchungen.",
+    "download": "Buchungsstapel und Belege herunterladen",
+    "downloaded_one": "{{csvName}} und {{zipName}} mit 1 Beleg wurden heruntergeladen.",
+    "downloaded_other": "{{csvName}} und {{zipName}} mit {{count}} Belegen wurden heruntergeladen.",
+    "archiveMissing": "Für {{documents}} fehlt das Archiv-PDF. Ohne Original gibt es kein Beleg-ZIP; es wurde nichts heruntergeladen.",
+    "empty": "In diesem Monat gibt es keine festgeschriebenen Ausgangsrechnungen, also nichts zu exportieren.",
+    "blocked": "So lässt sich der Monat nicht in DATEV importieren. Bitte behebe zuerst diese Punkte:",
+    "warnings": "Bitte prüfe vor dem Import:",
+    "toSettings": "Zu den DATEV-Einstellungen",
+    "failed": {
+      "auth": "Deine Anmeldung ist abgelaufen. Bitte melde dich neu an.",
+      "forbidden": "Dir fehlt die Berechtigung für den Export.",
+      "unknown": "Der Export ist fehlgeschlagen. Bitte prüfe die Verbindung und versuche es erneut."
+    },
+    "findings": {
+      "numbers_missing": "Berater- und Mandantennummer fehlen in den DATEV-Einstellungen.",
+      "currency": "{{document}}: Nur Belege in Euro lassen sich exportieren (Währung {{value}}).",
+      "issue_date_missing": "{{document}}: Das Rechnungsdatum fehlt.",
+      "chart_mismatch": "{{document}}: Der Beleg wurde mit {{value}} festgeschrieben, eingestellt ist ein anderer Kontenrahmen.",
+      "debtor_missing": "{{document}}: Für den Kunden ist kein Debitorenkonto hinterlegt.",
+      "debtor_length": "{{document}}: Das Debitorenkonto {{value}} passt nicht zur eingestellten Kontenlänge.",
+      "account_missing": "{{document}}: Für einen Steuersatz fehlt das Erlöskonto.",
+      "account_length": "{{document}}: Das Erlöskonto {{value}} passt nicht zur eingestellten Kontenlänge.",
+      "split_mismatch": "{{document}}: Die Positionen ergeben nicht die Summen je Steuersatz.",
+      "total_mismatch": "{{document}}: Die Buchungen ergeben nicht den Bruttobetrag des Belegs.",
+      "cost_center_invalid": "{{document}}: Die Kostenstelle {{value}} enthält Zeichen, die DATEV nicht annimmt.",
+      "collective_debtor": "{{document}}: wird auf den Sammel-Debitor {{value}} gebucht.",
+      "document_number_changed": "{{document}}: Die Belegnummer enthält Zeichen, die DATEV nicht annimmt. Sie wird ohne diese Zeichen übergeben.",
+      "chars_replaced": "{{document}}: Die Zeichen {{value}} gibt es in DATEV nicht. Sie werden durch ? ersetzt.",
+      "no_bookings": "{{document}}: Der Betrag ist 0, es entsteht keine Buchung."
+    }
   },
   "employees": {
     "title": "Mitarbeiter",
@@ -1426,7 +1446,8 @@
         },
         "debtorUnresolved": "Es gibt keinen Debitor. Ergänze die Kundennummer am Kontakt oder einen Sammel-Debitor in den DATEV-Einstellungen.",
         "accountMissing": "Für {{tax}} ist kein Erlöskonto hinterlegt. Ergänze es in den DATEV-Einstellungen, sonst fehlt es im Export."
-      }
+      },
+      "sendAfter": "Danach per E-Mail versenden"
     },
     "discard": {
       "title": "Änderungen verwerfen?",
@@ -1706,6 +1727,82 @@
     "reverseChargeHint": "Subunternehmer mit §13b: Die Rechnung kommt ohne Umsatzsteuer, die Steuer schuldet dein Betrieb. Umsatzsteuer ist deshalb auf 0 % gesetzt.",
     "withholdingWarning": "Für diesen Subunternehmer liegt zum Rechnungsdatum keine gültige Freistellungsbescheinigung (§48b EStG) vor. Bei Zahlung müssen {{amount}} (15 %) als Bauabzugsteuer einbehalten und ans Finanzamt abgeführt werden."
   },
+  "incomingInvoiceForm": {
+    "upload": {
+      "dropTitle": "Rechnung hier ablegen oder auswählen",
+      "dropHint": "PDF, E-Rechnung (XRechnung, ZUGFeRD) oder Foto, höchstens 20 MB. XRechnung und ZUGFeRD füllen die Felder vor.",
+      "uploading": "Wird abgelegt …",
+      "reading": "E-Rechnung wird gelesen …",
+      "attached": "Original angehängt",
+      "attachedName": "Original angehängt: {{name}}",
+      "suggested": "Vorschlag",
+      "suggestedInfo": "Aus der E-Rechnung ({{format}}) vorbefüllt. Markierte Felder bitte prüfen. Felder, die schon ausgefüllt waren, bleiben unverändert.",
+      "format": {
+        "zugferd": "ZUGFeRD",
+        "xrechnung": "XRechnung"
+      },
+      "foreignCurrency": "Die Rechnung ist in {{currency}} ausgestellt. Beträge werden nur in Euro erfasst und deshalb nicht übernommen.",
+      "noEInvoice": "Keine E-Rechnungsdaten gefunden. Bitte die Felder von Hand ausfüllen.",
+      "photo": "Foto abgelegt. Aus Fotos wird nichts gelesen, bitte die Felder von Hand ausfüllen.",
+      "readError": "Die Datei ist abgelegt, aber die E-Rechnung konnte nicht gelesen werden.",
+      "errors": {
+        "forbidden": "Keine Berechtigung für Eingangsrechnungen dieses Betriebs.",
+        "tooLarge": "Die Datei ist zu groß. Höchstens 20 MB je Beleg.",
+        "unsupported": "Nur PDF, XML, JPEG, PNG oder WebP.",
+        "fileExists": "Diese Rechnung hat schon eine andere Originaldatei. Ein Original wird nicht ausgetauscht.",
+        "notDraft": "Eine Datei lässt sich nur an einen Entwurf anhängen.",
+        "invalid": "Die Datei fehlt oder ist leer.",
+        "unknown": "Die Datei konnte nicht abgelegt werden."
+      }
+    },
+    "title": "Eingangsrechnung erfassen",
+    "editTitle": "Eingangsrechnung",
+    "description": "Rechnung eines Lieferanten oder Subunternehmers. Als Entwurf darf sie unvollständig sein, ab „Offen“ sind die markierten Felder Pflicht.",
+    "retainedDescription": "Diese Rechnung ist erfasst und aufbewahrungspflichtig. Ändern lässt sich nur noch der Status.",
+    "order": "Auftrag",
+    "noOrder": "Ohne Auftrag",
+    "noCategory": "Ohne Kostenart",
+    "status": "Status",
+    "sumOk": "Netto + USt ergibt Brutto.",
+    "sumHint": "Netto + USt ergibt {{expected}}, nicht den eingetragenen Bruttobetrag.",
+    "saved": "Eingangsrechnung gespeichert.",
+    "saveError": "Die Eingangsrechnung konnte nicht gespeichert werden.",
+    "loadError": "Die Eingangsrechnung konnte nicht geladen werden.",
+    "deleteTitle": "Entwurf löschen?",
+    "deleteText": "Der Entwurf wird endgültig gelöscht.",
+    "deleted": "Entwurf gelöscht.",
+    "deleteError": "Der Entwurf konnte nicht gelöscht werden.",
+    "deleteRetained": "Erfasste Eingangsrechnungen sind aufbewahrungspflichtig und lassen sich nicht löschen. Gelöscht werden nur Entwürfe.",
+    "errors": {
+      "vendorRequired": "Bitte den Lieferanten angeben.",
+      "dateRequired": "Bitte das Rechnungsdatum angeben.",
+      "dueRequired": "Bitte das Fälligkeitsdatum angeben.",
+      "netRequired": "Bitte den Nettobetrag angeben.",
+      "vatRequired": "Bitte die Umsatzsteuer angeben (0, wenn keine).",
+      "grossRequired": "Bitte den Bruttobetrag angeben.",
+      "negativeAmount": "Beträge dürfen nicht negativ sein.",
+      "sumMismatch": "Netto + USt ergibt nicht den Bruttobetrag.",
+      "dueBeforeDate": "Die Fälligkeit liegt vor dem Rechnungsdatum."
+    },
+    "sections": {
+      "invoice": "Rechnung",
+      "amounts": "Beträge",
+      "assignment": "Zuordnung"
+    },
+    "original": {
+      "title": "Beleg",
+      "none": "Zu dieser Rechnung ist kein Beleg hinterlegt.",
+      "loadError": "Der Beleg konnte nicht geladen werden.",
+      "xml": "Diese E-Rechnung ist reines XML und hat kein Druckbild. Die Angaben stehen im Formular."
+    }
+  },
+  "incomingInvoiceStatus": {
+    "draft": "Entwurf",
+    "open": "Offen",
+    "partially_paid": "Teilbezahlt",
+    "paid": "Bezahlt",
+    "overdue": "Überfällig"
+  },
   "employeeForm": {
     "newTitle": "Neuer Mitarbeiter",
     "editTitle": "Mitarbeiter bearbeiten",
@@ -1722,42 +1819,22 @@
     "newInvoice": "Neue Rechnung",
     "newQuote": "Neues Angebot",
     "showAll": "Alle anzeigen",
-    "groupsLabel": "Ansicht wählen",
     "outgoing": {
       "title": "Ausgangsrechnungen",
-      "groups": {
-        "overdue": "Überfällig",
-        "open": "Offen",
-        "draft": "Entwürfe"
-      },
-      "empty": {
-        "overdue": "Nichts überfällig.",
-        "open": "Keine offenen Rechnungen.",
-        "draft": "Keine Entwürfe."
-      },
+      "empty": "Keine offenen Ausgangsrechnungen.",
       "noNumber": "Entwurf ohne Nummer",
       "unknownCustomer": "Ohne Kunde",
-      "daysOverdue_one": "{{count}} Tag überfällig",
-      "daysOverdue_other": "{{count}} Tage überfällig",
       "due": "fällig {{date}}",
-      "noDue": "ohne Fälligkeit",
-      "created": "angelegt {{date}}"
+      "created": "angelegt {{date}}",
+      "sumLabel": "Offene Ausgangsrechnungen",
+      "create": "Ausgangsrechnung schreiben"
     },
     "incoming": {
       "title": "Eingangsrechnungen",
-      "groups": {
-        "new": "Neu",
-        "overdue": "Überfällig",
-        "dueSoon": "Fällig in 7 Tagen",
-        "open": "Offen"
-      },
-      "empty": {
-        "new": "Seit dem letzten Arbeitstag ist nichts eingegangen.",
-        "overdue": "Nichts überfällig.",
-        "dueSoon": "In den nächsten 7 Tagen wird nichts fällig.",
-        "open": "Alles bezahlt."
-      },
-      "noVendor": "Unbekannter Lieferant"
+      "empty": "Keine offenen Eingangsrechnungen.",
+      "noVendor": "Unbekannter Lieferant",
+      "sumLabel": "Offene Eingangsrechnungen",
+      "create": "Eingangsrechnung erfassen"
     },
     "kpis": {
       "subtitle": "netto",
@@ -1777,7 +1854,17 @@
       "loadError": "Die Zahlen konnten nicht geladen werden."
     },
     "loadError": "Die Rechnungen konnten nicht geladen werden.",
-    "nothingVisible": "Für dieses Konto ist in diesem Bereich nichts freigeschaltet."
+    "nothingVisible": "Für dieses Konto ist in diesem Bereich nichts freigeschaltet.",
+    "due": {
+      "overdue_one": "{{count}} Tag überfällig",
+      "overdue_other": "{{count}} Tage überfällig",
+      "today": "Heute fällig",
+      "tomorrow": "Morgen fällig",
+      "soon_one": "Fällig in {{count}} Tag",
+      "soon_other": "Fällig in {{count}} Tagen",
+      "open": "Offen",
+      "draft": "Entwurf"
+    }
   },
   "orderContacts": {
     "title": "Beteiligte",
@@ -1905,11 +1992,6 @@
       "replyTo": "Antwort an",
       "senderAddress": "rechnungen@bautakt.com"
     },
-    "footer": {
-      "office": "Sitz",
-      "directors": "Geschäftsführer",
-      "missing": "{{field}} fehlt"
-    },
     "template": {
       "invoice": {
         "subject": "Rechnung {{number}} von {{company}}",
@@ -1934,15 +2016,25 @@
       "subject": "Bitte einen Betreff angeben.",
       "text": "Bitte eine Nachricht angeben.",
       "codes": {
-        "not_available": "Der E-Mail-Versand ist noch nicht eingerichtet. Der Beleg bleibt unverändert.",
         "recipient_not_allowed": "Im Testmodus gehen Mails nur an freigegebene Testadressen. Diese Adresse ist nicht freigegeben.",
         "legal_footer_incomplete": "Es fehlen Pflichtangaben deines Betriebs für die Fußzeile. Bitte in den Einstellungen ergänzen.",
         "send_limit_exceeded": "Das Versandlimit deines Betriebs ist erreicht. Bitte später noch einmal versuchen.",
         "mail_not_configured": "Der E-Mail-Versand ist für deinen Betrieb noch nicht eingerichtet.",
         "provider_failed": "Der Mail-Dienst hat die E-Mail nicht angenommen. Bitte später noch einmal versuchen.",
         "forbidden": "Du darfst Belege nicht versenden.",
-        "unknown": "Unbekannter Fehler. Bitte noch einmal versuchen."
+        "unknown": "Unbekannter Fehler. Bitte noch einmal versuchen.",
+        "provider_outcome_unknown": "Unklar, ob die E-Mail angekommen ist. Frag beim Empfänger nach, bevor du sie noch einmal sendest.",
+        "send_in_progress": "Die E-Mail wird gerade versendet. Bitte einen Moment warten.",
+        "idempotency_conflict": "Die Bestätigung passt nicht mehr zu dieser E-Mail. Bitte zurück und die Vorschau neu öffnen.",
+        "invalid_request": "Die E-Mail konnte so nicht versendet werden. Bitte Empfänger, Betreff und Text prüfen."
       }
+    },
+    "previewLoading": "Vorschau wird erstellt …",
+    "previewError": "Die Vorschau konnte nicht erstellt werden.",
+    "result": {
+      "sent": "E-Mail an {{to}} versendet",
+      "dryRun": "Probelauf: Die E-Mail wurde geprüft und archiviert, aber nicht verschickt.",
+      "bookkeepingFailed": "Der Beleg konnte danach nicht als versendet markiert werden. Bitte „Als versendet markieren“ nutzen."
     }
   },
   "mailSettings": {

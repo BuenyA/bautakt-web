@@ -27,6 +27,13 @@ export const invoiceFromOrderParam = 'auftrag';
 /** Query von `/rechnungen/neu?gutschrift=…`: Gutschrift zu dieser Rechnung. */
 export const creditNoteFromParam = 'gutschrift';
 
+/**
+ * Query, der auf der Belegseite den Versanddialog öffnet (`?versenden=1`),
+ * etwa nach „Festschreiben und danach versenden“ (#186). Die Seite entfernt
+ * ihn danach.
+ */
+export const sendParam = 'versenden';
+
 export const routes = {
   // Oeffentlich. Impressum und Datenschutz liegen ausserhalb der
   // Auth-Guards, damit sie ohne Sitzung und auch angemeldet erreichbar sind.
@@ -57,6 +64,7 @@ export const routes = {
   quoteNew: '/angebote/neu',
   invoices: '/rechnungen/ausgang',
   invoice: (id: string) => `/rechnungen/${id}`,
+  invoiceSend: (id: string) => `/rechnungen/${id}?${sendParam}=1`,
   invoiceNew: '/rechnungen/neu',
   /** Neue Rechnung mit Kunde und Positionen eines Auftrags (`?auftrag=`). */
   invoiceNewFromOrder: (orderId: string) =>
@@ -69,8 +77,13 @@ export const routes = {
   receivables: '/offene-posten',
   /** Eingangsrechnungen und sonstige Ausgaben (zwei Register). */
   expenses: '/rechnungen/eingang',
+  /** Eingangsrechnung erfassen bzw. öffnen: eigene Seite wie der Rechnungs-Editor. */
+  incomingInvoiceNew: '/rechnungen/eingang/neu',
+  incomingInvoice: (id: string) => `/rechnungen/eingang/${id}`,
   dunning: '/mahnwesen',
   reports: '/auswertungen',
+  /** Buchungsstapel und Belege eines Monats für die Steuerberatung (#169). */
+  datevExport: '/rechnungen/datev-export',
 
   // Team — Hub `/personal`, Verzeichnis bleibt `/mitarbeiter`.
   personalHub: '/personal',

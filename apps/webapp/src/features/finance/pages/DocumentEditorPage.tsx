@@ -605,7 +605,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       ? routes.invoice(state.parentDocumentId)
       : state.type === 'quote'
         ? routes.quotes
-        : routes.invoices;
+        : routes.financeHub;
 
   async function onSaveDraft() {
     setError(null);
@@ -630,7 +630,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
     setConfirmRelease(true);
   }
 
-  async function onConfirmRelease() {
+  async function onConfirmRelease(sendAfter: boolean) {
     // Der Dialog lässt nur mit aktueller Vorschau bestätigen.
     const expectedFingerprint = live.fingerprint;
     if (!expectedFingerprint) {
@@ -655,7 +655,8 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
           description: t('domain:editor.release.originalDiffersDescription'),
         });
       else toast.success(t('domain:invoices.finalizeSuccess', { number: documentNumber }));
-      leaveTo(routes.invoice(savedId));
+      // Ohne Archiv-Original gibt es nichts zu versenden; die Warnung steht oben.
+      leaveTo(sendAfter && archived ? routes.invoiceSend(savedId) : routes.invoice(savedId));
     } catch (error) {
       setConfirmRelease(false);
       if (error instanceof PreviewMismatchError && savedId) {
@@ -1240,7 +1241,7 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
         pending={busy === 'release'}
         preview={releasePreview}
         datevDocumentId={dirty ? null : documentId}
-        onConfirm={() => void onConfirmRelease()}
+        onConfirm={(sendAfter) => void onConfirmRelease(sendAfter)}
         onClose={() => setConfirmRelease(false)}
       />
 

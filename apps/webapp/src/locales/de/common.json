@@ -55,12 +55,13 @@
     "toggleSidebar": "Seitenleiste ein- oder ausblenden",
     "collapseSidebar": "Seitenleiste einklappen",
     "expandSidebar": "Seitenleiste ausklappen",
+    "sidebarShortcut": "Strg+B",
     "overview": "Übersicht",
     "finance": "Rechnungen",
     "material": "Material",
     "orders": "Aufträge",
     "assignments": "Einsatzplanung",
-    "calendar": "Kalender",
+    "calendar": "Mein Kalender",
     "quotes": "Angebote",
     "invoices": "Rechnungen",
     "receivables": "Offene Posten",
@@ -93,7 +94,8 @@
         "incoming": "Eingangsrechnungen",
         "quotes": "Angebote",
         "dunning": "Mahnwesen",
-        "reports": "Auswertungen"
+        "reports": "Auswertungen",
+        "datevExport": "DATEV-Export"
       }
     },
     "personal": {

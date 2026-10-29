@@ -36,6 +36,8 @@ const MESSAGES: Record<string, string> = {
   // Archivfelder und Löschen eines festgeschriebenen Belegs.
   DOCUMENT_IMMUTABLE:
     'Dieser Beleg ist festgeschrieben und lässt sich nicht mehr ändern oder löschen. Korrigieren kannst du ihn nur noch per Storno.',
+  // Entwurf speichern (bautakt-app 20261028210000_a_save_draft_rpc).
+  DRAFT_NOT_FOUND: 'Diesen Entwurf gibt es nicht mehr. Bitte lade die Seite neu.',
   DOCUMENT_FINALIZE_VIA_RPC:
     'Ein Beleg wird nur über „Freigeben“ ausgestellt. Bitte lade die Seite neu und versuche es noch einmal.',
   // Storno (bautakt-app 20261016215235_a_cancel_sales_document).
@@ -70,6 +72,11 @@ const MESSAGES: Record<string, string> = {
   contact_bank_accounts_contact_id_iban_key: 'Diese IBAN ist bei dem Kontakt schon hinterlegt.',
   contacts_name_required: 'Bitte einen Namen angeben.',
   MERGE_INVALID: 'Diese beiden Kontakte lassen sich nicht zusammenführen.',
+  // Eingangsrechnungen (enforce_incoming_invoice_retention, bautakt-web#161).
+  RETAINED_RECEIPT:
+    'Erfasste Eingangsrechnungen sind aufbewahrungspflichtig: nicht löschbar, nicht zurück zum Entwurf, das Original bleibt.',
+  INCOMING_FILE_SERVER_ONLY:
+    'Die Originaldatei legt nur der Server ab. Bitte die Datei über „Hochladen“ hinzufügen.',
   CONTACT_IN_USE:
     'Der Kontakt hängt noch an Aufträgen oder Belegen. Archiviere ihn stattdessen – dann verschwindet er aus Listen und Auswahlfeldern.',
 };

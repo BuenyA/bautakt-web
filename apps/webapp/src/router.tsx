@@ -18,10 +18,12 @@ import { ContactDetailPage } from '@/features/contacts/pages/ContactDetailPage';
 import { ContactsListPage } from '@/features/contacts/pages/ContactsListPage';
 import { LegacyCustomerRedirect } from '@/features/contacts/pages/LegacyCustomerRedirect';
 import { LegacyExpensesRedirect } from '@/features/finance/LegacyExpensesRedirect';
+import { DatevExportPage } from '@/features/finance/pages/DatevExportPage';
 import { DocumentEditorPage } from '@/features/finance/pages/DocumentEditorPage';
 import { DunningPage } from '@/features/finance/pages/DunningPage';
 import { ExpensesPage } from '@/features/finance/pages/ExpensesPage';
 import { FinanceOverviewPage } from '@/features/finance/pages/FinanceOverviewPage';
+import { IncomingInvoicePage } from '@/features/finance/pages/IncomingInvoicePage';
 import { InvoiceDetailPage } from '@/features/finance/pages/InvoiceDetailPage';
 import { InvoicePrintPage } from '@/features/finance/pages/InvoicePrintPage';
 import { InvoicesListPage } from '@/features/finance/pages/InvoicesListPage';
@@ -142,6 +144,22 @@ export const appRoutes: RouteObject[] = [
                 ),
               },
               {
+                path: routes.incomingInvoiceNew,
+                element: (
+                  <RequirePermission anyOf={['canManageOverheadCosts']}>
+                    <IncomingInvoicePage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.incomingInvoice(':id'),
+                element: (
+                  <RequirePermission anyOf={['canManageOverheadCosts']}>
+                    <IncomingInvoicePage />
+                  </RequirePermission>
+                ),
+              },
+              {
                 path: routes.dunning,
                 element: (
                   <RequirePermission anyOf={['canUseBillingModule', 'canViewCompanyFinance']}>
@@ -154,6 +172,20 @@ export const appRoutes: RouteObject[] = [
                 element: (
                   <RequirePermission anyOf={['canViewCompanyFinance']}>
                     <ReportsPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.datevExport,
+                element: (
+                  <RequirePermission
+                    anyOf={[
+                      'canUseBillingModule',
+                      'canViewCompanyFinance',
+                      'canViewManagementInvoices',
+                    ]}
+                  >
+                    <DatevExportPage />
                   </RequirePermission>
                 ),
               },

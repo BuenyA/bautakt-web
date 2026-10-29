@@ -1,6 +1,5 @@
 import {
   AppItem,
-  Avatar,
   Button,
   Hamburger,
   makeStyles,
@@ -30,9 +29,9 @@ import {
   Settings20Regular,
   SignOut20Regular,
 } from '@fluentui/react-icons';
-import { useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useLocation } from 'react-router';
+import { matchPath, Outlet, useLocation } from 'react-router';
 
 import { type Theme } from '@/app/ThemeContext';
 import { useTheme } from '@/app/useTheme';
@@ -43,13 +42,29 @@ import { useMyProfile } from '@/features/auth/useMyProfile';
 import { useMembership } from '@/features/company/useMembership';
 import { useProfileImageUrls } from '@/features/team/useProfileImageUrls';
 import { LEGAL_PAGES, type LegalPageId, legalPath } from '@/lib/legal';
-import { HOME_ROUTE } from '@/lib/routes';
+import { HOME_ROUTE, routes } from '@/lib/routes';
 
 import { calendarNavItem, isNavActive, maySee, navItems, settingsNavItem } from './navItems';
 import { NotificationsBell } from './NotificationsBell';
 import { QuickSearch } from './QuickSearch';
 import { SidebarNavItem } from './SidebarNav';
+import {
+  RAIL_WIDTH,
+  SIDEBAR_DURATION,
+  SIDEBAR_EASE,
+  SIDEBAR_INSET,
+  useSidebarStyles,
+} from './sidebarStyles';
 import { useMediaQuery } from './useMediaQuery';
+
+/** Größe des Umschalters. */
+const TOGGLE_SIZE = 32;
+/** Höhe der Kopfzeile der Leiste (Signet-Zeile). */
+const HEAD_HEIGHT = 56;
+/** Eingeklappt: Zeile unter dem Signet mit Ausklappen und Trennlinie. */
+const RAIL_ROW_HEIGHT = TOGGLE_SIZE + 8 + 1 + 8;
+/** Mitte der ersten Zeile (Signet), auf Höhe der Kopfzeile rechts daneben. */
+const HEAD_CENTER = 28;
 
 const COOKIE = 'bautakt_sidebar_state';
 
@@ -64,83 +79,143 @@ function writeExpanded(expanded: boolean) {
 }
 
 /**
- * Fluents `NavDrawer` mit seinen eigenen Farben und Abständen. Eigene Regeln
- * gibt es nur für die eingeklappte Icon-Leiste: Fluent setzt die Breite des
- * Drawers fest auf 260 px, eine schmale Variante kennt er nicht.
+ * Beleg-Editoren (neue Rechnung, neues Angebot, Rechnung bearbeiten,
+ * Eingangsrechnung) brauchen
+ * die Breite: Dort fährt die Leiste ein. Wer sie aufklappt, tut das nur für
+ * diesen Besuch — der gespeicherte Zustand bleibt, und nach dem Editor gilt
+ * wieder, wie die Leiste vorher stand.
+ */
+const EDITOR_PATHS = [
+  routes.invoiceNew,
+  routes.quoteNew,
+  routes.invoiceEdit(':id'),
+  routes.incomingInvoiceNew,
+  routes.incomingInvoice(':id'),
+];
+
+function isEditorPath(pathname: string): boolean {
+  return EDITOR_PATHS.some((path) => matchPath(path, pathname) !== null);
+}
+
+/**
+ * Fluents `NavDrawer` mit seinen eigenen Farben. Fluent setzt die Breite fest
+ * auf 260 px und kennt keine schmale Variante; die Icon-Leiste und die Bewegung
+ * dazwischen kommen von hier und aus `sidebarStyles`.
  */
 const useStyles = makeStyles({
   drawer: {
     height: '100%',
+    // `clip` statt `hidden`: abgeschnitten, aber nie gescrollt — auch nicht,
+    // wenn der Browser einen fokussierten, verdeckten Knopf ins Bild holen will.
+    overflow: 'clip',
   },
   rail: {
-    width: '68px',
-    minWidth: '68px',
+    width: `${RAIL_WIDTH}px`,
   },
-  // Eingeklappt: kein seitliches Polster, die Einträge stehen als 44-px-Quadrate
-  // mittig. Fluents Body hat links 10 und rechts 4 px Einzug; mit diesem Versatz
-  // saß jedes Icon links in seiner Hover-Fläche.
-  railItems: {
-    paddingInline: 0,
-    alignItems: 'center',
-  },
-  railItem: {
-    width: '44px',
-    minWidth: '44px',
-    paddingInline: 0,
-    justifyContent: 'center',
-    marginInline: 'auto',
-    overflow: 'visible',
-    // Fluents Auswahl-Balken (`::after`) sitzt mit festem Versatz im Eintrag.
-    // Im 44-px-Quadrat landete er im Icon; hier steht er links außerhalb, am
-    // Rand der Leiste wie im ausgeklappten Zustand (Eintrag 12 px vom Rand).
-    '::after': {
-      left: '-8px',
-      marginInlineStart: 0,
-    },
-  },
-  // Kopf der Leiste: Signet und Name links, Einklappen rechts, eine Zeile.
+  // Kopf: Signet und Name. Eingeklappt bleibt nur das Signet sichtbar, der
+  // Name liegt abgeschnitten rechts davon.
   header: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     gap: tokens.spacingHorizontalXS,
-    paddingInlineStart: '10px',
-    paddingInlineEnd: tokens.spacingHorizontalS,
+    // Fluent setzt `paddingInlineStart: 14px` und `paddingBlock: 5px` eigens;
+    // dieselben Schlüssel hier, damit sie überschrieben werden.
+    paddingInlineStart: `${SIDEBAR_INSET}px`,
+    // Rechts Platz für den Umschalter, der über dem Kopf liegt.
+    paddingInlineEnd: `${SIDEBAR_INSET + TOGGLE_SIZE + 4}px`,
     paddingBlock: tokens.spacingVerticalS,
+    overflow: 'clip',
   },
-  headerRail: {
-    flexDirection: 'column',
-    paddingInline: 0,
-    gap: tokens.spacingVerticalXS,
-  },
+  // Signet 24 px mit 10 px Einzug: Mitte auf der Mittellinie der Icon-Leiste.
   appItem: {
-    flexGrow: 1,
-    minWidth: 0,
-  },
-  // Fluents Footer hat kein Polster; dieselben Einzüge wie der Body (10 / 4 px),
-  // damit „Kalender“ mit den übrigen Einträgen fluchtet, und Luft nach unten.
-  footer: {
+    // Fluent rückt das `AppItem` um −6 px ein; hier sitzt es bündig im Kopf.
+    marginInlineStart: 0,
+    flex: '1 0 44px',
+    minWidth: '44px',
     paddingInlineStart: '10px',
-    paddingInlineEnd: '4px',
-    paddingBottom: tokens.spacingVerticalM,
-    gap: tokens.spacingVerticalXS,
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    // Eingeklappt ist der Eintrag genau 44 px breit; ohne das würde das
+    // 24-px-Signet zugunsten von Abstand und Innenrand gestaucht.
+    '& .fui-AppItem__icon': {
+      flexShrink: 0,
+    },
   },
+  // Ein- und Ausklappen: ein Knopf für beide Zustände. Ausgeklappt steht er
+  // rechts im Kopf; eingeklappt gleitet er unter das Signet. Er liegt über dem
+  // Drawer, damit er beim Umschalten derselbe bleibt (Fokus, Bewegung).
+  toggle: {
+    position: 'absolute',
+    insetInlineEnd: `${SIDEBAR_INSET}px`,
+    top: `${HEAD_CENTER - TOGGLE_SIZE / 2}px`,
+    width: `${TOGGLE_SIZE}px`,
+    minWidth: `${TOGGLE_SIZE}px`,
+    height: `${TOGGLE_SIZE}px`,
+    padding: 0,
+    transitionProperty: 'inset-inline-end, top',
+    transitionDuration: SIDEBAR_DURATION,
+    transitionTimingFunction: SIDEBAR_EASE,
+    '@media (prefers-reduced-motion: reduce)': {
+      transitionDuration: '0.01ms',
+    },
+  },
+  // Mitte auf der Mittellinie der Icon-Leiste, direkt unter dem Signet.
+  toggleInRail: {
+    insetInlineEnd: `${(RAIL_WIDTH - TOGGLE_SIZE) / 2}px`,
+    top: `${HEAD_HEIGHT}px`,
+  },
+  // Platz für das Ausklappen samt Trennlinie darunter; wächst beim Einklappen
+  // auf, damit die Einträge weich nach unten rutschen statt zu springen.
+  railRow: {
+    flexShrink: 0,
+    height: 0,
+    overflow: 'hidden',
+    display: 'flex',
+    alignItems: 'flex-end',
+    paddingInline: `${SIDEBAR_INSET}px`,
+    transitionProperty: 'height',
+    transitionDuration: SIDEBAR_DURATION,
+    transitionTimingFunction: SIDEBAR_EASE,
+    '@media (prefers-reduced-motion: reduce)': {
+      transitionDuration: '0.01ms',
+    },
+  },
+  railRowOpen: {
+    height: `${RAIL_ROW_HEIGHT}px`,
+  },
+  // Gleicher Abstand über und unter der Linie (8 px).
+  railDivider: {
+    flexGrow: 1,
+    marginBottom: tokens.spacingVerticalS,
+    height: tokens.strokeWidthThin,
+    backgroundColor: tokens.colorNeutralStroke2,
+  },
+  body: {
+    paddingInline: `${SIDEBAR_INSET}px`,
+    // Beim Schmalerwerden steht Inhalt kurz seitlich über; ohne das blitzte
+    // unten im Body ein Scrollbalken auf.
+    overflowX: 'hidden',
+  },
+  footer: {
+    // Kurzform wie im Kopf, sonst gewinnt Fluents `padding: 0`.
+    padding: `0 ${SIDEBAR_INSET}px ${tokens.spacingVerticalM}`,
+    gap: tokens.spacingVerticalXS,
+    overflow: 'clip',
+  },
+  // Ein Knopf für beide Zustände. Avatar 32 px, 5 px Einzug plus 1 px Rand:
+  // Mitte auf der Mittellinie der Icon-Leiste.
   personaButton: {
     width: '100%',
+    minWidth: 0,
     maxWidth: 'none',
     justifyContent: 'flex-start',
     paddingBlock: tokens.spacingVerticalS,
-    paddingInline: tokens.spacingHorizontalS,
+    paddingInlineStart: '5px',
+    paddingInlineEnd: tokens.spacingHorizontalS,
     minHeight: '48px',
-  },
-  // Avatar als Inhalt, nicht als Icon: der Icon-Slot ist 20 px und schnitt den
-  // 32-px-Kreis links und rechts ab.
-  railButton: {
-    minWidth: 'auto',
-    width: '44px',
-    height: '44px',
-    padding: 0,
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
   },
 });
 
@@ -166,6 +241,7 @@ function LegalMenuLink({ page, onNavigate }: { page: LegalPageId; onNavigate?: (
 function UserMenu({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: () => void }) {
   const { t } = useTranslation();
   const styles = useStyles();
+  const sidebar = useSidebarStyles();
   const { signOut, user } = useAuth();
   const settingsLink = useRouterLink(settingsNavItem.to);
   const { data: membership } = useMembership();
@@ -186,15 +262,16 @@ function UserMenu({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: 
     color: 'brand' as const,
   };
 
-  const trigger = collapsed ? (
-    <Button appearance="subtle" className={styles.railButton} aria-label={email}>
-      <Avatar {...avatar} size={32} />
-    </Button>
-  ) : (
-    <Button appearance="subtle" className={styles.personaButton}>
+  const labelClass = mergeClasses(sidebar.label, collapsed && sidebar.labelHidden);
+  const trigger = (
+    <Button
+      appearance="subtle"
+      className={styles.personaButton}
+      aria-label={collapsed ? email : undefined}
+    >
       <Persona
-        name={company || email}
-        secondaryText={company ? email : undefined}
+        primaryText={{ children: company || email, className: labelClass }}
+        secondaryText={company ? { children: email, className: labelClass } : undefined}
         avatar={avatar}
         size="medium"
         textAlignment="center"
@@ -211,15 +288,7 @@ function UserMenu({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: 
         if (data.name === 'theme' && data.checkedItems[0]) setTheme(data.checkedItems[0] as Theme);
       }}
     >
-      <MenuTrigger disableButtonEnhancement>
-        {collapsed ? (
-          <Tooltip content={email} relationship="description" positioning="after">
-            {trigger}
-          </Tooltip>
-        ) : (
-          trigger
-        )}
-      </MenuTrigger>
+      <MenuTrigger disableButtonEnhancement>{trigger}</MenuTrigger>
       <MenuPopover>
         <MenuList>
           <MenuGroup>
@@ -277,6 +346,7 @@ function AppTitle({
   className?: string;
 }) {
   const { t } = useTranslation();
+  const sidebar = useSidebarStyles();
   const link = useRouterLink(HOME_ROUTE);
   const name = t('common:app.name');
   return (
@@ -288,10 +358,9 @@ function AppTitle({
         onNavigate?.();
       }}
       icon={<BautaktSignet className="size-6" />}
-      aria-label={collapsed ? name : undefined}
       className={className}
     >
-      {collapsed ? null : name}
+      <span className={mergeClasses(sidebar.label, collapsed && sidebar.labelHidden)}>{name}</span>
     </AppItem>
   );
 }
@@ -299,9 +368,9 @@ function AppTitle({
 /**
  * Rahmen der angemeldeten App: Seitenleiste, Kopfzeile, Inhalt.
  *
- * Kopf der Leiste in einer Zeile: Signet und Name (`AppItem`) links, rechts
- * das Einklapp-Symbol. Desktop: Drawer inline, einklappbar auf eine
- * Icon-Leiste, Zustand im Cookie. Unter 768 px: Overlay, geöffnet über den
+ * Kopf der Leiste: Signet und Name (`AppItem`), rechts das Einklappen.
+ * Desktop: Drawer inline, einklappbar auf eine Icon-Leiste; eingeklappt sitzt
+ * das Ausklappen unter dem Signet, darunter eine Trennlinie. Dazu Strg+B. Zustand im Cookie. Unter 768 px: Overlay, geöffnet über den
  * Hamburger in der Kopfzeile, schließt nach dem Navigieren. Die Kopfzeile
  * trägt die Schnellsuche und die Glocke.
  */
@@ -311,26 +380,61 @@ export function AppShell() {
   const { data: membership } = useMembership();
   const { pathname } = useLocation();
   const isMobile = useMediaQuery('(max-width: 767px)');
-  const [expanded, setExpanded] = useState(readExpanded);
+  const [savedExpanded, setSavedExpanded] = useState(readExpanded);
+  const inEditor = isEditorPath(pathname);
+  // Im Editor eigener Zustand, bei jedem Betreten wieder eingefahren.
+  const [editorExpanded, setEditorExpanded] = useState(false);
+  const [wasInEditor, setWasInEditor] = useState(inEditor);
+  if (inEditor !== wasInEditor) {
+    setWasInEditor(inEditor);
+    setEditorExpanded(false);
+  }
+  const expanded = inEditor ? editorExpanded : savedExpanded;
   const [mobileOpen, setMobileOpen] = useState(false);
+  const sidebar = useSidebarStyles();
 
   const collapsed = !isMobile && !expanded;
   const visible = navItems.filter((item) => maySee(item, membership?.permissions));
   const selected = [...visible, calendarNavItem].find((item) => isNavActive(pathname, item))?.to;
   const closeMobile = isMobile ? () => setMobileOpen(false) : undefined;
   const toggleLabel = t('common:nav.toggleSidebar');
-  const collapseLabel = collapsed ? t('common:nav.expandSidebar') : t('common:nav.collapseSidebar');
+  const toggleAction = t(collapsed ? 'common:nav.expandSidebar' : 'common:nav.collapseSidebar');
 
   function toggle() {
     if (isMobile) {
       setMobileOpen((open) => !open);
       return;
     }
-    setExpanded((current) => {
-      writeExpanded(!current);
-      return !current;
-    });
+    setDesktopExpanded(!expanded);
   }
+
+  function setDesktopExpanded(next: boolean) {
+    if (inEditor) {
+      setEditorExpanded(next);
+      return;
+    }
+    setSavedExpanded(next);
+    writeExpanded(next);
+  }
+
+  const toggleByShortcut = useEffectEvent(() => setDesktopExpanded(!expanded));
+
+  // Strg+B (Mac: ⌘B) klappt die Leiste um, wie in VS Code. Nicht in
+  // Eingabefeldern, dort kann es „fett“ heißen.
+  useEffect(() => {
+    if (isMobile) return;
+    function onKey(event: KeyboardEvent) {
+      if (!(event.ctrlKey || event.metaKey) || event.shiftKey || event.altKey) return;
+      if (event.key.toLowerCase() !== 'b') return;
+      if ((event.target as HTMLElement | null)?.closest('input, textarea, [contenteditable]')) {
+        return;
+      }
+      event.preventDefault();
+      toggleByShortcut();
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isMobile]);
 
   const drawer = (
     <NavDrawer
@@ -338,43 +442,34 @@ export function AppShell() {
       open={isMobile ? mobileOpen : true}
       onOpenChange={(_, data) => setMobileOpen(data.open)}
       selectedValue={selected ?? ''}
-      className={mergeClasses(styles.drawer, collapsed && styles.rail)}
+      className={mergeClasses(
+        styles.drawer,
+        !isMobile && sidebar.drawerMotion,
+        collapsed && styles.rail,
+      )}
     >
-      <NavDrawerHeader className={mergeClasses(styles.header, collapsed && styles.headerRail)}>
-        <AppTitle
-          collapsed={collapsed}
-          onNavigate={closeMobile}
-          className={collapsed ? styles.railItem : styles.appItem}
-        />
-        <Tooltip content={collapseLabel} relationship="label" positioning="after">
-          <Button
-            appearance="subtle"
-            icon={collapsed ? <PanelLeftExpand20Regular /> : <PanelLeftContract20Regular />}
-            onClick={toggle}
-            aria-expanded={isMobile ? mobileOpen : expanded}
-          />
-        </Tooltip>
+      <NavDrawerHeader className={styles.header}>
+        <AppTitle collapsed={collapsed} onNavigate={closeMobile} className={styles.appItem} />
       </NavDrawerHeader>
+      {isMobile ? null : (
+        <div className={mergeClasses(styles.railRow, collapsed && styles.railRowOpen)}>
+          <div className={styles.railDivider} />
+        </div>
+      )}
 
-      <NavDrawerBody className={collapsed ? styles.railItems : undefined}>
+      <NavDrawerBody className={styles.body}>
         {visible.map((item) => (
           <SidebarNavItem
             key={item.to}
             item={item}
             collapsed={collapsed}
             onNavigate={closeMobile}
-            className={collapsed ? styles.railItem : undefined}
           />
         ))}
       </NavDrawerBody>
 
-      <NavDrawerFooter className={mergeClasses(styles.footer, collapsed && styles.railItems)}>
-        <SidebarNavItem
-          item={calendarNavItem}
-          collapsed={collapsed}
-          onNavigate={closeMobile}
-          className={collapsed ? styles.railItem : undefined}
-        />
+      <NavDrawerFooter className={styles.footer}>
+        <SidebarNavItem item={calendarNavItem} collapsed={collapsed} onNavigate={closeMobile} />
         <NavDivider />
         <UserMenu collapsed={collapsed} onNavigate={closeMobile} />
       </NavDrawerFooter>
@@ -383,10 +478,31 @@ export function AppShell() {
 
   return (
     <div className="flex min-h-svh">
-      {isMobile ? drawer : <div className="sticky top-0 h-svh shrink-0">{drawer}</div>}
+      {isMobile ? (
+        drawer
+      ) : (
+        <div className="sticky top-0 h-svh shrink-0">
+          {drawer}
+          <Tooltip
+            content={`${toggleAction} (${t('common:nav.sidebarShortcut')})`}
+            relationship="description"
+            positioning="after"
+          >
+            <Button
+              appearance="subtle"
+              icon={collapsed ? <PanelLeftExpand20Regular /> : <PanelLeftContract20Regular />}
+              onClick={toggle}
+              aria-label={toggleAction}
+              aria-expanded={expanded}
+              aria-keyshortcuts="Control+B"
+              className={mergeClasses(styles.toggle, collapsed && styles.toggleInRail)}
+            />
+          </Tooltip>
+        </div>
+      )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="border-border bg-background sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b px-4 sm:px-6">
+        <header className="border-border bg-canvas sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b px-4 sm:px-6">
           {isMobile ? (
             <Hamburger onClick={toggle} aria-label={toggleLabel} aria-expanded={mobileOpen} />
           ) : null}

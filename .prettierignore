@@ -13,3 +13,7 @@ packages/supabase/src/database.types.ts
 # Rechtstexte wörtlich lassen. Prettier würde Zeilenumbrüche im Adressblock umbrechen.
 apps/webapp/src/content/legal/impressum.md
 apps/webapp/src/content/legal/datenschutz.md
+
+# Wörtliche Kopie aus bautakt-app (Deno-Stil), Abgleich per `npm run check:sync`
+packages/document-render/src/core
+packages/document-render/golden

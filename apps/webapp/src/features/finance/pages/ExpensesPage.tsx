@@ -1,16 +1,19 @@
 import { daysBetween, eurosToMinor, formatMoney, todayIso } from '@bautakt/finance';
-import { cn, DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
+import { cn, DataTable, type DataTableColumn, StatusBadge, type StatusTone } from '@bautakt/ui';
 import { Button, Text } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
+import { routes } from '@/lib/routes';
 
 import { isEInvoiceIncoming } from '../archiveFiles';
 import { EInvoiceBadge } from '../EInvoiceBadge';
@@ -34,6 +37,7 @@ import {
 export function ExpensesPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
+  const navigate = useNavigate();
 
   const canManage = usePermission('canManageOverheadCosts');
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -74,6 +78,17 @@ export function ExpensesPage() {
         accessorKey: 'due_date',
         header: t('domain:expenses.columns.due'),
         cell: ({ row }) => <DueCell dueDate={row.original.due_date} status={row.original.status} />,
+      },
+      {
+        accessorKey: 'status',
+        header: t('domain:incomingInvoiceForm.status'),
+        cell: ({ row }) => (
+          <StatusBadge tone={STATUS_TONE[row.original.status] ?? 'neutral'}>
+            {t(`domain:incomingInvoiceStatus.${row.original.status}`, {
+              defaultValue: row.original.status,
+            })}
+          </StatusBadge>
+        ),
       },
       {
         accessorKey: 'gross_total',
@@ -132,9 +147,14 @@ export function ExpensesPage() {
         description={t('domain:expenses.description')}
         actions={
           canManage ? (
-            <Button appearance="primary" onClick={() => setSheetOpen(true)} icon={<AddRegular />}>
-              {t('domain:expenseForm.title')}
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button onClick={() => setSheetOpen(true)} icon={<AddRegular />}>
+                {t('domain:expenseForm.title')}
+              </Button>
+              <LinkButton appearance="primary" to={routes.incomingInvoiceNew} icon={<AddRegular />}>
+                {t('domain:incomingInvoiceForm.title')}
+              </LinkButton>
+            </div>
           ) : null
         }
       />
@@ -147,6 +167,9 @@ export function ExpensesPage() {
             isLoading={isLoading}
             labels={labels}
             exportFileName="eingangsrechnungen"
+            onRowClick={
+              canManage ? (row) => void navigate(routes.incomingInvoice(row.id)) : undefined
+            }
             empty={
               <EmptyState
                 title={t('domain:expenses.emptyIncomingTitle')}
@@ -179,6 +202,14 @@ export function ExpensesPage() {
     </div>
   );
 }
+
+const STATUS_TONE: Record<string, StatusTone> = {
+  draft: 'outline',
+  open: 'brand',
+  partially_paid: 'warning',
+  paid: 'success',
+  overdue: 'danger',
+};
 
 /** Faellig, bald faellig oder ueberfaellig — bezahlt ist neutral. */
 function DueCell({ dueDate, status }: { dueDate: string | null; status: string }) {

@@ -6,17 +6,14 @@ import {
 } from '@bautakt/finance';
 import { SkeletonBlock, toast } from '@bautakt/ui';
 import {
-  Body1Strong,
   Button,
   Card,
   CardHeader,
   makeStyles,
   mergeClasses,
   Text,
-  tokens,
 } from '@fluentui/react-components';
 import {
-  CheckmarkCircle48Regular,
   CheckmarkRegular,
   ChevronRightRegular,
   DismissRegular,
@@ -37,8 +34,8 @@ import { routes } from '@/lib/routes';
 import type { Deadline, ExpiringExemption } from '../today';
 import type { OverviewAbsence } from '../useTodayData';
 import { MemberAvatar } from './CrewAvatars';
-import { DashboardEmptyState } from './DashboardEmptyState';
-import { COLUMN_SCROLL } from './layout';
+import { DashboardEmptyIcon, DashboardEmptyState, EMPTY_ICON_SIZE } from './DashboardEmptyState';
+import { COLUMN_FILL_SCROLL } from './layout';
 
 const useStyles = makeStyles({
   // Die Karte ist in der Zeile so hoch wie der Einsatzplan. Der Körper füllt
@@ -51,10 +48,6 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     flexGrow: 1,
     minHeight: 0,
-  },
-  // Umriss in der Erfolgsfarbe, 48 px wie der Kreis im Einsatzplan.
-  doneIcon: {
-    color: tokens.colorStatusSuccessForeground1,
   },
 });
 
@@ -107,13 +100,17 @@ export function TodoPanel({
         }
       />
 
-      <div className={mergeClasses(COLUMN_SCROLL, styles.body)}>
+      <div className={mergeClasses(COLUMN_FILL_SCROLL, styles.body)}>
         {isLoading ? (
           <SkeletonBlock className="h-48 w-full" />
         ) : isEmpty ? (
           <DashboardEmptyState
-            icon={<CheckmarkCircle48Regular className={styles.doneIcon} aria-hidden />}
-            title={<Body1Strong>{t('domain:overview.todo.emptyTitle')}</Body1Strong>}
+            icon={
+              <DashboardEmptyIcon>
+                <CheckmarkRegular fontSize={EMPTY_ICON_SIZE / 2} aria-hidden />
+              </DashboardEmptyIcon>
+            }
+            title={t('domain:overview.todo.emptyTitle')}
             description={t('domain:overview.todo.emptyHint')}
           />
         ) : (

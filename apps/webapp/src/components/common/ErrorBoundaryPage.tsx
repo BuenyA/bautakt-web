@@ -8,7 +8,7 @@ export function ErrorBoundaryPage() {
   const error = useRouteError();
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background p-6 text-center">
+    <div className="flex min-h-svh flex-col items-center justify-center gap-4 bg-canvas p-6 text-center">
       <h1 className="text-2xl font-semibold tracking-tight">{t('errors:boundary.title')}</h1>
       <p className="text-muted-foreground">{t('errors:boundary.description')}</p>
       {import.meta.env.DEV && error instanceof Error ? (
