@@ -12,7 +12,7 @@ Bünyamin Aydemir, Geschäftsführer
 
 ## Kontakt
 
-Telefon: {{TELEFON}}
+Telefon: +49 160 92093832
 E-Mail: [support@bautakt.com](mailto:support@bautakt.com)
 
 ## Registereintrag

@@ -77,7 +77,8 @@ describe('Rechtsseiten ohne Sitzung', () => {
 
     expect(imprint).toContain('Impressum');
     expect(imprint).toContain('Zur Anmeldung');
-    expect(imprint).toContain('{{TELEFON}}');
+    expect(imprint).toContain('Telefon:');
+    expect(imprint).not.toContain('{{TELEFON}}');
     expect(imprint).toContain('<br');
     expect(imprint).not.toContain('Melde dich mit deinem Bautakt-Konto');
     expect(imprint).not.toContain('{{ANSCHRIFT}}');

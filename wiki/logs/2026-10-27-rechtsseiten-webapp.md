@@ -9,8 +9,8 @@ auch mit Sitzung. Sie sind Geschwister der Auth-Guards, nicht deren Kinder
 Der Wortlaut steht nur in `apps/webapp/src/content/legal/impressum.md` und
 `datenschutz.md`. Gezeichnet wird er mit `react-markdown`, `remark-gfm` und
 `remark-breaks` (`MarkdownDocument.tsx`): Tabellen, fette Stellen, Listen,
-und ein einfacher Zeilenumbruch bleibt eine Zeile. `{{TELEFON}}` bleibt im
-Quelltext und erscheint als Hinweis-Badge. https- und mailto-Links öffnen in
+und ein einfacher Zeilenumbruch bleibt eine Zeile. Die Telefonnummer steht
+im Impressum. https- und mailto-Links öffnen in
 einem neuen Tab mit `rel="noopener noreferrer"`. Die Tabelle sitzt in
 `overflow-x-auto`.
 
@@ -24,7 +24,7 @@ Die Marketing-App ist unverändert. `apps/webapp/vercel.json` hatte den
 Catch-all schon.
 
 Der Wortlaut der beiden Markdown-Dateien ist 1:1 der gelieferte Text.
-`{{TELEFON}}` bleibt der offene Platzhalter im Impressum. Abschnitt 8
+Die Telefonnummer ist im Impressum eingesetzt. Abschnitt 8
 zählt die Speichereinträge in einer eigenen Tabelle, Abschnitt 9 die
 Dienstleister. Die Tabellen sind `w-full` und brechen um; `overflow-x-auto`
 ist nur der Fallback, wenn die Breite unter die Mindestbreite fällt.
