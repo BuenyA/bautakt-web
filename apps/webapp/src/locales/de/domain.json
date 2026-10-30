@@ -25,7 +25,8 @@
     "listTitle": "Aufträge",
     "listDescription": "Aufträge meines Betriebs.",
     "detailTitle": "Auftrag",
-    "detailDescription": "Stammdaten und Status.",
+    "sectionsLabel": "Bereiche des Auftrags",
+    "overviewTab": "Übersicht",
     "filtersLabel": "Auftragsstatus",
     "filterAll": "Alle",
     "filterRunning": "Laufend",
@@ -44,10 +45,12 @@
       "address": "Adresse",
       "start": "Beginn",
       "end": "Ende",
+      "period": "Zeitraum",
       "contractSum": "Auftragssumme",
       "costCenter": "Kostenstelle",
       "country": "Land",
-      "created": "Angelegt"
+      "created": "Angelegt",
+      "description": "Beschreibung"
     },
     "noCustomer": "Kein Kunde",
     "noDate": "Kein Datum",
@@ -162,7 +165,17 @@
       "saved": "Auftrag gespeichert.",
       "saveError": "Auftrag konnte nicht gespeichert werden."
     },
-    "createInvoice": "Rechnung erstellen"
+    "createInvoice": "Rechnung erstellen",
+    "preview": {
+      "showAll": "Alle anzeigen",
+      "masterData": "Stammdaten",
+      "loadError": "Konnte nicht geladen werden.",
+      "newNote": "Neue Notiz",
+      "newMaterial": "Material erfassen",
+      "newReport": "Neuer Bericht",
+      "checklistDone": "Alle Punkte erledigt.",
+      "reportNoText": "Ohne Beschreibung"
+    }
   },
   "contactKind": {
     "company": "Firma",

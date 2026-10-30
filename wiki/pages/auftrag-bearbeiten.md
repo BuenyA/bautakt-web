@@ -104,4 +104,4 @@ Die Mutation invalidiert `['orders', companyId]`. Liste
 - `apps/webapp/src/features/orders/OrderSheet.tsx`
 - `apps/webapp/src/features/orders/orderEdit.ts`
 - `apps/webapp/src/features/orders/useUpdateOrder.ts`
-- `apps/webapp/src/features/orders/pages/OrderDetailPage.tsx`
+- `apps/webapp/src/features/orders/pages/OrderDetailLayout.tsx`

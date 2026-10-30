@@ -129,7 +129,7 @@ export function OrderContacts({ orderId }: { orderId: string }) {
   const list = contacts.data ?? [];
 
   return (
-    <div className="max-w-3xl">
+    <div>
       <SectionCard
         title={t('domain:orderContacts.title')}
         description={t('domain:orderContacts.description')}

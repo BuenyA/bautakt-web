@@ -6,7 +6,8 @@ privaten Bucket `order-images`. Die Anzeige läuft weiter über signierte URLs.
 
 ## Was die Seite tut
 
-`OrderPhotos` steht unter der Stammdatenkarte auf `OrderDetailPage`. Vier
+`OrderPhotos` ist die Unterseite `/auftraege/:id/fotos`; die Übersicht zeigt
+nur eine Vorschau (siehe [auftragsseite.md](auftragsseite.md)). Vier
 Zustände: Skelett beim Laden, Fehler mit „Erneut versuchen“, leerer Hinweis,
 Raster der Vorschaubilder. Ein Klick öffnet das Bild in einem Dialog. Die
 Kacheln sind weiche Cards (`rounded-xl`, `bg-card`, `shadow-sm`); das Raster

@@ -6,6 +6,7 @@ import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useAuth } from '@/features/auth/useAuth';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { useMembership } from '@/features/company/useMembership';
@@ -26,7 +27,7 @@ const SKELETON_COUNT = 2;
 const quantityFormatter = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 4 });
 
 /**
- * Material unter den Stammdaten eines Auftrags, unter den Zeiten.
+ * Material eines Auftrags, Unterseite `/auftraege/:id/material`.
  *
  * Anlegen, Bearbeiten und Löschen laufen über ein Seitenpanel. Wer weder
  * erfassen noch Aufträge verwalten darf, sieht die Liste nur. Abgerechnete
@@ -42,6 +43,8 @@ export function OrderMaterials({ orderId }: { orderId: string }) {
   // Katalog beim Öffnen leer und die Artikelauswahl zeigt nichts Vorbelegtes.
   useArticles({ enabled: canCreate || canManage });
   const [draft, setDraft] = useState<OrderMaterialDraft | null>(null);
+  // „Neu“ auf der Auftragsübersicht führt mit `?neu=1` hierher.
+  useCreateFromUrl(canCreate, () => openNew());
   const materials = useOrderMaterials(orderId);
   const { data, isError, refetch } = materials;
   const isLoading = useCompanyListLoading(materials);

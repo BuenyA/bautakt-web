@@ -30,7 +30,7 @@ import { type OrderPhoto, useOrderImages } from './useOrderImages';
 const SKELETON_COUNT = 4;
 
 /**
- * Fotos unter den Stammdaten eines Auftrags.
+ * Fotos eines Auftrags, Unterseite `/auftraege/:id/fotos`.
  *
  * Hochladen mit `canTakePhotos`. Löschen der eigenen Fotos mit demselben
  * Recht, aller Fotos mit `canManageOrders`. Die Datenbank bleibt die Grenze.
