@@ -133,7 +133,7 @@ nicht Helvetica.
   Layout, Standard- und Archiv-Markierung; „Neue Vorlage“ aus Voreinstellung
   (Spahrbau, leerer Briefbogen, Bautakt-Standard). Die erste Vorlage wird automatisch
   Standard. Menü je Vorlage: als Standard verwenden, archivieren/wiederherstellen.
-- **Vorlage bearbeiten** (`/einstellungen/rechnungsvorlagen/:id`,
+- **Vorlage bearbeiten** (`/unternehmen/rechnungsvorlage/:id`,
   `InvoiceTemplatePage.tsx`): links Grundlagen, Gestaltung, Brief, Fußzeile, Texte je
   Belegart; rechts ein Beispielbeleg (Abschlag, Schlussrechnung, Gutschrift, Rechnung),
   live aus dem ungespeicherten Formular im Web Worker gerendert
@@ -153,7 +153,7 @@ nicht Helvetica.
 2. Firmendaten des Demo-Betriebs: Logo als **PNG** (SVG kann der Renderer nicht
    einbetten), Telefon `07147 / 2750-0`, E-Mail, Hauptbank KSK Ludwigsburg,
    Steuernummer, Registergericht „Amtsgericht Stuttgart“, HRB 290382, Geschäftsführer.
-3. Einrichtung → Rechnungsvorlagen → Neue Vorlage → Briefbogen „Spahrbau“.
+3. Unternehmen → Rechnungsvorlage → Vorlagen → Neue Vorlage → Briefbogen „Spahrbau“.
 4. Neuer Beleg: Abschlagsrechnung, Betreff „BV: NB EFH, …“, eine Position
    „1. Abschlagszahlung - Baustelleneinrichtung“.
 

@@ -1,4 +1,4 @@
-import type { CompanyCountry } from '@/features/settings/companyValidation';
+import type { CompanyCountry } from '@/features/companySettings/companyValidation';
 import { supabase } from '@/lib/supabase';
 
 /**

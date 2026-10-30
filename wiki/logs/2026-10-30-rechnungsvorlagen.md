@@ -11,7 +11,7 @@ Belege (Abschlags-, Schlussrechnung, Gutschrift) und das Logo als SVG.
   (`template.ts`, `letterhead.ts`), Vorlage im Bündel der Function.
 - Hier: Kopie des Kerns per `npm run sync` (zwei neue Kern-Dateien in
   `scripts/sync.mjs`), Karte „Rechnungsvorlagen“ in der Einrichtung, Seite
-  `/einstellungen/rechnungsvorlagen/:id` mit Live-Vorschau, Vorlage und
+  `/unternehmen/rechnungsvorlage/:id` mit Live-Vorschau, Vorlage und
   Betreff im Beleg-Editor.
 
 **Warum so**

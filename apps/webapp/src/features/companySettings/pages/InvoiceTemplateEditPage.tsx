@@ -22,8 +22,8 @@ import { useParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { LinkButton } from '@/components/common/LinkButton';
-import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
+import { SubPage } from '@/components/layout/SubNavLayout';
 import { useMembership } from '@/features/company/useMembership';
 import { usePermission } from '@/features/company/usePermission';
 import { PdfViewer } from '@/features/finance/PdfViewer';
@@ -39,10 +39,10 @@ import {
   useInvoiceTemplates,
   useUpdateTemplate,
 } from '../invoiceTemplates';
-import { PREVIEW_TYPES, type PreviewType, useTemplatePreview } from '../useTemplatePreview';
+import { PREVIEW_TYPES, type PreviewType, useTemplatePreview } from '../useLayoutTemplatePreview';
 
 /**
- * Vorlage bearbeiten (`/einstellungen/rechnungsvorlagen/:id`): links die
+ * Vorlage bearbeiten (`/unternehmen/rechnungsvorlage/:id`): links die
  * Einstellungen, rechts ein Beispielbeleg mit genau dieser Vorlage, live aus
  * dem Formular gerendert. Gespeichert wird nur auf Klick.
  *
@@ -50,7 +50,7 @@ import { PREVIEW_TYPES, type PreviewType, useTemplatePreview } from '../useTempl
  * Logo) stehen nicht hier, sondern bleiben in der Einrichtung — eine Vorlage
  * ergänzt sie nur.
  */
-export function InvoiceTemplatePage() {
+export function InvoiceTemplateEditPage() {
   const { t } = useTranslation();
   const { id = '' } = useParams();
   const { data: membership } = useMembership();
@@ -82,7 +82,9 @@ export function InvoiceTemplatePage() {
     return (
       <EmptyState
         title={t('domain:templates.notFound')}
-        action={<LinkButton to={routes.settings}>{t('domain:templates.back')}</LinkButton>}
+        action={
+          <LinkButton to={routes.companyInvoiceTemplate}>{t('domain:templates.back')}</LinkButton>
+        }
       />
     );
   }
@@ -112,27 +114,26 @@ export function InvoiceTemplatePage() {
     set({ texts: { ...form.texts, [textType]: { ...textEntry, ...patch } } });
 
   return (
-    <div className="flex flex-col gap-6">
-      <PageHeader
-        title={form.name || t('domain:templates.untitled')}
-        description={t('domain:templates.editDescription')}
-        actions={
-          <div className="flex gap-2">
-            <LinkButton to={routes.settings}>{t('domain:templates.back')}</LinkButton>
-            {canEdit ? (
-              <Button
-                appearance="primary"
-                disabled={!dirty || nameMissing || colorInvalid || update.isPending}
-                icon={update.isPending ? <Spinner size="tiny" /> : undefined}
-                onClick={() => void save()}
-              >
-                {t('common:action.save')}
-              </Button>
-            ) : null}
-          </div>
-        }
-      />
-
+    <SubPage
+      title={form.name || t('domain:templates.untitled')}
+      description={t('domain:templates.editDescription')}
+      wide
+      actions={
+        <div className="flex gap-2">
+          <LinkButton to={routes.companyInvoiceTemplate}>{t('domain:templates.back')}</LinkButton>
+          {canEdit ? (
+            <Button
+              appearance="primary"
+              disabled={!dirty || nameMissing || colorInvalid || update.isPending}
+              icon={update.isPending ? <Spinner size="tiny" /> : undefined}
+              onClick={() => void save()}
+            >
+              {t('common:action.save')}
+            </Button>
+          ) : null}
+        </div>
+      }
+    >
       <div className="grid gap-6 xl:grid-cols-2">
         <fieldset disabled={!canEdit} className="flex min-w-0 flex-col gap-4">
           <Section title={t('domain:templates.sections.basics')}>
@@ -399,7 +400,7 @@ export function InvoiceTemplatePage() {
           </Text>
         </div>
       </div>
-    </div>
+    </SubPage>
   );
 }
 

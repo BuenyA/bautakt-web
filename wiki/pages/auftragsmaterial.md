@@ -40,7 +40,7 @@ Die Einheit ist frei; leer wird `Stk.`, der Spalten-Default. Die Notiz darf
 leer sein. Ein Icon-Picker gibt es nicht.
 
 Der Katalog ist nur die Auswahl. `useArticles` ist dieselbe Abfrage wie
-`/katalog`. Inaktive Artikel fehlen, außer die Zeile hängt schon an einem.
+`/unternehmen/katalog`. Inaktive Artikel fehlen, außer die Zeile hängt schon an einem.
 Bei der Wahl werden Einheit, Einkaufspreis und Verkaufspreis aus dem Artikel
 übernommen. Ein leerer Verkaufspreis lässt das Feld leer: die Rechnung nimmt
 dann den Einkaufspreis (`unit_price ?? unit_cost` im Line-Generator der

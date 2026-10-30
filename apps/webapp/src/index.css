@@ -30,3 +30,14 @@
     -webkit-print-color-adjust: exact;
   }
 }
+
+/**
+ * Hinweise unter Formularfeldern in Fließtextgröße (14 statt Fluents 12 px).
+ * Gilt in den Abschnitten von Mein Profil, Unternehmen und Einstellungen
+ * (`SubPage`); dem Owner war 12 px zu klein zum Lesen (2026-10-30). Zwei
+ * Klassen schlagen Griffels eine atomare Klasse.
+ */
+.bautakt-readable .fui-Field__hint {
+  font-size: var(--fontSizeBase300);
+  line-height: var(--lineHeightBase300);
+}

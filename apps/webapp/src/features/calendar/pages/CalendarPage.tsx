@@ -116,7 +116,7 @@ function rangeLabel(view: View, dayIso: string, days: readonly string[]): string
     month: '2-digit',
     year: 'numeric',
   });
-  return `${short.format(parseIsoDay(days[0]))} – ${long.format(parseIsoDay(days[6]))}`;
+  return `${short.format(parseIsoDay(days[0]))} bis ${long.format(parseIsoDay(days[6]))}`;
 }
 
 /**

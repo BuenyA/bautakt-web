@@ -1,0 +1,189 @@
+{
+  "menu": {
+    "profile": "Mein Profil",
+    "company": "Unternehmen",
+    "settings": "Einstellungen"
+  },
+  "switch": {
+    "title": "Meine Unternehmen",
+    "short": "Wechseln",
+    "unnamed": "Ohne Namen",
+    "join": "Unternehmen beitreten …",
+    "create": "Neues Unternehmen anlegen",
+    "error": "Das Unternehmen konnte nicht gewechselt werden."
+  },
+  "join": {
+    "title": "Unternehmen beitreten",
+    "description": "Gib den Einladungscode ein, den du vom Unternehmen bekommen hast. Ein Einladungslink funktioniert auch.",
+    "code": "Einladungscode oder -link",
+    "placeholder": "z. B. 3f9a-12bc-7e40-d915",
+    "invalid": "Das ist kein gültiger Einladungscode.",
+    "submit": "Beitreten",
+    "success": "Du bist dem Unternehmen beigetreten.",
+    "error": "Beitreten hat nicht geklappt."
+  },
+  "profile": {
+    "title": "Mein Profil",
+    "navLabel": "Bereiche meines Profils",
+    "groupAccount": "Konto",
+    "groupSupport": "Hilfe & Rechtliches",
+    "nav": {
+      "personal": "Persönliche Daten",
+      "account": "Konto & Sicherheit",
+      "language": "Sprache",
+      "help": "Hilfe & Feedback",
+      "legal": "Rechtliches"
+    }
+  },
+  "personal": {
+    "title": "Persönliche Daten",
+    "description": "Mein Name und mein Profilbild, so wie mein Team sie sieht.",
+    "photo": "Profilbild",
+    "photoHint": "Erscheint in der Seitenleiste, in der Einsatzplanung und bei meinen Kollegen.",
+    "changePhoto": "Profilbild ändern",
+    "uploadPhoto": "Bild hochladen",
+    "replacePhoto": "Anderes Bild wählen",
+    "removePhoto": "Profilbild entfernen",
+    "photoSaved": "Profilbild gespeichert",
+    "photoRemoved": "Profilbild entfernt",
+    "photoError": "Das Profilbild konnte nicht gespeichert werden.",
+    "name": "Name und Geburtstag",
+    "nameHint": "Der Name steht in Zeiten, Bautagebüchern und Belegen.",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "birthday": "Geburtsdatum",
+    "birthdayHint": "Freiwillig.",
+    "errors": {
+      "firstName": "Mindestens 2 Zeichen.",
+      "lastName": "Mindestens 2 Zeichen."
+    }
+  },
+  "security": {
+    "title": "Konto & Sicherheit",
+    "description": "Wie ich mich anmelde und wo ich Mitglied bin.",
+    "email": "E-Mail-Adresse",
+    "emailHint": "Mit dieser Adresse meldest du dich an. Nach der Änderung bekommst du eine Mail zur Bestätigung.",
+    "currentEmail": "Aktuell:",
+    "newEmail": "Neue E-Mail-Adresse",
+    "emailSame": "Das ist schon deine aktuelle Adresse.",
+    "changeEmail": "E-Mail ändern",
+    "emailSent": "Bestätigungsmail verschickt",
+    "emailPending": "Bitte bestätige die Änderung über den Link, den wir an {{email}} geschickt haben. Bis dahin gilt die bisherige Adresse.",
+    "emailError": "Die E-Mail-Adresse konnte nicht geändert werden.",
+    "password": "Passwort",
+    "passwordHint": "Mindestens {{count}} Zeichen. Danach gilt es auf allen Geräten.",
+    "newPassword": "Neues Passwort",
+    "confirmPassword": "Neues Passwort wiederholen",
+    "changePassword": "Passwort ändern",
+    "passwordSaved": "Passwort geändert",
+    "passwordError": "Das Passwort konnte nicht geändert werden.",
+    "membership": "Mitgliedschaft",
+    "membershipHint": "Das Unternehmen, in dem du gerade arbeitest. Wechseln kannst du unten links über den Firmennamen.",
+    "memberOf": "{{name}} · {{role}}",
+    "leave": "Unternehmen verlassen",
+    "leaveTitle": "{{name}} verlassen?",
+    "leaveText": "Du verlierst den Zugriff auf Aufträge, Zeiten und Belege dieses Unternehmens. Deine erfassten Zeiten bleiben dort erhalten. Zurück kommst du nur mit einer neuen Einladung.",
+    "left": "Du hast {{name}} verlassen.",
+    "leaveError": "Du konntest das Unternehmen nicht verlassen.",
+    "leaveLastOwner": "Du bist der letzte Geschäftsführer. Ernenne zuerst jemand anderen oder lösche das Unternehmen.",
+    "deleteAccount": "Konto löschen",
+    "deleteAccountHint": "Dein Konto lässt sich derzeit nicht direkt löschen. Schreib uns kurz, dann löschen wir es und bestätigen dir das.",
+    "deleteProfile": "Dein Profil und deine persönlichen Daten werden gelöscht.",
+    "deleteMemberships": "Deine Verknüpfungen zu Unternehmen werden entfernt.",
+    "deleteRetention": "Belege und Zeiterfassungen mit gesetzlicher Aufbewahrungsfrist werden anonymisiert statt gelöscht.",
+    "deleteRequest": "Löschung per E-Mail anfragen",
+    "deleteDirect": "Oder schreib direkt an",
+    "deleteMailSubject": "Löschung meines Bautakt-Kontos",
+    "deleteMailBody": "Hallo,\n\nbitte löscht mein Bautakt-Konto.\n\nKonto: {{account}}\n\nViele Grüße"
+  },
+  "language": {
+    "title": "Sprache",
+    "description": "In welcher Sprache Bautakt mit mir spricht.",
+    "available": "Verfügbare Sprachen",
+    "webNote": "Die Auswahl gilt für die Handy-App und für Push-Nachrichten. Die Web-App gibt es vorerst nur auf Deutsch.",
+    "saved": "Sprache gespeichert"
+  },
+  "help": {
+    "title": "Hilfe & Feedback",
+    "description": "Antworten auf häufige Fragen und der direkte Draht zu uns.",
+    "faq": "Häufige Fragen",
+    "questions": {
+      "switchCompany": {
+        "q": "Wie wechsle ich zwischen meinen Unternehmen?",
+        "a": "Klick unten links auf deinen Namen und dann auf den Firmennamen. Dort siehst du alle Unternehmen, in denen du Mitglied bist, und kannst eines beitreten oder neu anlegen."
+      },
+      "invite": {
+        "q": "Wie hole ich Mitarbeiter in mein Unternehmen?",
+        "a": "Unter Mitarbeiter → Mitarbeiter hinzufügen erzeugst du einen QR-Code oder Einladungscode. Den geben deine Mitarbeiter in der App oder hier im Web ein."
+      },
+      "password": {
+        "q": "Wo ändere ich mein Passwort?",
+        "a": "Unter Mein Profil → Konto & Sicherheit. Hast du dein Passwort vergessen, nutze auf der Anmeldeseite „Passwort vergessen“."
+      },
+      "invoiceLogo": {
+        "q": "Wie kommt mein Logo auf die Rechnung?",
+        "a": "Unter Unternehmen → Rechnungsvorlage lädst du das Logo hoch und wählst Farbe und Texte. Die Vorschau daneben zeigt sofort, wie die Rechnung aussieht."
+      },
+      "roles": {
+        "q": "Wie lege ich fest, wer was sehen darf?",
+        "a": "Unter Unternehmen → Rollen & Berechtigungen legst du die Standardrechte jeder Rolle fest. Abweichungen für einzelne Personen stellst du auf der Seite des Mitarbeiters ein."
+      }
+    },
+    "contact": "Kontakt",
+    "contactHint": "Du hast eine Frage oder brauchst Hilfe? Schreib uns, wir helfen dir gern weiter.",
+    "writeUs": "E-Mail schreiben",
+    "feedback": "Feedback geben",
+    "feedbackHint": "Was gefällt dir, was fehlt, was klemmt? Dein Feedback geht direkt an unser Team.",
+    "category": "Worum geht es?",
+    "categories": {
+      "general": "Allgemein",
+      "improvement": "Verbesserung",
+      "feature": "Funktionswunsch",
+      "bug": "Fehler melden"
+    },
+    "message": "Deine Nachricht",
+    "messagePlaceholder": "Beschreibe dein Anliegen …",
+    "messageShort": "Bitte schreib mindestens {{count}} Zeichen.",
+    "send": "Feedback senden",
+    "feedbackSent": "Danke! Dein Feedback ist angekommen.",
+    "feedbackError": "Dein Feedback konnte nicht gesendet werden."
+  },
+  "legal": {
+    "title": "Rechtliches",
+    "description": "Impressum und Datenschutzhinweise von Bautakt."
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "description": "Wie Bautakt für mich aussieht und wann es sich meldet.",
+    "appearance": {
+      "title": "Darstellung",
+      "hint": "Gilt für diesen Browser. „Wie das System“ folgt der Einstellung deines Geräts."
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "description": "Gilt für mein aktives Unternehmen, im Web und in der App.",
+      "briefing": "Morning Briefing",
+      "briefingLabel": "Meine Tagesübersicht am Morgen",
+      "briefingTime": "Uhrzeit",
+      "briefingTimeHint": "In Viertelstundenschritten.",
+      "quiet": "Ruhezeiten",
+      "quietLabel": "Zwischen 20:00 und 06:00 ohne Ton, die Nachricht kommt am Morgen",
+      "types": "Worüber ich benachrichtigt werde",
+      "categories": {
+        "team": { "label": "Team-Nachrichten", "hint": "Rundnachrichten aus meinem Betrieb" },
+        "schedule": {
+          "label": "Einsatzplanung",
+          "hint": "Wenn ich einer Baustelle zugeteilt werde"
+        },
+        "todos": { "label": "ToDos", "hint": "Zuweisungen und Fälligkeiten meiner Aufgaben" },
+        "orders": { "label": "Baustelle", "hint": "Gemeldete Mängel auf meinen Baustellen" },
+        "absence": {
+          "label": "Fehlzeiten",
+          "hint": "Anträge und Entscheidungen zu Urlaub und Krankheit"
+        },
+        "finance": { "label": "Rechnungen", "hint": "Überfällige Rechnungen und Mahnstufen" }
+      },
+      "saveError": "Die Einstellung konnte nicht gespeichert werden."
+    }
+  }
+}

@@ -55,10 +55,10 @@ import { PageSpinner } from '@/components/common/PageSpinner';
 import { DatePicker } from '@/components/form/dateTime';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { useMembership } from '@/features/company/useMembership';
+import { useInvoiceTemplates } from '@/features/companySettings/invoiceTemplates';
 import { ContactPicker } from '@/features/contacts/ContactPicker';
 import { useContacts } from '@/features/contacts/useContacts';
 import { useOrders } from '@/features/orders/useOrders';
-import { useInvoiceTemplates } from '@/features/settings/invoiceTemplates';
 import { readableDbError } from '@/lib/dbErrors';
 import { creditNoteFromParam, invoiceFromOrderParam, routes } from '@/lib/routes';
 
@@ -326,7 +326,16 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       : initialState(type, defaultTaxMode);
     const ordered = order ? { ...fresh, orderId: order.id, customerId: order.customer_id } : fresh;
     // Standardvorlage samt ihrer Texte für diese Belegart vorbelegen.
-    const start = withTemplate(ordered, null, defaultTemplate ?? null);
+    const templated = withTemplate(ordered, null, defaultTemplate ?? null);
+    // Was die Vorlage offenlässt, füllen Einleitung und Schlusstext aus
+    // Unternehmen → Rechnungsvorlage (nur bei neuen Belegen, nicht bei Gutschriften).
+    const start = parentDocument.data
+      ? templated
+      : {
+          ...templated,
+          introText: templated.introText || (taxProfile.data?.introText ?? ''),
+          footerText: templated.footerText || (taxProfile.data?.footerText ?? ''),
+        };
     if (order) pendingOrderImport.current = order.id;
     setState(start);
     setBaseline(JSON.stringify(start));

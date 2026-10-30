@@ -1,6 +1,6 @@
 # Kostenstellen
 
-`/kostenstellen` listet die Kostenstellen des Betriebs, legt sie an und löscht
+`/unternehmen/kostenstellen` (bis 2026-10-30 `/kostenstellen`, leitet um) listet die Kostenstellen des Betriebs, legt sie an und löscht
 sie, solange kein Auftrag darauf zeigt. Die Seite bleibt hinter
 `canManageCostCenters` (`RequirePermission`). Das blendet die Seite aus und ist
 keine Kontrolle.
