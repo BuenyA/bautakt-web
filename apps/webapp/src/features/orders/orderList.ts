@@ -1,56 +1,36 @@
-/** Art der Auftragsliste. Default ohne Query ist `order`. */
-export type OrderKind = 'order' | 'quote';
+/** Filter der Auftragsliste. Default ohne Query ist `running`. */
+export type OrderFilter = 'all' | 'running' | 'finished';
 
-export type OrderSection = 'running' | 'finished' | 'quotes' | 'declined';
-
-/**
- * `?status=quote` ist der bisherige Angebote-Tab. Alles andere, auch
- * fehlend, ist Aufträge — der Default der Handy-App.
- */
-export function orderKindFromSearch(value: string | null): OrderKind {
-  return value === 'quote' ? 'quote' : 'order';
-}
-
-/**
- * Sektion innerhalb der Art. Die andere Art liefert `null` und fällt
- * aus der Liste.
- *
- * Aufträge: `finished` ist abgeschlossen, jeder andere Status, der kein
- * Angebot und nicht abgelehnt ist, läuft (`active` und Unbekanntes).
- * Angebote: `quote` ist offen, `declined` ist abgelehnt.
- */
-export function orderSection(status: string, kind: OrderKind): OrderSection | null {
-  if (kind === 'quote') {
-    if (status === 'quote') return 'quotes';
-    if (status === 'declined') return 'declined';
-    return null;
-  }
-  if (status === 'quote' || status === 'declined') return null;
-  if (status === 'finished') return 'finished';
-  return 'running';
-}
-
-const SECTION_RANK: Record<OrderSection, number> = {
-  running: 0,
-  finished: 1,
-  quotes: 0,
-  declined: 1,
+/** Wert von `?status=` je Filter. `running` ist der Default und steht nicht in der URL. */
+const FILTER_PARAM: Record<Exclude<OrderFilter, 'running'>, string> = {
+  all: 'alle',
+  finished: 'abgeschlossen',
 };
 
 /**
- * Laufend vor abgeschlossen, offene Angebote vor abgelehnt. Innerhalb
- * der Sektion die neuesten zuerst (`created_at`), wie die Liste bisher
- * und wie „Recent“ in der App.
+ * `?status=alle` und `?status=abgeschlossen` wählen den Filter. Alles
+ * andere, auch fehlend oder der alte Angebote-Link `?status=quote`, ist
+ * Laufend.
  */
-export function compareOrdersForKind<T extends { status: string; created_at: string }>(
-  kind: OrderKind,
-  a: T,
-  b: T,
-): number {
-  const sectionA = orderSection(a.status, kind);
-  const sectionB = orderSection(b.status, kind);
-  const rankA = sectionA === null ? 0 : SECTION_RANK[sectionA];
-  const rankB = sectionB === null ? 0 : SECTION_RANK[sectionB];
-  if (rankA !== rankB) return rankA - rankB;
-  return b.created_at.localeCompare(a.created_at);
+export function orderFilterFromSearch(value: string | null): OrderFilter {
+  if (value === FILTER_PARAM.all) return 'all';
+  if (value === FILTER_PARAM.finished) return 'finished';
+  return 'running';
+}
+
+export function orderFilterParam(filter: OrderFilter): string | null {
+  return filter === 'running' ? null : FILTER_PARAM[filter];
+}
+
+/**
+ * Ob ein Auftrag unter dem Filter erscheint.
+ *
+ * `finished` ist abgeschlossen. `quote` und `declined` stammen aus der
+ * früheren Angebote-Ansicht und stehen nur unter Alle. Jeder andere
+ * Status läuft (`active` und Unbekanntes).
+ */
+export function matchesOrderFilter(status: string, filter: OrderFilter): boolean {
+  if (filter === 'all') return true;
+  if (status === 'quote' || status === 'declined') return false;
+  return (status === 'finished') === (filter === 'finished');
 }
