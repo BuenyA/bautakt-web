@@ -88,15 +88,22 @@ Login-Seite verlinkt `/registrieren` nicht mehr. Die Route und `RegisterPage` bl
 damit ein direkter Aufruf nicht ins Leere fällt. Das Formular wird nicht vorab
 gesperrt; erst die Antwort von `supabase.auth.signUp` wird übersetzt.
 
-`signUp` in `AuthProvider` ruft nur die öffentliche `signUp`-Methode auf und wird nur
-von `RegisterPage` benutzt.
+`signUp` in `AuthProvider` wird nur von `RegisterPage` benutzt. Die Seite fragt
+wie `sign-up.tsx` der App Vorname, Nachname, Geburtsdatum, E-Mail und Passwort ab
+(seit 30.10.2026). Name und Geburtsdatum gehen als `options.data` in die
+`user_metadata`: Mit E-Mail-Bestätigung gibt es nach `signUp` keine Sitzung, und
+`handle_new_user` legt `profiles` nur mit `NULL`-Namen an (gemessen am 30.10.2026
+am Trigger `on_auth_user_created`). `/betrieb-einrichten` schreibt die Werte nach
+der ersten Anmeldung nach `profiles`. Eine leere `identities`-Liste in der Antwort
+heißt „Adresse schon registriert“ und wird als `errors:auth.userAlreadyExists`
+gemeldet — Supabase liefert dafür bei aktiver Bestätigung keinen Fehler.
 
-Mitarbeiter-Einladungen teilen sich diesen Aufruf nicht. Gemessen am 09.10.2026 an
-`accept_employment_invitation(p_token)`: die Funktion verlangt `auth.uid()` und legt
-dann eine Beschäftigung an. Sie erzeugt keinen Auth-Benutzer. Die Web-App ruft sie
-nicht auf. Passwort setzen auf `/passwort-zuruecksetzen` geht über `updateUser`. Der
-Hinweis im Mitarbeiter-Sheet, dass die Einladung in die App über die Handy-App läuft,
-bleibt.
+Mitarbeiter-Einladungen erzeugen keinen Auth-Benutzer:
+`accept_employment_invitation(p_token)` verlangt `auth.uid()` und legt nur die
+Beschäftigung an (SECURITY DEFINER, `authenticated` ja, `anon` nein — gemessen
+30.10.2026 mit `has_function_privilege`). Die Web-App ruft sie auf
+`/betrieb-einrichten` auf, nachdem sich der neue Nutzer registriert und angemeldet
+hat.
 
 ## Betrieb einrichten
 
@@ -106,24 +113,43 @@ umgeleitet wird — sonst sieht ein Reload kurz keine Mitgliedschaft. Ein Fehler
 der Query ist kein leeres Ergebnis: die Seite zeigt „Erneut versuchen“, legt
 aber keine Firma an.
 
-Das Formular sammelt dieselben drei Pflichtwerte wie der Chef-Zweig der App
-(`company-name`, `company-trade`, `company-size`): Betriebsname (mindestens
-zwei Zeichen), Gewerk (Liste oder eigener Text ab zwei Zeichen), Teamgröße
-`solo` / `small` / `medium` / `large`. Angelegt wird über dieselben Aufrufe wie
-`createCompany` mit `setAsPrimary: true`: Firma, bisherige primäre
-Beschäftigung zurücksetzen, Beschäftigung mit Rolle `Geschäftsführer`.
-Adresse, Kontakt und Land gehen als leere Zeichenketten bzw. `DE` mit, wie
-`createCompanyFromDraft`. Seed-RPCs ruft die Oberfläche nicht auf.
+Die Seite ist ein Assistent nach dem Weg der App (`app/index.tsx`,
+`role.tsx`, `company-*.tsx`, `join-company.tsx`, `welcome-team.tsx`),
+`features/company/pages/CompanySetupPage.tsx`:
 
-Danach setzt das Web `profiles.onboarding_complete` auf `true` (in der App der
-Willkommensscreen über die Outbox `profile.onboarding`) und lädt die
-Mitgliedschaft neu. Mit Betrieb ist `/betrieb-einrichten` gesperrt und führt
-auf die Übersicht.
+1. **Über mich** — nur, wenn `profiles` und `user_metadata` zusammen keinen
+   Vornamen, Nachnamen und kein gültiges Geburtsdatum ergeben (Konten von vor
+   dem 30.10.2026 oder aus der App). Regeln wie `validateBirthDate` der App.
+2. **Gründen oder beitreten** (`RoleChoice`). Die Wahl steuert nur den Weg; die
+   Rolle entsteht über `employments`.
+3. **Chef:** Betriebsname (≥ 2 Zeichen), Gewerk (Liste oder eigener Text
+   ≥ 2 Zeichen), Teamgröße `solo` / `small` / `medium` / `large` — dann die
+   **Anschrift** (Straße ≥ 5, PLZ 5 bzw. 4 Ziffern je Land, Ort ≥ 2, Land
+   `DE`/`AT`/`CH`) mit denselben Regeln wie die Karte „Betrieb“ unter
+   Einrichtung. Telefon und E-Mail liegen unter „Weitere Angaben (optional)“
+   und werden nur geprüft, wenn sie gefüllt sind. Hier weicht das Web bewusst
+   von der App ab, die die Anschrift erst über die Einrichtungs-Checkliste
+   holt: ohne Anschrift lässt sich keine Rechnung stellen (Owner-Wunsch
+   30.10.2026).
+   Angelegt wird wie `createCompany` mit `setAsPrimary: true`: Firma,
+   bisherige primäre Beschäftigung zurücksetzen, Beschäftigung mit Rolle
+   `Geschäftsführer`. Seed-RPCs ruft die Oberfläche nicht auf; das tun die
+   Trigger auf `companies`. Ein zweiter Versuch nach einem Fehler hinter dem
+   Firmen-Insert legt keine zweite Firma an (`createdCompanyId`).
+   **Mitarbeiter:** Einladungscode (16 Zeichen, Leerzeichen und Bindestriche
+   egal) oder QR-Code. Erkennung wie `extractInviteToken` der App
+   (`features/company/invitations.ts`, mit Test); der QR der App trägt
+   `bautakt://invite/<token>`. `InviteQrDialog` liest die Kamera über
+   `getUserMedia` und dekodiert mit `jsqr`; ohne Kamera bleibt „Foto
+   hochladen“. Fehlercodes der RPC werden über `errors:invitation.*` übersetzt.
+4. **Willkommen** — „… ist startklar!“ bzw. „Willkommen bei …“.
 
-Profilfoto, Einladung, QR und Sprachwahl gibt es hier nicht. `/registrieren`
-bleibt bei E-Mail und Passwort. Sind `profiles.first_name` oder `last_name`
-leer, fragt die Seite Vorname, Nachname und Geburtsdatum ab (dieselben
-Pflichtregeln wie `validateBirthDate` beim Sign-up der App) und schreibt sie
-vor dem Firmen-Insert nach `profiles`. `language` bleibt unverändert. Das
-Datum wird als `TT.MM.JJJJ` eingegeben, auch als acht Ziffern, und als
-`yyyy-mm-dd` in `birthday` gespeichert.
+Vor Firma oder Beitritt schreibt die Seite Name und Geburtsdatum nach
+`profiles`, falls sie dort fehlen — die RPC lehnt sonst mit `NAME_REQUIRED` ab.
+Danach setzt sie `profiles.onboarding_complete` (in der App der
+Willkommensscreen). ⚠️ Die Mitgliedschafts-Query wird erst auf „Los geht's“
+invalidiert; sonst sähe `MembershipGate` den Betrieb sofort und spränge an der
+Willkommensseite vorbei. Mit Betrieb ist `/betrieb-einrichten` gesperrt und
+führt auf die Übersicht.
+
+Profilfoto und Sprachwahl gibt es im Web nicht.
