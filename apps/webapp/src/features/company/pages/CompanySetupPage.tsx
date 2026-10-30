@@ -377,7 +377,7 @@ export function CompanySetupPage() {
     profile: { title: t('auth:setup.profile.title'), subtitle: t('auth:setup.profile.subtitle') },
     choice: { title: t('auth:setup.choice.title') },
     company: { title: t('auth:setup.company.title') },
-    address: { title: t('auth:setup.address.title'), subtitle: t('auth:setup.address.subtitle') },
+    address: { title: t('auth:setup.address.title') },
     join: { title: t('auth:setup.join.title'), subtitle: t('auth:setup.join.subtitle') },
   };
   const current = heading[step as Exclude<Step, 'welcome'>];

@@ -53,7 +53,8 @@ export function AuthCard({
                   {title}
                 </Text>
               }
-              description={subtitle}
+              // Etwas Luft zwischen Überschrift und Text darunter.
+              description={subtitle ? { children: subtitle, className: 'pt-2' } : undefined}
             />
             <div className="flex flex-col gap-4">{children}</div>
             {footer ? (
