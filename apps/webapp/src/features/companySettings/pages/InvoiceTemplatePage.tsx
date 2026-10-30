@@ -1,39 +1,80 @@
 import { SkeletonBlock, toast } from '@bautakt/ui';
 import {
   Button,
-  ColorSwatch,
+  Card,
+  Dialog,
+  DialogActions,
+  DialogBody,
+  DialogContent,
+  DialogSurface,
+  DialogTitle,
+  Dropdown,
   Field,
   Image,
+  Input,
   makeStyles,
+  Menu,
+  MenuItem,
+  MenuList,
+  MenuPopover,
+  MenuTrigger,
+  MessageBar,
+  MessageBarBody,
+  Option,
   Spinner,
-  SwatchPicker,
+  Switch,
+  Tab,
+  TabList,
   Text,
-  Textarea,
   tokens,
 } from '@fluentui/react-components';
-import { ArrowUpload20Regular, Delete20Regular, Image20Regular } from '@fluentui/react-icons';
-import { type ReactNode, useRef } from 'react';
+import {
+  AddRegular,
+  ArrowUpload20Regular,
+  Delete20Regular,
+  Image20Regular,
+  MoreHorizontalRegular,
+  SaveRegular,
+} from '@fluentui/react-icons';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router';
 
+import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
+import { useReportUnsaved } from '@/components/common/unsavedChanges';
 import { SubPage } from '@/components/layout/SubNavLayout';
+import { useMembership } from '@/features/company/useMembership';
 import { SectionCard } from '@/features/contacts/SectionCard';
 import { PdfViewer } from '@/features/finance/PdfViewer';
 import { readableDbError } from '@/lib/dbErrors';
 import { ImageResizeError } from '@/lib/imageResize';
+import { routes } from '@/lib/routes';
 
 import { useCompanyAccess } from '../companyAccess';
-import { useCardForm, useSave, useUpdateCompany } from '../companyForm';
-import { FormCard } from '../FormCard';
+import { useCompanyLogo, useCompanyLogoUrl } from '../invoiceTemplate';
 import {
-  INVOICE_ACCENTS,
-  normalizeAccent,
-  useCompanyLogo,
-  useCompanyLogoUrl,
-  useTemplatePreview,
-} from '../invoiceTemplate';
-import { InvoiceTemplatesCard } from '../InvoiceTemplatesCard';
+  emptyTemplateForm,
+  formFromTemplate,
+  HEX_COLOR,
+  type InvoiceTemplate,
+  presetForm,
+  type TemplateForm,
+  useArchiveTemplate,
+  useCreateTemplate,
+  useInvoiceTemplates,
+  useSetDefaultTemplate,
+  useUpdateTemplate,
+} from '../invoiceTemplates';
 import { SectionGuard } from '../SectionGuard';
+import { Section, TemplateFields } from '../TemplateFields';
 import { type CompanyRecord, useCompanyRecord } from '../useCompanyRecord';
+import { PREVIEW_TYPES, type PreviewType, useTemplatePreview } from '../useLayoutTemplatePreview';
+
+/** Pfadwert der festen Bautakt-Standardvorlage; sie hat keine Zeile in der Datenbank. */
+const BUILTIN_TEMPLATE = 'bautakt';
+
+const BUILTIN_FORM = emptyTemplateForm('standard');
 
 const useStyles = makeStyles({
   logoBox: {
@@ -42,6 +83,7 @@ const useStyles = makeStyles({
     justifyContent: 'center',
     width: '160px',
     height: '96px',
+    flexShrink: 0,
     borderRadius: tokens.borderRadiusMedium,
     border: `${tokens.strokeWidthThin} dashed ${tokens.colorNeutralStroke1}`,
     // Das Logo steht auf der Rechnung immer auf Weiß.
@@ -49,22 +91,339 @@ const useStyles = makeStyles({
     overflow: 'hidden',
     color: tokens.colorNeutralForeground3,
   },
-  // Standardfarbe: Fluents neutrale Fläche statt eines eigenen Werts.
-  defaultSwatch: {
-    backgroundColor: tokens.colorNeutralBackground3,
-  },
-  preview: {
-    height: '760px',
-    minHeight: 0,
+  picker: {
+    minWidth: '260px',
   },
 });
+
+/**
+ * Rechnungsvorlage (`/unternehmen/rechnungsvorlage[/:id]`): oben die Auswahl
+ * der Vorlage mit „Neue Vorlage“ und „Speichern“, darunter links die
+ * Einstellungen, rechts ein Beispielbeleg mit genau diesem Stand.
+ *
+ * „Bautakt Standard“ ist fest und hat keine Zeile in `invoice_templates`;
+ * er gilt, solange keine eigene Vorlage vorausgewählt ist. Eigene Vorlagen
+ * starten mit den Werten von „Spahrbau“ und lassen sich frei anpassen.
+ */
+export function InvoiceTemplatePage() {
+  const { t } = useTranslation();
+  const { id } = useParams();
+  const access = useCompanyAccess();
+  const templates = useInvoiceTemplates();
+  const company = useCompanyRecord();
+
+  const active = (templates.data ?? []).filter((row) => !row.archived_at);
+  const preselected = active.find((row) => row.is_default) ?? null;
+  const selectedId = id ?? preselected?.id ?? BUILTIN_TEMPLATE;
+  const selected = active.find((row) => row.id === selectedId) ?? null;
+  const missing = selectedId !== BUILTIN_TEMPLATE && !selected;
+
+  return (
+    <SectionGuard allowed={access.invoicing.view}>
+      <SubPage
+        title={t('companySettings:template.title')}
+        description={t('companySettings:template.description')}
+        wide
+      >
+        {templates.isLoading || company.isLoading || !company.data ? (
+          <SkeletonBlock className="h-96 w-full" />
+        ) : missing ? (
+          <EmptyState
+            title={t('domain:templates.notFound')}
+            action={
+              <LinkButton to={routes.companyInvoiceTemplate}>
+                {t('domain:templates.back')}
+              </LinkButton>
+            }
+          />
+        ) : (
+          <TemplateWorkspace
+            // Neuer Formularstand je Vorlage; ein Wechsel mit offenen
+            // Änderungen fragt vorher (UnsavedChangesGuard im Layout).
+            key={selectedId}
+            active={active}
+            selected={selected}
+            company={company.data}
+            canEdit={access.invoicing.edit}
+            canEditLogo={access.invoicing.editLogo}
+          />
+        )}
+      </SubPage>
+    </SectionGuard>
+  );
+}
+
+function TemplateWorkspace({
+  active,
+  selected,
+  company,
+  canEdit,
+  canEditLogo,
+}: {
+  active: InvoiceTemplate[];
+  /** `null`: Bautakt Standard. */
+  selected: InvoiceTemplate | null;
+  company: CompanyRecord;
+  canEdit: boolean;
+  canEditLogo: boolean;
+}) {
+  const { t } = useTranslation();
+  const styles = useStyles();
+  const navigate = useNavigate();
+  const { data: membership } = useMembership();
+  const create = useCreateTemplate();
+  const update = useUpdateTemplate();
+  const setDefault = useSetDefaultTemplate();
+  const archive = useArchiveTemplate();
+
+  const builtin = selected === null;
+  const [saved, setSaved] = useState(() => ({
+    form: selected ? formFromTemplate(selected) : BUILTIN_FORM,
+    preselect: selected ? selected.is_default : !active.some((row) => row.is_default),
+  }));
+  const [form, setForm] = useState<TemplateForm>(saved.form);
+  const [preselect, setPreselect] = useState(saved.preselect);
+  const [previewType, setPreviewType] = useState<PreviewType>('partial_invoice');
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const dirty =
+    preselect !== saved.preselect || JSON.stringify(form) !== JSON.stringify(saved.form);
+  useReportUnsaved(dirty);
+
+  const preview = useTemplatePreview({
+    companyId: membership?.companyId,
+    templateId: selected?.id ?? null,
+    form,
+    type: previewType,
+    logoPath: company.logo_image_url,
+  });
+
+  const set = (patch: Partial<TemplateForm>) => setForm((prev) => ({ ...prev, ...patch }));
+  const nameMissing = !builtin && !form.name.trim();
+  const colorInvalid =
+    form.layout === 'letterhead' &&
+    (!HEX_COLOR.test(form.primaryColor) || !HEX_COLOR.test(form.secondaryColor));
+  const saving = update.isPending || setDefault.isPending;
+
+  const fail = (caught: unknown) =>
+    toast.error(t('domain:settings.saveError'), {
+      description: readableDbError(caught) ?? (caught instanceof Error ? caught.message : ''),
+    });
+
+  const save = async () => {
+    try {
+      if (selected) await update.mutateAsync({ id: selected.id, form });
+      if (preselect !== saved.preselect) {
+        await setDefault.mutateAsync(preselect && selected ? selected.id : null);
+      }
+      setSaved({ form, preselect });
+      toast.success(t('domain:settings.saved'));
+    } catch (caught) {
+      fail(caught);
+    }
+  };
+
+  const createNew = async () => {
+    try {
+      const fresh = { ...presetForm('spahrbau'), name: t('domain:templates.newName') };
+      const newId = await create.mutateAsync({ form: fresh, makeDefault: false });
+      void navigate(routes.invoiceTemplate(newId));
+    } catch (caught) {
+      fail(caught);
+    }
+  };
+
+  const remove = async () => {
+    if (!selected) return;
+    try {
+      await archive.mutateAsync({ id: selected.id, archived: true });
+      setConfirmDelete(false);
+      // Nichts mehr offen, damit der Wechsel nicht nachfragt.
+      setSaved({ form, preselect });
+      toast.success(t('domain:templates.deleted'));
+      void navigate(routes.invoiceTemplate(BUILTIN_TEMPLATE));
+    } catch (caught) {
+      fail(caught);
+    }
+  };
+
+  const labelFor = (row: InvoiceTemplate | null) => {
+    const name = row ? row.name : t('domain:templates.builtin');
+    const isPreselected = row ? row.is_default : !active.some((r) => r.is_default);
+    return isPreselected ? `${name} (${t('domain:templates.preselectedShort')})` : name;
+  };
+  const selectedValue = selected?.id ?? BUILTIN_TEMPLATE;
+
+  return (
+    <div className="flex flex-col gap-4">
+      <Card size="large">
+        <div className="flex flex-wrap items-end gap-3">
+          <Field label={t('domain:templates.pickerLabel')}>
+            <Dropdown
+              className={styles.picker}
+              value={labelFor(selected)}
+              selectedOptions={[selectedValue]}
+              onOptionSelect={(_, data) => {
+                if (data.optionValue && data.optionValue !== selectedValue) {
+                  void navigate(routes.invoiceTemplate(data.optionValue));
+                }
+              }}
+            >
+              <Option value={BUILTIN_TEMPLATE}>{labelFor(null)}</Option>
+              {active.map((row) => (
+                <Option key={row.id} value={row.id}>
+                  {labelFor(row)}
+                </Option>
+              ))}
+            </Dropdown>
+          </Field>
+          {canEdit ? (
+            <Button
+              icon={create.isPending ? <Spinner size="tiny" /> : <AddRegular />}
+              disabled={create.isPending}
+              onClick={() => void createNew()}
+            >
+              {t('domain:templates.new')}
+            </Button>
+          ) : null}
+          {canEdit ? (
+            <div className="ml-auto flex items-center gap-2">
+              {dirty ? (
+                <Text className="text-muted-foreground">{t('domain:templates.unsaved')}</Text>
+              ) : null}
+              {selected ? (
+                <Menu>
+                  <MenuTrigger disableButtonEnhancement>
+                    <Button
+                      appearance="subtle"
+                      icon={<MoreHorizontalRegular />}
+                      aria-label={t('domain:templates.more')}
+                    />
+                  </MenuTrigger>
+                  <MenuPopover>
+                    <MenuList>
+                      {form.layout === 'letterhead' ? (
+                        <MenuItem
+                          onClick={() => set({ ...presetForm('spahrbau'), name: form.name })}
+                        >
+                          {t('domain:templates.applySpahrbau')}
+                        </MenuItem>
+                      ) : null}
+                      <MenuItem onClick={() => setConfirmDelete(true)}>
+                        {t('domain:templates.delete')}
+                      </MenuItem>
+                    </MenuList>
+                  </MenuPopover>
+                </Menu>
+              ) : null}
+              <Button
+                appearance="primary"
+                icon={saving ? <Spinner size="tiny" /> : <SaveRegular />}
+                disabled={!dirty || nameMissing || colorInvalid || saving}
+                onClick={() => void save()}
+              >
+                {t('common:action.save')}
+              </Button>
+            </div>
+          ) : null}
+        </div>
+      </Card>
+
+      <div className="grid items-start gap-4 xl:grid-cols-2">
+        <fieldset disabled={!canEdit} className="flex min-w-0 flex-col gap-4">
+          <Section title={t('domain:templates.sections.basics')}>
+            {builtin ? (
+              <MessageBar intent="info">
+                <MessageBarBody>{t('domain:templates.builtinHint')}</MessageBarBody>
+              </MessageBar>
+            ) : (
+              <Field
+                label={t('domain:templates.fields.name')}
+                required
+                validationMessage={nameMissing ? t('domain:templates.nameRequired') : undefined}
+              >
+                <Input
+                  value={form.name}
+                  maxLength={80}
+                  onChange={(_, d) => set({ name: d.value })}
+                />
+              </Field>
+            )}
+            <Switch
+              checked={preselect}
+              // Bautakt Standard abwählen geht nur, indem eine eigene Vorlage vorausgewählt wird.
+              disabled={builtin && saved.preselect}
+              label={t('domain:templates.fields.preselect')}
+              onChange={(_, d) => setPreselect(d.checked)}
+            />
+            <Text size={200} className="text-muted-foreground">
+              {t('domain:templates.fields.preselectHint')}
+            </Text>
+          </Section>
+
+          <LogoCard key={company.logo_image_url ?? ''} company={company} canEdit={canEditLogo} />
+
+          {builtin ? null : <TemplateFields form={form} set={set} />}
+        </fieldset>
+
+        <div className="flex min-w-0 flex-col gap-3 xl:sticky xl:top-4 xl:h-[calc(100vh-8rem)]">
+          <TabList
+            selectedValue={previewType}
+            onTabSelect={(_, d) => setPreviewType(d.value as PreviewType)}
+            style={{ flexWrap: 'wrap' }}
+          >
+            {PREVIEW_TYPES.map((type) => (
+              <Tab key={type} value={type}>
+                {t(`domain:templates.documentTypes.${type}`)}
+              </Tab>
+            ))}
+          </TabList>
+          {preview.error ? (
+            <MessageBar intent="warning">
+              <MessageBarBody>{t('domain:templates.previewError')}</MessageBarBody>
+            </MessageBar>
+          ) : null}
+          <div className="min-h-[32rem] flex-1">
+            <PdfViewer
+              data={preview.pdf}
+              loading={preview.loading}
+              emptyText={t('domain:templates.previewEmpty')}
+            />
+          </div>
+          <Text size={200} className="text-muted-foreground">
+            {t('domain:templates.previewHint')}
+          </Text>
+        </div>
+      </div>
+
+      <Dialog open={confirmDelete} onOpenChange={(_, d) => setConfirmDelete(d.open)}>
+        <DialogSurface>
+          <DialogBody>
+            <DialogTitle>{t('domain:templates.deleteTitle', { name: form.name })}</DialogTitle>
+            <DialogContent>{t('domain:templates.deleteText')}</DialogContent>
+            <DialogActions>
+              <Button onClick={() => setConfirmDelete(false)}>{t('common:action.cancel')}</Button>
+              <Button
+                appearance="primary"
+                disabled={archive.isPending}
+                onClick={() => void remove()}
+              >
+                {t('domain:templates.delete')}
+              </Button>
+            </DialogActions>
+          </DialogBody>
+        </DialogSurface>
+      </Dialog>
+    </div>
+  );
+}
 
 function LogoCard({ company, canEdit }: { company: CompanyRecord; canEdit: boolean }) {
   const { t } = useTranslation();
   const styles = useStyles();
-  const input = useRef<HTMLInputElement>(null);
   const logo = useCompanyLogo();
   const url = useCompanyLogoUrl(company.logo_image_url);
+  const [input, setInput] = useState<HTMLInputElement | null>(null);
 
   async function change(file: File | null) {
     try {
@@ -99,7 +458,7 @@ function LogoCard({ company, canEdit }: { company: CompanyRecord; canEdit: boole
         {canEdit ? (
           <div className="flex flex-wrap gap-2">
             <input
-              ref={input}
+              ref={setInput}
               type="file"
               accept="image/png,image/jpeg,image/webp"
               hidden
@@ -112,7 +471,7 @@ function LogoCard({ company, canEdit }: { company: CompanyRecord; canEdit: boole
             <Button
               icon={<ArrowUpload20Regular />}
               disabled={logo.isPending}
-              onClick={() => input.current?.click()}
+              onClick={() => input?.click()}
             >
               {t(
                 company.logo_image_url
@@ -138,196 +497,5 @@ function LogoCard({ company, canEdit }: { company: CompanyRecord; canEdit: boole
         )}
       </div>
     </SectionCard>
-  );
-}
-
-function TemplateEditor({
-  company,
-  canEdit,
-  logoCard,
-}: {
-  company: CompanyRecord;
-  canEdit: boolean;
-  logoCard: ReactNode;
-}) {
-  const { t } = useTranslation();
-  const styles = useStyles();
-  const update = useUpdateCompany();
-  const form = useCardForm(
-    {
-      accent: normalizeAccent(company.invoice_accent_color),
-      intro: company.invoice_intro_text ?? '',
-      footer: company.invoice_footer_text ?? '',
-    },
-    () => ({}),
-  );
-  const save = useSave(update, form.reset);
-  const v = form.values;
-  const preview = useTemplatePreview(
-    {
-      accent: v.accent,
-      intro: v.intro,
-      footer: v.footer,
-      paymentTermDays: company.payment_term_days,
-    },
-    company.logo_image_url,
-    {
-      labor: t('companySettings:template.sampleLabor'),
-      material: t('companySettings:template.sampleMaterial'),
-    },
-  );
-
-  return (
-    // Gestapelt so breit wie die anderen Abschnitte; ab 2xl die Vorschau daneben.
-    <div className="grid max-w-3xl items-start gap-4 2xl:max-w-none 2xl:grid-cols-2">
-      <div className="flex min-w-0 flex-col gap-4">
-        {logoCard}
-        <FormCard
-          title={t('companySettings:template.design')}
-          description={t('companySettings:template.designHint')}
-          canEdit={canEdit}
-          dirty={form.dirty}
-          saving={update.isPending}
-          onReset={form.reset}
-          onSave={() =>
-            void save({
-              invoice_accent_color: normalizeAccent(v.accent),
-              invoice_intro_text: v.intro.trim(),
-              invoice_footer_text: v.footer.trim(),
-            })
-          }
-        >
-          <Field label={t('companySettings:template.accent')}>
-            <SwatchPicker
-              aria-label={t('companySettings:template.accent')}
-              selectedValue={v.accent || 'default'}
-              onSelectionChange={(_, data) =>
-                canEdit &&
-                form.set({ accent: data.selectedValue === 'default' ? '' : data.selectedValue })
-              }
-              size="large"
-              shape="rounded"
-            >
-              {INVOICE_ACCENTS.map((accent) =>
-                accent.value ? (
-                  <ColorSwatch
-                    key={accent.key}
-                    value={accent.value}
-                    color={accent.value}
-                    disabled={!canEdit}
-                    aria-label={t(`companySettings:template.accents.${accent.key}`)}
-                  />
-                ) : (
-                  <ColorSwatch
-                    key={accent.key}
-                    value="default"
-                    color="transparent"
-                    className={styles.defaultSwatch}
-                    disabled={!canEdit}
-                    aria-label={t('companySettings:template.accents.default')}
-                  />
-                ),
-              )}
-            </SwatchPicker>
-          </Field>
-          <Text className="text-muted-foreground -mt-2">
-            {t(
-              `companySettings:template.accents.${
-                INVOICE_ACCENTS.find((accent) => accent.value === v.accent)?.key ?? 'default'
-              }`,
-            )}
-          </Text>
-          <Field
-            label={t('companySettings:template.intro')}
-            hint={t('companySettings:template.introHint')}
-          >
-            <Textarea
-              value={v.intro}
-              disabled={!canEdit}
-              resize="vertical"
-              rows={3}
-              maxLength={1000}
-              placeholder={t('companySettings:template.introPlaceholder')}
-              onChange={(_, d) => form.set({ intro: d.value })}
-            />
-          </Field>
-          <Field
-            label={t('companySettings:template.footer')}
-            hint={t('companySettings:template.footerHint')}
-          >
-            <Textarea
-              value={v.footer}
-              disabled={!canEdit}
-              resize="vertical"
-              rows={3}
-              maxLength={1000}
-              placeholder={t('companySettings:template.footerPlaceholder')}
-              onChange={(_, d) => form.set({ footer: d.value })}
-            />
-          </Field>
-        </FormCard>
-      </div>
-
-      <SectionCard
-        title={t('companySettings:template.preview')}
-        description={t('companySettings:template.previewHint')}
-      >
-        <div className={styles.preview}>
-          <PdfViewer
-            data={preview.pdf}
-            loading={preview.rendering}
-            error={preview.error ? t('companySettings:template.previewError') : null}
-            emptyText={t('companySettings:template.previewEmpty')}
-          />
-        </div>
-      </SectionCard>
-    </div>
-  );
-}
-
-/**
- * Rechnungsvorlage: Logo, Akzentfarbe, Einleitung und Schlusstext. Farbe
- * und Texte gelten für neue Belege; freigegebene Belege bleiben, wie sie
- * archiviert sind. Rechts eine Musterrechnung aus demselben Render-Kern wie
- * der Beleg-Editor.
- */
-export function InvoiceTemplatePage() {
-  const { t } = useTranslation();
-  const access = useCompanyAccess();
-  const { data, isLoading } = useCompanyRecord();
-
-  return (
-    <SectionGuard allowed={access.invoicing.view}>
-      <SubPage
-        title={t('companySettings:template.title')}
-        description={t('companySettings:template.description')}
-        wide
-      >
-        {/* Eigene Layouts wie der Briefbogen; ohne Vorlage gilt das Standard-Layout darunter. */}
-        <div className="max-w-3xl">
-          <InvoiceTemplatesCard />
-        </div>
-        {isLoading || !data ? (
-          <SkeletonBlock className="h-96 w-full" />
-        ) : (
-          <TemplateEditor
-            key={JSON.stringify([
-              data.invoice_accent_color,
-              data.invoice_intro_text,
-              data.invoice_footer_text,
-            ])}
-            company={data}
-            canEdit={access.invoicing.edit}
-            logoCard={
-              <LogoCard
-                key={data.logo_image_url ?? ''}
-                company={data}
-                canEdit={access.invoicing.editLogo}
-              />
-            }
-          />
-        )}
-      </SubPage>
-    </SectionGuard>
   );
 }

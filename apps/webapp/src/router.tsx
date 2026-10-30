@@ -26,7 +26,6 @@ import {
 } from '@/features/companySettings/pages/CompanyDataPages';
 import { DeleteCompanyPage } from '@/features/companySettings/pages/DeleteCompanyPage';
 import { DunningSettingsPage } from '@/features/companySettings/pages/DunningSettingsPage';
-import { InvoiceTemplateEditPage } from '@/features/companySettings/pages/InvoiceTemplateEditPage';
 import { InvoiceTemplatePage } from '@/features/companySettings/pages/InvoiceTemplatePage';
 import { NumbersPage } from '@/features/companySettings/pages/NumbersPage';
 import { RatesPage } from '@/features/companySettings/pages/RatesPage';
@@ -322,16 +321,7 @@ export const appRoutes: RouteObject[] = [
                   { path: routes.companyBank, element: <BankPage /> },
                   { path: routes.companyNumbers, element: <NumbersPage /> },
                   { path: routes.companyInvoiceTemplate, element: <InvoiceTemplatePage /> },
-                  {
-                    path: routes.invoiceTemplate(':id'),
-                    element: (
-                      <RequirePermission
-                        anyOf={['canManageCompanySettings', 'canUseBillingModule']}
-                      >
-                        <InvoiceTemplateEditPage />
-                      </RequirePermission>
-                    ),
-                  },
+                  { path: routes.invoiceTemplate(':id'), element: <InvoiceTemplatePage /> },
                   { path: routes.companyDunning, element: <DunningSettingsPage /> },
                   { path: routes.companyRates, element: <RatesPage /> },
                   {

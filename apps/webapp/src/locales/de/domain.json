@@ -2602,47 +2602,21 @@
     }
   },
   "templates": {
-    "title": "Vorlagen",
-    "description": "Eigene Layouts, zum Beispiel ein Briefbogen. Die Standardvorlage gilt für jeden neuen Beleg, im Beleg kann ich eine andere wählen. Ohne Vorlage gilt das Layout mit Akzentfarbe weiter unten.",
     "new": "Neue Vorlage",
-    "presetMenu": {
-      "spahrbau": "Briefbogen „Spahrbau“",
-      "letterhead": "Leerer Briefbogen",
-      "standard": "Bautakt-Standard"
-    },
-    "presets": {
-      "spahrbau": "Spahrbau",
-      "letterhead": "Briefbogen",
-      "standard": "Standard"
-    },
-    "layouts": {
-      "standard": "Bautakt-Standard",
-      "letterhead": "Briefbogen"
-    },
-    "default": "Standard",
-    "archived": "Archiviert",
-    "empty": "Noch keine Vorlage. Meine Belege nutzen das Layout mit Akzentfarbe weiter unten.",
-    "loadError": "Die Vorlagen konnten nicht geladen werden.",
     "more": "Weitere Aktionen",
-    "setDefault": "Als Standard verwenden",
-    "unsetDefault": "Nicht mehr Standard",
-    "archive": "Archivieren",
-    "restore": "Wiederherstellen",
     "notFound": "Diese Vorlage gibt es nicht.",
-    "back": "Zur Einrichtung",
+    "back": "Zur Rechnungsvorlage",
     "untitled": "Vorlage ohne Namen",
-    "editDescription": "Rechnungsvorlage meines Betriebs. Rechts siehst du einen Beispielbeleg mit genau diesen Einstellungen.",
     "nameRequired": "Bitte gib der Vorlage einen Namen.",
     "colorInvalid": "Bitte eine Farbe im Format #RRGGBB angeben.",
-    "standardHint": "Das Bautakt-Standardlayout nutzt Logo, Firmendaten und die Akzentfarbe des Betriebs. Für einen eigenen Briefbogen wähle „Briefbogen“.",
-    "applySpahrbau": "Werte von „Spahrbau“ übernehmen",
+    "applySpahrbau": "Auf Spahrbau-Werte zurücksetzen",
     "logoHint": "Das Logo kommt aus den Firmendaten (PNG oder JPG) und steht im Briefbogen groß oben rechts.",
     "textsHint": "Diese Texte stehen in jedem neuen Beleg der gewählten Art schon drin und lassen sich dort anpassen.",
     "previewHint": "Beispielbeleg mit Musterkunde. Meine echten Belege bleiben unverändert.",
     "previewEmpty": "Die Vorschau wird erstellt …",
     "previewError": "Die Vorschau konnte nicht erstellt werden. Bitte prüfe die Verbindung.",
     "sections": {
-      "basics": "Grundlagen",
+      "basics": "Allgemein",
       "design": "Gestaltung",
       "letter": "Brief",
       "footer": "Fußzeile",
@@ -2686,7 +2660,19 @@
       "title": "Titel im Beleg",
       "titleHint": "Zum Beispiel „Abschlagszahlung“ statt „Abschlagsrechnung“. Leer = Standardtitel.",
       "intro": "Einleitungstext",
-      "footer": "Schlusstext"
-    }
+      "footer": "Schlusstext",
+      "preselect": "In neuen Belegen vorauswählen",
+      "preselectHint": "Im Beleg lässt sich jederzeit eine andere Vorlage wählen."
+    },
+    "pickerLabel": "Vorlage",
+    "builtin": "Bautakt Standard",
+    "builtinHint": "Die Bautakt-Standardvorlage ist fest und lässt sich nicht ändern. Für ein eigenes Layout lege eine neue Vorlage an.",
+    "preselectedShort": "vorausgewählt",
+    "newName": "Neue Vorlage",
+    "unsaved": "Nicht gespeichert",
+    "delete": "Vorlage löschen",
+    "deleted": "Vorlage gelöscht",
+    "deleteTitle": "„{{name}}“ löschen?",
+    "deleteText": "Neue Belege können die Vorlage danach nicht mehr wählen. Bereits erstellte Belege behalten ihr Aussehen."
   }
 }

@@ -129,16 +129,23 @@ nicht Helvetica.
 
 ## 5. Oberfläche (Web)
 
-- **Einrichtung → Karte „Rechnungsvorlagen“** (`InvoiceTemplatesCard.tsx`): Liste mit
-  Layout, Standard- und Archiv-Markierung; „Neue Vorlage“ aus Voreinstellung
-  (Spahrbau, leerer Briefbogen, Bautakt-Standard). Die erste Vorlage wird automatisch
-  Standard. Menü je Vorlage: als Standard verwenden, archivieren/wiederherstellen.
-- **Vorlage bearbeiten** (`/unternehmen/rechnungsvorlage/:id`,
-  `InvoiceTemplatePage.tsx`): links Grundlagen, Gestaltung, Brief, Fußzeile, Texte je
-  Belegart; rechts ein Beispielbeleg (Abschlag, Schlussrechnung, Gutschrift, Rechnung),
-  live aus dem ungespeicherten Formular im Web Worker gerendert
-  (`useTemplatePreview.ts`, gleicher Kern wie die Function). Mit Musterkunde, echte
-  Belege bleiben unberührt.
+- **Unternehmen → Rechnungsvorlage** (`/unternehmen/rechnungsvorlage[/:id]`,
+  `InvoiceTemplatePage.tsx`): eine Seite für alles. Oben ein Auswahlmenü mit allen
+  Vorlagen, „Neue Vorlage“ und ein deutlicher Speichern-Knopf; Löschen und „Auf
+  Spahrbau-Werte zurücksetzen“ im Menü daneben. Darunter links Allgemein (Name,
+  „In neuen Belegen vorauswählen“), Logo und die Felder der Vorlage
+  (`TemplateFields.tsx`), rechts ein Beispielbeleg (Abschlag, Schlussrechnung,
+  Gutschrift, Rechnung), live aus dem ungespeicherten Formular im Web Worker
+  gerendert (`useLayoutTemplatePreview.ts`, gleicher Kern wie die Function).
+- **Bautakt Standard** steht immer als erster Eintrag im Menü, hat keine Zeile in
+  `invoice_templates` und lässt sich nicht bearbeiten. Er gilt, solange keine eigene
+  Vorlage vorausgewählt ist. Eine **neue Vorlage** startet mit den Spahrbau-Werten
+  (Briefbogen) und ist danach frei anpassbar. Löschen archiviert (festgeschriebene
+  Belege verweisen auf die Vorlage).
+- Die frühere Bearbeitung von Akzentfarbe, Einleitung und Schlusstext auf dieser Seite
+  ist entfallen (Wunsch 2026-10-30: der Standard ist fest). Die Spalten auf `companies`
+  bleiben; der Renderer und die App nutzen sie weiter, und vorhandene Texte belegen
+  neue Belege vor, soweit die Vorlage nichts vorgibt.
 - **Beleg-Editor**: Feld „Vorlage“ (nur, wenn es Vorlagen gibt) und
   „Betreff / Bauvorhaben“. Ein neuer Beleg bekommt die Standardvorlage samt ihren
   Texten für die Belegart. Wechsel von Vorlage oder Belegart tauscht Einleitung und
@@ -153,7 +160,8 @@ nicht Helvetica.
 2. Firmendaten des Demo-Betriebs: Logo als **PNG** (SVG kann der Renderer nicht
    einbetten), Telefon `07147 / 2750-0`, E-Mail, Hauptbank KSK Ludwigsburg,
    Steuernummer, Registergericht „Amtsgericht Stuttgart“, HRB 290382, Geschäftsführer.
-3. Unternehmen → Rechnungsvorlage → Vorlagen → Neue Vorlage → Briefbogen „Spahrbau“.
+3. Unternehmen → Rechnungsvorlage → Neue Vorlage (startet mit den Spahrbau-Werten),
+   Namen „Spahrbau“ geben, „In neuen Belegen vorauswählen“ an, Speichern.
 4. Neuer Beleg: Abschlagsrechnung, Betreff „BV: NB EFH, …“, eine Position
    „1. Abschlagszahlung - Baustelleneinrichtung“.
 

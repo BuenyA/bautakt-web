@@ -129,11 +129,15 @@ export function useTemplatePreview({
   templateId,
   form,
   type,
+  logoPath,
 }: {
   companyId: string | null | undefined;
-  templateId: string;
+  /** `null`: die feste Bautakt-Standardvorlage, ohne eigene Vorlage im Bündel. */
+  templateId: string | null;
   form: TemplateForm | null;
   type: PreviewType;
+  /** Nach einem neuen Logo wird das Bündel neu geladen. */
+  logoPath?: string | null;
 }) {
   const [pdf, setPdf] = useState<Uint8Array | null>(null);
   const [loading, setLoading] = useState(false);
@@ -141,6 +145,8 @@ export function useTemplatePreview({
   const bundleRef = useRef<Promise<LoadedBundle> | null>(null);
   const runRef = useRef(0);
   const json = form ? JSON.stringify(form) : null;
+  const bundleKey = `${companyId ?? ''}:${logoPath ?? ''}`;
+  const bundleKeyRef = useRef(bundleKey);
 
   useEffect(() => {
     if (!companyId || !form) return;
@@ -148,6 +154,10 @@ export function useTemplatePreview({
     const timer = window.setTimeout(
       () => {
         const draft = sampleDraft(companyId, type, form);
+        if (bundleKeyRef.current !== bundleKey) {
+          bundleKeyRef.current = bundleKey;
+          bundleRef.current = null;
+        }
         bundleRef.current ??= loadBundle({ document: { company_id: companyId, type }, lines: [] });
         setLoading(true);
         bundleRef.current
@@ -159,7 +169,7 @@ export function useTemplatePreview({
                 customer: SAMPLE_CUSTOMER,
                 parent: { document_number: '2026403', issue_date: '2026-09-25' },
                 credited: SAMPLE_CREDITED,
-                template: rowFromForm(templateId, form),
+                template: templateId ? rowFromForm(templateId, form) : null,
               },
             }),
           )
@@ -182,7 +192,7 @@ export function useTemplatePreview({
     return () => window.clearTimeout(timer);
     // `form` steckt in `json`; ein neues Objekt mit gleichem Inhalt rendert nicht neu.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [companyId, templateId, json, type]);
+  }, [companyId, templateId, json, type, bundleKey]);
 
   return { pdf, loading, error };
 }

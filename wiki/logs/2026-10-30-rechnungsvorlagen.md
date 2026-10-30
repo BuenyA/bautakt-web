@@ -29,3 +29,11 @@ Beleg ohne Logo wurden lokal mit dem Kern gerendert und gegen die Originale
 verglichen. Im Browser gegen die Datenbank erst nach Einspielen der Migration.
 
 Konzept und Einrichtung: [rechnungsvorlagen.md](../pages/rechnungsvorlagen.md).
+
+## Nachtrag: eine Seite statt Liste plus Akzentfarbe
+
+Nach dem ersten Test war die Seite unübersichtlich: Vorlagenliste, Logo und das alte
+Akzentfarben-Formular standen nebeneinander. Jetzt gibt es nur noch ein Auswahlmenü
+(„Bautakt Standard“ fest, darunter die eigenen Vorlagen), „Neue Vorlage“, Speichern,
+links die Felder, rechts die Vorschau. Akzentfarbe, Einleitung und Schlusstext des
+Betriebs sind aus der Web-Oberfläche entfernt.
