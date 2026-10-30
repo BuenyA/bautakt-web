@@ -2147,5 +2147,66 @@
     "replyToHintNoEmail": "Leer lassen, dann gehen Antworten an die E-Mail-Adresse deines Betriebs. Dafür fehlt dort noch eine Adresse.",
     "replyToInvalid": "Bitte eine gültige E-Mail-Adresse angeben.",
     "nothingWritten": "Du darfst die E-Mail-Einstellungen nicht ändern."
+  },
+  "rejectionMail": {
+    "action": "Ablehnungs-Mail senden",
+    "title": "Ablehnung an den Absender schicken",
+    "preparing": "Vorlage und Empfänger werden vorbereitet …",
+    "templateLoadError": "Die Vorlage konnte nicht geladen werden.",
+    "skip": "Überspringen",
+    "testMode": "Mails gehen nur an freigegebene Testadressen. Der Versand an Lieferanten wird erst nach Unterzeichnung von AVV und Pilotvertrag freigeschaltet.",
+    "recipientFrom": {
+      "eInvoice": "Aus der E-Rechnung übernommen.",
+      "contact": "Aus dem Lieferanten-Kontakt übernommen.",
+      "none": "Keine Adresse in E-Rechnung oder Kontakt, bitte eintragen."
+    },
+    "templateBuiltin": "Betreff und Text kommen aus der Standard-Vorlage.",
+    "templateCustom": "Betreff und Text kommen aus der Vorlage deines Betriebs.",
+    "editTemplate": "Vorlage bearbeiten",
+    "confirm": "Ich habe Empfänger, Betreff und Text geprüft.",
+    "bookkeepingFailed": "Die Mail konnte danach nicht ins Protokoll eingetragen werden. Bitte noch einmal senden, sie geht dabei nicht doppelt raus.",
+    "template": {
+      "subject": "Ihre Rechnung {rechnungsnummer} vom {rechnungsdatum}",
+      "body": "Guten Tag,\n\nwir haben Ihre Rechnung {rechnungsnummer} vom {rechnungsdatum} über {betrag} geprüft und können sie leider nicht annehmen.\n\nGrund: {grund}\n\nBitte senden Sie uns eine korrigierte Rechnung.\n\nMit freundlichen Grüßen\n{firma}"
+    },
+    "placeholders": {
+      "rechnungsnummer": "Nummer der Rechnung",
+      "rechnungsdatum": "Datum der Rechnung",
+      "betrag": "Bruttobetrag",
+      "lieferant": "Name des Lieferanten",
+      "grund": "Begründung der Ablehnung",
+      "firma": "Name deines Betriebs"
+    },
+    "templateDialog": {
+      "title": "Vorlage für Ablehnungs-Mails",
+      "text": "Die Vorlage gilt für alle künftigen Ablehnungs-Mails deines Betriebs. Platzhalter in geschweiften Klammern werden beim Versand gefüllt; vor dem Senden siehst du den fertigen Text.",
+      "placeholders": "Platzhalter",
+      "unknown": "Diese Platzhalter gibt es nicht und sie bleiben so im Text stehen: {{names}}",
+      "save": "Vorlage speichern",
+      "reset": "Standard wiederherstellen",
+      "saved": "Vorlage gespeichert.",
+      "resetDone": "Standard-Vorlage wiederhergestellt.",
+      "saveError": "Die Vorlage konnte nicht gespeichert werden.",
+      "errors": {
+        "subjectRequired": "Bitte einen Betreff angeben.",
+        "subjectLineBreak": "Der Betreff muss in eine Zeile passen.",
+        "subjectTooLong": "Höchstens {{max}} Zeichen.",
+        "bodyRequired": "Bitte einen Text angeben.",
+        "bodyTooLong": "Höchstens {{max}} Zeichen."
+      }
+    },
+    "errors": {
+      "codes": {
+        "forbidden": "Du darfst Eingangsrechnungen nicht bearbeiten.",
+        "not_rejected": "Ablehnungs-Mails gehen nur zu abgelehnten Rechnungen."
+      }
+    },
+    "log": {
+      "to": "An: {{to}}",
+      "subject": "Betreff: {{subject}}",
+      "show": "Mail ansehen",
+      "archivedTitle": "Gesendete Mail vom {{at}}",
+      "loadError": "Die gesendete Mail konnte nicht geladen werden."
+    }
   }
 }

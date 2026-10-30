@@ -507,7 +507,7 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
           {saved && savedStatus && savedStatus !== 'draft' && reviewStatus ? (
             <Section title={t('domain:incomingReview.title')}>
               <IncomingReviewSection
-                invoiceId={saved.id}
+                invoice={saved}
                 status={savedStatus}
                 reviewStatus={reviewStatus}
               />
