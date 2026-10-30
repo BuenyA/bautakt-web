@@ -7,7 +7,7 @@ Schlussrechnung, Gutschrift; Owner-Vorgabe 2026-10-30). Stand: 2026-10-30.
 
 Schema, RLS und Renderer gehören `bautakt-app`:
 
-- Migration `supabase/migrations/20261030235000_a_invoice_templates.sql`
+- Migration `supabase/migrations/20261030231747_a_invoice_templates.sql`
 - Renderer `supabase/functions/finance-document-render/template.ts` (Vorlage → Layout)
   und `letterhead.ts` (Layout „Briefbogen“), gespiegelt nach
   `packages/document-render/src/core/`.
