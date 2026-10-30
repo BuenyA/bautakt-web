@@ -6,12 +6,15 @@ import { unzipSync } from 'fflate';
 
 import {
   buildZip,
+  formatTaxValue,
   monthOptions,
   monthValue,
+  parseDirection,
   parseMonthValue,
   previousMonth,
   readCheckResponse,
   readExportResponse,
+  storageExtension,
   zipEntryNames,
   zipFileName,
 } from './datevExport.ts';
@@ -181,8 +184,28 @@ describe('Beleg-ZIP', () => {
     );
   });
 
-  it('Name des ZIP je Monat', () => {
-    assert.equal(zipFileName({ year: 2026, month: 3 }), 'Belege_Ausgang_2026-03.zip');
+  it('Name des ZIP je Monat und Richtung', () => {
+    assert.equal(zipFileName({ year: 2026, month: 3 }, 'outgoing'), 'Belege_Ausgang_2026-03.zip');
+    assert.equal(zipFileName({ year: 2026, month: 10 }, 'incoming'), 'Belege_Eingang_2026-10.zip');
+  });
+
+  it('Originale der Eingangsrechnungen behalten ihre Endung', () => {
+    const paths: Record<string, string> = {
+      a: 'c/incoming/a.xml',
+      b: 'c/incoming/b.JPG',
+      c: 'c/incoming/c.pdf',
+      d: 'c/incoming/d',
+    };
+    const names = zipEntryNames(
+      [ref('a', 'ER-1'), ref('b', 'ER-1'), ref('c', 'KU2026/1'), ref('d', 'X')],
+      (id) => storageExtension(paths[id]!),
+    );
+    assert.deepEqual([...names.values()], ['ER-1.xml', 'ER-1.jpg', 'KU2026_1.pdf', 'X.pdf']);
+  });
+
+  it('Dublette mit gleicher Endung wird nummeriert', () => {
+    const names = zipEntryNames([ref('a', 'ER-1'), ref('b', 'er-1')], () => 'xml');
+    assert.deepEqual([...names.values()], ['ER-1.xml', 'er-1_2.xml']);
   });
 
   it('ZIP enthält die Bytes unverändert', () => {
@@ -203,5 +226,47 @@ describe('Beleg-ZIP', () => {
       }),
       { kind: 'failed', reason: 'unknown' },
     );
+  });
+});
+
+describe('Eingangsrechnungen', () => {
+  it('Richtung lesen, Unbekanntes ist Ausgang', () => {
+    assert.equal(parseDirection('incoming'), 'incoming');
+    assert.equal(parseDirection('outgoing'), 'outgoing');
+    assert.equal(parseDirection('eingang'), 'outgoing');
+  });
+
+  it('Befunde des Eingangs sind bekannt und gehen nicht als Fehler unter', () => {
+    const check = readCheckResponse(200, {
+      ok: true,
+      check_only: true,
+      importable: false,
+      bookings: 3,
+      findings: [
+        { code: 'not_approved', severity: 'warning', document: 'ER-1' },
+        { code: 'collective_creditor', severity: 'warning', document: 'ER-1', value: '99999' },
+        {
+          code: 'account_missing',
+          severity: 'error',
+          document: 'SUB-13B',
+          value: 'reverse_charge|19.00',
+        },
+        { code: 'tax_lines_missing', severity: 'error', document: 'ER-2' },
+        { code: 'document_number_missing', severity: 'warning', document: 'Malerbetrieb Klein' },
+      ],
+      documents: [{ id: 'x', document_number: 'ER-1', document_field1: 'ER-1' }],
+    });
+    assert.equal(check.kind, 'checked');
+    assert.equal(check.kind === 'checked' ? check.findings.length : 0, 5);
+  });
+
+  it('Steuerart und Satz lesbar', () => {
+    assert.equal(formatTaxValue('reverse_charge|19.00'), '§ 13b, 19 %');
+    assert.equal(formatTaxValue('standard|7.00'), '7 %');
+    assert.equal(formatTaxValue('standard|10.70'), '10,7 %');
+    assert.equal(formatTaxValue('tax_free|0.00'), 'steuerfrei');
+    assert.equal(formatTaxValue('small_business|0.00'), 'Kleinunternehmer');
+    assert.equal(formatTaxValue('3400'), '3400');
+    assert.equal(formatTaxValue('unbekannt|1.00'), 'unbekannt|1.00');
   });
 });
