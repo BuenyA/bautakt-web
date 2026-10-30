@@ -92,6 +92,9 @@ const MESSAGES: Record<string, string> = {
   INCOMING_MAIL_NOT_REJECTED: 'Ablehnungs-Mails gehören nur zu abgelehnten Rechnungen.',
   INCOMING_MAIL_NOT_SENT:
     'Zu dieser Rechnung gibt es keine versendete Mail mit dieser ID. Bitte lade die Seite neu.',
+  // Sperre nach dem Erfassen (bautakt-app 20261030210000_b_incoming_invoice_lock, bautakt-web#170).
+  INCOMING_LOCKED:
+    'An einer erfassten Eingangsrechnung sind Beträge, Lieferant, Nummer und Daten festgeschrieben. Ändern lassen sich nur Status und Zuordnung. Bitte lade die Seite neu.',
   // Skonto-Vermerk (bautakt-app 20261030120000_b_incoming_invoice_adjustments, bautakt-web#166).
   INCOMING_ADJUSTMENT_EXISTS:
     'Für diese Rechnung ist schon ein Skonto vermerkt. Hebe es erst auf, dann vermerke es neu. Bitte lade die Seite neu.',

@@ -1854,7 +1854,11 @@
     "action": {
       "approved": "Freigegeben",
       "rejected": "Abgelehnt",
-      "mail_sent": "Mail an den Absender gesendet"
+      "mail_sent": "Mail an den Absender gesendet",
+      "captured": "Erfasst",
+      "status_changed": "Status geändert",
+      "assignment_changed": "Zuordnung geändert",
+      "unknown": "Änderung"
     },
     "by": "{{name}} · {{at}}",
     "unknownActor": "Unbekannt",
@@ -1878,6 +1882,17 @@
     "errors": {
       "reasonRequired": "Bitte begründe die Ablehnung.",
       "reasonTooLong": "Höchstens {{max}} Zeichen."
+    },
+    "change": {
+      "status": "Status: {{from}} → {{to}}",
+      "statusInitial": "Status: {{to}}",
+      "none": "keine",
+      "missing": "nicht mehr vorhanden",
+      "field": {
+        "order_id": "Auftrag: {{from}} → {{to}}",
+        "cost_category_id": "Kostenart: {{from}} → {{to}}",
+        "supplier_id": "Lieferant (Stamm): {{from}} → {{to}}"
+      }
     }
   },
   "incomingSkonto": {
