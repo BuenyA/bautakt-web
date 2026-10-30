@@ -375,9 +375,9 @@ export function CompanySetupPage() {
   const stepNumber = flow.indexOf(step!) + 1;
   const canGoBack = step !== 'profile' && !(step === 'choice' && !showProfileStep);
 
-  const heading: Record<Exclude<Step, 'welcome'>, { title: string; subtitle: string }> = {
+  const heading: Record<Exclude<Step, 'welcome'>, { title: string; subtitle?: string }> = {
     profile: { title: t('auth:setup.profile.title'), subtitle: t('auth:setup.profile.subtitle') },
-    choice: { title: t('auth:setup.choice.title'), subtitle: t('auth:setup.choice.subtitle') },
+    choice: { title: t('auth:setup.choice.title') },
     company: { title: t('auth:setup.company.title'), subtitle: t('auth:setup.company.subtitle') },
     address: { title: t('auth:setup.address.title'), subtitle: t('auth:setup.address.subtitle') },
     join: { title: t('auth:setup.join.title'), subtitle: t('auth:setup.join.subtitle') },
@@ -391,14 +391,20 @@ export function CompanySetupPage() {
         ? t('auth:setup.join.submit')
         : t('auth:setup.next');
 
-  const footer = (
+  const signOutButton = (
     <Button appearance="transparent" size="small" disabled={pending} onClick={() => void signOut()}>
       {t('common:action.signOut')}
     </Button>
   );
 
   return (
-    <AuthCard title={current.title} subtitle={current.subtitle} footer={footer}>
+    <AuthCard
+      title={current.title}
+      subtitle={current.subtitle}
+      titleSize={step === 'choice' ? 600 : 500}
+      centerTitle={step === 'choice'}
+      headerAction={signOutButton}
+    >
       <form className="flex flex-col gap-4" noValidate onSubmit={handleSubmit}>
         <Text size={200} className="text-muted-foreground">
           {t('auth:setup.stepOf', { step: stepNumber, total: flow.length })}

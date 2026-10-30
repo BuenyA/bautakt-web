@@ -11,7 +11,7 @@ const useStyles = makeStyles({
     alignItems: 'center',
     gap: tokens.spacingHorizontalM,
     width: '100%',
-    padding: tokens.spacingVerticalM,
+    padding: `${tokens.spacingVerticalL} ${tokens.spacingHorizontalL}`,
     textAlign: 'start',
     cursor: 'pointer',
     color: tokens.colorNeutralForeground1,
@@ -34,9 +34,9 @@ const useStyles = makeStyles({
     flexShrink: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    width: '44px',
-    height: '44px',
-    fontSize: '24px',
+    width: '52px',
+    height: '52px',
+    fontSize: '28px',
     borderRadius: tokens.borderRadiusLarge,
     color: tokens.colorNeutralForeground2,
     backgroundColor: tokens.colorNeutralBackground3,
@@ -69,14 +69,12 @@ export function RoleChoice({
         selected={value === 'owner'}
         icon={<BuildingRegular />}
         title={t('auth:setup.choice.owner.title')}
-        description={t('auth:setup.choice.owner.description')}
         onSelect={() => onChange('owner')}
       />
       <Option
         selected={value === 'employee'}
         icon={<PeopleTeamRegular />}
         title={t('auth:setup.choice.employee.title')}
-        description={t('auth:setup.choice.employee.description')}
         onSelect={() => onChange('employee')}
       />
     </div>
@@ -87,13 +85,11 @@ function Option({
   selected,
   icon,
   title,
-  description,
   onSelect,
 }: {
   selected: boolean;
   icon: ReactNode;
   title: string;
-  description: string;
   onSelect: () => void;
 }) {
   const styles = useStyles();
@@ -106,10 +102,9 @@ function Option({
       onClick={onSelect}
     >
       <span className={mergeClasses(styles.icon, selected && styles.iconSelected)}>{icon}</span>
-      <span className="flex flex-col gap-0.5">
-        <Text weight="semibold">{title}</Text>
-        <Text size={200}>{description}</Text>
-      </span>
+      <Text size={500} weight="semibold">
+        {title}
+      </Text>
     </button>
   );
 }

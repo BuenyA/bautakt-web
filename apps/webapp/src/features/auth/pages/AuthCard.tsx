@@ -15,6 +15,8 @@ export function AuthCard({
   title,
   subtitle,
   titleSize = 500,
+  centerTitle = false,
+  headerAction,
   children,
   footer,
 }: {
@@ -22,6 +24,9 @@ export function AuthCard({
   subtitle?: string;
   /** Einstiegsseiten (Anmelden, Konto anlegen) zeigen den Titel eine Stufe größer. */
   titleSize?: 500 | 600;
+  centerTitle?: boolean;
+  /** Sitzt oben rechts in der Karte, z. B. „Abmelden“ in der Einrichtung. */
+  headerAction?: ReactNode;
   children: ReactNode;
   footer?: ReactNode;
 }) {
@@ -40,12 +45,20 @@ export function AuthCard({
               Kartenschatten ist ungelayert und schlägt Tailwind ohne `!`. */}
           <Card
             size="large"
-            className="shadow-[0_8px_24px_rgba(0,0,0,0.45),0_32px_80px_rgba(0,0,0,0.7)]!"
+            className="relative shadow-[0_8px_24px_rgba(0,0,0,0.45),0_32px_80px_rgba(0,0,0,0.7)]!"
           >
+            {headerAction ? <div className="absolute top-3 right-3">{headerAction}</div> : null}
             <BautaktLogo className="self-center py-2" />
             <CardHeader
+              className={centerTitle ? 'justify-items-center text-center' : undefined}
               header={
-                <Text as="h1" size={titleSize} weight="semibold">
+                <Text
+                  as="h1"
+                  size={titleSize}
+                  weight="semibold"
+                  align={centerTitle ? 'center' : undefined}
+                  className={centerTitle ? 'w-full' : undefined}
+                >
                   {title}
                 </Text>
               }
