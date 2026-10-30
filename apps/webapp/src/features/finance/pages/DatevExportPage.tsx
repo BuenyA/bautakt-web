@@ -225,7 +225,7 @@ function CheckResult({
           <MessageBarBody>
             {t('domain:datevExport.blocked')}
             <FindingList findings={errors} direction={direction} />
-            <RouterLink to={routes.settings}>{t('domain:datevExport.toSettings')}</RouterLink>
+            <RouterLink to={routes.companyDatev}>{t('domain:datevExport.toSettings')}</RouterLink>
           </MessageBarBody>
         </MessageBar>
       ) : check.bookings === 0 ? (
