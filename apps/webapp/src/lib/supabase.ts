@@ -41,7 +41,7 @@ export function getSupabaseBootError(): string | null {
 
   return (
     `${missing.join(' und ')} ${missing.length === 1 ? 'fehlt' : 'fehlen'} oder ${missing.length === 1 ? 'ist' : 'sind'} leer. ` +
-    'In den Vercel-Projekteinstellungen von bautakt-webapp setzen und neu deployen — ' +
+    'In den Vercel-Projekteinstellungen von bautakt-webapp setzen und neu deployen. ' +
     'Vite ersetzt VITE_* zur Build-Zeit, ein Neustart genuegt nicht.'
   );
 }

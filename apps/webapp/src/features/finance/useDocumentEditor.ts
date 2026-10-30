@@ -391,6 +391,8 @@ export async function loadPartialCredits(
 /**
  * Was der Editor vom Betrieb braucht: Kleinunternehmer stellen ohne
  * Umsatzsteuer aus (§ 19 UStG), das Land wählt den Wortlaut der Hinweise.
+ * Einleitung und Schlusstext der Rechnungsvorlage (Unternehmen →
+ * Rechnungsvorlage) belegen neue Belege vor, wie in der App.
  */
 export function useCompanyTaxProfile() {
   const { data: membership } = useMembership();
@@ -399,14 +401,24 @@ export function useCompanyTaxProfile() {
   return useQuery({
     queryKey: ['company-tax-profile', companyId],
     enabled: Boolean(companyId),
-    queryFn: async (): Promise<{ isSmallBusiness: boolean; country: string }> => {
+    queryFn: async (): Promise<{
+      isSmallBusiness: boolean;
+      country: string;
+      introText: string;
+      footerText: string;
+    }> => {
       const { data, error } = await supabase
         .from('companies')
-        .select('is_small_business, country')
+        .select('is_small_business, country, invoice_intro_text, invoice_footer_text')
         .eq('id', companyId!)
         .single();
       if (error) throw error;
-      return { isSmallBusiness: Boolean(data.is_small_business), country: data.country ?? 'DE' };
+      return {
+        isSmallBusiness: Boolean(data.is_small_business),
+        country: data.country ?? 'DE',
+        introText: data.invoice_intro_text ?? '',
+        footerText: data.invoice_footer_text ?? '',
+      };
     },
   });
 }

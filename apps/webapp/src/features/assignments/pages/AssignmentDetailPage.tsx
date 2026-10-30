@@ -61,7 +61,7 @@ function periodHeading(startsAt: string, endsAt: string): { date: string; time: 
   }
   return {
     date: longDate.format(start),
-    time: `${formatTime(startsAt)} – ${longDate.format(end)}, ${formatTime(endsAt)}`,
+    time: `${formatTime(startsAt)} bis ${longDate.format(end)}, ${formatTime(endsAt)}`,
   };
 }
 
@@ -306,7 +306,7 @@ function AssignmentView({
             <Fact icon={<CalendarRegular />} label={t('domain:assignments.detail.date')}>
               {sameLocalDay(new Date(assignment.starts_at), new Date(assignment.ends_at))
                 ? formatDate(assignment.starts_at)
-                : `${formatDate(assignment.starts_at)} – ${formatDate(assignment.ends_at)}`}
+                : `${formatDate(assignment.starts_at)} bis ${formatDate(assignment.ends_at)}`}
             </Fact>
             <Fact icon={<ClockRegular />} label={t('domain:assignments.detail.time')}>
               {formatTime(assignment.starts_at)}–{formatTime(assignment.ends_at)}

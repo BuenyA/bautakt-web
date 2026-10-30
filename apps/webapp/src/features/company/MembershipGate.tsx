@@ -4,7 +4,7 @@ import { Navigate, Outlet, useLocation } from 'react-router';
 
 import { FullPageSpinner } from '@/components/common/FullPageSpinner';
 import { useAuth } from '@/features/auth/useAuth';
-import { HOME_ROUTE, routes } from '@/lib/routes';
+import { additionalCompanyParam, HOME_ROUTE, routes } from '@/lib/routes';
 
 import { useMembership } from './useMembership';
 
@@ -54,7 +54,9 @@ export function MembershipGate() {
     return <Navigate to={routes.companySetup} replace />;
   }
 
-  if (hasCompany && onSetup) {
+  // `?weiteres=1` aus dem Profilmenü: ein zusätzlicher Betrieb ist erlaubt.
+  const additional = new URLSearchParams(location.search).get(additionalCompanyParam) === '1';
+  if (hasCompany && onSetup && !additional) {
     return <Navigate to={HOME_ROUTE} replace />;
   }
 

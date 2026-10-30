@@ -17,8 +17,6 @@ import {
   PeopleTeam20Regular,
   Person20Filled,
   Person20Regular,
-  Settings20Filled,
-  Settings20Regular,
 } from '@fluentui/react-icons';
 
 import {
@@ -39,7 +37,6 @@ const DocumentText = bundleIcon(DocumentText20Filled, DocumentText20Regular);
 const Person = bundleIcon(Person20Filled, Person20Regular);
 const People = bundleIcon(People20Filled, People20Regular);
 const Box = bundleIcon(Box20Filled, Box20Regular);
-const Settings = bundleIcon(Settings20Filled, Settings20Regular);
 
 export type NavItem = PermissionGate & {
   to: string;
@@ -58,8 +55,9 @@ export type NavItem = PermissionGate & {
 };
 
 /**
- * Flache Top-Navigation. Der Kalender steht im Fuss, die Einstellungen im
- * Profilmenue. Keine Sektionsueberschriften.
+ * Flache Top-Navigation. Der Kalender steht im Fuss; Mein Profil,
+ * Unternehmen und Einstellungen im Profilmenue (`UserMenu`). Keine
+ * Sektionsueberschriften.
  *
  * Auftraege und Zeiten sind ein Klick. Rechnungen und Material oeffnen einen
  * Hub, Mitarbeiter leitet direkt ins Verzeichnis weiter; die Listen dahinter
@@ -101,13 +99,6 @@ export const calendarNavItem: NavItem = {
   to: routes.calendar,
   labelKey: 'common:nav.calendar',
   icon: CalendarLtr,
-};
-
-/** Im Profilmenue unten links, nicht in der Leiste. */
-export const settingsNavItem: NavItem = {
-  to: routes.settings,
-  labelKey: 'common:nav.settings',
-  icon: Settings,
 };
 
 export function maySee(item: NavItem, permissions: Parameters<typeof passesGate>[1]): boolean {

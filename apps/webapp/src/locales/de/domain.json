@@ -490,7 +490,7 @@
     },
     "absence": {
       "approved": "{{type}} {{period}}",
-      "approvedAssigned": "{{type}} {{period}} – bitte austragen",
+      "approvedAssigned": "{{type}} {{period}}, bitte austragen",
       "pending": "{{type}} beantragt ({{period}})",
       "onTile": "{{type}} (genehmigt)",
       "onTilePending": "{{type}} beantragt"
@@ -535,9 +535,9 @@
   },
   "agingBucket": {
     "not_due": "Nicht fällig",
-    "1_30": "1–30 Tage",
-    "31_60": "31–60 Tage",
-    "61_90": "61–90 Tage",
+    "1_30": "1 bis 30 Tage",
+    "31_60": "31 bis 60 Tage",
+    "61_90": "61 bis 90 Tage",
     "90_plus": "Über 90 Tage"
   },
   "invoices": {
@@ -1348,8 +1348,8 @@
       "action": "Kostenstelle anlegen",
       "title": "Kostenstelle anlegen",
       "description": "Nummer und Bezeichnung gelten für diesen Betrieb und sind danach auch in der Handy-App sichtbar.",
-      "codeRequired": "Bitte eine Nummer angeben — sonst ist die Kostenstelle in der Liste nicht zu finden.",
-      "nameRequired": "Bitte eine Bezeichnung angeben — sonst ist die Kostenstelle in der Liste nicht zu finden.",
+      "codeRequired": "Bitte eine Nummer angeben, sonst ist die Kostenstelle in der Liste nicht zu finden.",
+      "nameRequired": "Bitte eine Bezeichnung angeben, sonst ist die Kostenstelle in der Liste nicht zu finden.",
       "duplicateCode": "Diese Nummer gibt es in diesem Betrieb schon.",
       "saved": "Kostenstelle angelegt.",
       "saveError": "Kostenstelle konnte nicht angelegt werden."
@@ -1652,7 +1652,7 @@
       "label": "Umsatzsteuer",
       "modes": {
         "standard": "Regulär (mit USt)",
-        "reverse_charge": "§ 13b – Steuerschuld beim Kunden",
+        "reverse_charge": "§ 13b: Steuerschuld beim Kunden",
         "tax_free": "Steuerfrei",
         "small_business": "Kleinunternehmer (§ 19)"
       },
@@ -1940,7 +1940,7 @@
   },
   "absenceForm": {
     "title": "Abwesenheit eintragen",
-    "description": "Wird sofort als genehmigt eingetragen — du entscheidest hier selbst. Offene Anträge kommen aus der Handy-App.",
+    "description": "Wird sofort als genehmigt eingetragen, du entscheidest hier selbst. Offene Anträge kommen aus der Handy-App.",
     "start": "Von",
     "end": "Bis",
     "employeeRequired": "Bitte einen Mitarbeiter wählen.",
@@ -2566,7 +2566,7 @@
     "choose": "Bitte wählen",
     "mode": {
       "standard": "{{rate}} % Umsatzsteuer",
-      "reverse_charge": "§13b – Steuer schuldet der Empfänger ({{rate}} %)",
+      "reverse_charge": "§13b: Steuer schuldet der Empfänger ({{rate}} %)",
       "tax_free": "Steuerfrei",
       "small_business": "Kleinunternehmer (§19, ohne Umsatzsteuer)"
     },

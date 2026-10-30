@@ -21,14 +21,17 @@ baut die Leiste aus Fluents `NavDrawer`:
   `PanelLeftExpand20Regular`). Kein Hamburger in der Leiste — Owner-Vorgabe:
   wie in anderen Apps, und am Symbol soll man sehen, dass hier etwas einklappt.
 - **Body:** die `NavItem`s mit 20px-Icons (`bundleIcon`, aktiv gefüllt).
-- **Footer:** Einstellungen, `NavDivider`, Benutzermenü als Fluent-`Persona`
+- **Footer:** Kalender, `NavDivider`, Benutzermenü als Fluent-`Persona`
   (Firma, E-Mail, Avatar). Der Avatar zeigt das eigene Profilbild
   (`useMyProfile` + `useProfileImageUrls`), sonst die Initialen des Namens,
   ohne Namen die ersten zwei Buchstaben der E-Mail. Bis 2026-10-12 waren es
-  immer die E-Mail-Buchstaben, das Bild wurde nie geladen. Im Menü liegen
-  Impressum und Datenschutz direkt unter „Rechtliches“ (`LEGAL_PAGES`):
-  Persona öffnen, dann der Link. AGB ist nicht dabei (`published: false` in
-  `legal.ts`), solange es keine Seite gibt.
+  immer die E-Mail-Buchstaben, das Bild wurde nie geladen.
+- **Benutzermenü** (`components/layout/UserMenu.tsx`, seit 2026-10-30): oben
+  der Betrieb mit Untermenü zum Wechseln, Beitreten und Anlegen, dann
+  **Mein Profil**, **Unternehmen**, **Einstellungen** (Einstellungen ganz
+  unten, Owner-Vorgabe), abgesetzt Abmelden. Darstellung und Rechtliches
+  standen bis dahin direkt im Menü; sie liegen jetzt in Einstellungen bzw.
+  Mein Profil. Details: [unternehmen-und-profil.md](unternehmen-und-profil.md).
 
 Farben, Abstände und Auswahl (neutrale Fläche plus Brand-Indikator) sind
 Fluents Standard. Eigene Regeln gibt es für den Kopf, das Footer-Polster und
@@ -56,7 +59,8 @@ Kopfzeile sie.
 
 **Schnellsuche** (`QuickSearch.tsx`, Fluent-`Combobox`): Seite oder Aktion
 tippen, wählen, dort. Strg+K bzw. Cmd+K setzt den Fokus. Seiten sind die
-Einträge der Leiste, die sichtbaren Hub-Karten und Einstellungen. Aktionen
+Einträge der Leiste, die sichtbaren Hub-Karten sowie Mein Profil, Unternehmen
+(mit Rechten) und Einstellungen. Aktionen
 („Neuer Kunde“, „Zeit nachtragen“, „Auftrag anlegen“ …) springen auf die Liste
 mit `?neu=1`; die Seite öffnet ihr Anlege-Panel über `useCreateFromUrl` und
 nimmt den Parameter wieder heraus. Neue Rechnung und neues Angebot haben eigene
@@ -81,28 +85,29 @@ bleibt bei zehn Punkten. Seit 2026-10-14 heißt „Finanzen“ „Rechnungen“ 
 Kachel-Hub mehr, sondern eine Übersicht mit Reitern, siehe
 [rechnungsbereich.md](rechnungsbereich.md).
 
-| #   | Eintrag        | Ziel                                           | Art                    |
-| --- | -------------- | ---------------------------------------------- | ---------------------- |
-| 1   | Übersicht      | `/uebersicht`                                  | Direkt (HOME)          |
-| 2   | Aufträge       | `/auftraege`                                   | Direkt                 |
-| 3   | Einsatzplanung | `/einsatzplanung` (alt `/einsaetze` leitet um) | Direkt                 |
-| 5   | Kalender       | `/kalender`                                    | Direkt                 |
-| 6   | Rechnungen     | `/rechnungen` (alt `/finanzen` leitet um)      | Übersicht mit Reitern  |
-| 7   | Mitarbeiter    | `/personal`                                    | Hub                    |
-| 8   | Kontakte       | `/kontakte` (alt `/kunden` leitet um)          | Direkt, Reiter         |
-| 9   | Material       | `/material`                                    | Hub                    |
-| 10  | Einstellungen  | `/einstellungen`                               | Direkt, Fuß der Leiste |
+| #   | Eintrag        | Ziel                                           | Art                   |
+| --- | -------------- | ---------------------------------------------- | --------------------- |
+| 1   | Übersicht      | `/uebersicht`                                  | Direkt (HOME)         |
+| 2   | Aufträge       | `/auftraege`                                   | Direkt                |
+| 3   | Einsatzplanung | `/einsatzplanung` (alt `/einsaetze` leitet um) | Direkt                |
+| 5   | Kalender       | `/kalender`                                    | Direkt                |
+| 6   | Rechnungen     | `/rechnungen` (alt `/finanzen` leitet um)      | Übersicht mit Reitern |
+| 7   | Mitarbeiter    | `/personal`                                    | Hub                   |
+| 8   | Kontakte       | `/kontakte` (alt `/kunden` leitet um)          | Direkt, Reiter        |
+| 9   | Material       | `/material`                                    | Hub                   |
 
 Definiert in `components/layout/navItems.ts`, die Karten in
 `features/hubs/hubs.ts`. Ein Hub-Punkt fehlt, wenn **keine** seiner Karten
 sichtbar ist. Die Karten filtern einzeln, mit denselben Rechten wie die
 frühere flache Zeile. Listen- und Detail-URLs sind nicht umgezogen
-(`/mitarbeiter`, `/katalog`, …). Ausnahme seit 2026-10-14: Die Rechnungs-Übersicht
+(`/mitarbeiter`, …). Ausnahme seit 2026-10-14: Die Rechnungs-Übersicht
 liegt unter `/rechnungen`, die Liste der Ausgangsrechnungen unter `/rechnungen/ausgang`;
 Belege bleiben `/rechnungen/:id`. Beim Rechnungsbereich sind die „Karten“ die Reiter
 (`FinanceLayout`), siehe [rechnungsbereich.md](rechnungsbereich.md).
 
-Einstellungen bleibt im Fuß, abgesetzt, und zählt als zehnter Punkt.
+Mein Profil, Unternehmen und Einstellungen sind keine Einträge der Leiste,
+sondern stehen im Benutzermenü. Katalog und Kostenstellen liegen seit
+2026-10-30 unter `/unternehmen/…`; die Karten im Material-Hub führen dorthin.
 Benachrichtigungen sind die Topbar-Glocke, kein Nav-Eintrag.
 
 Die Auswahl in der Leiste gilt auch für den Hub, solange eine seiner Zielrouten
@@ -123,12 +128,12 @@ Die Karte ist ein Router-Link über die ganze Fläche: `rounded-xl` (24px),
 Light `bg-surface`, Dark `bg-card-raised`, 150ms. Fokus: `ring-2 ring-ring`,
 Offset 2. Gedrückt: Deckkraft 0.95. Kein Primary-Fill.
 
-| Hub         | Karte                  | Ziel             | Recht wie bisher       |
-| ----------- | ---------------------- | ---------------- | ---------------------- |
-| Mitarbeiter | Mitarbeiterverzeichnis | `/mitarbeiter`   | `canManageEmployees`   |
-| Mitarbeiter | Abwesenheiten          | `/abwesenheiten` | `canManageAbsences`    |
-| Material    | Katalog                | `/katalog`       | `canManageCatalog`     |
-| Material    | Kostenstellen          | `/kostenstellen` | `canManageCostCenters` |
+| Hub         | Karte                  | Ziel                         | Recht wie bisher       |
+| ----------- | ---------------------- | ---------------------------- | ---------------------- |
+| Mitarbeiter | Mitarbeiterverzeichnis | `/mitarbeiter`               | `canManageEmployees`   |
+| Mitarbeiter | Abwesenheiten          | `/abwesenheiten`             | `canManageAbsences`    |
+| Material    | Katalog                | `/unternehmen/katalog`       | `canManageCatalog`     |
+| Material    | Kostenstellen          | `/unternehmen/kostenstellen` | `canManageCostCenters` |
 
 Seit 2026-10-11 (Owner) hat der Mitarbeiter-Hub nur noch Verzeichnis und
 Abwesenheiten. „Mitarbeiter hinzufügen“ führte auf dieselbe Liste und ist weg;

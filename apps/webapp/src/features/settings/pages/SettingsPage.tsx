@@ -1,133 +1,268 @@
-import { SkeletonBlock, StatusBadge } from '@bautakt/ui';
-import { Card, CardHeader, Text } from '@fluentui/react-components';
-import { useQuery } from '@tanstack/react-query';
+import { darkTheme, lightTheme, SkeletonBlock, toast } from '@bautakt/ui';
+import {
+  Dropdown,
+  Field,
+  FluentProvider,
+  makeStyles,
+  mergeClasses,
+  Option,
+  Radio,
+  RadioGroup,
+  Switch,
+  Text,
+  tokens,
+} from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';
 
-import { DetailCard, DetailRow } from '@/components/common/DetailCard';
-import { PageHeader } from '@/components/common/PageHeader';
-import { useMembership } from '@/features/company/useMembership';
-import { usePermission } from '@/features/company/usePermission';
-import { ContactNumberSettingsCard } from '@/features/contacts/ContactNumberSettingsCard';
-import { supabase } from '@/lib/supabase';
+import { type Theme } from '@/app/ThemeContext';
+import { useTheme } from '@/app/useTheme';
+import { SwitchRow } from '@/components/common/SwitchRow';
+import { SubPage } from '@/components/layout/SubNavLayout';
+import { SectionCard } from '@/features/contacts/SectionCard';
+import { readableDbError } from '@/lib/dbErrors';
 
-import { BankCard, CompanyCard, LegalCard, RegisterCard } from '../CompanyForms';
-import { DatevSettingsCard } from '../DatevSettingsCard';
-import { MailSettingsCard } from '../MailSettingsCard';
+import {
+  BRIEFING_TIMES,
+  CATEGORY_ORDER,
+  isCategoryEnabled,
+  type NotificationPreferences,
+  setCategoryEnabled,
+  useNotificationPreferences,
+  useSaveNotificationPreferences,
+} from '../notificationPreferences';
 
-/** Stammdaten des Betriebs und die Rollen, die es hier gibt. */
-function useCompanySettings() {
-  const { data: membership } = useMembership();
-  const companyId = membership?.companyId;
+const THEMES: Theme[] = ['light', 'dark', 'system'];
 
-  return useQuery({
-    queryKey: ['company-settings', companyId],
-    enabled: Boolean(companyId),
-    queryFn: async () => {
-      const [company, roles] = await Promise.all([
-        supabase
-          .from('companies')
-          .select(
-            'name, type, street_address, postal_code, city, country, email, phone_number, tax_number, vat_id, trade_register, legal_form, register_court, managing_directors, registered_office, iban, bic, bank_name, invoice_prefix, next_invoice_number, payment_term_days, is_small_business',
-          )
-          .eq('id', companyId!)
-          .maybeSingle(),
-        supabase
-          .from('company_roles')
-          .select('id, name, is_system, system_key, sort_order')
-          .eq('company_id', companyId!)
-          .order('sort_order', { ascending: true }),
-      ]);
+const useStyles = makeStyles({
+  // Fluents RadioGroup setzt `display: flex` selbst; Tailwind verlöre dagegen.
+  group: {
+    display: 'grid',
+    gap: tokens.spacingHorizontalM,
+    gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+  },
+  // Radio als Kachel: Kreis links oben, daneben Vorschau und Name.
+  tile: {
+    alignItems: 'flex-start',
+    padding: tokens.spacingHorizontalXS,
+    borderRadius: tokens.borderRadiusLarge,
+    border: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
+    cursor: 'pointer',
+  },
+  tileLabel: {
+    flexGrow: 1,
+    minWidth: 0,
+  },
+  tileSelected: {
+    border: `${tokens.strokeWidthThick} solid ${tokens.colorBrandStroke1}`,
+  },
+  preview: {
+    display: 'flex',
+    height: '72px',
+    borderRadius: tokens.borderRadiusMedium,
+    overflow: 'hidden',
+    border: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
+    backgroundColor: tokens.colorNeutralBackground2,
+  },
+  previewRail: {
+    width: '28%',
+    backgroundColor: tokens.colorNeutralBackground3,
+  },
+  previewBody: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+    padding: '8px',
+  },
+  previewBar: {
+    height: '6px',
+    borderRadius: tokens.borderRadiusSmall,
+    backgroundColor: tokens.colorNeutralStroke1,
+  },
+  previewAccent: {
+    height: '6px',
+    width: '40%',
+    borderRadius: tokens.borderRadiusSmall,
+    backgroundColor: tokens.colorBrandBackground,
+  },
+  half: {
+    display: 'flex',
+    flex: 1,
+  },
+});
 
-      if (company.error) throw company.error;
-      if (roles.error) throw roles.error;
+/**
+ * Miniatur der Oberfläche in Fluents eigenem Theme — keine eigenen Farben.
+ * „Wie das System“ zeigt beide Hälften nebeneinander.
+ */
+function ThemePreview({ theme }: { theme: Theme }) {
+  const styles = useStyles();
+  const mini = (
+    <div className={styles.preview}>
+      <div className={styles.previewRail} />
+      <div className={styles.previewBody}>
+        <div className={styles.previewAccent} />
+        <div className={styles.previewBar} />
+        <div className={styles.previewBar} />
+      </div>
+    </div>
+  );
+  if (theme === 'system') {
+    return (
+      <div className="flex gap-1">
+        {[lightTheme, darkTheme].map((fluentTheme, index) => (
+          <div key={index} className="min-w-0 flex-1">
+            <FluentProvider theme={fluentTheme}>{mini}</FluentProvider>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return <FluentProvider theme={theme === 'dark' ? darkTheme : lightTheme}>{mini}</FluentProvider>;
+}
 
-      return { company: company.data, roles: roles.data ?? [] };
-    },
-  });
+function AppearanceCard() {
+  const { t } = useTranslation();
+  const styles = useStyles();
+  const { theme, setTheme } = useTheme();
+
+  return (
+    <SectionCard title={t('account:settings.appearance.title')}>
+      <RadioGroup
+        aria-label={t('account:settings.appearance.title')}
+        value={theme}
+        onChange={(_, data) => setTheme(data.value as Theme)}
+        className={styles.group}
+      >
+        {THEMES.map((option) => (
+          // Die Vorschau steht im Label des Radios: ein Klick darauf wählt aus,
+          // Tastatur und Screenreader bedienen den Radio wie gewohnt.
+          <Radio
+            key={option}
+            value={option}
+            className={mergeClasses(styles.tile, theme === option && styles.tileSelected)}
+            label={{
+              className: styles.tileLabel,
+              children: (
+                <span className="flex flex-col gap-2">
+                  <ThemePreview theme={option} />
+                  <span>{t(`common:theme.${option}`)}</span>
+                </span>
+              ),
+            }}
+          />
+        ))}
+      </RadioGroup>
+      <Text className="text-muted-foreground">{t('account:settings.appearance.hint')}</Text>
+    </SectionCard>
+  );
+}
+
+function NotificationsCard() {
+  const { t } = useTranslation();
+  const preferences = useNotificationPreferences();
+  const save = useSaveNotificationPreferences();
+  const value = preferences.data;
+
+  function update(patch: Partial<NotificationPreferences>) {
+    if (!value) return;
+    save.mutate(
+      { ...value, ...patch },
+      {
+        onError: (caught) =>
+          toast.error(t('account:settings.notifications.saveError'), {
+            description: readableDbError(caught) ?? undefined,
+          }),
+      },
+    );
+  }
+
+  return (
+    <SectionCard
+      title={t('account:settings.notifications.title')}
+      description={t('account:settings.notifications.description')}
+    >
+      {!value ? (
+        <SkeletonBlock className="h-48 w-full" />
+      ) : (
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2">
+            <Text weight="semibold">{t('account:settings.notifications.briefing')}</Text>
+            <Switch
+              checked={value.briefingEnabled}
+              label={t('account:settings.notifications.briefingLabel')}
+              onChange={(_, d) => update({ briefingEnabled: d.checked })}
+            />
+            {value.briefingEnabled ? (
+              <Field
+                label={t('account:settings.notifications.briefingTime')}
+                hint={t('account:settings.notifications.briefingTimeHint')}
+                className="max-w-48"
+              >
+                <Dropdown
+                  value={value.briefingTime}
+                  selectedOptions={[value.briefingTime]}
+                  onOptionSelect={(_, d) =>
+                    d.optionValue && update({ briefingTime: d.optionValue })
+                  }
+                >
+                  {BRIEFING_TIMES.map((time) => (
+                    <Option key={time} value={time}>
+                      {time}
+                    </Option>
+                  ))}
+                </Dropdown>
+              </Field>
+            ) : null}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Text weight="semibold">{t('account:settings.notifications.quiet')}</Text>
+            <Switch
+              checked={value.quietHoursEnabled}
+              label={t('account:settings.notifications.quietLabel')}
+              onChange={(_, d) => update({ quietHoursEnabled: d.checked })}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <Text weight="semibold">{t('account:settings.notifications.types')}</Text>
+            {CATEGORY_ORDER.map((category) => (
+              <SwitchRow
+                key={category}
+                checked={isCategoryEnabled(category, value.mutedTypes)}
+                label={t(`account:settings.notifications.categories.${category}.label`)}
+                description={t(`account:settings.notifications.categories.${category}.hint`)}
+                onChange={(checked) =>
+                  update({
+                    mutedTypes: setCategoryEnabled(category, checked, value.mutedTypes),
+                  })
+                }
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </SectionCard>
+  );
 }
 
 /**
- * Einrichtung: Firma, Rechtliches und Bank sind bearbeitbar (#61), mit
- * denselben Prüfregeln wie die App (`companyValidation.ts`). Ohne das Recht
- * `canEditCompanyMasterData` bleibt alles lesend.
+ * Einstellungen: nur noch, wie Bautakt sich für mich verhält — Darstellung
+ * und Benachrichtigungen. Alles zum Betrieb liegt unter „Unternehmen“, alles
+ * zu meiner Person unter „Mein Profil“ (Owner, 2026-10-30).
  *
- * Nummernkreis und Zahlungsziel bleiben hier vorerst lesend.
- *
- * Die Karten für E-Mail (#220) und DATEV (#167) prüfen ihre Rechte selbst und
- * fehlen ohne sie ganz.
+ * Die Darstellung gilt für diesen Browser (`ThemeProvider`); die
+ * Benachrichtigungen gelten je Betrieb und auch in der App.
  */
 export function SettingsPage() {
   const { t } = useTranslation();
-  const { data, isLoading } = useCompanySettings();
-  const company = data?.company;
-  const canEdit = usePermission('canEditCompanyMasterData');
-  // Nach dem Speichern starten die Formulare vom neuen Stand.
-  const formKey = JSON.stringify(company);
-
   return (
-    <div className="flex flex-col gap-6">
-      <PageHeader
-        title={t('domain:settings.title')}
-        description={t('domain:settings.description')}
-      />
-
-      {isLoading ? (
-        <SkeletonBlock className="h-64 w-full max-w-3xl" />
-      ) : (
-        <div className="grid gap-4 xl:grid-cols-2">
-          {company ? (
-            <>
-              <div className="xl:col-span-2">
-                <CompanyCard key={formKey} company={company} canEdit={canEdit} />
-              </div>
-              <RegisterCard key={`register-${formKey}`} company={company} canEdit={canEdit} />
-              <LegalCard key={`legal-${formKey}`} company={company} canEdit={canEdit} />
-              <BankCard key={`bank-${formKey}`} company={company} canEdit={canEdit} />
-            </>
-          ) : null}
-
-          <DetailCard title={t('domain:settings.invoicing')}>
-            <DetailRow
-              label={t('domain:settings.invoicePrefix')}
-              value={company?.invoice_prefix ?? ''}
-            />
-            <DetailRow
-              label={t('domain:settings.nextNumber')}
-              value={company ? String(company.next_invoice_number) : ''}
-            />
-            <DetailRow
-              label={t('domain:invoices.paymentTerm')}
-              value={company ? t('domain:invoices.days', { count: company.payment_term_days }) : ''}
-            />
-          </DetailCard>
-
-          <ContactNumberSettingsCard />
-
-          <MailSettingsCard />
-
-          <DatevSettingsCard />
-
-          <Card size="large" className="xl:col-span-2">
-            <CardHeader
-              header={
-                <Text as="h2" size={400} weight="semibold">
-                  {t('domain:settings.roles')}
-                </Text>
-              }
-            />
-            <div className="flex flex-wrap gap-2">
-              {(data?.roles ?? []).map((role) => (
-                <StatusBadge key={role.id} tone={role.is_system ? 'brand' : 'outline'}>
-                  {role.name}
-                </StatusBadge>
-              ))}
-              {data?.roles.length === 0 ? (
-                <p className="text-muted-foreground text-sm">{t('domain:settings.noRoles')}</p>
-              ) : null}
-            </div>
-          </Card>
-        </div>
-      )}
+    <div className="mx-auto w-full max-w-3xl">
+      <SubPage title={t('account:settings.title')} description={t('account:settings.description')}>
+        <AppearanceCard />
+        <NotificationsCard />
+      </SubPage>
     </div>
   );
 }

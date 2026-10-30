@@ -3,48 +3,26 @@ import {
   Button,
   Hamburger,
   makeStyles,
-  Menu,
-  MenuDivider,
-  MenuGroup,
-  MenuGroupHeader,
-  MenuItem,
-  MenuItemLink,
-  MenuItemRadio,
-  MenuList,
-  MenuPopover,
-  MenuTrigger,
   mergeClasses,
   NavDivider,
   NavDrawer,
   NavDrawerBody,
   NavDrawerFooter,
   NavDrawerHeader,
-  Persona,
   tokens,
   Tooltip,
 } from '@fluentui/react-components';
-import {
-  PanelLeftContract20Regular,
-  PanelLeftExpand20Regular,
-  Settings20Regular,
-  SignOut20Regular,
-} from '@fluentui/react-icons';
+import { PanelLeftContract20Regular, PanelLeftExpand20Regular } from '@fluentui/react-icons';
 import { useEffect, useEffectEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { matchPath, Outlet, useLocation } from 'react-router';
 
-import { type Theme } from '@/app/ThemeContext';
-import { useTheme } from '@/app/useTheme';
 import { BautaktSignet } from '@/components/brand/BautaktSignet';
 import { useRouterLink } from '@/components/common/useRouterLink';
-import { useAuth } from '@/features/auth/useAuth';
-import { useMyProfile } from '@/features/auth/useMyProfile';
 import { useMembership } from '@/features/company/useMembership';
-import { useProfileImageUrls } from '@/features/team/useProfileImageUrls';
-import { LEGAL_PAGES, type LegalPageId, legalPath } from '@/lib/legal';
 import { HOME_ROUTE, routes } from '@/lib/routes';
 
-import { calendarNavItem, isNavActive, maySee, navItems, settingsNavItem } from './navItems';
+import { calendarNavItem, isNavActive, maySee, navItems } from './navItems';
 import { NotificationsBell } from './NotificationsBell';
 import { QuickSearch } from './QuickSearch';
 import { SidebarNavItem } from './SidebarNav';
@@ -56,6 +34,7 @@ import {
   useSidebarStyles,
 } from './sidebarStyles';
 import { useMediaQuery } from './useMediaQuery';
+import { UserMenu } from './UserMenu';
 
 /** Größe des Umschalters. */
 const TOGGLE_SIZE = 32;
@@ -203,137 +182,7 @@ const useStyles = makeStyles({
     gap: tokens.spacingVerticalXS,
     overflow: 'clip',
   },
-  // Ein Knopf für beide Zustände. Avatar 32 px, 5 px Einzug plus 1 px Rand:
-  // Mitte auf der Mittellinie der Icon-Leiste.
-  personaButton: {
-    width: '100%',
-    minWidth: 0,
-    maxWidth: 'none',
-    justifyContent: 'flex-start',
-    paddingBlock: tokens.spacingVerticalS,
-    paddingInlineStart: '5px',
-    paddingInlineEnd: tokens.spacingHorizontalS,
-    minHeight: '48px',
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-  },
 });
-
-/** Impressum und Datenschutz direkt im Menü: Persona öffnen, dann der Link. */
-function LegalMenuLink({ page, onNavigate }: { page: LegalPageId; onNavigate?: () => void }) {
-  const { t } = useTranslation();
-  const path = legalPath(page);
-  const link = useRouterLink(path ?? '/');
-  if (!path) return null;
-  return (
-    <MenuItemLink
-      href={link.href}
-      onClick={(event) => {
-        link.onClick(event);
-        onNavigate?.();
-      }}
-    >
-      {t(`common:legal.${page}`)}
-    </MenuItemLink>
-  );
-}
-
-function UserMenu({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: () => void }) {
-  const { t } = useTranslation();
-  const styles = useStyles();
-  const sidebar = useSidebarStyles();
-  const { signOut, user } = useAuth();
-  const settingsLink = useRouterLink(settingsNavItem.to);
-  const { data: membership } = useMembership();
-  const { theme, setTheme } = useTheme();
-
-  const { data: profile } = useMyProfile();
-  const imagePath = profile?.imagePath ?? null;
-  const imageUrl = useProfileImageUrls([imagePath]).data?.[imagePath ?? ''];
-
-  const email = user?.email ?? '';
-  const company = membership?.companyName ?? '';
-  // Mit Namen bildet Fluent die Initialen selbst („Bünyamin Aydemir“ → BA);
-  // ohne Namen die ersten zwei Buchstaben der E-Mail.
-  const avatar = {
-    name: profile?.name || undefined,
-    initials: profile?.name ? undefined : email.slice(0, 2).toUpperCase() || '??',
-    image: imageUrl ? { src: imageUrl } : undefined,
-    color: 'brand' as const,
-  };
-
-  const labelClass = mergeClasses(sidebar.label, collapsed && sidebar.labelHidden);
-  const trigger = (
-    <Button
-      appearance="subtle"
-      className={styles.personaButton}
-      aria-label={collapsed ? email : undefined}
-    >
-      <Persona
-        primaryText={{ children: company || email, className: labelClass }}
-        secondaryText={company ? { children: email, className: labelClass } : undefined}
-        avatar={avatar}
-        size="medium"
-        textAlignment="center"
-        className="min-w-0 text-left"
-      />
-    </Button>
-  );
-
-  return (
-    <Menu
-      positioning="above-start"
-      checkedValues={{ theme: [theme] }}
-      onCheckedValueChange={(_, data) => {
-        if (data.name === 'theme' && data.checkedItems[0]) setTheme(data.checkedItems[0] as Theme);
-      }}
-    >
-      <MenuTrigger disableButtonEnhancement>{trigger}</MenuTrigger>
-      <MenuPopover>
-        <MenuList>
-          <MenuGroup>
-            <MenuGroupHeader>{email}</MenuGroupHeader>
-          </MenuGroup>
-          <MenuDivider />
-          <MenuItemLink
-            icon={<Settings20Regular />}
-            href={settingsLink.href}
-            onClick={(event) => {
-              settingsLink.onClick(event);
-              onNavigate?.();
-            }}
-          >
-            {t(settingsNavItem.labelKey)}
-          </MenuItemLink>
-          <MenuDivider />
-          <MenuGroup>
-            <MenuGroupHeader>{t('common:theme.label')}</MenuGroupHeader>
-            <MenuItemRadio name="theme" value="light">
-              {t('common:theme.light')}
-            </MenuItemRadio>
-            <MenuItemRadio name="theme" value="dark">
-              {t('common:theme.dark')}
-            </MenuItemRadio>
-            <MenuItemRadio name="theme" value="system">
-              {t('common:theme.system')}
-            </MenuItemRadio>
-          </MenuGroup>
-          <MenuDivider />
-          <MenuGroup>
-            <MenuGroupHeader>{t('common:legal.label')}</MenuGroupHeader>
-            {LEGAL_PAGES.map((page) => (
-              <LegalMenuLink key={page} page={page} onNavigate={onNavigate} />
-            ))}
-          </MenuGroup>
-          <MenuDivider />
-          <MenuItem icon={<SignOut20Regular />} onClick={() => void signOut()}>
-            {t('common:action.signOut')}
-          </MenuItem>
-        </MenuList>
-      </MenuPopover>
-    </Menu>
-  );
-}
 
 /** App-Name oben in der Leiste: Fluents `AppItem`, führt zur Übersicht. */
 function AppTitle({

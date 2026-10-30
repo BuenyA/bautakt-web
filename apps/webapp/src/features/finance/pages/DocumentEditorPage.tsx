@@ -280,7 +280,12 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
           parentDocument.data,
           isSmallBusiness ? 'small_business' : toTaxMode(parentDocument.data.tax_mode),
         )
-      : initialState(type, defaultTaxMode);
+      : {
+          ...initialState(type, defaultTaxMode),
+          // Vorbelegung aus der Rechnungsvorlage des Betriebs.
+          introText: taxProfile.data?.introText ?? '',
+          footerText: taxProfile.data?.footerText ?? '',
+        };
     const start = order ? { ...fresh, orderId: order.id, customerId: order.customer_id } : fresh;
     if (order) pendingOrderImport.current = order.id;
     setState(start);

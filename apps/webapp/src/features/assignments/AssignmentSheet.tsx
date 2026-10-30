@@ -392,7 +392,7 @@ function AssignmentForm({
                         period:
                           absence.start_date === absence.end_date
                             ? formatDate(absence.start_date)
-                            : `${formatDate(absence.start_date)} – ${formatDate(absence.end_date)}`,
+                            : `${formatDate(absence.start_date)} bis ${formatDate(absence.end_date)}`,
                       },
                     )
                   : null;
