@@ -14,11 +14,14 @@ import { LegalLinks } from '@/components/common/LegalLinks';
 export function AuthCard({
   title,
   subtitle,
+  titleSize = 500,
   children,
   footer,
 }: {
   title: string;
   subtitle?: string;
+  /** Einstiegsseiten (Anmelden, Konto anlegen) zeigen den Titel eine Stufe größer. */
+  titleSize?: 500 | 600;
   children: ReactNode;
   footer?: ReactNode;
 }) {
@@ -42,7 +45,7 @@ export function AuthCard({
             <BautaktLogo className="self-center py-2" />
             <CardHeader
               header={
-                <Text as="h1" size={500} weight="semibold">
+                <Text as="h1" size={titleSize} weight="semibold">
                   {title}
                 </Text>
               }

@@ -38,7 +38,7 @@ export function LoginPage() {
   return (
     <AuthCard
       title={t('auth:signIn.title')}
-      subtitle={t('auth:signIn.subtitle')}
+      titleSize={600}
       footer={
         <Trans
           i18nKey="auth:signIn.noAccount"

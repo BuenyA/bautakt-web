@@ -88,7 +88,7 @@ export function RegisterPage() {
   );
 
   return (
-    <AuthCard title={t('auth:signUp.title')} footer={footer}>
+    <AuthCard title={t('auth:signUp.title')} titleSize={600} footer={footer}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
         <FormError messageKey={errorKey} />
 
