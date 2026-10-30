@@ -15,10 +15,6 @@ export type EmployeeDraft = {
   phone: string;
 };
 
-export function emptyEmployee(): EmployeeDraft {
-  return { firstName: '', lastName: '', role: '', jobTitle: '', email: '', phone: '' };
-}
-
 /**
  * Aus einer Listenzeile einen Formularzustand machen.
  *

@@ -57,7 +57,7 @@ function useEntries(): { pages: Entry[]; actions: Entry[] } {
       key: 'domain:contacts.newSubcontractor',
     },
     can('canManageEmployees') && {
-      to: withCreate(routes.employees),
+      to: routes.employeeNew,
       key: 'domain:employeeForm.newTitle',
     },
     can('canManageAbsences') && {

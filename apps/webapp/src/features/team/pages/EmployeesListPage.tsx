@@ -1,7 +1,7 @@
 import { DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
 import { Button, Link as FluentLink } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
 
@@ -15,8 +15,6 @@ import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
-import { type EmployeeDraft, emptyEmployee } from '../employeeDraft';
-import { EmployeeSheet } from '../EmployeeSheet';
 import {
   employeeFilterFromSearch,
   type EmployeeListFilter,
@@ -31,9 +29,8 @@ export function EmployeesListPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = employeeFilterFromSearch(searchParams.get('status'));
-  const [draft, setDraft] = useState<EmployeeDraft | null>(null);
-  // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel.
-  useCreateFromUrl(canManage, () => setDraft(emptyEmployee()));
+  // Alte Links mit `?neu=1` führen auf die eigene Anlege-Seite.
+  useCreateFromUrl(canManage, () => void navigate(routes.employeeNew));
   const employees = useEmployees();
   const { data, isError, refetch } = employees;
 
@@ -155,7 +152,7 @@ export function EmployeesListPage() {
           canManage ? (
             <Button
               appearance="primary"
-              onClick={() => setDraft(emptyEmployee())}
+              onClick={() => void navigate(routes.employeeNew)}
               icon={<AddRegular />}
             >
               {t('domain:employeeForm.newTitle')}
@@ -200,12 +197,6 @@ export function EmployeesListPage() {
             }
           />
         }
-      />
-
-      <EmployeeSheet
-        draft={draft}
-        open={draft !== null}
-        onOpenChange={(open) => !open && setDraft(null)}
       />
     </div>
   );
