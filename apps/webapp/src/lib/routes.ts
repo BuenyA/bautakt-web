@@ -93,16 +93,41 @@ export const routes = {
   employee: (id: string) => `/mitarbeiter/${id}`,
   absences: '/abwesenheiten',
   absence: (id: string) => `/abwesenheiten/${id}`,
-  payroll: '/lohn',
 
   // Kontakte direkt (Kunden, Lieferanten, Subunternehmer, Sonstige als
-  // Reiter), Material als Hub. Katalog und Kostenstellen bleiben.
+  // Reiter), Material als Hub. Katalog und Kostenstellen liegen im
+  // Unternehmensbereich; die Hub-Karten führen dorthin.
   contacts: '/kontakte',
   contact: (id: string) => `/kontakte/${id}`,
   materialHub: '/material',
-  catalog: '/katalog',
-  costCenters: '/kostenstellen',
 
+  // Profilmenü unten links: Mein Profil, Unternehmen, Einstellungen.
+  // `/profil` und `/unternehmen` haben eine Unternavigation; jeder Abschnitt
+  // hat eine eigene Adresse.
+  profile: '/profil',
+  profilePersonal: '/profil/persoenliche-daten',
+  profileAccount: '/profil/konto',
+  profileLanguage: '/profil/sprache',
+  profileHelp: '/profil/hilfe',
+  profileLegal: '/profil/rechtliches',
+
+  company: '/unternehmen',
+  companyMasterData: '/unternehmen/stammdaten',
+  companyLegal: '/unternehmen/rechtliches',
+  companyBank: '/unternehmen/bankverbindung',
+  companyNumbers: '/unternehmen/nummernkreise',
+  companyInvoiceTemplate: '/unternehmen/rechnungsvorlage',
+  companyDunning: '/unternehmen/mahnwesen',
+  companyRates: '/unternehmen/stundensaetze',
+  costCenters: '/unternehmen/kostenstellen',
+  catalog: '/unternehmen/katalog',
+  companyMail: '/unternehmen/e-mail',
+  companyDatev: '/unternehmen/datev',
+  companyRoles: '/unternehmen/rollen',
+  companyAbsences: '/unternehmen/urlaub',
+  companyDelete: '/unternehmen/loeschen',
+
+  /** Nur noch Bedienung: Darstellung, Benachrichtigungen, Seitenleiste. */
   settings: '/einstellungen',
 
   // Alte Pfade: Redirects bleiben, bis Bookmarks und Mails umgezogen sind.
@@ -124,7 +149,14 @@ export const routes = {
    * und auf der Mitarbeiterseite; `?order=` führt auf den Auftrag.
    */
   legacyTimes: '/zeiten',
+  /** Bis 2026-10-30 lagen Katalog, Kostenstellen und Lohnsätze außerhalb von `/unternehmen`. */
+  legacyCatalog: '/katalog',
+  legacyCostCenters: '/kostenstellen',
+  legacyPayroll: '/lohn',
 } as const;
+
+/** Query von `/betrieb-einrichten?weiteres=1`: ein weiteres Unternehmen anlegen. */
+export const additionalCompanyParam = 'weiteres';
 
 /** Startseite nach dem Anmelden. */
 export const HOME_ROUTE = routes.overview;

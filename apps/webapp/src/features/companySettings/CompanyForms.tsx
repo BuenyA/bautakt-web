@@ -1,7 +1,4 @@
-import type { TablesUpdate } from '@bautakt/supabase';
-import { toast } from '@bautakt/ui';
 import {
-  Button,
   Combobox,
   Field,
   Input,
@@ -12,16 +9,13 @@ import {
   Spinner,
   Switch,
 } from '@fluentui/react-components';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { type ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useLegalFooterMissing } from '@/features/company/useLegalFooter';
-import { useMembership } from '@/features/company/useMembership';
-import { SectionCard } from '@/features/contacts/SectionCard';
-import { readableDbError } from '@/lib/dbErrors';
 import { supabase } from '@/lib/supabase';
 
+import { text, useCardForm, useSave, useUpdateCompany } from './companyForm';
 import {
   COMPANY_COUNTRIES,
   COMPANY_TYPES,
@@ -43,6 +37,7 @@ import {
   PLACEHOLDERS,
   toCompanyCountry,
 } from './companyValidation';
+import { FormCard } from './FormCard';
 
 /** Die Spalten von `companies`, die diese Seite liest und schreibt. */
 export type CompanyMasterData = {
@@ -66,137 +61,6 @@ export type CompanyMasterData = {
   bic: string | null;
   bank_name: string | null;
 };
-
-type Patch = Pick<TablesUpdate<'companies'>, keyof CompanyMasterData>;
-
-/**
- * Stammdaten speichern. Schreiben dürfen laut RLS Inhaber und wer
- * `canEditCompanyMasterData` oder `canManageCompanySettings` hat; die Seite
- * blendet die Knöpfe nur aus.
- *
- * Den Verkäufer liest der Renderer beim Erzeugen des PDFs. Freigegebene
- * Belege ändern sich dadurch nicht: Ihr Original-PDF liegt schon im Archiv.
- */
-function useUpdateCompany() {
-  const queryClient = useQueryClient();
-  const { data: membership } = useMembership();
-  const companyId = membership?.companyId;
-
-  return useMutation({
-    mutationFn: async (patch: Patch) => {
-      const { error } = await supabase.from('companies').update(patch).eq('id', companyId!);
-      if (error) throw error;
-    },
-    onSuccess: async () => {
-      // Steuer-IDs und Kleinunternehmer lesen Editor und Belegseite getrennt.
-      await Promise.all(
-        [
-          'company-settings',
-          'company-tax-ids',
-          'company-tax-profile',
-          'company-legal-missing',
-          'company-legal-details',
-        ].map((key) => queryClient.invalidateQueries({ queryKey: [key, companyId] })),
-      );
-      await queryClient.invalidateQueries({ queryKey: ['membership'] });
-    },
-  });
-}
-
-const text = (value: string | null | undefined) => value ?? '';
-
-/**
- * Ein Formular je Karte: Fehler am Feld, sobald es angefasst oder gespeichert
- * wurde; „Speichern“ erst, wenn sich etwas geändert hat.
- */
-function useCardForm<T extends Record<string, string | boolean>>(
-  initial: T,
-  errorsOf: (values: T) => Partial<Record<keyof T, string>>,
-) {
-  const [values, setValues] = useState<T | null>(null);
-  const [touched, setTouched] = useState<Set<keyof T>>(new Set());
-  const [submitted, setSubmitted] = useState(false);
-  const current = values ?? initial;
-  const errors = errorsOf(current);
-  const dirty = (Object.keys(initial) as (keyof T)[]).some((key) => current[key] !== initial[key]);
-
-  return {
-    values: current,
-    dirty,
-    hasErrors: Object.values(errors).some(Boolean),
-    errorFor: (key: keyof T) => (submitted || touched.has(key) ? errors[key] : undefined),
-    set: (patch: Partial<T>) => {
-      setValues({ ...current, ...patch });
-      setTouched((prev) => new Set([...prev, ...(Object.keys(patch) as (keyof T)[])]));
-    },
-    submit: () => setSubmitted(true),
-    reset: () => {
-      setValues(null);
-      setTouched(new Set());
-      setSubmitted(false);
-    },
-  };
-}
-
-function FormCard({
-  title,
-  description,
-  canEdit,
-  dirty,
-  saving,
-  onSave,
-  children,
-}: {
-  title: string;
-  description?: ReactNode;
-  canEdit: boolean;
-  dirty: boolean;
-  saving: boolean;
-  onSave: () => void;
-  children: ReactNode;
-}) {
-  const { t } = useTranslation();
-  return (
-    <SectionCard title={title} description={description}>
-      <form
-        className="flex flex-col gap-4"
-        onSubmit={(event) => {
-          event.preventDefault();
-          onSave();
-        }}
-      >
-        {children}
-        {canEdit ? (
-          <div className="flex justify-end">
-            <Button
-              appearance="primary"
-              type="submit"
-              disabled={!dirty || saving}
-              icon={saving ? <Spinner size="tiny" /> : undefined}
-            >
-              {t('common:action.save')}
-            </Button>
-          </div>
-        ) : null}
-      </form>
-    </SectionCard>
-  );
-}
-
-function useSave(update: ReturnType<typeof useUpdateCompany>, onDone: () => void) {
-  const { t } = useTranslation();
-  return async (patch: Patch) => {
-    try {
-      await update.mutateAsync(patch);
-      toast.success(t('domain:settings.saved'));
-      onDone();
-    } catch (caught) {
-      toast.error(t('domain:settings.saveError'), {
-        description: readableDbError(caught) ?? undefined,
-      });
-    }
-  };
-}
 
 // ---------------------------------------------------------------------------
 
@@ -242,6 +106,7 @@ export function CompanyCard({
       canEdit={canEdit}
       dirty={form.dirty}
       saving={update.isPending}
+      onReset={form.reset}
       onSave={() => {
         form.submit();
         if (form.hasErrors) return;
@@ -410,6 +275,7 @@ export function RegisterCard({
       canEdit={canEdit}
       dirty={form.dirty}
       saving={update.isPending}
+      onReset={form.reset}
       onSave={() => {
         form.submit();
         if (form.hasErrors) return;
@@ -539,6 +405,7 @@ export function LegalCard({ company, canEdit }: { company: CompanyMasterData; ca
       canEdit={canEdit}
       dirty={form.dirty}
       saving={update.isPending}
+      onReset={form.reset}
       onSave={() => {
         form.submit();
         if (form.hasErrors) return;
@@ -641,6 +508,7 @@ export function BankCard({ company, canEdit }: { company: CompanyMasterData; can
       canEdit={canEdit}
       dirty={form.dirty}
       saving={update.isPending}
+      onReset={form.reset}
       onSave={() => {
         form.submit();
         if (form.hasErrors) return;

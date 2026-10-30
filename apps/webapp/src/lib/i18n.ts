@@ -1,8 +1,10 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import account from '@/locales/de/account.json';
 import auth from '@/locales/de/auth.json';
 import common from '@/locales/de/common.json';
+import companySettings from '@/locales/de/companySettings.json';
 import domain from '@/locales/de/domain.json';
 import errors from '@/locales/de/errors.json';
 import validation from '@/locales/de/validation.json';
@@ -27,9 +29,9 @@ void i18next.use(initReactI18next).init({
   lng: 'de',
   fallbackLng: 'de',
   defaultNS,
-  ns: ['common', 'auth', 'domain', 'errors', 'validation'],
+  ns: ['common', 'auth', 'domain', 'errors', 'validation', 'account', 'companySettings'],
   resources: {
-    de: { common, auth, domain, errors, validation },
+    de: { common, auth, domain, errors, validation, account, companySettings },
   },
   interpolation: { escapeValue: false },
 });

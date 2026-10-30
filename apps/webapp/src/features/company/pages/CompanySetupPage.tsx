@@ -16,13 +16,13 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { FullPageSpinner } from '@/components/common/FullPageSpinner';
 import { DatePicker } from '@/components/form/dateTime';
 import { useAuth } from '@/features/auth/useAuth';
-import { COMPANY_TYPES } from '@/features/settings/companyValidation';
-import { HOME_ROUTE } from '@/lib/routes';
+import { COMPANY_TYPES } from '@/features/companySettings/companyValidation';
+import { additionalCompanyParam, HOME_ROUTE } from '@/lib/routes';
 import { supabase } from '@/lib/supabase';
 
 import { type BirthDateIssue, birthDateIssue } from '../birthDate';
@@ -59,6 +59,9 @@ export function CompanySetupPage() {
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  // Aus dem Profilmenü: ein weiterer Betrieb neben dem bestehenden.
+  const [searchParams] = useSearchParams();
+  const additional = searchParams.get(additionalCompanyParam) === '1';
   const queryClient = useQueryClient();
   const submitting = useRef(false);
 
@@ -151,7 +154,19 @@ export function CompanySetupPage() {
         setCompanyId(createdId);
       }
       await markOnboardingComplete(user.id);
-      await queryClient.invalidateQueries({ queryKey: ['membership', user.id] });
+      if (additional) {
+        // Bei einem weiteren Betrieb darf `createOwnerCompany` die alte
+        // Hauptbeschäftigung oft nicht zurücksetzen (RLS auf `employments`
+        // verlangt Personalrechte im alten Betrieb). `switch_primary_company`
+        // läuft als SECURITY DEFINER und setzt genau eine Zeile aktiv.
+        const { error } = await supabase.rpc('switch_primary_company', {
+          p_company_id: createdId,
+        });
+        if (error) throw error;
+        await queryClient.resetQueries();
+      } else {
+        await queryClient.invalidateQueries({ queryKey: ['membership', user.id] });
+      }
       navigate(HOME_ROUTE, { replace: true });
     } catch {
       setServerError(true);
@@ -350,14 +365,25 @@ export function CompanySetupPage() {
             <Button appearance="primary" type="submit" disabled={pending}>
               {pending ? t('common:state.loading') : t('auth:setup.submit')}
             </Button>
-            <Button
-              appearance="subtle"
-              type="button"
-              disabled={pending}
-              onClick={() => void signOut()}
-            >
-              {t('common:action.signOut')}
-            </Button>
+            {additional ? (
+              <Button
+                appearance="subtle"
+                type="button"
+                disabled={pending}
+                onClick={() => navigate(HOME_ROUTE)}
+              >
+                {t('common:action.cancel')}
+              </Button>
+            ) : (
+              <Button
+                appearance="subtle"
+                type="button"
+                disabled={pending}
+                onClick={() => void signOut()}
+              >
+                {t('common:action.signOut')}
+              </Button>
+            )}
           </form>
         </Card>
       </div>

@@ -1,15 +1,23 @@
 import { hasPermission } from '@bautakt/core';
 import { Combobox, Option, OptionGroup } from '@fluentui/react-components';
-import { AddCircle20Regular, type FluentIcon, Search20Regular } from '@fluentui/react-icons';
+import {
+  AddCircle20Regular,
+  BuildingMultiple20Regular,
+  type FluentIcon,
+  Person20Regular,
+  Search20Regular,
+  Settings20Regular,
+} from '@fluentui/react-icons';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { useMembership } from '@/features/company/useMembership';
+import { anyCompanySection, useCompanyAccess } from '@/features/companySettings/companyAccess';
 import { hubs, visibleHubCards } from '@/features/hubs/hubs';
 import { routes, withCreate } from '@/lib/routes';
 
-import { calendarNavItem, maySee, navItems, settingsNavItem } from './navItems';
+import { calendarNavItem, maySee, navItems } from './navItems';
 
 type Entry = { to: string; label: string; icon: FluentIcon };
 
@@ -23,6 +31,7 @@ function useEntries(): { pages: Entry[]; actions: Entry[] } {
   const { t } = useTranslation();
   const { data: membership } = useMembership();
   const permissions = membership?.permissions;
+  const companyAccess = useCompanyAccess();
   const can = (key: Parameters<typeof hasPermission>[1]) => hasPermission(permissions, key);
 
   const pages: Entry[] = [
@@ -34,7 +43,12 @@ function useEntries(): { pages: Entry[]; actions: Entry[] } {
         .filter((card) => !card.duplicate)
         .map((card) => ({ to: card.to, label: t(card.titleKey), icon: card.icon })),
     ),
-    { to: settingsNavItem.to, label: t(settingsNavItem.labelKey), icon: settingsNavItem.icon },
+    // Wie im Profilmenü unten links.
+    { to: routes.profile, label: t('account:menu.profile'), icon: Person20Regular },
+    ...(anyCompanySection(companyAccess)
+      ? [{ to: routes.company, label: t('account:menu.company'), icon: BuildingMultiple20Regular }]
+      : []),
+    { to: routes.settings, label: t('account:menu.settings'), icon: Settings20Regular },
   ];
 
   const actions: Entry[] = [

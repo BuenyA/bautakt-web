@@ -15,7 +15,8 @@
     "close": "Schließen",
     "delete": "Löschen",
     "more": "Weitere Aktionen",
-    "helpFor": "Hilfe zu {{label}}"
+    "helpFor": "Hilfe zu {{label}}",
+    "discard": "Verwerfen"
   },
   "state": {
     "loading": "Wird geladen …",
@@ -73,7 +74,6 @@
     "contacts": "Kontakte",
     "catalog": "Katalog",
     "costCenters": "Kostenstellen",
-    "settings": "Einstellungen",
     "openMenu": "Menü öffnen",
     "closeMenu": "Menü schließen",
     "main": "Hauptnavigation"
@@ -127,5 +127,11 @@
   "answer": {
     "yes": "Ja",
     "no": "Nein"
+  },
+  "unsaved": {
+    "title": "Änderungen verwerfen?",
+    "description": "Du hast Eingaben, die noch nicht gespeichert sind. Wenn du die Seite verlässt, gehen sie verloren.",
+    "stay": "Weiter bearbeiten",
+    "leave": "Verwerfen und verlassen"
   }
 }

@@ -1,0 +1,411 @@
+{
+  "title": "Unternehmen",
+  "backToOverview": "Zur Übersicht",
+  "nav": {
+    "label": "Bereiche meines Unternehmens",
+    "overview": "Übersicht",
+    "groupCompany": "Unternehmen",
+    "groupFinance": "Finanzen & Abrechnung",
+    "groupTeam": "Team",
+    "groupDanger": "Gefahrenzone",
+    "masterData": "Unternehmensdaten",
+    "legal": "Rechtliches & Steuern",
+    "bank": "Bankverbindung",
+    "numbers": "Nummernkreise",
+    "invoiceTemplate": "Rechnungsvorlage",
+    "dunning": "Mahnwesen",
+    "rates": "Stundensätze",
+    "costCenters": "Kostenstellen",
+    "catalog": "Katalog & Preise",
+    "mail": "E-Mail-Versand",
+    "datev": "DATEV & Steuerberatung",
+    "roles": "Rollen & Berechtigungen",
+    "absences": "Urlaub & Abwesenheit",
+    "delete": "Unternehmen löschen"
+  },
+  "overview": {
+    "title": "Übersicht",
+    "description": "Alles, was meinen Betrieb in Bautakt einrichtet.",
+    "setup": "Einrichtungsstand",
+    "setupHint": "Was Rechnungen und Mails aus Bautakt brauchen. Offene Punkte führen direkt zur passenden Stelle.",
+    "progress": "{{done}} von {{total}} erledigt",
+    "done": "erledigt",
+    "open": "offen",
+    "checks": {
+      "address": {
+        "title": "Anschrift und Kontakt",
+        "hint": "Name, Anschrift, Telefon und E-Mail stehen auf jeder Rechnung."
+      },
+      "tax": {
+        "title": "Steuernummer oder USt-IdNr.",
+        "hint": "Ohne eine der beiden lässt sich keine Rechnung freigeben."
+      },
+      "register": {
+        "title": "Pflichtangaben für Geschäftsmails",
+        "hint": "Rechtsform, Register und Geschäftsführung — sonst sperrt Bautakt den Mailversand."
+      },
+      "bank": {
+        "title": "Bankverbindung",
+        "hint": "Damit Kunden wissen, wohin sie überweisen."
+      },
+      "logo": {
+        "title": "Logo auf der Rechnung",
+        "hint": "Freiwillig, aber es macht deine Belege erkennbar."
+      }
+    },
+    "tiles": {
+      "masterData": "Name, Gewerk, Anschrift und Kontakt",
+      "legal": "Steuernummer, Rechtsform und Register",
+      "bank": "IBAN und Bank für Rechnungen",
+      "numbers": "Belegnummern und Zahlungsziel",
+      "invoiceTemplate": "Logo, Farbe und Texte der Rechnung",
+      "dunning": "Fristen für Erinnerung und Mahnung",
+      "rates": "Kosten- und Verrechnungssätze",
+      "costCenters": "Kostenstellen anlegen und auswerten",
+      "catalog": "Artikel, Leistungen und Preise",
+      "mail": "Absender und Antwortadresse",
+      "datev": "Kontenrahmen und Export",
+      "roles": "Wer was sehen und tun darf",
+      "absences": "Jahresurlaub und Wochenenden",
+      "delete": "Unternehmen endgültig löschen"
+    }
+  },
+  "masterData": {
+    "title": "Unternehmensdaten",
+    "description": "So steht mein Betrieb auf Rechnungen, Angeboten und Mails."
+  },
+  "legal": {
+    "title": "Rechtliches & Steuern",
+    "description": "Steuerangaben und Pflichtangaben meines Betriebs."
+  },
+  "bank": {
+    "title": "Bankverbindung",
+    "description": "Das Konto, das auf meinen Rechnungen steht."
+  },
+  "numbers": {
+    "title": "Nummernkreise",
+    "description": "Wie meine Belege und Kontakte nummeriert werden.",
+    "documents": "Belegnummern",
+    "documentsHint": "Änderbar, bis für die Belegart die erste Nummer vergeben ist — danach muss die Nummerierung lückenlos weiterlaufen. Ein Startwert über 1 ist erlaubt, etwa beim Umstieg von einer anderen Software.",
+    "type": "Belegart",
+    "prefix": "Präfix",
+    "next": "Nächste Nummer",
+    "example": "So sieht sie aus",
+    "nextInvalid": "Ganze Zahl ab 1.",
+    "locked": "Für diese Belegart sind schon Nummern vergeben. Der Nummernkreis läuft lückenlos weiter und lässt sich nicht mehr ändern.",
+    "lockedShort": "Gesperrt",
+    "paymentTerm": "Zahlungsziel",
+    "paymentTermHint": "Vorschlag für neue Rechnungen. Am Kunden und am Beleg lässt es sich abweichend setzen.",
+    "paymentTermDays": "Standard-Zahlungsziel",
+    "paymentTermInvalid": "0 bis 365 Tage.",
+    "daysUnit": "Tage"
+  },
+  "template": {
+    "title": "Rechnungsvorlage",
+    "description": "Wie meine Rechnungen aussehen. Gilt für neue Belege — freigegebene bleiben, wie sie archiviert sind.",
+    "logo": "Logo",
+    "logoHint": "Steht oben auf jedem Beleg. PNG, JPG oder WebP; Bautakt verkleinert es auf 512 px.",
+    "noLogo": "Kein Logo",
+    "uploadLogo": "Logo hochladen",
+    "replaceLogo": "Logo ersetzen",
+    "removeLogo": "Entfernen",
+    "logoSaved": "Logo gespeichert",
+    "logoRemoved": "Logo entfernt",
+    "logoError": "Das Bild konnte nicht gespeichert werden.",
+    "logoReadOnly": "Das Logo ändert, wer die Unternehmenseinstellungen verwalten darf.",
+    "logoErrors": {
+      "UNSUPPORTED_IMAGE": "Bitte ein PNG-, JPG- oder WebP-Bild wählen.",
+      "IMAGE_UNREADABLE": "Das Bild ließ sich nicht lesen."
+    },
+    "design": "Farbe und Texte",
+    "designHint": "Die Texte stehen in jedem neuen Beleg vorbelegt und lassen sich dort anpassen.",
+    "accent": "Akzentfarbe",
+    "accents": {
+      "default": "Standard",
+      "blue": "Blau",
+      "teal": "Petrol",
+      "slate": "Schiefer",
+      "green": "Grün",
+      "red": "Rot"
+    },
+    "intro": "Einleitung",
+    "introHint": "Steht über den Positionen.",
+    "introPlaceholder": "z. B. Vielen Dank für Ihren Auftrag. Wir berechnen Ihnen folgende Leistungen:",
+    "footer": "Schlusstext",
+    "footerHint": "Steht unter der Summe.",
+    "footerPlaceholder": "z. B. Bitte überweisen Sie den Betrag innerhalb des Zahlungsziels.",
+    "preview": "Vorschau",
+    "previewHint": "Musterrechnung mit Beispielpositionen; der Empfänger bleibt leer.",
+    "previewEmpty": "Die Vorschau wird erstellt …",
+    "previewError": "Die Vorschau konnte nicht erstellt werden.",
+    "sampleLabor": "Montagearbeiten",
+    "sampleMaterial": "Material"
+  },
+  "dunning": {
+    "title": "Mahnwesen",
+    "description": "Ab wann Bautakt an offene Rechnungen erinnert und mahnt.",
+    "info": "Die Fristen zählen ab Fälligkeit der Rechnung. Die Mahnungen selbst findest du unter Rechnungen → Mahnwesen.",
+    "automation": "Stufen und Fristen",
+    "automationHint": "Für jede eingeschaltete Stufe braucht es eine Frist; die Fristen müssen von Stufe zu Stufe steigen.",
+    "auto": "Automatisch vorschlagen",
+    "days": "Tage nach Fälligkeit",
+    "steps": {
+      "reminder": {
+        "label": "Zahlungserinnerung",
+        "hint": "Freundlicher Hinweis, dass die Rechnung offen ist."
+      },
+      "first": {
+        "label": "1. Mahnung",
+        "hint": "Erste förmliche Mahnung."
+      },
+      "second": {
+        "label": "2. Mahnung",
+        "hint": "Letzte Mahnung vor dem Inkasso."
+      },
+      "collection": {
+        "label": "Inkasso",
+        "hint": "Übergabe an ein Inkassobüro."
+      }
+    },
+    "errors": {
+      "required": "Bitte eine Frist größer 0 angeben.",
+      "order": "Muss später liegen als die Stufe davor."
+    }
+  },
+  "rates": {
+    "title": "Stundensätze",
+    "description": "Was eine Stunde meinen Betrieb kostet und was ich dafür berechne.",
+    "current": "Aktuelle Sätze",
+    "currentHint": "Gelten für neu erfasste Zeiten. Eine Rolle ohne eigenen Satz nimmt den Firmenstandard.",
+    "inherits": "Firmenstandard",
+    "editTitle": "Satz für {{target}}",
+    "editHint": "Der neue Satz gilt ab heute. Bereits erfasste Zeiten behalten ihren Satz.",
+    "perHour": "€/h",
+    "positive": "Bitte einen Betrag größer 0.",
+    "saved": "Stundensatz gespeichert",
+    "history": "Verlauf aller Sätze"
+  },
+  "mail": {
+    "title": "E-Mail-Versand",
+    "description": "Wie Bautakt Belege für meinen Betrieb verschickt."
+  },
+  "datev": {
+    "title": "DATEV & Steuerberatung",
+    "description": "Kontenrahmen und Konten für den Export an meine Steuerberatung."
+  },
+  "roles": {
+    "title": "Rollen & Berechtigungen",
+    "description": "Wer in meinem Betrieb was sehen und tun darf.",
+    "listLabel": "Rollen",
+    "hint": "Das sind die Standardrechte der Rolle. Abweichungen für einzelne Personen stellst du auf der Seite des Mitarbeiters ein.",
+    "system": "Systemrolle",
+    "custom": "Eigene Rolle",
+    "members_one": "{{count}} Mitglied",
+    "members_other": "{{count}} Mitglieder",
+    "granted_one": "{{count}} Recht",
+    "granted_other": "{{count}} Rechte",
+    "saved": "Rechte von {{role}} gespeichert",
+    "ownerLocked": "Die Rolle Geschäftsführer hat feste Rechte, damit sich niemand aus der Einrichtung des Betriebs aussperrt.",
+    "create": "Rolle anlegen",
+    "createTitle": "Neue Rolle",
+    "name": "Name",
+    "namePlaceholder": "z. B. Vorarbeiter",
+    "nameShort": "Mindestens 2 Zeichen.",
+    "nameTaken": "Eine Rolle mit diesem Namen gibt es schon.",
+    "icon": "Symbol",
+    "icons": {
+      "user": "Person",
+      "hammer": "Werkzeug",
+      "briefcase": "Aktentasche",
+      "badge-check": "Abzeichen",
+      "book": "Buch",
+      "graduation-cap": "Abschluss"
+    },
+    "template": "Rechte übernehmen von",
+    "templateHint": "Die neue Rolle startet mit den Rechten dieser Rolle. Den Namen kannst du später nicht mehr ändern.",
+    "created": "Rolle {{role}} angelegt",
+    "createError": "Die Rolle konnte nicht angelegt werden.",
+    "deleteBlocked": "Die Rolle ist noch Mitarbeitern zugewiesen.",
+    "deleteTitle": "{{role}} löschen?",
+    "deleteText": "Die Rolle und ihr Stundensatz werden gelöscht. Das lässt sich nicht rückgängig machen.",
+    "deleted": "Rolle {{role}} gelöscht",
+    "deleteError": "Die Rolle konnte nicht gelöscht werden.",
+    "allowed": "erlaubt",
+    "denied": "nicht erlaubt"
+  },
+  "permissionGroups": {
+    "site": "Baustelle & Dokumentation",
+    "documents": "Dokumente",
+    "orders": "Aufträge & Kalender",
+    "finance": "Finanzen",
+    "company": "Unternehmen"
+  },
+  "permissions": {
+    "canTrackTime": {
+      "title": "Zeiterfassung",
+      "description": "Eigene Arbeitszeiten erfassen und bearbeiten"
+    },
+    "canTrackTimeForTeam": {
+      "title": "Zeiterfassung für Team",
+      "description": "Zeiten für andere Mitarbeiter erfassen und verwalten"
+    },
+    "canCreateAndViewReports": {
+      "title": "Bautagebuch",
+      "description": "Bautagebücher erstellen und einsehen"
+    },
+    "canRecordMaterials": {
+      "title": "Material erfassen",
+      "description": "Materialverbrauch auf Aufträgen buchen"
+    },
+    "canViewChecklist": {
+      "title": "Checkliste einsehen",
+      "description": "Auftrags-Checklisten ansehen, ohne sie zu ändern"
+    },
+    "canEditChecklist": {
+      "title": "Checkliste bearbeiten",
+      "description": "Punkte anlegen, abhaken, bearbeiten und löschen"
+    },
+    "canViewNotes": {
+      "title": "Notizen einsehen",
+      "description": "Auftrags-Notizen ansehen, ohne sie zu ändern"
+    },
+    "canCreateNotes": {
+      "title": "Notizen bearbeiten",
+      "description": "Notizen anlegen, bearbeiten und löschen"
+    },
+    "canTakePhotos": {
+      "title": "Fotos & Galerie",
+      "description": "Bilder aufnehmen und verwalten"
+    },
+    "canViewDocuments": {
+      "title": "Dokumente einsehen",
+      "description": "Hochgeladene Dokumente anzeigen"
+    },
+    "canUploadAndEditDocuments": {
+      "title": "Dokumente bearbeiten",
+      "description": "Dokumente hochladen und ändern"
+    },
+    "canCreateOrders": {
+      "title": "Aufträge anlegen",
+      "description": "Neue Aufträge erstellen"
+    },
+    "canManageOrders": {
+      "title": "Aufträge verwalten",
+      "description": "Bestehende Aufträge bearbeiten"
+    },
+    "canCompleteOrders": {
+      "title": "Aufträge abschließen",
+      "description": "Aufträge als abgeschlossen markieren"
+    },
+    "canManageAllCalendar": {
+      "title": "Kalender (alle)",
+      "description": "Termine für alle Mitarbeiter verwalten"
+    },
+    "canManageWorkAssignments": {
+      "title": "Einsatzplanung",
+      "description": "Mitarbeiter auf Baustellen einteilen und planen"
+    },
+    "canUseBillingModule": {
+      "title": "Rechnungsmodul",
+      "description": "Rechnungen erstellen und versenden"
+    },
+    "canViewManagementInvoices": {
+      "title": "Rechnungen einsehen",
+      "description": "Finanzübersicht im Management"
+    },
+    "canViewOrderFinance": {
+      "title": "Auftragsfinanzen",
+      "description": "Kosten und Margen eines Auftrags einsehen (ohne Kollegenlöhne)"
+    },
+    "canViewWageCosts": {
+      "title": "Lohnkosten einsehen",
+      "description": "Individuelle Lohn- und Kostensätze der Mitarbeiter sehen"
+    },
+    "canManageRates": {
+      "title": "Stundensätze pflegen",
+      "description": "Kosten- und Verrechnungssätze anlegen und ändern"
+    },
+    "canManageOverheadCosts": {
+      "title": "Gemeinkosten pflegen",
+      "description": "Gemeinkosten und Kostenarten erfassen und verwalten"
+    },
+    "canViewCompanyFinance": {
+      "title": "Betriebsergebnis",
+      "description": "Firmenweite Auswertungen und Charts im Finanzbereich"
+    },
+    "canManageCustomers": {
+      "title": "Kunden verwalten",
+      "description": "Kunden anlegen und bearbeiten"
+    },
+    "canManageSuppliers": {
+      "title": "Lieferanten verwalten",
+      "description": "Lieferanten, Subunternehmer und Freistellungsbescheinigungen pflegen"
+    },
+    "canManageCostCenters": {
+      "title": "Kostenstellen",
+      "description": "Kostenstellen anlegen und bearbeiten"
+    },
+    "canManageEmployees": {
+      "title": "Mitarbeiter verwalten",
+      "description": "Mitarbeiter hinzufügen und bearbeiten"
+    },
+    "canManageAbsences": {
+      "title": "Fehlzeiten verwalten",
+      "description": "Anträge einsehen, genehmigen, ablehnen und Fehlzeiten direkt erfassen"
+    },
+    "canManageRoles": {
+      "title": "Rollen verwalten",
+      "description": "Rollen anlegen, löschen und Standardrechte bearbeiten"
+    },
+    "canSendNotifications": {
+      "title": "Benachrichtigungen",
+      "description": "Push- und In-App-Nachrichten senden"
+    },
+    "canEditCompanyMasterData": {
+      "title": "Stammdaten",
+      "description": "Unternehmensdaten bearbeiten"
+    },
+    "canManageCompanySettings": {
+      "title": "Einstellungen",
+      "description": "Allgemeine Unternehmenseinstellungen"
+    },
+    "canManageCatalog": {
+      "title": "Materialkatalog",
+      "description": "Artikel und Preise im Unternehmenskatalog pflegen"
+    },
+    "canManageLicenses": {
+      "title": "Lizenzen",
+      "description": "Lizenzen und Abonnements verwalten"
+    }
+  },
+  "absences": {
+    "title": "Urlaub & Abwesenheit",
+    "description": "Standards für Urlaub in meinem Betrieb.",
+    "leave": "Urlaubskontingent",
+    "leaveHint": "Gilt für alle Mitarbeiter. Abweichungen für einzelne Personen stellst du auf der Seite des Mitarbeiters ein.",
+    "days": "Jahresurlaubsanspruch",
+    "daysUnit": "Tage",
+    "daysInvalid": "0 bis 365 Tage, halbe Tage mit Komma.",
+    "weekends": "Wochenenden zählen als Urlaub",
+    "weekendsHint": "Ausgeschaltet zählen nur Werktage (Mo–Fr) abzüglich Feiertage."
+  },
+  "delete": {
+    "title": "Unternehmen löschen",
+    "description": "Den Betrieb mit allen Daten endgültig aus Bautakt entfernen.",
+    "cardTitle": "{{name}} löschen",
+    "warningTitle": "Das lässt sich nicht rückgängig machen.",
+    "warning": "Alle Daten des Unternehmens werden sofort und endgültig gelöscht.",
+    "consequences": {
+      "data": "Aufträge, Kontakte, Zeiten, Belege und Dokumente werden gelöscht.",
+      "team": "Alle Mitarbeiter verlieren den Zugriff auf das Unternehmen.",
+      "archive": "Lade vorher herunter, was du aufbewahren musst — etwa den DATEV-Export und die Rechnungs-PDFs."
+    },
+    "action": "Unternehmen löschen …",
+    "confirmTitle": "Wirklich endgültig löschen?",
+    "confirmText": "Tippe zur Bestätigung den Namen des Unternehmens ein: {{name}}",
+    "confirmLabel": "Name des Unternehmens",
+    "confirmAction": "Endgültig löschen",
+    "done": "{{name}} wurde gelöscht.",
+    "error": "Das Unternehmen konnte nicht gelöscht werden."
+  }
+}
