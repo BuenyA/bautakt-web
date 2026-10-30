@@ -22,6 +22,7 @@ import { cn } from '../lib/cn';
  * und `FormDrawerDescription`, `DrawerBody`, `FormDrawerFooter`. Das Formular
  * liegt zwischen Drawer und Kopf, damit Enter im Feld absendet; es braucht
  * `className="flex h-full min-h-0 flex-col"`, sonst scrollt der Body nicht.
+ * Die volle Breite setzt `FormDrawer` selbst.
  *
  * `onOpenChange` bekommt nur den Wert, wie zuvor bei shadcn. Wer das Schließen
  * während einer laufenden Mutation sperren will, nimmt `useDismissLock`.
@@ -41,6 +42,9 @@ export function FormDrawer({
     <OverlayDrawer
       position="end"
       size={size}
+      // Fluent richtet den Inhalt mit `align-items: flex-start` aus; ohne volle
+      // Breite wäre ein Formular nur so breit wie sein längster Text.
+      className="[&>*]:w-full"
       open={open}
       onOpenChange={(_, data) => onOpenChange(data.open)}
     >
