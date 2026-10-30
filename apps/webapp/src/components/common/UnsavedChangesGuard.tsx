@@ -1,16 +1,8 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogBody,
-  DialogContent,
-  DialogSurface,
-  DialogTitle,
-} from '@fluentui/react-components';
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBlocker } from 'react-router';
 
+import { DiscardChangesDialog } from './DiscardChangesDialog';
 import { UnsavedChangesContext } from './unsavedChanges';
 
 /**
@@ -54,27 +46,17 @@ export function UnsavedChangesGuard({ children }: { children: ReactNode }) {
   return (
     <UnsavedChangesContext.Provider value={registry}>
       {children}
-      <Dialog
+      <DiscardChangesDialog
         open={blocker.state === 'blocked'}
-        onOpenChange={(_, data) => {
-          if (!data.open) blocker.reset?.();
-        }}
-      >
-        <DialogSurface>
-          <DialogBody>
-            <DialogTitle>{t('common:unsaved.title')}</DialogTitle>
-            <DialogContent>{t('common:unsaved.description')}</DialogContent>
-            <DialogActions>
-              <Button appearance="secondary" onClick={() => blocker.reset?.()}>
-                {t('common:unsaved.stay')}
-              </Button>
-              <Button appearance="primary" onClick={() => blocker.proceed?.()}>
-                {t('common:unsaved.leave')}
-              </Button>
-            </DialogActions>
-          </DialogBody>
-        </DialogSurface>
-      </Dialog>
+        onDismiss={() => blocker.reset?.()}
+        title={t('common:unsaved.title')}
+        description={t('common:unsaved.description')}
+        keepLabel={t('common:unsaved.stay')}
+        discardLabel={t('common:unsaved.leave')}
+        keepAppearance="secondary"
+        onKeep={() => blocker.reset?.()}
+        onDiscard={() => blocker.proceed?.()}
+      />
     </UnsavedChangesContext.Provider>
   );
 }

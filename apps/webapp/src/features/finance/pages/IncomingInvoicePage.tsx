@@ -39,6 +39,7 @@ import { type FormEvent, type ReactNode, useEffect, useId, useMemo, useRef, useS
 import { useTranslation } from 'react-i18next';
 import { useBlocker, useNavigate, useParams } from 'react-router';
 
+import { DiscardChangesDialog } from '@/components/common/DiscardChangesDialog';
 import { PageHeader } from '@/components/common/PageHeader';
 import { DatePicker } from '@/components/form/dateTime';
 import { ContactPicker } from '@/features/contacts/ContactPicker';
@@ -868,25 +869,16 @@ function IncomingInvoiceForm({
         </DialogSurface>
       </Dialog>
 
-      <Dialog
+      <DiscardChangesDialog
         open={blocker.state === 'blocked'}
-        onOpenChange={(_, data) => {
-          if (!data.open) blocker.reset?.();
-        }}
-      >
-        <DialogSurface>
-          <DialogBody>
-            <DialogTitle>{t('domain:editor.discard.title')}</DialogTitle>
-            <DialogContent>{t('domain:editor.discard.description')}</DialogContent>
-            <DialogActions>
-              <Button onClick={() => blocker.reset?.()}>{t('domain:editor.discard.keep')}</Button>
-              <Button appearance="primary" onClick={() => blocker.proceed?.()}>
-                {t('domain:editor.discard.confirm')}
-              </Button>
-            </DialogActions>
-          </DialogBody>
-        </DialogSurface>
-      </Dialog>
+        onDismiss={() => blocker.reset?.()}
+        title={t('domain:editor.discard.title')}
+        description={t('domain:editor.discard.description')}
+        keepLabel={t('domain:editor.discard.keep')}
+        discardLabel={t('domain:editor.discard.confirm')}
+        onKeep={() => blocker.reset?.()}
+        onDiscard={() => blocker.proceed?.()}
+      />
     </form>
   );
 }
