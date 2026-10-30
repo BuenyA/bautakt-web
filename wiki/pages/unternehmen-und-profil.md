@@ -120,8 +120,9 @@ Die Unternavigation hat dieselbe Dichte wie die Seitenleiste (Fluent-Standard,
 `UnsavedChangesGuard` (ein Guard je Bereich, React Router erlaubt nur einen
 Blocker) fragt beim Verlassen der Seite nach, `beforeunload` beim Schließen
 des Tabs. Karten melden sich über `useReportUnsaved`. `FormCard` macht das
-selbst. Der Wechsel zwischen Rollen innerhalb der Rollenseite fragt nicht
-nach, dort gehen ungespeicherte Schalter verloren.
+selbst. Die Rückfrage ist `DiscardChangesDialog`: „Verwerfen und verlassen“
+ist ein `DangerButton`. Der Wechsel zwischen Rollen innerhalb der Rollenseite
+fragt nicht nach, dort gehen ungespeicherte Schalter verloren.
 
 ## Code
 

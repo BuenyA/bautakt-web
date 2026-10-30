@@ -127,6 +127,13 @@ Knopf keinen Text mehr (Owner: „nimmt zu viel Platz weg“): auf Seiten und in
 `DeleteButton`, in Tabellenzeilen und auf Kacheln `DangerIconButton`. Nur der
 Bestätigungsknopf im Dialog ist ein `DangerButton` mit Text.
 
+Seit 2026-10-30 gilt das auch für „Verwerfen“ in der Rückfrage „Änderungen
+verwerfen?“. `DiscardChangesDialog` (`apps/webapp/src/components/common`) setzt
+den bestätigenden Knopf auf `DangerButton`. Aufgerufen wird er im
+Rechnungs-Editor, im Eingangsrechnungs-Editor und im `UnsavedChangesGuard`
+(Profil und Unternehmen). Der „Verwerfen“-Knopf auf der Formular-Karte
+(`FormCard`) setzt nur den Entwurf zurück und bleibt ein normaler Knopf.
+
 Im Panel-Fuß steht der Mülleimer links: `className="mr-auto!"`. Ohne `!` gewinnt
 Fluents `margin: 0` am Button gegen Tailwind (Utilities liegen in einer Layer); das
 frühere `sm:mr-auto` hatte deshalb nie gewirkt.

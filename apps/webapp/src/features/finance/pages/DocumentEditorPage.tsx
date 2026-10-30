@@ -13,12 +13,6 @@ import {
   Button,
   Card,
   CardHeader,
-  Dialog,
-  DialogActions,
-  DialogBody,
-  DialogContent,
-  DialogSurface,
-  DialogTitle,
   Input,
   Label,
   makeStyles,
@@ -46,6 +40,7 @@ import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'rea
 import { useTranslation } from 'react-i18next';
 import { useBlocker, useNavigate, useParams, useSearchParams } from 'react-router';
 
+import { DiscardChangesDialog } from '@/components/common/DiscardChangesDialog';
 import { EmptyState } from '@/components/common/EmptyState';
 import { HelpButton } from '@/components/common/HelpButton';
 import { LinkButton } from '@/components/common/LinkButton';
@@ -1250,20 +1245,16 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
         onClose={() => setConfirmRelease(false)}
       />
 
-      <Dialog open={discardOpen} onOpenChange={(_, data) => !data.open && onDiscardKept()}>
-        <DialogSurface>
-          <DialogBody>
-            <DialogTitle>{t('domain:editor.discard.title')}</DialogTitle>
-            <DialogContent>{t('domain:editor.discard.description')}</DialogContent>
-            <DialogActions>
-              <Button onClick={onDiscardKept}>{t('domain:editor.discard.keep')}</Button>
-              <Button appearance="primary" onClick={onDiscardConfirmed}>
-                {t('domain:editor.discard.confirm')}
-              </Button>
-            </DialogActions>
-          </DialogBody>
-        </DialogSurface>
-      </Dialog>
+      <DiscardChangesDialog
+        open={discardOpen}
+        onDismiss={onDiscardKept}
+        title={t('domain:editor.discard.title')}
+        description={t('domain:editor.discard.description')}
+        keepLabel={t('domain:editor.discard.keep')}
+        discardLabel={t('domain:editor.discard.confirm')}
+        onKeep={onDiscardKept}
+        onDiscard={onDiscardConfirmed}
+      />
     </div>
   );
 }
