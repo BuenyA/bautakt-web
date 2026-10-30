@@ -851,7 +851,7 @@
       "paid": "Bezahlt"
     },
     "emptyFilterTitle": "Keine Eingangsrechnungen mit diesem Status",
-    "emptyFilterDescription": "Unter „Alle“ stehen die übrigen.",
+    "emptyFilterDescription": "Im Filter „Alle“ wählen, um die übrigen zu sehen.",
     "emptyExpensesTitle": "Keine Ausgaben erfasst",
     "emptyExpensesDescription": "Gemeinkosten und sonstige Belege erscheinen hier."
   },
