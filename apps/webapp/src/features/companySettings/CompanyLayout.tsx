@@ -10,7 +10,7 @@ import { useCompanyNavGroups } from './companyNav';
 export function CompanyLayout() {
   const { t } = useTranslation();
   const { data: membership } = useMembership();
-  const groups = useCompanyNavGroups();
+  const { groups, ready } = useCompanyNavGroups();
 
   return (
     <UnsavedChangesGuard>
@@ -19,7 +19,7 @@ export function CompanyLayout() {
         subtitle={membership?.companyName}
         basePath={routes.company}
         groups={groups}
-        indexPage
+        ready={ready}
         ariaLabel={t('companySettings:nav.label')}
       />
     </UnsavedChangesGuard>

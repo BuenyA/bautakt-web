@@ -1,9 +1,9 @@
 {
   "title": "Unternehmen",
-  "backToOverview": "Zur Übersicht",
+  "backToOverview": "Zurück zum Unternehmen",
   "nav": {
     "label": "Bereiche meines Unternehmens",
-    "overview": "Übersicht",
+    "setupStatus": "Einrichtung",
     "groupCompany": "Unternehmen",
     "groupFinance": "Finanzen & Abrechnung",
     "groupTeam": "Team",
@@ -23,14 +23,15 @@
     "absences": "Urlaub & Abwesenheit",
     "delete": "Unternehmen löschen"
   },
-  "overview": {
-    "title": "Übersicht",
-    "description": "Alles, was meinen Betrieb in Bautakt einrichtet.",
-    "setup": "Einrichtungsstand",
-    "setupHint": "Was Rechnungen und Mails aus Bautakt brauchen. Offene Punkte führen direkt zur passenden Stelle.",
+  "setupStatus": {
+    "title": "Einrichtung",
+    "description": "Was meinem Betrieb für Rechnungen und Mails noch fehlt. Ist alles eingetragen, verschwindet dieser Abschnitt.",
+    "progressTitle": "Einrichtungsstand",
+    "hint": "Offene Punkte führen direkt zur passenden Stelle.",
     "progress": "{{done}} von {{total}} erledigt",
     "done": "erledigt",
     "open": "offen",
+    "optional": "Optional",
     "checks": {
       "address": {
         "title": "Anschrift und Kontakt",
@@ -42,7 +43,7 @@
       },
       "register": {
         "title": "Pflichtangaben für Geschäftsmails",
-        "hint": "Rechtsform, Register und Geschäftsführung — sonst sperrt Bautakt den Mailversand."
+        "hint": "Rechtsform, Register und Geschäftsführung. Ohne diese Angaben sperrt Bautakt den Mailversand."
       },
       "bank": {
         "title": "Bankverbindung",
@@ -52,22 +53,6 @@
         "title": "Logo auf der Rechnung",
         "hint": "Freiwillig, aber es macht deine Belege erkennbar."
       }
-    },
-    "tiles": {
-      "masterData": "Name, Gewerk, Anschrift und Kontakt",
-      "legal": "Steuernummer, Rechtsform und Register",
-      "bank": "IBAN und Bank für Rechnungen",
-      "numbers": "Belegnummern und Zahlungsziel",
-      "invoiceTemplate": "Logo, Farbe und Texte der Rechnung",
-      "dunning": "Fristen für Erinnerung und Mahnung",
-      "rates": "Kosten- und Verrechnungssätze",
-      "costCenters": "Kostenstellen anlegen und auswerten",
-      "catalog": "Artikel, Leistungen und Preise",
-      "mail": "Absender und Antwortadresse",
-      "datev": "Kontenrahmen und Export",
-      "roles": "Wer was sehen und tun darf",
-      "absences": "Jahresurlaub und Wochenenden",
-      "delete": "Unternehmen endgültig löschen"
     }
   },
   "masterData": {
@@ -86,7 +71,7 @@
     "title": "Nummernkreise",
     "description": "Wie meine Belege und Kontakte nummeriert werden.",
     "documents": "Belegnummern",
-    "documentsHint": "Änderbar, bis für die Belegart die erste Nummer vergeben ist — danach muss die Nummerierung lückenlos weiterlaufen. Ein Startwert über 1 ist erlaubt, etwa beim Umstieg von einer anderen Software.",
+    "documentsHint": "Änderbar, bis für die Belegart die erste Nummer vergeben ist. Danach muss die Nummerierung lückenlos weiterlaufen. Ein Startwert über 1 ist erlaubt, etwa beim Umstieg von einer anderen Software.",
     "type": "Belegart",
     "prefix": "Präfix",
     "next": "Nächste Nummer",
@@ -102,7 +87,7 @@
   },
   "template": {
     "title": "Rechnungsvorlage",
-    "description": "Wie meine Rechnungen aussehen. Gilt für neue Belege — freigegebene bleiben, wie sie archiviert sind.",
+    "description": "Wie meine Rechnungen aussehen. Gilt für neue Belege. Freigegebene bleiben so, wie sie archiviert sind.",
     "logo": "Logo",
     "logoHint": "Steht oben auf jedem Beleg. PNG, JPG oder WebP; Bautakt verkleinert es auf 512 px.",
     "noLogo": "Kein Logo",
@@ -387,7 +372,7 @@
     "daysUnit": "Tage",
     "daysInvalid": "0 bis 365 Tage, halbe Tage mit Komma.",
     "weekends": "Wochenenden zählen als Urlaub",
-    "weekendsHint": "Ausgeschaltet zählen nur Werktage (Mo–Fr) abzüglich Feiertage."
+    "weekendsHint": "Ausgeschaltet zählen nur Werktage (Montag bis Freitag) abzüglich Feiertage."
   },
   "delete": {
     "title": "Unternehmen löschen",
@@ -398,7 +383,7 @@
     "consequences": {
       "data": "Aufträge, Kontakte, Zeiten, Belege und Dokumente werden gelöscht.",
       "team": "Alle Mitarbeiter verlieren den Zugriff auf das Unternehmen.",
-      "archive": "Lade vorher herunter, was du aufbewahren musst — etwa den DATEV-Export und die Rechnungs-PDFs."
+      "archive": "Lade vorher herunter, was du aufbewahren musst, etwa den DATEV-Export und die Rechnungs-PDFs."
     },
     "action": "Unternehmen löschen …",
     "confirmTitle": "Wirklich endgültig löschen?",

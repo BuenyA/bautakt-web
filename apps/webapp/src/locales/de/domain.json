@@ -205,7 +205,7 @@
   },
   "contacts": {
     "listTitle": "Kontakte",
-    "listDescription": "Kunden, Lieferanten, Subunternehmer und alle anderen Beteiligten – jeder nur einmal.",
+    "listDescription": "Kunden, Lieferanten, Subunternehmer und alle anderen Beteiligten, jeder nur einmal.",
     "detailTitle": "Kontakt",
     "new": "Neuer Kontakt",
     "newCustomer": "Neuer Kunde",
@@ -262,7 +262,7 @@
     "usageArticles": "Katalogartikel",
     "andMore": "und {{count}} weitere",
     "emptyTitle": "Noch keine Kontakte",
-    "emptyDescription": "Lege Kunden, Lieferanten und Partner an – oder sie entstehen beim Erfassen von Aufträgen und Rechnungen.",
+    "emptyDescription": "Lege Kunden, Lieferanten und Partner an. Sie entstehen auch beim Erfassen von Aufträgen und Rechnungen.",
     "emptyResultsTitle": "Keine Treffer",
     "emptyResultsDescription": "In diesem Reiter steht niemand, der zur Suche passt.",
     "loadErrorTitle": "Kontakte konnten nicht geladen werden",
@@ -318,7 +318,7 @@
     "exemptionHint": "Die §48b-Freistellungsbescheinigung hinterlegst du nach dem Speichern auf der Kontaktseite.",
     "function": "Funktion",
     "notes": "Notizen",
-    "nameRequired": "Bitte einen Namen angeben – bei Firmen den Firmennamen, bei Personen Vor- oder Nachname.",
+    "nameRequired": "Bitte einen Namen angeben: bei Firmen den Firmennamen, bei Personen Vor- oder Nachname.",
     "roleRequired": "Bitte mindestens eine Rolle wählen.",
     "daysInvalid": "Tage bitte als ganze Zahl angeben.",
     "buyerReferenceTooLong": "Die Leitweg-ID darf höchstens {{max}} Zeichen haben.",
@@ -353,7 +353,7 @@
     "newTitle": "Neue Bankverbindung",
     "editTitle": "Bankverbindung bearbeiten",
     "ibanInvalid": "Diese IBAN ist nicht gültig (Prüfziffer stimmt nicht).",
-    "fraudHint": "Eine neue oder geänderte Bankverbindung eines Lieferanten wird dem Inhaber gemeldet. Prüfe Änderungen immer telefonisch beim Lieferanten – geänderte IBANs sind der häufigste Weg für Rechnungsbetrug.",
+    "fraudHint": "Eine neue oder geänderte Bankverbindung eines Lieferanten wird dem Inhaber gemeldet. Prüfe Änderungen immer telefonisch beim Lieferanten, denn geänderte IBANs sind der häufigste Weg für Rechnungsbetrug.",
     "saved": "Bankverbindung gespeichert",
     "saveError": "Konnte nicht gespeichert werden.",
     "deleted": "Bankverbindung entfernt",
@@ -370,7 +370,7 @@
     },
     "withholdingHint": "Ohne gültige Bescheinigung am Zahlungstag müssen 15 % jeder Rechnung als Bauabzugsteuer einbehalten und ans Finanzamt abgeführt werden.",
     "newTitle": "Freistellungsbescheinigung",
-    "description": "Gültigkeit und Nummer stehen auf der Bescheinigung des Finanzamts. Eine Erneuerung ist ein neuer Eintrag – die alte gilt für frühere Zahlungen weiter.",
+    "description": "Gültigkeit und Nummer stehen auf der Bescheinigung des Finanzamts. Eine Erneuerung ist ein neuer Eintrag. Die alte gilt für frühere Zahlungen weiter.",
     "validFrom": "Gültig ab",
     "validUntil": "Gültig bis",
     "number": "Nummer der Bescheinigung",
@@ -496,7 +496,7 @@
     },
     "absence": {
       "approved": "{{type}} {{period}}",
-      "approvedAssigned": "{{type}} {{period}} – bitte austragen",
+      "approvedAssigned": "{{type}} {{period}}, bitte austragen",
       "pending": "{{type}} beantragt ({{period}})",
       "onTile": "{{type}} (genehmigt)",
       "onTilePending": "{{type}} beantragt"
@@ -541,9 +541,9 @@
   },
   "agingBucket": {
     "not_due": "Nicht fällig",
-    "1_30": "1–30 Tage",
-    "31_60": "31–60 Tage",
-    "61_90": "61–90 Tage",
+    "1_30": "1 bis 30 Tage",
+    "31_60": "31 bis 60 Tage",
+    "61_90": "61 bis 90 Tage",
     "90_plus": "Über 90 Tage"
   },
   "invoices": {
@@ -1118,8 +1118,8 @@
       "action": "Kostenstelle anlegen",
       "title": "Kostenstelle anlegen",
       "description": "Nummer und Bezeichnung gelten für diesen Betrieb und sind danach auch in der Handy-App sichtbar.",
-      "codeRequired": "Bitte eine Nummer angeben — sonst ist die Kostenstelle in der Liste nicht zu finden.",
-      "nameRequired": "Bitte eine Bezeichnung angeben — sonst ist die Kostenstelle in der Liste nicht zu finden.",
+      "codeRequired": "Bitte eine Nummer angeben, sonst ist die Kostenstelle in der Liste nicht zu finden.",
+      "nameRequired": "Bitte eine Bezeichnung angeben, sonst ist die Kostenstelle in der Liste nicht zu finden.",
       "duplicateCode": "Diese Nummer gibt es in diesem Betrieb schon.",
       "saved": "Kostenstelle angelegt.",
       "saveError": "Kostenstelle konnte nicht angelegt werden."
@@ -1422,7 +1422,7 @@
       "label": "Umsatzsteuer",
       "modes": {
         "standard": "Regulär (mit USt)",
-        "reverse_charge": "§ 13b – Steuerschuld beim Kunden",
+        "reverse_charge": "§ 13b: Steuerschuld beim Kunden",
         "tax_free": "Steuerfrei",
         "small_business": "Kleinunternehmer (§ 19)"
       },
@@ -1710,7 +1710,7 @@
   },
   "absenceForm": {
     "title": "Abwesenheit eintragen",
-    "description": "Wird sofort als genehmigt eingetragen — du entscheidest hier selbst. Offene Anträge kommen aus der Handy-App.",
+    "description": "Wird sofort als genehmigt eingetragen, du entscheidest hier selbst. Offene Anträge kommen aus der Handy-App.",
     "start": "Von",
     "end": "Bis",
     "employeeRequired": "Bitte einen Mitarbeiter wählen.",
@@ -2006,7 +2006,7 @@
     "title": "Beteiligte",
     "description": "Wer außer dem Kunden noch an diesem Auftrag hängt.",
     "add": "Hinzufügen",
-    "empty": "Noch niemand eingetragen – z. B. Architekt, Hausverwaltung oder Ansprechpartner vor Ort.",
+    "empty": "Noch niemand eingetragen, z. B. Architekt, Hausverwaltung oder Ansprechpartner vor Ort.",
     "newTitle": "Beteiligten hinzufügen",
     "contact": "Kontakt",
     "chooseContact": "Kontakt wählen …",

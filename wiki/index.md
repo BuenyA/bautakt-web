@@ -121,6 +121,7 @@ verlinkt, nie kopiert.
 | 2026-10-27 | [Rechtsseiten in der Web-App](logs/2026-10-27-rechtsseiten-webapp.md)                                          |
 | 2026-10-28 | [Betrieb einrichten nach der Anmeldung](logs/2026-10-28-betrieb-einrichten.md)                                 |
 | 2026-10-30 | [Profilmenü neu: Mein Profil, Unternehmen, Einstellungen](logs/2026-10-30-profil-unternehmen-einstellungen.md) |
+| 2026-10-30 | [Einrichtung statt Übersicht, keine Gedankenstriche](logs/2026-10-30-einrichtung-und-gedankenstriche.md)       |
 
 ## Die drei wichtigsten Sätze
 

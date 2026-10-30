@@ -87,7 +87,7 @@
     "leaveError": "Du konntest das Unternehmen nicht verlassen.",
     "leaveLastOwner": "Du bist der letzte Geschäftsführer. Ernenne zuerst jemand anderen oder lösche das Unternehmen.",
     "deleteAccount": "Konto löschen",
-    "deleteAccountHint": "Dein Konto lässt sich derzeit nicht direkt löschen. Schreib uns kurz — wir löschen es und bestätigen dir das.",
+    "deleteAccountHint": "Dein Konto lässt sich derzeit nicht direkt löschen. Schreib uns kurz, dann löschen wir es und bestätigen dir das.",
     "deleteProfile": "Dein Profil und deine persönlichen Daten werden gelöscht.",
     "deleteMemberships": "Deine Verknüpfungen zu Unternehmen werden entfernt.",
     "deleteRetention": "Belege und Zeiterfassungen mit gesetzlicher Aufbewahrungsfrist werden anonymisiert statt gelöscht.",
@@ -130,7 +130,7 @@
       }
     },
     "contact": "Kontakt",
-    "contactHint": "Du hast eine Frage oder brauchst Hilfe? Schreib uns — wir helfen dir gern weiter.",
+    "contactHint": "Du hast eine Frage oder brauchst Hilfe? Schreib uns, wir helfen dir gern weiter.",
     "writeUs": "E-Mail schreiben",
     "feedback": "Feedback geben",
     "feedbackHint": "Was gefällt dir, was fehlt, was klemmt? Dein Feedback geht direkt an unser Team.",
@@ -167,7 +167,7 @@
       "briefingTime": "Uhrzeit",
       "briefingTimeHint": "In Viertelstundenschritten.",
       "quiet": "Ruhezeiten",
-      "quietLabel": "Zwischen 20:00 und 06:00 ohne Ton — die Nachricht kommt am Morgen",
+      "quietLabel": "Zwischen 20:00 und 06:00 ohne Ton, die Nachricht kommt am Morgen",
       "types": "Worüber ich benachrichtigt werde",
       "categories": {
         "team": { "label": "Team-Nachrichten", "hint": "Rundnachrichten aus meinem Betrieb" },

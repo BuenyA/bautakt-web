@@ -139,30 +139,30 @@ function MobileLink({ item }: { item: SubNavItem }) {
 }
 
 /**
- * Bereich mit Unternavigation — Mein Profil und Unternehmen.
+ * Bereich mit Unternavigation: Mein Profil und Unternehmen.
  *
  * Breit: links die Abschnitte als Fluent-`Nav` mit Gruppenüberschriften,
  * rechts der Abschnitt (`Outlet`). Jeder Abschnitt hat eine eigene Adresse,
- * damit Links und Lesezeichen funktionieren.
+ * damit Links und Lesezeichen funktionieren. Die Startadresse führt zum ersten
+ * sichtbaren Abschnitt.
  *
- * Schmal: auf der Startadresse die Liste (oder die Startseite, wenn es eine
- * gibt), im Abschnitt ein Zurück-Knopf dorthin. Hat der Bereich keine eigene Startseite (`indexPage: false`), führt
- * die Startadresse in der breiten Ansicht direkt zum ersten Abschnitt.
+ * Schmal: auf der Startadresse die Liste, im Abschnitt ein Zurück-Knopf
+ * dorthin, wie in der App.
  */
 export function SubNavLayout({
   title,
   subtitle,
   basePath,
   groups,
-  indexPage,
+  ready = true,
   ariaLabel,
 }: {
   title: string;
   subtitle?: ReactNode;
   basePath: string;
   groups: SubNavGroup[];
-  /** `true`: die Startadresse ist selbst ein Abschnitt (Übersicht). */
-  indexPage: boolean;
+  /** `false`, solange noch offen ist, welche Abschnitte sichtbar sind. */
+  ready?: boolean;
   ariaLabel: string;
 }) {
   const { t } = useTranslation();
@@ -189,7 +189,7 @@ export function SubNavLayout({
   );
 
   if (narrow) {
-    if (atIndex && !indexPage) {
+    if (atIndex) {
       return (
         <nav aria-label={ariaLabel} className="mx-auto flex w-full max-w-xl flex-col gap-4">
           {heading}
@@ -210,27 +210,26 @@ export function SubNavLayout({
     }
     return (
       <div className="flex flex-col gap-4">
-        {atIndex ? null : (
-          <div>
-            <Button
-              as="a"
-              href={backLink.href}
-              onClick={backLink.onClick}
-              appearance="subtle"
-              icon={<ChevronLeft20Regular />}
-            >
-              {title}
-            </Button>
-          </div>
-        )}
-        {/* Mit eigener Startseite listet die Übersicht die Abschnitte selbst. */}
+        <div>
+          <Button
+            as="a"
+            href={backLink.href}
+            onClick={backLink.onClick}
+            appearance="subtle"
+            icon={<ChevronLeft20Regular />}
+          >
+            {title}
+          </Button>
+        </div>
         <Outlet />
       </div>
     );
   }
 
-  if (atIndex && !indexPage && items[0]) {
-    return <Navigate to={items[0].to} replace />;
+  if (atIndex) {
+    // Noch offen, welcher Abschnitt der erste ist: nicht voreilig umleiten.
+    if (!ready) return null;
+    if (items[0]) return <Navigate to={items[0].to} replace />;
   }
 
   return (

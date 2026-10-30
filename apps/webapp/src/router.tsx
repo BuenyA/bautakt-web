@@ -24,13 +24,13 @@ import {
   MailPage,
   MasterDataPage,
 } from '@/features/companySettings/pages/CompanyDataPages';
-import { CompanyOverviewPage } from '@/features/companySettings/pages/CompanyOverviewPage';
 import { DeleteCompanyPage } from '@/features/companySettings/pages/DeleteCompanyPage';
 import { DunningSettingsPage } from '@/features/companySettings/pages/DunningSettingsPage';
 import { InvoiceTemplatePage } from '@/features/companySettings/pages/InvoiceTemplatePage';
 import { NumbersPage } from '@/features/companySettings/pages/NumbersPage';
 import { RatesPage } from '@/features/companySettings/pages/RatesPage';
 import { RolesPage } from '@/features/companySettings/pages/RolesPage';
+import { SetupStatusPage } from '@/features/companySettings/pages/SetupStatusPage';
 import { ContactDetailPage } from '@/features/contacts/pages/ContactDetailPage';
 import { ContactsListPage } from '@/features/contacts/pages/ContactsListPage';
 import { LegacyCustomerRedirect } from '@/features/contacts/pages/LegacyCustomerRedirect';
@@ -305,7 +305,8 @@ export const appRoutes: RouteObject[] = [
                 path: routes.company,
                 element: <CompanyLayout />,
                 children: [
-                  { index: true, element: <CompanyOverviewPage /> },
+                  { index: true, element: null },
+                  { path: routes.companySetupStatus, element: <SetupStatusPage /> },
                   { path: routes.companyMasterData, element: <MasterDataPage /> },
                   { path: routes.companyLegal, element: <LegalSettingsPage /> },
                   { path: routes.companyBank, element: <BankPage /> },

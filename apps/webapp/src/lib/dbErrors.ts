@@ -100,7 +100,7 @@ const MESSAGES: Record<string, string> = {
   INCOMING_ADJUSTMENT_AGREEMENT: 'Bitte gib an, mit wem und wann das Skonto vereinbart wurde.',
   INCOMING_ADJUSTMENT_INVALID: 'Der Skonto-Vermerk ist unvollständig. Bitte prüfe die Angaben.',
   CONTACT_IN_USE:
-    'Der Kontakt hängt noch an Aufträgen oder Belegen. Archiviere ihn stattdessen – dann verschwindet er aus Listen und Auswahlfeldern.',
+    'Der Kontakt hängt noch an Aufträgen oder Belegen. Archiviere ihn stattdessen, dann verschwindet er aus Listen und Auswahlfeldern.',
 };
 
 /**

@@ -107,7 +107,7 @@ export function AbsencesPage() {
           // Am Handy bricht der Zeitraum zwischen den beiden Daten um, nie mitten im Datum.
           <span className="text-muted-foreground sm:whitespace-nowrap">
             <span className="whitespace-nowrap">{formatDate(row.original.start_date)}</span>{' '}
-            <span className="whitespace-nowrap">– {formatDate(row.original.end_date)}</span>
+            <span className="whitespace-nowrap">bis {formatDate(row.original.end_date)}</span>
           </span>
         ),
       },

@@ -112,6 +112,7 @@ export const routes = {
   profileLegal: '/profil/rechtliches',
 
   company: '/unternehmen',
+  companySetupStatus: '/unternehmen/einrichtung',
   companyMasterData: '/unternehmen/stammdaten',
   companyLegal: '/unternehmen/rechtliches',
   companyBank: '/unternehmen/bankverbindung',

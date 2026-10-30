@@ -20,6 +20,7 @@ import type { SubNavGroup } from '@/components/layout/SubNavLayout';
 import { routes } from '@/lib/routes';
 
 import { useCompanyAccess } from './companyAccess';
+import { useCompanySetup } from './companySetup';
 
 /**
  * Unternehmen: alles, was den Betrieb einrichtet. Gruppen wie in der App
@@ -27,15 +28,18 @@ import { useCompanyAccess } from './companyAccess';
  * vor selten. Was die App erst ankündigt (Lizenzen, Integrationen,
  * Ressourcen), steht hier nicht.
  */
-export function useCompanyNavGroups(): SubNavGroup[] {
+export function useCompanyNavGroups(): { groups: SubNavGroup[]; ready: boolean } {
   const access = useCompanyAccess();
-  return [
+  const setup = useCompanySetup();
+  const groups: SubNavGroup[] = [
     {
+      // Nur bis der Betrieb eingerichtet ist (`useCompanySetup`).
       items: [
         {
-          to: routes.company,
-          labelKey: 'companySettings:nav.overview',
+          to: routes.companySetupStatus,
+          labelKey: 'companySettings:nav.setupStatus',
           icon: TaskListLtr20Regular,
+          visible: setup.pending,
         },
       ],
     },
@@ -144,4 +148,6 @@ export function useCompanyNavGroups(): SubNavGroup[] {
       ],
     },
   ];
+  // Erst wenn der Stand feststeht, darf `/unternehmen` zum ersten Abschnitt leiten.
+  return { groups, ready: !setup.isLoading };
 }

@@ -66,7 +66,7 @@ export function formatDateTimeRange(
     return `${formatDate(startsAt)}, ${formatTime(startsAt)}–${formatTime(endsAt)}`;
   }
 
-  return `${formatDateTime(startsAt)} – ${formatDateTime(endsAt)}`;
+  return `${formatDateTime(startsAt)} bis ${formatDateTime(endsAt)}`;
 }
 
 /**

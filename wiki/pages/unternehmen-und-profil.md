@@ -8,19 +8,18 @@ im Menü (Owner: „ultra unordentlich“).
 
 ## Aufbau
 
-| Bereich       | Adresse          | Inhalt                                                                                                                                                             |
-| ------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Mein Profil   | `/profil/…`      | Persönliche Daten, Konto & Sicherheit, Sprache, Hilfe & Feedback, Rechtliches                                                                                      |
-| Unternehmen   | `/unternehmen/…` | Übersicht, Stammdaten, Rechtliches, Bank, Nummernkreise, Rechnungsvorlage, Mahnwesen, Stundensätze, Kostenstellen, Katalog, E-Mail, DATEV, Rollen, Urlaub, Löschen |
-| Einstellungen | `/einstellungen` | Darstellung (je Browser), Benachrichtigungen (je Betrieb, auch in der App)                                                                                         |
+| Bereich       | Adresse          | Inhalt                                                                                                                                                                                           |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Mein Profil   | `/profil/…`      | Persönliche Daten, Konto & Sicherheit, Sprache, Hilfe & Feedback, Rechtliches                                                                                                                    |
+| Unternehmen   | `/unternehmen/…` | Einrichtung (nur solange unvollständig), Stammdaten, Rechtliches, Bank, Nummernkreise, Rechnungsvorlage, Mahnwesen, Stundensätze, Kostenstellen, Katalog, E-Mail, DATEV, Rollen, Urlaub, Löschen |
+| Einstellungen | `/einstellungen` | Darstellung (je Browser), Benachrichtigungen (je Betrieb, auch in der App)                                                                                                                       |
 
 Mein Profil und Unternehmen nutzen `SubNavLayout`
 (`components/layout/SubNavLayout.tsx`). Breit steht links eine Fluent-`Nav` mit
 Gruppen und rechts der Abschnitt. Schmal (unter 1024 px) erscheint erst die
 Liste, dann der Abschnitt mit einem Zurück-Knopf, wie in der App. Jeder Abschnitt
-hat eine eigene Adresse. `/profil` hat keine eigene Startseite und leitet breit
-auf den ersten Abschnitt um. `/unternehmen` ist die Übersicht mit dem
-Einrichtungsstand.
+hat eine eigene Adresse. Beide Startadressen (`/profil`, `/unternehmen`)
+leiten breit auf den ersten sichtbaren Abschnitt um.
 
 Die Gruppen folgen der App (`SETUP_SECTIONS` in
 `bautakt-app/app/lib/utils/managementHub.ts` und Mein Profil →
@@ -51,6 +50,16 @@ Den Menüpunkt „Unternehmen“ gibt es, sobald irgendein Abschnitt sichtbar is
 (`anyCompanySection`).
 
 ## Entscheidungen und Gründe
+
+- **Einrichtung** (`/unternehmen/einrichtung`, `useCompanySetup`) zeigt den
+  Einrichtungsstand: Anschrift, Steuernummer, Pflichtangaben für Mails, Bank.
+  Den Abschnitt gibt es nur, solange davon etwas fehlt; danach verschwindet er
+  aus der Leiste, und die Adresse leitet zurück (Owner, 2026-10-30). Das Logo
+  steht als „Optional“ dabei und zählt nicht mit, sonst bliebe der Abschnitt
+  für Betriebe ohne Logo für immer stehen. Die früheren Kacheln zu allen
+  Abschnitten sind weg, sie wiederholten nur die Leiste. Bis der Stand
+  geladen ist, leitet `/unternehmen` nicht um (`ready`), sonst landete man
+  vorschnell in den Stammdaten.
 
 - **Nummernkreise** sind nur editierbar, solange für die Belegart noch keine
   Nummer vergeben ist. Die RPC lehnt sonst mit `DOCUMENT_NUMBERS_ALREADY_ISSUED`

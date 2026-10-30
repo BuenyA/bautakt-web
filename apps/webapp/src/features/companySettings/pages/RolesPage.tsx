@@ -216,7 +216,7 @@ function RoleEditor({ role, canEdit }: { role: CompanyRole; canEdit: boolean }) 
                   <span className={draft[key] ? undefined : 'text-muted-foreground'}>
                     {t(`companySettings:permissions.${key}.title`)}
                     <span className="sr-only">
-                      {' — '}
+                      {': '}
                       {t(
                         draft[key]
                           ? 'companySettings:roles.allowed'

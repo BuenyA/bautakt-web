@@ -84,7 +84,7 @@ function ActionSurface({
   const period =
     absence.startDate === absence.endDate
       ? formatDate(absence.startDate)
-      : `${formatDate(absence.startDate)} – ${formatDate(absence.endDate)}`;
+      : `${formatDate(absence.startDate)} bis ${formatDate(absence.endDate)}`;
   const summary = t('domain:absences.actions.summary', {
     name: absence.name || t('domain:employees.unnamed'),
     type: t(`domain:absences.types.${absence.type}`, { defaultValue: absence.type }),

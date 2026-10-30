@@ -58,7 +58,6 @@ export function ProfileLayout() {
         subtitle={user?.email}
         basePath={routes.profile}
         groups={GROUPS}
-        indexPage={false}
         ariaLabel={t('account:profile.navLabel')}
       />
     </UnsavedChangesGuard>

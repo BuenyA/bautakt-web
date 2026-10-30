@@ -37,13 +37,13 @@ function weekLabel(monday: string): string {
   const end = parseIsoDay(addDays(monday, 6));
   const full = new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
   if (start.getFullYear() !== end.getFullYear()) {
-    return `${full.format(start)} – ${full.format(end)}`;
+    return `${full.format(start)} bis ${full.format(end)}`;
   }
   if (start.getMonth() !== end.getMonth()) {
     const dayMonth = new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'long' });
-    return `${dayMonth.format(start)} – ${full.format(end)}`;
+    return `${dayMonth.format(start)} bis ${full.format(end)}`;
   }
-  return `${start.getDate()}.–${full.format(end)}`;
+  return `${start.getDate()}. bis ${full.format(end)}`;
 }
 
 /** Die sieben Tage ab Montag und der Zeitraum für die Abfrage. */

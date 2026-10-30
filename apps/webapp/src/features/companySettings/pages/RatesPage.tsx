@@ -386,7 +386,7 @@ export function RatesPage() {
         cell: ({ row }) => (
           <span className="text-muted-foreground whitespace-nowrap">
             {formatDate(row.original.valid_from)}
-            {row.original.valid_to ? ` – ${formatDate(row.original.valid_to)}` : ''}
+            {row.original.valid_to ? ` bis ${formatDate(row.original.valid_to)}` : ''}
           </span>
         ),
       },
