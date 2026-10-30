@@ -1,10 +1,9 @@
 import { toast } from '@bautakt/ui';
 import {
   Button,
-  Card,
+  Divider,
   Field,
   Input,
-  makeStyles,
   MessageBar,
   MessageBarBody,
   Select,
@@ -13,14 +12,7 @@ import {
   TabList,
   Text,
 } from '@fluentui/react-components';
-import {
-  ArrowClockwiseRegular,
-  CheckmarkRegular,
-  CopyRegular,
-  KeyRegular,
-  PersonRegular,
-  QrCodeRegular,
-} from '@fluentui/react-icons';
+import { ArrowClockwiseRegular, CheckmarkRegular, CopyRegular } from '@fluentui/react-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { QRCodeSVG } from 'qrcode.react';
 import { type FormEvent, useMemo, useState } from 'react';
@@ -46,11 +38,6 @@ import { assignableRoles, useCompanyRoles } from '../useCompanyRoles';
 
 type AddMethod = InvitationMethod | 'manual';
 
-const useStyles = makeStyles({
-  // Auf schmalen Bildschirmen umbrechen statt „Ohne Konto“ abzuschneiden.
-  methods: { flexWrap: 'wrap' },
-});
-
 /**
  * Mitarbeiter hinzufügen — dieselben drei Wege wie in der App
  * (`bautakt-app/app/app/(tabs)/management/employees/new-employee.tsx`):
@@ -65,7 +52,6 @@ const useStyles = makeStyles({
  */
 export function EmployeeNewPage() {
   const { t } = useTranslation();
-  const styles = useStyles();
   const navigate = useNavigate();
   const { data: membership } = useMembership();
   const roles = useCompanyRoles();
@@ -91,73 +77,54 @@ export function EmployeeNewPage() {
         actions={<LinkButton to={routes.employees}>{t('common:action.back')}</LinkButton>}
       />
 
-      <Card size="large" className="w-full max-w-2xl">
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <Text weight="semibold">{t('domain:employeeNew.methodLabel')}</Text>
-            <TabList
-              className={styles.methods}
-              size="large"
-              selectedValue={method}
-              onTabSelect={(_, data) => setMethod(data.value as AddMethod)}
-            >
-              <Tab value="qr" icon={<QrCodeRegular />}>
-                {t('domain:employeeNew.methods.qr')}
-              </Tab>
-              <Tab value="token" icon={<KeyRegular />}>
-                {t('domain:employeeNew.methods.token')}
-              </Tab>
-              <Tab value="manual" icon={<PersonRegular />}>
-                {t('domain:employeeNew.methods.manual')}
-              </Tab>
-            </TabList>
-          </div>
+      <div className="flex max-w-2xl flex-col gap-6">
+        <TabList
+          // Wie die Reiter unter „Rechnungen“: bündig mit der Überschrift,
+          // am Handy wischt man durch statt umzubrechen.
+          className="-mx-2.5 overflow-x-auto [scrollbar-width:none]"
+          aria-label={t('domain:employeeNew.methodLabel')}
+          selectedValue={method}
+          onTabSelect={(_, data) => setMethod(data.value as AddMethod)}
+        >
+          <Tab value="qr">{t('domain:employeeNew.methods.qr')}</Tab>
+          <Tab value="token">{t('domain:employeeNew.methods.token')}</Tab>
+          <Tab value="manual">{t('domain:employeeNew.methods.manual')}</Tab>
+        </TabList>
 
-          <Field
-            label={t('domain:employees.columns.role')}
-            hint={isManual ? undefined : t('domain:employeeNew.roleHint')}
-            validationMessage={
-              roles.isSuccess && options.length === 0 ? t('domain:employeeNew.noRoles') : undefined
-            }
+        <Field
+          className="max-w-xs"
+          label={t('domain:employees.columns.role')}
+          hint={isManual ? undefined : t('domain:employeeNew.roleHint')}
+          validationMessage={
+            roles.isSuccess && options.length === 0 ? t('domain:employeeNew.noRoles') : undefined
+          }
+        >
+          <Select
+            value={role}
+            disabled={options.length === 0}
+            onChange={(_, { value }) => setPickedRole(value)}
           >
-            <Select
-              value={role}
-              disabled={options.length === 0}
-              onChange={(_, { value }) => setPickedRole(value)}
-            >
-              {options.map((option) => (
-                <option key={option.id} value={option.name}>
-                  {option.name}
-                </option>
-              ))}
-            </Select>
-          </Field>
+            {options.map((option) => (
+              <option key={option.id} value={option.name}>
+                {option.name}
+              </option>
+            ))}
+          </Select>
+        </Field>
 
-          {method === 'manual' ? (
-            <ManualPanel role={role} onDone={() => void navigate(routes.employees)} />
-          ) : (
-            <InvitationPanel
-              key={method}
-              method={method}
-              role={role}
-              onDone={() => void navigate(routes.employees)}
-            />
-          )}
-        </div>
-      </Card>
+        <Divider />
+
+        {method === 'manual' ? (
+          <ManualPanel role={role} onDone={() => void navigate(routes.employees)} />
+        ) : (
+          <InvitationPanel key={method} method={method} role={role} />
+        )}
+      </div>
     </div>
   );
 }
 
-function InvitationPanel({
-  method,
-  role,
-  onDone,
-}: {
-  method: InvitationMethod;
-  role: string;
-  onDone: () => void;
-}) {
+function InvitationPanel({ method, role }: { method: InvitationMethod; role: string }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { data: membership } = useMembership();
@@ -195,14 +162,10 @@ function InvitationPanel({
     }
   }
 
+  const isQr = method === 'qr';
+
   return (
     <div className="flex flex-col gap-4">
-      <MessageBar intent="info">
-        <MessageBarBody>
-          {method === 'qr' ? t('domain:employeeNew.qrInfo') : t('domain:employeeNew.tokenInfo')}
-        </MessageBarBody>
-      </MessageBar>
-
       {error && !pending ? (
         <MessageBar intent="error">
           <MessageBarBody>
@@ -211,82 +174,99 @@ function InvitationPanel({
         </MessageBar>
       ) : null}
 
-      <div className="flex min-h-56 flex-col items-center justify-center gap-4 rounded-lg border border-border p-6">
-        {pending ? (
-          <Spinner label={t('domain:employeeNew.creating')} />
-        ) : !current ? null : method === 'qr' ? (
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+        {isQr ? (
           // Weißer Rand um den Code: Scanner brauchen die helle Ruhezone,
           // auch im dunklen Design.
-          <div className="rounded-md bg-white p-3">
-            <QRCodeSVG
-              value={inviteAppUrl(current.token)}
-              size={208}
-              marginSize={2}
-              title={t('domain:employeeNew.qrTitle')}
-            />
+          <div className="border-border flex size-44 shrink-0 items-center justify-center rounded-lg border bg-white p-2">
+            {pending || !current ? (
+              <Spinner size="small" />
+            ) : (
+              <QRCodeSVG
+                value={inviteAppUrl(current.token)}
+                size={156}
+                marginSize={1}
+                title={t('domain:employeeNew.qrTitle')}
+              />
+            )}
           </div>
-        ) : (
-          <>
-            <Text
-              as="p"
-              size={600}
-              weight="semibold"
-              font="monospace"
-              align="center"
-              className="break-all select-all"
-            >
-              {formatInvitationToken(current.token)}
+        ) : null}
+
+        <div className="flex min-w-0 flex-1 flex-col gap-3">
+          <div className="flex flex-col gap-1">
+            <Text as="h2" size={400} weight="semibold">
+              {isQr ? t('domain:employeeNew.qrHeading') : t('domain:employeeNew.tokenHeading')}
             </Text>
-            <div className="flex flex-wrap justify-center gap-2">
-              <Button
-                icon={copied === 'code' ? <CheckmarkRegular /> : <CopyRegular />}
-                onClick={() => void copy('code', current.token)}
-              >
-                {copied === 'code'
-                  ? t('domain:employeeNew.copied')
-                  : t('domain:employeeNew.copyCode')}
-              </Button>
-              <Button
-                icon={copied === 'text' ? <CheckmarkRegular /> : <CopyRegular />}
-                onClick={() =>
-                  void copy(
-                    'text',
-                    t('domain:employeeNew.shareText', {
-                      code: formatInvitationToken(current.token),
-                      date: formatDate(current.expiresAt),
-                    }),
-                  )
-                }
-              >
-                {copied === 'text'
-                  ? t('domain:employeeNew.copied')
-                  : t('domain:employeeNew.copyText')}
-              </Button>
+            <Text as="p" className="text-muted-foreground">
+              {isQr ? t('domain:employeeNew.qrInfo') : t('domain:employeeNew.tokenInfo')}
+            </Text>
+          </div>
+
+          {isQr ? null : (
+            <div className="flex flex-col gap-3">
+              <div className="bg-muted flex min-h-12 w-fit max-w-full items-center rounded-lg px-5 py-2">
+                {pending || !current ? (
+                  <Spinner size="tiny" />
+                ) : (
+                  <Text
+                    size={500}
+                    weight="semibold"
+                    font="monospace"
+                    className="break-all select-all"
+                  >
+                    {formatInvitationToken(current.token)}
+                  </Text>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  icon={copied === 'code' ? <CheckmarkRegular /> : <CopyRegular />}
+                  disabled={pending || !current}
+                  onClick={() => current && void copy('code', current.token)}
+                >
+                  {copied === 'code'
+                    ? t('domain:employeeNew.copied')
+                    : t('domain:employeeNew.copyCode')}
+                </Button>
+                <Button
+                  icon={copied === 'text' ? <CheckmarkRegular /> : <CopyRegular />}
+                  disabled={pending || !current}
+                  onClick={() =>
+                    current &&
+                    void copy(
+                      'text',
+                      t('domain:employeeNew.shareText', {
+                        code: formatInvitationToken(current.token),
+                        date: formatDate(current.expiresAt),
+                      }),
+                    )
+                  }
+                >
+                  {copied === 'text'
+                    ? t('domain:employeeNew.copied')
+                    : t('domain:employeeNew.copyText')}
+                </Button>
+              </div>
             </div>
-          </>
-        )}
-      </div>
+          )}
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Text size={200} className="text-muted-foreground">
-          {current && !pending
-            ? t('domain:employeeNew.validUntil', { date: formatDate(current.expiresAt) })
-            : ''}
-        </Text>
-        <Button
-          appearance="subtle"
-          icon={<ArrowClockwiseRegular />}
-          disabled={pending || !role}
-          onClick={() => regenerate.mutate()}
-        >
-          {t('domain:employeeNew.regenerate')}
-        </Button>
-      </div>
-
-      <div className="flex justify-end">
-        <Button appearance="primary" onClick={onDone}>
-          {t('domain:employeeNew.done')}
-        </Button>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <Text size={200} className="text-muted-foreground">
+              {current && !pending
+                ? t('domain:employeeNew.validUntil', { date: formatDate(current.expiresAt) })
+                : t('domain:employeeNew.creating')}
+            </Text>
+            <Button
+              appearance="transparent"
+              size="small"
+              icon={<ArrowClockwiseRegular />}
+              disabled={pending || !role}
+              onClick={() => regenerate.mutate()}
+            >
+              {t('domain:employeeNew.regenerate')}
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -344,9 +324,14 @@ function ManualPanel({ role, onDone }: { role: string; onDone: () => void }) {
 
   return (
     <form onSubmit={(event) => void onSubmit(event)} className="flex flex-col gap-4">
-      <MessageBar intent="info">
-        <MessageBarBody>{t('domain:employeeNew.manualInfo')}</MessageBarBody>
-      </MessageBar>
+      <div className="flex flex-col gap-1">
+        <Text as="h2" size={400} weight="semibold">
+          {t('domain:employeeNew.manualHeading')}
+        </Text>
+        <Text as="p" className="text-muted-foreground">
+          {t('domain:employeeNew.manualInfo')}
+        </Text>
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label={t('domain:contactForm.firstName')} required>
@@ -367,7 +352,7 @@ function ManualPanel({ role, onDone }: { role: string; onDone: () => void }) {
 
       {error ? <p className="text-destructive text-sm">{error}</p> : null}
 
-      <div className="flex justify-end">
+      <div>
         <Button appearance="primary" type="submit" disabled={create.isPending || !role}>
           {t('domain:employeeNew.create')}
         </Button>
