@@ -67,14 +67,12 @@ Den Menüpunkt „Unternehmen“ gibt es, sobald irgendein Abschnitt sichtbar is
   Nummer und zeigt gesperrte Zeilen mit Schloss. Das Format ist das von
   `finalize_sales_document`: mit Präfix fünfstellig aufgefüllt, ohne Präfix
   die nackte Zahl.
-- **Rechnungsvorlage**: Akzentfarbe, Einleitung und Schlusstext liegen auf
-  `companies`. Bis 2026-10-30 hat der Web-Editor Einleitung und Schlusstext
-  **nicht** übernommen, die Vorlage wirkte also nur in der App. Jetzt belegt
-  `useCompanyTaxProfile` neue Belege damit vor (`DocumentEditorPage`). Die
-  Farbpalette ist die der App. Ihre Hex-Werte sind gespeicherte PDF-Daten, keine
-  Oberflächenfarben (Weiß darauf ≥ 4,5:1). Die Vorschau rendert eine
-  Musterrechnung im selben Worker wie der Editor (#160). Das Bündel kommt von
-  `finance-document-render`, die Akzentfarbe aus dem Formular.
+- **Rechnungsvorlage**: Auswahl der Vorlagen mit fester „Bautakt Standard“ und
+  eigenen Vorlagen, Logo und Live-Vorschau; Einzelheiten in
+  [rechnungsvorlagen.md](rechnungsvorlagen.md). Akzentfarbe, Einleitung und
+  Schlusstext auf `companies` lassen sich im Web nicht mehr bearbeiten, wirken aber
+  weiter: `useCompanyTaxProfile` belegt neue Belege mit den Texten vor, soweit die
+  Vorlage nichts vorgibt.
 - **Kalkulationswerte** (`company_finance_settings`: Gemeinkosten/h,
   Zuschläge, produktive Stunden) haben bewusst **keinen** Abschnitt. Weder die
   App noch das Web lesen sie (geprüft 2026-10-30). Ein Editor für Zahlen ohne

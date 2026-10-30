@@ -68,6 +68,10 @@ export type SalesDocumentDetail = {
   intro_text: string;
   footer_text: string;
   notes: string;
+  /** Betreff / Bauvorhaben über dem Belegtitel. */
+  subject: string;
+  /** Gewählte Rechnungsvorlage; `null` = Standardvorlage des Betriebs. */
+  invoice_template_id: string | null;
   buyer_reference: string;
   /** E-Mail des Käufers, beim Festschreiben vom Kunden übernommen; sonst leer. */
   buyer_email: string | null;
@@ -156,6 +160,7 @@ export function useSalesDocument(id: string | undefined) {
         .select(
           `id, type, status, document_number, issue_date, due_date, service_date, currency,
            net_total, vat_total, gross_total, credited_total, intro_text, footer_text, notes,
+           subject, invoice_template_id,
            buyer_reference, buyer_email, parent_document_id,
            payment_term_days, skonto_days, skonto_percent, tax_mode, customer_id,
            storage_path, content_hash, e_invoice, einvoice_format,

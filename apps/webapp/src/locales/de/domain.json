@@ -1710,6 +1710,15 @@
       "refresh": "Aktualisieren",
       "warningsTitle": "Hinweise zur E-Rechnung",
       "warningsTitlePlain": "Hinweise zur Rechnung"
+    },
+    "template": {
+      "label": "Vorlage",
+      "companyDefault": "Standardvorlage ({{name}})",
+      "bautakt": "Bautakt-Standard"
+    },
+    "subject": {
+      "label": "Betreff / Bauvorhaben",
+      "placeholder": "z. B. BV: NB EFH, Lerchenweg 13, 74321 Bietigheim"
     }
   },
   "eInvoice": {
@@ -2591,5 +2600,79 @@
       "vatMissing": "Umsatzsteuer 0 bei einem Steuersatz: Ist es §13b, steuerfrei oder ein Kleinunternehmer?",
       "sumMismatch": "Die Steuersätze ergeben nicht Netto und Umsatzsteuer der Rechnung."
     }
+  },
+  "templates": {
+    "new": "Neue Vorlage",
+    "more": "Weitere Aktionen",
+    "notFound": "Diese Vorlage gibt es nicht.",
+    "back": "Zur Rechnungsvorlage",
+    "untitled": "Vorlage ohne Namen",
+    "nameRequired": "Bitte gib der Vorlage einen Namen.",
+    "colorInvalid": "Bitte eine Farbe im Format #RRGGBB angeben.",
+    "applySpahrbau": "Auf Spahrbau-Werte zurücksetzen",
+    "logoHint": "Das Logo kommt aus den Firmendaten (PNG oder JPG) und steht im Briefbogen groß oben rechts.",
+    "textsHint": "Diese Texte stehen in jedem neuen Beleg der gewählten Art schon drin und lassen sich dort anpassen.",
+    "previewHint": "Beispielbeleg mit Musterkunde. Meine echten Belege bleiben unverändert.",
+    "previewEmpty": "Die Vorschau wird erstellt …",
+    "previewError": "Die Vorschau konnte nicht erstellt werden. Bitte prüfe die Verbindung.",
+    "sections": {
+      "basics": "Allgemein",
+      "design": "Gestaltung",
+      "letter": "Brief",
+      "footer": "Fußzeile",
+      "texts": "Texte je Belegart"
+    },
+    "documentTypes": {
+      "invoice": "Rechnung",
+      "partial_invoice": "Abschlagsrechnung",
+      "final_invoice": "Schlussrechnung",
+      "credit_note": "Gutschrift",
+      "cancellation": "Stornorechnung",
+      "quote": "Angebot",
+      "order_confirmation": "Auftragsbestätigung",
+      "delivery_note": "Lieferschein"
+    },
+    "fields": {
+      "name": "Name",
+      "layout": "Layout",
+      "primaryColor": "Hauptfarbe",
+      "primaryColorHint": "Slogan, Leistungen, breiter Streifen",
+      "secondaryColor": "Zweitfarbe",
+      "secondaryColorHint": "Aufzählungspunkte, schmaler Streifen",
+      "sideStripes": "Farbstreifen am linken Rand",
+      "services": "Leistungen unter dem Logo",
+      "servicesHint": "Eine Leistung pro Zeile.",
+      "slogan": "Slogan über der Fußzeile",
+      "reference": "Zeichen hinter dem Datum",
+      "referenceHint": "Zum Beispiel ein Bearbeiterkürzel wie „ak-sz“.",
+      "closingGreeting": "Grußformel",
+      "signatureLines": "Unterschriftszeilen",
+      "linesHint": "Eine Zeile pro Zeile.",
+      "fax": "Telefax",
+      "website": "Internet",
+      "legalLine": "Rechtsangaben",
+      "legalLineHint": "Leer lassen, dann setzt Bautakt sie aus Registergericht, Handelsregister, Geschäftsführern und Steuernummer zusammen.",
+      "extraBanks": "Weitere Bankverbindungen",
+      "extraBanksHint": "Die Hauptbank kommt aus den Firmendaten; hier kannst du bis zu drei weitere ergänzen.",
+      "bankName": "Bank",
+      "addBank": "Bankverbindung hinzufügen",
+      "documentType": "Belegart",
+      "title": "Titel im Beleg",
+      "titleHint": "Zum Beispiel „Abschlagszahlung“ statt „Abschlagsrechnung“. Leer = Standardtitel.",
+      "intro": "Einleitungstext",
+      "footer": "Schlusstext",
+      "preselect": "In neuen Belegen vorauswählen",
+      "preselectHint": "Im Beleg lässt sich jederzeit eine andere Vorlage wählen."
+    },
+    "pickerLabel": "Vorlage",
+    "builtin": "Bautakt Standard",
+    "builtinHint": "Die Bautakt-Standardvorlage ist fest und lässt sich nicht ändern. Für ein eigenes Layout lege eine neue Vorlage an.",
+    "preselectedShort": "vorausgewählt",
+    "newName": "Neue Vorlage",
+    "unsaved": "Nicht gespeichert",
+    "delete": "Vorlage löschen",
+    "deleted": "Vorlage gelöscht",
+    "deleteTitle": "„{{name}}“ löschen?",
+    "deleteText": "Neue Belege können die Vorlage danach nicht mehr wählen. Bereits erstellte Belege behalten ihr Aussehen."
   }
 }

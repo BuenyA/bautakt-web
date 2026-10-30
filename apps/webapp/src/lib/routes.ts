@@ -132,6 +132,7 @@ export const routes = {
 
   /** Nur noch Bedienung: Darstellung, Benachrichtigungen, Seitenleiste. */
   settings: '/einstellungen',
+  invoiceTemplate: (id: string) => `/unternehmen/rechnungsvorlage/${id}`,
 
   // Alte Pfade: Redirects bleiben, bis Bookmarks und Mails umgezogen sind.
   // `/mitarbeiter` und `/kalender` sind echte Seiten.

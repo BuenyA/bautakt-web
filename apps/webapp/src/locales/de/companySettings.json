@@ -87,9 +87,9 @@
   },
   "template": {
     "title": "Rechnungsvorlage",
-    "description": "Wie meine Rechnungen aussehen. Gilt für neue Belege. Freigegebene bleiben so, wie sie archiviert sind.",
+    "description": "Wie meine Belege aussehen. Wähle eine Vorlage, passe sie an und speichere. Freigegebene Belege bleiben so, wie sie archiviert sind.",
     "logo": "Logo",
-    "logoHint": "Steht oben auf jedem Beleg. PNG, JPG oder WebP; Bautakt verkleinert es auf 512 px.",
+    "logoHint": "Gilt für alle Vorlagen. PNG, JPG oder WebP; Bautakt verkleinert es auf 512 px.",
     "noLogo": "Kein Logo",
     "uploadLogo": "Logo hochladen",
     "replaceLogo": "Logo ersetzen",
@@ -101,30 +101,7 @@
     "logoErrors": {
       "UNSUPPORTED_IMAGE": "Bitte ein PNG-, JPG- oder WebP-Bild wählen.",
       "IMAGE_UNREADABLE": "Das Bild ließ sich nicht lesen."
-    },
-    "design": "Farbe und Texte",
-    "designHint": "Die Texte stehen in jedem neuen Beleg vorbelegt und lassen sich dort anpassen.",
-    "accent": "Akzentfarbe",
-    "accents": {
-      "default": "Standard",
-      "blue": "Blau",
-      "teal": "Petrol",
-      "slate": "Schiefer",
-      "green": "Grün",
-      "red": "Rot"
-    },
-    "intro": "Einleitung",
-    "introHint": "Steht über den Positionen.",
-    "introPlaceholder": "z. B. Vielen Dank für Ihren Auftrag. Wir berechnen Ihnen folgende Leistungen:",
-    "footer": "Schlusstext",
-    "footerHint": "Steht unter der Summe.",
-    "footerPlaceholder": "z. B. Bitte überweisen Sie den Betrag innerhalb des Zahlungsziels.",
-    "preview": "Vorschau",
-    "previewHint": "Musterrechnung mit Beispielpositionen; der Empfänger bleibt leer.",
-    "previewEmpty": "Die Vorschau wird erstellt …",
-    "previewError": "Die Vorschau konnte nicht erstellt werden.",
-    "sampleLabor": "Montagearbeiten",
-    "sampleMaterial": "Material"
+    }
   },
   "dunning": {
     "title": "Mahnwesen",

@@ -25,6 +25,7 @@ import {
   type SalesLineRow,
 } from "./mapping.ts";
 import { buildInvoicePdf } from "./pdf.ts";
+import type { InvoiceTemplateRow } from "./template.ts";
 import type { InvoiceData } from "./types.ts";
 
 /** Alles, was neben Beleg und Positionen in den Render eingeht. */
@@ -34,6 +35,11 @@ export type RenderBundle = {
   parent: ParentDocRow | null;
   credited: CreditedDocRow[];
   typeCodes: Record<string, string>;
+  /**
+   * Vorlage des Belegs bzw. Standardvorlage des Betriebs. Optional, weil ein
+   * Bündel einer älteren Function-Version das Feld nicht kennt.
+   */
+  template?: InvoiceTemplateRow | null;
 };
 
 /**
@@ -60,6 +66,8 @@ const COMPANY_RENDER_FIELDS = [
   "payment_term_days",
   "currency",
   "invoice_accent_color",
+  "register_court",
+  "managing_directors",
 ] as const satisfies readonly (keyof CompanyRow)[];
 
 export function pickCompanyForRender(row: CompanyRow | null): CompanyRow | null {

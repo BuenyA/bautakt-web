@@ -321,6 +321,7 @@ export const appRoutes: RouteObject[] = [
                   { path: routes.companyBank, element: <BankPage /> },
                   { path: routes.companyNumbers, element: <NumbersPage /> },
                   { path: routes.companyInvoiceTemplate, element: <InvoiceTemplatePage /> },
+                  { path: routes.invoiceTemplate(':id'), element: <InvoiceTemplatePage /> },
                   { path: routes.companyDunning, element: <DunningSettingsPage /> },
                   { path: routes.companyRates, element: <RatesPage /> },
                   {
