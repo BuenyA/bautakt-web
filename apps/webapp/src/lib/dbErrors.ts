@@ -88,6 +88,10 @@ const MESSAGES: Record<string, string> = {
     'Freigeben und Ablehnen geht nur über die Knöpfe in der Prüfung. Bitte lade die Seite neu.',
   INCOMING_NOT_FOUND:
     'Diese Eingangsrechnung gibt es nicht, oder dir fehlt die Berechtigung, sie zu prüfen.',
+  // Protokolleintrag zur Ablehnungs-Mail nachtragen (record_incoming_rejection_mail, #171).
+  INCOMING_MAIL_NOT_REJECTED: 'Ablehnungs-Mails gehören nur zu abgelehnten Rechnungen.',
+  INCOMING_MAIL_NOT_SENT:
+    'Zu dieser Rechnung gibt es keine versendete Mail mit dieser ID. Bitte lade die Seite neu.',
   // Skonto-Vermerk (bautakt-app 20261030120000_b_incoming_invoice_adjustments, bautakt-web#166).
   INCOMING_ADJUSTMENT_EXISTS:
     'Für diese Rechnung ist schon ein Skonto vermerkt. Hebe es erst auf, dann vermerke es neu. Bitte lade die Seite neu.',

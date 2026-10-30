@@ -65,12 +65,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: authErrorKey(error) };
   }, []);
 
-  const signUp = useCallback<AuthContextValue['signUp']>(async (email, password) => {
-    const { error } = await supabase.auth.signUp({
+  /**
+   * Name und Geburtsdatum reisen als `user_metadata` mit: Mit E-Mail-
+   * Bestätigung gibt es nach `signUp` noch keine Sitzung, `profiles` ist
+   * also noch nicht beschreibbar. Die Einrichtung (`/betrieb-einrichten`)
+   * schreibt die Werte nach der ersten Anmeldung nach `profiles`.
+   *
+   * Eine leere `identities`-Liste heisst bei aktiver Bestätigung: die Adresse
+   * ist schon registriert. Supabase meldet das bewusst nicht als Fehler.
+   */
+  const signUp = useCallback<AuthContextValue['signUp']>(async (email, password, profile) => {
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: `${window.location.origin}/login` },
+      options: {
+        emailRedirectTo: `${window.location.origin}/login`,
+        data: {
+          first_name: profile.firstName.trim(),
+          last_name: profile.lastName.trim(),
+          birthday: profile.birthday,
+        },
+      },
     });
+    if (!error && data.user && (data.user.identities?.length ?? 0) === 0) {
+      return { error: 'errors:auth.userAlreadyExists' };
+    }
     return { error: authErrorKey(error) };
   }, []);
 
