@@ -61,8 +61,9 @@ export type NavItem = PermissionGate & {
  * Flache Top-Navigation. Der Kalender steht im Fuss, die Einstellungen im
  * Profilmenue. Keine Sektionsueberschriften.
  *
- * Auftraege und Zeiten sind ein Klick. Rechnungen, Mitarbeiter und Material
- * oeffnen einen Hub; die Listen dahinter behalten ihre Pfade.
+ * Auftraege und Zeiten sind ein Klick. Rechnungen und Material oeffnen einen
+ * Hub, Mitarbeiter leitet direkt ins Verzeichnis weiter; die Listen dahinter
+ * behalten ihre Pfade.
  *
  * ⚠️ Das Ausblenden ist Fuehrung, keine Kontrolle. Wer die Adresse kennt,
  * ruft die Route trotzdem auf — die verbindliche Grenze sind die

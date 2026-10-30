@@ -1,11 +1,12 @@
 import { DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
 import { Button, Link as FluentLink } from '@fluentui/react-components';
-import { AddRegular } from '@fluentui/react-icons';
+import { AddRegular, BeachRegular } from '@fluentui/react-icons';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { ListFilterChips } from '@/components/common/ListFilterChips';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
@@ -26,6 +27,7 @@ export function EmployeesListPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
   const canManage = usePermission('canManageEmployees');
+  const canManageAbsences = usePermission('canManageAbsences');
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = employeeFilterFromSearch(searchParams.get('status'));
@@ -149,15 +151,22 @@ export function EmployeesListPage() {
         title={t('domain:employees.title')}
         description={t('domain:employees.description')}
         actions={
-          canManage ? (
-            <Button
-              appearance="primary"
-              onClick={() => void navigate(routes.employeeNew)}
-              icon={<AddRegular />}
-            >
-              {t('domain:employeeForm.newTitle')}
-            </Button>
-          ) : null
+          <div className="flex flex-wrap gap-2">
+            {canManageAbsences ? (
+              <LinkButton to={routes.absences} icon={<BeachRegular />}>
+                {t('common:nav.absences')}
+              </LinkButton>
+            ) : null}
+            {canManage ? (
+              <Button
+                appearance="primary"
+                onClick={() => void navigate(routes.employeeNew)}
+                icon={<AddRegular />}
+              >
+                {t('domain:employeeForm.newTitle')}
+              </Button>
+            ) : null}
+          </div>
         }
       />
 
