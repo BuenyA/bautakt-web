@@ -6,7 +6,7 @@ import {
   toast,
 } from '@bautakt/ui';
 import { Button, DrawerBody, DrawerHeader, Input, Label, Select } from '@fluentui/react-components';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -15,39 +15,16 @@ import { readableDbError } from '@/lib/dbErrors';
 import { supabase } from '@/lib/supabase';
 
 import type { EmployeeDraft } from './employeeDraft';
-
-/** Rollen dieses Betriebs — die Auswahl kommt aus der Datenbank, nicht aus einer Liste im Code. */
-function useCompanyRoles() {
-  const { data: membership } = useMembership();
-  const companyId = membership?.companyId;
-
-  return useQuery({
-    queryKey: ['company-roles', companyId],
-    enabled: Boolean(companyId),
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('company_roles')
-        .select('id, name, sort_order')
-        .eq('company_id', companyId!)
-        .order('sort_order', { ascending: true });
-
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
-}
+import { useCompanyRoles } from './useCompanyRoles';
 
 /**
- * Mitarbeiter anlegen oder aendern.
+ * Mitarbeiter aendern.
  *
- * ⚠️ Angelegt wird ueber `create_manual_employment`, nicht per `insert`: die
- * Funktion prueft, ob der Aufrufer diese Rolle ueberhaupt vergeben darf
- * (`can_assign_employment_role`), und haengt die Beschaeftigung an den richtigen
- * Betrieb. Ein Handwerker ohne Konto bekommt so eine Beschaeftigung ohne
- * `user_id` — eingeladen wird getrennt davon.
+ * Neu angelegt wird auf der eigenen Seite (`EmployeeNewPage`) — wie in der
+ * App per QR-Code, Code oder ohne Konto.
  *
- * Beim Aendern geht der Name ueber `display_*`, nicht ueber das Profil: das
- * Profil gehoert der Person, die Anzeige im Betrieb dem Betrieb.
+ * Der Name geht ueber `display_*`, nicht ueber das Profil: das Profil gehoert
+ * der Person, die Anzeige im Betrieb dem Betrieb.
  */
 function useSaveEmployee() {
   const queryClient = useQueryClient();
@@ -55,32 +32,19 @@ function useSaveEmployee() {
   const companyId = membership?.companyId;
 
   return useMutation({
-    mutationFn: async (draft: EmployeeDraft) => {
-      if (draft.id) {
-        const { error } = await supabase
-          .from('employments')
-          .update({
-            display_first_name: draft.firstName.trim() || null,
-            display_last_name: draft.lastName.trim() || null,
-            job_title: draft.jobTitle.trim() || null,
-            contact_email: draft.email.trim() || null,
-            contact_phone: draft.phone.trim() || null,
-            role: draft.role,
-          })
-          .eq('id', draft.id)
-          .eq('company_id', companyId!);
-        if (error) throw error;
-        return;
-      }
-
-      const { error } = await supabase.rpc('create_manual_employment', {
-        p_first_name: draft.firstName.trim(),
-        p_last_name: draft.lastName.trim(),
-        p_role: draft.role,
-        p_contact_email: draft.email.trim() || undefined,
-        p_contact_phone: draft.phone.trim() || undefined,
-        p_job_title: draft.jobTitle.trim() || undefined,
-      });
+    mutationFn: async (draft: EmployeeDraft & { id: string }) => {
+      const { error } = await supabase
+        .from('employments')
+        .update({
+          display_first_name: draft.firstName.trim() || null,
+          display_last_name: draft.lastName.trim() || null,
+          job_title: draft.jobTitle.trim() || null,
+          contact_email: draft.email.trim() || null,
+          contact_phone: draft.phone.trim() || null,
+          role: draft.role,
+        })
+        .eq('id', draft.id)
+        .eq('company_id', companyId!);
       if (error) throw error;
     },
     onSuccess: async () => {
@@ -131,8 +95,10 @@ function EmployeeForm({ initial, onDone }: { initial: EmployeeDraft; onDone: () 
       return;
     }
 
+    if (!draft.id) return;
+
     try {
-      await save.mutateAsync(draft);
+      await save.mutateAsync({ ...draft, id: draft.id });
       toast.success(t('domain:employeeForm.saved'));
       onDone();
     } catch (caught) {
@@ -147,7 +113,7 @@ function EmployeeForm({ initial, onDone }: { initial: EmployeeDraft; onDone: () 
     >
       <DrawerHeader>
         <FormDrawerTitle closeLabel={t('common:action.close')}>
-          {draft.id ? t('domain:employeeForm.editTitle') : t('domain:employeeForm.newTitle')}
+          {t('domain:employeeForm.editTitle')}
         </FormDrawerTitle>
         <FormDrawerDescription>{t('domain:employeeForm.description')}</FormDrawerDescription>
       </DrawerHeader>
@@ -219,10 +185,6 @@ function EmployeeForm({ initial, onDone }: { initial: EmployeeDraft; onDone: () 
             />
           </div>
         </div>
-
-        {!draft.id ? (
-          <p className="text-text-subtle text-xs">{t('domain:employeeForm.inviteHint')}</p>
-        ) : null}
 
         {error ? <p className="text-destructive text-sm">{error}</p> : null}
       </DrawerBody>

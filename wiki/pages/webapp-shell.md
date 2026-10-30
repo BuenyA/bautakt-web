@@ -405,7 +405,6 @@ bearbeiten: [auftrag-bearbeiten.md](auftrag-bearbeiten.md). Kostenstellen:
   Id auf `/rechnungen/:id/druck` zeigt denselben Nicht-gefunden- bzw.
   Ladefehler wie die Detailseite, mit Rückweg zur Liste — keinen Spinner.
   Der Briefkopf lädt weiter parallel und blockiert die Seite nicht.
-- **Einladung von Mitarbeitern in die App** — läuft weiter über das Handy.
 - **Katalog pflegen** — bisher nur lesend. Kostenstellen anlegen und löschen
   steht, siehe [kostenstellen.md](kostenstellen.md).
 - **Mobilansicht** ist gebaut, aber noch nicht an einem echten Gerät geprüft.

@@ -42,6 +42,7 @@ import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 import { AbsenceDetailPage } from '@/features/team/pages/AbsenceDetailPage';
 import { AbsencesPage } from '@/features/team/pages/AbsencesPage';
 import { EmployeeDetailPage } from '@/features/team/pages/EmployeeDetailPage';
+import { EmployeeNewPage } from '@/features/team/pages/EmployeeNewPage';
 import { EmployeesListPage } from '@/features/team/pages/EmployeesListPage';
 import { PayrollPage } from '@/features/team/pages/PayrollPage';
 import { LegacyTimesRedirect } from '@/features/times/LegacyTimesRedirect';
@@ -231,6 +232,14 @@ export const appRoutes: RouteObject[] = [
                 element: (
                   <RequirePermission anyOf={['canManageEmployees']}>
                     <EmployeesListPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.employeeNew,
+                element: (
+                  <RequirePermission anyOf={['canManageEmployees']}>
+                    <EmployeeNewPage />
                   </RequirePermission>
                 ),
               },

@@ -24,6 +24,7 @@
     "fflate": "0.8.2",
     "i18next": "^25.10.10",
     "pdfjs-dist": "6.4.299",
+    "qrcode.react": "^4.2.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-hook-form": "^7.88.0",
