@@ -2,7 +2,7 @@
  * GENERIERT — nicht von Hand bearbeiten.
  *
  * Quelle:  Supabase-Projekt "Bautakt" (bxivzvmlcnaxqlytumvz, eu-central-1)
- * Stand:   2026-10-29
+ * Stand:   2026-10-30
  *
  * Neu erzeugen:
  *   npx supabase gen types typescript --project-id bxivzvmlcnaxqlytumvz \
@@ -737,6 +737,41 @@ export type Database = {
             foreignKeyName: "company_mail_settings_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_mail_templates: {
+        Row: {
+          body: string
+          company_id: string
+          modified_at: string
+          modified_by: string | null
+          purpose: string
+          subject: string
+        }
+        Insert: {
+          body: string
+          company_id: string
+          modified_at?: string
+          modified_by?: string | null
+          purpose: string
+          subject: string
+        }
+        Update: {
+          body?: string
+          company_id?: string
+          modified_at?: string
+          modified_by?: string | null
+          purpose?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_mail_templates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
@@ -4692,6 +4727,10 @@ export type Database = {
         }
         Returns: string
       }
+      mail_template_can_write: {
+        Args: { p_company_id: string; p_purpose: string }
+        Returns: boolean
+      }
       merge_contacts: {
         Args: { p_drop: string; p_keep: string }
         Returns: undefined
@@ -4711,6 +4750,26 @@ export type Database = {
       notification_user_has_permission: {
         Args: { p_company_id: string; p_permission: string; p_user_id: string }
         Returns: boolean
+      }
+      record_incoming_rejection_mail: {
+        Args: { p_invoice_id: string; p_mail_id: string }
+        Returns: {
+          action: string
+          actor_id: string | null
+          actor_name: string
+          company_id: string
+          created_at: string
+          id: string
+          invoice_id: string
+          mail_reference: string | null
+          reason: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "incoming_invoice_events"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       recurrence_covers_date: {
         Args: { p_date: string; p_rule: string; p_series_start: string }
