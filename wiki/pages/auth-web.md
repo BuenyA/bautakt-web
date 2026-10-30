@@ -82,11 +82,13 @@ werden gezeigt.
 
 ## Registrierung
 
-Öffentliche Registrierung ist in Supabase Auth seit 09.10.2026 12:04 abgeschaltet
-(Owner-Entscheidung, keine Änderung an Config oder Schema in diesem Repo). Die
-Login-Seite verlinkt `/registrieren` nicht mehr. Die Route und `RegisterPage` bleiben,
-damit ein direkter Aufruf nicht ins Leere fällt. Das Formular wird nicht vorab
-gesperrt; erst die Antwort von `supabase.auth.signUp` wird übersetzt.
+Öffentliche Registrierung war in Supabase Auth vom 09.10.2026 an abgeschaltet und
+ist inzwischen wieder offen: am 30.10.2026 entstanden Konten über `/registrieren`,
+sofort bestätigt (gemessen an `auth.users`). Seit 30.10.2026 verlinkt die
+Login-Seite wieder „Noch kein Konto? Registrieren“ (`auth:signIn.noAccount`,
+Owner-Wunsch). Das Formular wird nicht vorab gesperrt; ist die Registrierung aus,
+übersetzt die Seite die Antwort von `supabase.auth.signUp`
+(`errors:auth.signupDisabled`).
 
 `signUp` in `AuthProvider` wird nur von `RegisterPage` benutzt. Die Seite fragt
 wie `sign-up.tsx` der App Vorname, Nachname, Geburtsdatum, E-Mail und Passwort ab

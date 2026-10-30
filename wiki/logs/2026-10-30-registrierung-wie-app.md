@@ -22,3 +22,8 @@ Geändert:
 Warum die Anschrift hier Pflicht ist, obwohl die App sie später holt: Owner-
 Wunsch, und ohne Anschrift geht keine Rechnung hinaus. Details:
 [auth-web](../pages/auth-web.md#betrieb-einrichten).
+
+Nachtrag: Die Login-Seite verlinkt wieder auf `/registrieren` („Noch kein
+Konto? Registrieren“) — Owner-Wunsch. Das hebt
+[Login ohne Registrierungslink](2026-10-09-login-ohne-registrierung.md) auf;
+die Registrierung ist in Supabase wieder offen.
