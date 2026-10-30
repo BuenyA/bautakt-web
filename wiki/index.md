@@ -19,33 +19,34 @@ verlinkt, nie kopiert.
 
 ## Subsysteme
 
-| Seite                                                        | Inhalt                                                                    |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------- |
-| [auth-web.md](pages/auth-web.md)                             | Sitzung, Guards, Passwort-Reset und die Abweichungen zur App.             |
-| [berechtigungen-im-web.md](pages/berechtigungen-im-web.md)   | Die 33 Rechte, drei Durchsetzungsebenen, Drift-Check.                     |
-| [deployment-vercel.md](pages/deployment-vercel.md)           | Zwei Projekte aus einem Repo, der SPA-Rewrite, Env-Präfixe.               |
-| [webapp-shell.md](pages/webapp-shell.md)                     | Shell-Layout, kanonische Top-Nav IA, Listen-Muster.                       |
-| [unternehmen-und-profil.md](pages/unternehmen-und-profil.md) | Profilmenü: Mein Profil, Unternehmen einrichten, Einstellungen.           |
-| [fluent-ui.md](pages/fluent-ui.md)                           | Fluent UI 2: Themes, Provider, Tailwind-Regel, Bausteine.                 |
-| [uebersicht.md](pages/uebersicht.md)                         | Startseite: Tagesplan, Zu erledigen, Jahresergebnis.                      |
-| [rechnungsbereich.md](pages/rechnungsbereich.md)             | Bereich „Rechnungen“: Reiter, Übersicht mit Ausgang, Eingang, Zahlen.     |
-| [kontakte.md](pages/kontakte.md)                             | Kontakte: ein Geschäftspartner mit Rollen, Auswahl in Belegen.            |
-| [auftragsfotos.md](pages/auftragsfotos.md)                   | Fotos am Auftrag anzeigen, hochladen und löschen.                         |
-| [auftragsnotizen.md](pages/auftragsnotizen.md)               | Notizen am Auftrag lesen, anlegen, bearbeiten, löschen.                   |
-| [kalender.md](pages/kalender.md)                             | Kalender mit Terminen, Einsätzen, Abwesenheiten; Termine anlegen, Serien. |
-| [auftragszeiten.md](pages/auftragszeiten.md)                 | Zeiten am Auftrag anlegen, ändern, löschen; Stunden je Mitarbeiter.       |
-| [mitarbeiterseite.md](pages/mitarbeiterseite.md)             | Seite je Mitarbeiter mit Stammdaten und Zeiten (`/mitarbeiter/:id`).      |
-| [auftragsmaterial.md](pages/auftragsmaterial.md)             | Material am Auftrag lesen, anlegen, ändern, löschen.                      |
-| [bautagebuch.md](pages/bautagebuch.md)                       | Bautagebuch am Auftrag lesen, anlegen, ändern, löschen.                   |
-| [auftragscheckliste.md](pages/auftragscheckliste.md)         | Checkliste am Auftrag lesen, abhaken, zuweisen.                           |
-| [auftrag-anlegen.md](pages/auftrag-anlegen.md)               | Auftrag aus der Liste anlegen, dieselbe `orders`-Zeile.                   |
-| [auftrag-bearbeiten.md](pages/auftrag-bearbeiten.md)         | Stammdaten eines Auftrags ändern, Teilpatch wie in der App.               |
-| [einsatzplanung.md](pages/einsatzplanung.md)                 | Wochenplan mit Gesichtern, Einsatzseite, Einsatz bearbeiten.              |
-| [abwesenheiten.md](pages/abwesenheiten.md)                   | Abwesenheiten genehmigen, ablehnen, stornieren, bearbeiten, löschen.      |
-| [einsatz-anlegen.md](pages/einsatz-anlegen.md)               | Einsatz anlegen und löschen, Zeiten bleiben stehen.                       |
-| [kostenstellen.md](pages/kostenstellen.md)                   | Kostenstelle anlegen und löschen, Auftragssumme je Zeile.                 |
-| [demo-gf-2026-10-10.md](pages/demo-gf-2026-10-10.md)         | Klickpfad GF-Demo 10.10.2026 (Spahrbau).                                  |
-| [datumseingabe.md](pages/datumseingabe.md)                   | Deutsche Datums- und Uhrzeitfelder, Wert bleibt ISO.                      |
+| Seite                                                          | Inhalt                                                                         |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| [auth-web.md](pages/auth-web.md)                               | Sitzung, Guards, Passwort-Reset und die Abweichungen zur App.                  |
+| [berechtigungen-im-web.md](pages/berechtigungen-im-web.md)     | Die 33 Rechte, drei Durchsetzungsebenen, Drift-Check.                          |
+| [deployment-vercel.md](pages/deployment-vercel.md)             | Zwei Projekte aus einem Repo, der SPA-Rewrite, Env-Präfixe.                    |
+| [webapp-shell.md](pages/webapp-shell.md)                       | Shell-Layout, kanonische Top-Nav IA, Listen-Muster.                            |
+| [unternehmen-und-profil.md](pages/unternehmen-und-profil.md)   | Profilmenü: Mein Profil, Unternehmen einrichten, Einstellungen.                |
+| [fluent-ui.md](pages/fluent-ui.md)                             | Fluent UI 2: Themes, Provider, Tailwind-Regel, Bausteine.                      |
+| [uebersicht.md](pages/uebersicht.md)                           | Startseite: Tagesplan, Zu erledigen, Jahresergebnis.                           |
+| [rechnungsbereich.md](pages/rechnungsbereich.md)               | Bereich „Rechnungen“: Reiter, Übersicht mit Ausgang, Eingang, Zahlen.          |
+| [kontakte.md](pages/kontakte.md)                               | Kontakte: ein Geschäftspartner mit Rollen, Auswahl in Belegen.                 |
+| [auftragsfotos.md](pages/auftragsfotos.md)                     | Fotos am Auftrag anzeigen, hochladen und löschen.                              |
+| [auftragsnotizen.md](pages/auftragsnotizen.md)                 | Notizen am Auftrag lesen, anlegen, bearbeiten, löschen.                        |
+| [kalender.md](pages/kalender.md)                               | Kalender mit Terminen, Einsätzen, Abwesenheiten; Termine anlegen, Serien.      |
+| [auftragszeiten.md](pages/auftragszeiten.md)                   | Zeiten am Auftrag anlegen, ändern, löschen; Stunden je Mitarbeiter.            |
+| [mitarbeiterseite.md](pages/mitarbeiterseite.md)               | Seite je Mitarbeiter mit Stammdaten und Zeiten (`/mitarbeiter/:id`).           |
+| [mitarbeiter-hinzufuegen.md](pages/mitarbeiter-hinzufuegen.md) | Mitarbeiter per QR-Code, Code oder ohne Konto hinzufügen (`/mitarbeiter/neu`). |
+| [auftragsmaterial.md](pages/auftragsmaterial.md)               | Material am Auftrag lesen, anlegen, ändern, löschen.                           |
+| [bautagebuch.md](pages/bautagebuch.md)                         | Bautagebuch am Auftrag lesen, anlegen, ändern, löschen.                        |
+| [auftragscheckliste.md](pages/auftragscheckliste.md)           | Checkliste am Auftrag lesen, abhaken, zuweisen.                                |
+| [auftrag-anlegen.md](pages/auftrag-anlegen.md)                 | Auftrag aus der Liste anlegen, dieselbe `orders`-Zeile.                        |
+| [auftrag-bearbeiten.md](pages/auftrag-bearbeiten.md)           | Stammdaten eines Auftrags ändern, Teilpatch wie in der App.                    |
+| [einsatzplanung.md](pages/einsatzplanung.md)                   | Wochenplan mit Gesichtern, Einsatzseite, Einsatz bearbeiten.                   |
+| [abwesenheiten.md](pages/abwesenheiten.md)                     | Abwesenheiten genehmigen, ablehnen, stornieren, bearbeiten, löschen.           |
+| [einsatz-anlegen.md](pages/einsatz-anlegen.md)                 | Einsatz anlegen und löschen, Zeiten bleiben stehen.                            |
+| [kostenstellen.md](pages/kostenstellen.md)                     | Kostenstelle anlegen und löschen, Auftragssumme je Zeile.                      |
+| [demo-gf-2026-10-10.md](pages/demo-gf-2026-10-10.md)           | Klickpfad GF-Demo 10.10.2026 (Spahrbau).                                       |
+| [datumseingabe.md](pages/datumseingabe.md)                     | Deutsche Datums- und Uhrzeitfelder, Wert bleibt ISO.                           |
 
 ## Protokolle
 
@@ -120,6 +121,10 @@ verlinkt, nie kopiert.
 | 2026-10-27 | [Leerzustand in „Zu erledigen“ mittig](logs/2026-10-27-zu-erledigen-leerzustand.md)                            |
 | 2026-10-27 | [Rechtsseiten in der Web-App](logs/2026-10-27-rechtsseiten-webapp.md)                                          |
 | 2026-10-28 | [Betrieb einrichten nach der Anmeldung](logs/2026-10-28-betrieb-einrichten.md)                                 |
+| 2026-10-30 | [Mitarbeiter hinzufügen wie in der App](logs/2026-10-30-mitarbeiter-hinzufuegen.md)                            |
+| 2026-10-30 | [Registrierung und Einrichtung wie in der App](logs/2026-10-30-registrierung-wie-app.md)                       |
+| 2026-10-30 | [Auftragsliste: Statusfilter statt Angebote-Tab](logs/2026-10-30-auftraege-statusfilter.md)                    |
+| 2026-10-30 | [Eingangsrechnungen: Filter-Knopf statt Reiter](logs/2026-10-30-eingangsrechnungen-filterknopf.md)             |
 | 2026-10-30 | [Profilmenü neu: Mein Profil, Unternehmen, Einstellungen](logs/2026-10-30-profil-unternehmen-einstellungen.md) |
 | 2026-10-30 | [Einrichtung statt Übersicht, keine Gedankenstriche](logs/2026-10-30-einrichtung-und-gedankenstriche.md)       |
 

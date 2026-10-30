@@ -18,7 +18,8 @@ import { useNavigate } from 'react-router';
 import { readableDbError } from '@/lib/dbErrors';
 import { HOME_ROUTE } from '@/lib/routes';
 
-import { extractInviteToken, useJoinCompany } from './useMyCompanies';
+import { extractInviteToken, invitationErrorKey } from './invitations';
+import { useJoinCompany } from './useMyCompanies';
 
 /**
  * Einem weiteren Betrieb beitreten: Einladungscode oder -link einfügen. Den
@@ -58,8 +59,9 @@ export function JoinCompanyDialog({
       close(false);
       void navigate(HOME_ROUTE);
     } catch (caught) {
+      const key = invitationErrorKey(caught);
       toast.error(t('account:join.error'), {
-        description: readableDbError(caught) ?? undefined,
+        description: key === 'errors:generic' ? (readableDbError(caught) ?? undefined) : t(key),
       });
     }
   }

@@ -15,10 +15,10 @@ export type OrderListRow = {
 };
 
 /**
- * Aufträge des aktiven Betriebs, alle Status. Die Liste filtert die Art
- * clientseitig (`orderList`), damit Laufend/Abgeschlossen und
- * Angebote/Abgelehnt aus demselben Cache kommen. queryKey beginnt mit
- * companyId (Mandant).
+ * Aufträge des aktiven Betriebs, alle Status. Die Liste filtert
+ * Alle/Laufend/Abgeschlossen clientseitig (`orderList`), damit jeder
+ * Filter aus demselben Cache kommt. queryKey beginnt mit companyId
+ * (Mandant).
  */
 export function useOrders(options?: { enabled?: boolean }) {
   const { data: membership } = useMembership();

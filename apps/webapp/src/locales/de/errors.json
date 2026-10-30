@@ -12,5 +12,14 @@
   "boundary": {
     "title": "Unerwarteter Fehler",
     "description": "Die Seite konnte nicht geladen werden."
+  },
+  "invitation": {
+    "NOT_AUTHENTICATED": "Bitte melde dich an, um fortzufahren.",
+    "INVITATION_NOT_FOUND": "Einladung nicht gefunden. Prüfe den Code.",
+    "INVITATION_INACTIVE": "Diese Einladung ist nicht mehr aktiv. Bitte deinen Betrieb um eine neue.",
+    "INVITATION_EXPIRED": "Diese Einladung ist abgelaufen. Bitte deinen Betrieb um eine neue.",
+    "INVITATION_DEPLETED": "Diese Einladung wurde bereits verwendet.",
+    "ALREADY_MEMBER": "Du bist bereits Mitglied dieses Betriebs.",
+    "NAME_REQUIRED": "Vor- und Nachname sind erforderlich."
   }
 }

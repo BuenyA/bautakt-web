@@ -1,7 +1,6 @@
 import { DangerButton, toast } from '@bautakt/ui';
 import {
   Button,
-  Combobox,
   Dialog,
   DialogActions,
   DialogBody,
@@ -16,6 +15,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { Combobox } from '@/components/form/Combobox';
 import { readableDbError } from '@/lib/dbErrors';
 import { routes } from '@/lib/routes';
 

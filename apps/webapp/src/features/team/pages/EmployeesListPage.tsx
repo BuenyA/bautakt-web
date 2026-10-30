@@ -1,11 +1,12 @@
 import { DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
-import { Button, Link as FluentLink } from '@fluentui/react-components';
-import { AddRegular } from '@fluentui/react-icons';
-import { useMemo, useState } from 'react';
+import { Avatar, Button, Link as FluentLink } from '@fluentui/react-components';
+import { AddRegular, BeachRegular } from '@fluentui/react-icons';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { ListFilterChips } from '@/components/common/ListFilterChips';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
@@ -15,27 +16,27 @@ import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
-import { type EmployeeDraft, emptyEmployee } from '../employeeDraft';
-import { EmployeeSheet } from '../EmployeeSheet';
 import {
   employeeFilterFromSearch,
   type EmployeeListFilter,
   employmentListStatus,
 } from '../employeeStatus';
 import { type EmployeeRow, useEmployees } from '../useEmployees';
+import { useProfileImageUrls } from '../useProfileImageUrls';
 
 export function EmployeesListPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
   const canManage = usePermission('canManageEmployees');
+  const canManageAbsences = usePermission('canManageAbsences');
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = employeeFilterFromSearch(searchParams.get('status'));
-  const [draft, setDraft] = useState<EmployeeDraft | null>(null);
-  // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel.
-  useCreateFromUrl(canManage, () => setDraft(emptyEmployee()));
+  // Alte Links mit `?neu=1` führen auf die eigene Anlege-Seite.
+  useCreateFromUrl(canManage, () => void navigate(routes.employeeNew));
   const employees = useEmployees();
   const { data, isError, refetch } = employees;
+  const imageUrls = useProfileImageUrls(data?.map((row) => row.imagePath) ?? []).data;
 
   const isLoading = useCompanyListLoading(employees);
 
@@ -85,6 +86,16 @@ export function EmployeesListPage() {
         header: t('domain:employees.columns.name'),
         cell: ({ row }) => (
           <span className="flex items-center gap-2">
+            <Avatar
+              name={row.original.name || undefined}
+              size={28}
+              color="colorful"
+              image={
+                row.original.imagePath && imageUrls?.[row.original.imagePath]
+                  ? { src: imageUrls[row.original.imagePath] }
+                  : undefined
+              }
+            />
             <span className="text-foreground font-medium">
               {row.original.name || t('domain:employees.unnamed')}
             </span>
@@ -126,7 +137,7 @@ export function EmployeesListPage() {
         ),
       },
     ],
-    [t],
+    [t, imageUrls],
   );
 
   if (isError) {
@@ -152,15 +163,22 @@ export function EmployeesListPage() {
         title={t('domain:employees.title')}
         description={t('domain:employees.description')}
         actions={
-          canManage ? (
-            <Button
-              appearance="primary"
-              onClick={() => setDraft(emptyEmployee())}
-              icon={<AddRegular />}
-            >
-              {t('domain:employeeForm.newTitle')}
-            </Button>
-          ) : null
+          <div className="flex flex-wrap gap-2">
+            {canManageAbsences ? (
+              <LinkButton to={routes.absences} icon={<BeachRegular />}>
+                {t('common:nav.absences')}
+              </LinkButton>
+            ) : null}
+            {canManage ? (
+              <Button
+                appearance="primary"
+                onClick={() => void navigate(routes.employeeNew)}
+                icon={<AddRegular />}
+              >
+                {t('domain:employeeForm.newTitle')}
+              </Button>
+            ) : null}
+          </div>
         }
       />
 
@@ -200,12 +218,6 @@ export function EmployeesListPage() {
             }
           />
         }
-      />
-
-      <EmployeeSheet
-        draft={draft}
-        open={draft !== null}
-        onOpenChange={(open) => !open && setDraft(null)}
       />
     </div>
   );

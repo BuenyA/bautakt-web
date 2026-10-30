@@ -1,5 +1,5 @@
 import { hasPermission } from '@bautakt/core';
-import { Combobox, Option, OptionGroup } from '@fluentui/react-components';
+import { Option, OptionGroup } from '@fluentui/react-components';
 import {
   AddCircle20Regular,
   BuildingMultiple20Regular,
@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { Combobox } from '@/components/form/Combobox';
 import { useMembership } from '@/features/company/useMembership';
 import { anyCompanySection, useCompanyAccess } from '@/features/companySettings/companyAccess';
 import { hubs, visibleHubCards } from '@/features/hubs/hubs';
@@ -71,7 +72,7 @@ function useEntries(): { pages: Entry[]; actions: Entry[] } {
       key: 'domain:contacts.newSubcontractor',
     },
     can('canManageEmployees') && {
-      to: withCreate(routes.employees),
+      to: routes.employeeNew,
       key: 'domain:employeeForm.newTitle',
     },
     can('canManageAbsences') && {

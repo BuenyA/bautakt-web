@@ -71,23 +71,6 @@ export function useSwitchCompany() {
 }
 
 /**
- * Token aus Einladungscode oder -link, wie in der App
- * (`bautakt-app/app/lib/supabase/invitations.ts`): Links mit `invite/<hex>`,
- * sonst 16, 24 oder 48 Hex-Zeichen; Leerzeichen und Bindestriche zählen nicht.
- */
-export function extractInviteToken(input: string): string | null {
-  const trimmed = input.trim();
-  if (!trimmed) return null;
-  const urlMatch = trimmed.match(/invite\/([a-f0-9]+)/i);
-  if (urlMatch?.[1]) return urlMatch[1].toLowerCase();
-  const normalized = trimmed.replace(/[\s-]/g, '');
-  if (/^([a-f0-9]{16}|[a-f0-9]{24}|[a-f0-9]{48})$/i.test(normalized)) {
-    return normalized.toLowerCase();
-  }
-  return null;
-}
-
-/**
  * Einladung annehmen (`accept_employment_invitation`) und den neuen Betrieb
  * gleich aktiv machen — wer einen Code eintippt, will dort arbeiten.
  */

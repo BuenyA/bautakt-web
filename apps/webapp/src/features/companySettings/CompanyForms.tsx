@@ -1,10 +1,8 @@
 import {
-  Combobox,
   Field,
   Input,
   MessageBar,
   MessageBarBody,
-  Option,
   Select,
   Spinner,
 } from '@fluentui/react-components';
@@ -18,7 +16,6 @@ import { supabase } from '@/lib/supabase';
 import { text, useCardForm, useSave, useUpdateCompany } from './companyForm';
 import {
   COMPANY_COUNTRIES,
-  COMPANY_TYPES,
   type CompanyCountry,
   formatIbanInput,
   isValidBic,
@@ -38,6 +35,7 @@ import {
   toCompanyCountry,
 } from './companyValidation';
 import { FormCard } from './FormCard';
+import { TradeCombobox } from './TradeCombobox';
 
 /** Die Spalten von `companies`, die diese Seite liest und schreibt. */
 export type CompanyMasterData = {
@@ -135,18 +133,11 @@ export function CompanyCard({
           required
           validationMessage={form.errorFor('type')}
         >
-          <Combobox
-            freeform
+          <TradeCombobox
             disabled={!canEdit}
             value={v.type}
-            selectedOptions={v.type ? [v.type] : []}
-            onChange={(event) => form.set({ type: event.target.value })}
-            onOptionSelect={(_, d) => form.set({ type: d.optionText ?? '' })}
-          >
-            {COMPANY_TYPES.map((type) => (
-              <Option key={type}>{type}</Option>
-            ))}
-          </Combobox>
+            onChange={(type) => form.set({ type })}
+          />
         </Field>
         <Field
           label={t('domain:settings.street')}

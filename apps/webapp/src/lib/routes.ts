@@ -90,6 +90,8 @@ export const routes = {
   // Team — Hub `/personal`, Verzeichnis bleibt `/mitarbeiter`.
   personalHub: '/personal',
   employees: '/mitarbeiter',
+  /** Mitarbeiter hinzufügen: QR-Code, Einladungscode oder ohne Konto — wie in der App. */
+  employeeNew: '/mitarbeiter/neu',
   employee: (id: string) => `/mitarbeiter/${id}`,
   absences: '/abwesenheiten',
   absence: (id: string) => `/abwesenheiten/${id}`,

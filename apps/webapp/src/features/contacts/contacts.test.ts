@@ -4,6 +4,8 @@ import { describe, it } from 'node:test';
 
 import {
   changedFields,
+  type ContactDetail,
+  draftFromContact,
   emptyContact,
   hasOptionalValues,
   ibanPlacement,
@@ -74,11 +76,11 @@ describe('activeRoles', () => {
 });
 
 describe('Reiter der Kontaktliste', () => {
-  it('URL-Werte sind deutsch, unbekannt heißt Alle', () => {
+  it('URL-Werte sind deutsch, unbekannt heißt Kunden', () => {
     assert.equal(contactTabFromSearch('lieferanten'), 'suppliers');
-    assert.equal(contactTabFromSearch('quatsch'), 'all');
+    assert.equal(contactTabFromSearch('quatsch'), 'customers');
     assert.equal(contactTabToSearch('subcontractors'), 'subunternehmer');
-    assert.equal(contactTabToSearch('all'), null);
+    assert.equal(contactTabToSearch('customers'), null);
   });
   it('ein Kontakt mit zwei Rollen steht in beiden Reitern', () => {
     const row = { archived_at: null, roles: ['customer', 'subcontractor'] as const };
@@ -92,9 +94,9 @@ describe('Reiter der Kontaktliste', () => {
   it('archivierte nur mit dem Schalter, dann nur sie', () => {
     const archived = { archived_at: '2026-10-01', roles: [] };
     const active = { archived_at: null, roles: ['customer' as const] };
-    assert.equal(matchesContactTab(archived, 'all', false), false);
-    assert.equal(matchesContactTab(archived, 'all', true), true);
-    assert.equal(matchesContactTab(active, 'all', true), false);
+    assert.equal(matchesContactTab(archived, 'suppliers', false), false);
+    assert.equal(matchesContactTab(archived, 'suppliers', true), true);
+    assert.equal(matchesContactTab(active, 'customers', true), false);
   });
 });
 
@@ -106,6 +108,18 @@ describe('Rollen im Formular', () => {
     assert.deepEqual(withoutRole(['customer', 'supplier', 'subcontractor'], 'supplier'), [
       'customer',
     ]);
+  });
+  it('archivierte Rolle ist nicht angehakt, das Profil bleibt bekannt', () => {
+    const contact = {
+      id: 'c1',
+      kind: 'company',
+      customer: { archived_at: '2026-10-01T00:00:00Z' },
+      supplier: { archived_at: null, subcontractor: { archived_at: null } },
+      other: null,
+    } as unknown as ContactDetail;
+    const draft = draftFromContact(contact);
+    assert.deepEqual(draft.roles, ['supplier', 'subcontractor']);
+    assert.deepEqual(draft.existingRoles, ['customer', 'supplier', 'subcontractor']);
   });
   it('neuer Kontakt mit Rolle aus dem Reiter, Land Deutschland', () => {
     const draft = emptyContact('customer');

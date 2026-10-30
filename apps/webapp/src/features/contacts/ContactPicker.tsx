@@ -1,7 +1,8 @@
-import { Combobox, Option, OptionGroup } from '@fluentui/react-components';
+import { Option, OptionGroup } from '@fluentui/react-components';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { Combobox } from '@/components/form/Combobox';
 import { usePermission } from '@/features/company/usePermission';
 
 import { type ContactDraft, emptyContact } from './contactDraft';

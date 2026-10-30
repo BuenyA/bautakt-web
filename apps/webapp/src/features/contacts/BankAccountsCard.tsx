@@ -129,11 +129,7 @@ export function BankAccountsCard({
         </ul>
       )}
 
-      <FormDrawer
-        open={draft !== null}
-        onOpenChange={(open) => !open && setDraft(null)}
-        size="small"
-      >
+      <FormDrawer open={draft !== null} onOpenChange={(open) => !open && setDraft(null)}>
         {draft ? (
           <BankAccountForm
             contactId={contactId}

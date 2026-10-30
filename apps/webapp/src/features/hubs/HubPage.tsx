@@ -8,7 +8,7 @@ import {
 } from '@fluentui/react-components';
 import { ChevronRight20Regular } from '@fluentui/react-icons';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { Navigate, useNavigate } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -105,7 +105,15 @@ function HubCardLink({ card }: { card: HubCard }) {
   );
 }
 
+/**
+ * „Mitarbeiter“ öffnet direkt das Verzeichnis; die Abwesenheiten erreicht man
+ * über den Knopf in dessen Kopf. Wer nur Abwesenheiten verwalten darf, landet
+ * dort. Die Hub-Seite bleibt für Laden, Fehler und „keine Rechte“.
+ */
 export function PersonalHubPage() {
+  const membership = useMembership();
+  const [first] = visibleHubCards(personalHub, membership.data?.permissions);
+  if (membership.isSuccess && first) return <Navigate to={first.to} replace />;
   return <HubPage hub={personalHub} />;
 }
 

@@ -1,3 +1,4 @@
+import type { CompanyCountry } from '@/features/companySettings/companyValidation';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -5,8 +6,10 @@ import { supabase } from '@/lib/supabase';
  *
  * Vorbild: `bautakt-app` `app/lib/supabase/companies.ts` (`createCompany`,
  * `setAsPrimary` true) und `app/lib/onboarding/commitDraft.ts`
- * (`createCompanyFromDraft`). Adresse und Kontakt bleiben leer; das Land ist
- * `DE`. Die Rolle der ersten Beschaeftigung ist `Geschäftsführer`.
+ * (`createCompanyFromDraft`). Anders als dort fragt das Web die Anschrift
+ * gleich mit ab (Pflicht fuer jede Rechnung); Telefon und E-Mail sind
+ * optional und bleiben sonst leer. Die Rolle der ersten Beschaeftigung ist
+ * `Geschäftsführer`.
  *
  * `onboarding_complete` setzt die App erst auf dem Willkommensscreen
  * (`setOnboardingCompleted` → Outbox `profile.onboarding`). Dieselbe Spalte
@@ -23,6 +26,12 @@ export type OwnerCompanyInput = {
   name: string;
   type: string;
   teamSize: CompanyTeamSize;
+  street: string;
+  postalCode: string;
+  city: string;
+  country: CompanyCountry;
+  phone: string;
+  email: string;
 };
 
 const OWNER_ROLE = 'Geschäftsführer';
@@ -61,12 +70,12 @@ export async function createOwnerCompany(userId: string, input: OwnerCompanyInpu
       {
         name: input.name.trim(),
         type: input.type.trim(),
-        street_address: '',
-        postal_code: '',
-        city: '',
-        country: 'DE',
-        email: '',
-        phone_number: '',
+        street_address: input.street.trim(),
+        postal_code: input.postalCode.trim(),
+        city: input.city.trim(),
+        country: input.country,
+        email: input.email.trim(),
+        phone_number: input.phone.trim(),
         team_size: input.teamSize,
         creator_id: userId,
       },

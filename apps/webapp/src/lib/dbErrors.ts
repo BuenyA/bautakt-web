@@ -88,6 +88,20 @@ const MESSAGES: Record<string, string> = {
     'Freigeben und Ablehnen geht nur über die Knöpfe in der Prüfung. Bitte lade die Seite neu.',
   INCOMING_NOT_FOUND:
     'Diese Eingangsrechnung gibt es nicht, oder dir fehlt die Berechtigung, sie zu prüfen.',
+  // Protokolleintrag zur Ablehnungs-Mail nachtragen (record_incoming_rejection_mail, #171).
+  INCOMING_MAIL_NOT_REJECTED: 'Ablehnungs-Mails gehören nur zu abgelehnten Rechnungen.',
+  INCOMING_MAIL_NOT_SENT:
+    'Zu dieser Rechnung gibt es keine versendete Mail mit dieser ID. Bitte lade die Seite neu.',
+  // Sperre nach dem Erfassen (bautakt-app 20261030210000_b_incoming_invoice_lock, bautakt-web#170).
+  INCOMING_LOCKED:
+    'An einer erfassten Eingangsrechnung sind Beträge, Lieferant, Nummer und Daten festgeschrieben. Ändern lassen sich nur Status und Zuordnung. Bitte lade die Seite neu.',
+  // Steueraufteilung (bautakt-app 20261030230000_b_incoming_invoice_tax_lines, bautakt-web#168).
+  INCOMING_TAX_LINES_MISMATCH:
+    'Die Steuersätze ergeben nicht Netto und Umsatzsteuer der Rechnung. Die Rechnung ist als Entwurf gespeichert; bitte die Beträge prüfen.',
+  INCOMING_TAX_LINES_INVALID:
+    'Die Steueraufteilung ist ungültig: jede Steuerart nur einmal, Beträge mit höchstens zwei Nachkommastellen, bei §13b, steuerfrei und Kleinunternehmer keine Umsatzsteuer.',
+  INCOMING_TAX_LINES_NOT_SAVED:
+    'Die Steueraufteilung wurde nicht vollständig gespeichert. Die Rechnung ist als Entwurf gespeichert; bitte noch einmal speichern.',
   // Skonto-Vermerk (bautakt-app 20261030120000_b_incoming_invoice_adjustments, bautakt-web#166).
   INCOMING_ADJUSTMENT_EXISTS:
     'Für diese Rechnung ist schon ein Skonto vermerkt. Hebe es erst auf, dann vermerke es neu. Bitte lade die Seite neu.',

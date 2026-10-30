@@ -23,16 +23,13 @@
   },
   "orders": {
     "listTitle": "Aufträge",
-    "listDescription": "Aufträge und Angebote meines Betriebs.",
+    "listDescription": "Aufträge meines Betriebs.",
     "detailTitle": "Auftrag",
     "detailDescription": "Stammdaten und Status.",
-    "filtersLabel": "Auftragsart",
-    "kindOrders": "Aufträge",
-    "kindQuotes": "Angebote",
-    "sectionRunning": "Laufende Aufträge",
-    "sectionFinished": "Abgeschlossen",
-    "sectionQuotes": "Angebote",
-    "sectionDeclined": "Abgelehnt",
+    "filtersLabel": "Auftragsstatus",
+    "filterAll": "Alle",
+    "filterRunning": "Laufend",
+    "filterFinished": "Abgeschlossen",
     "emptyResultsTitle": "Keine Ergebnisse",
     "emptyResultsDescription": "Für diesen Filter oder diese Suche gibt es keine Treffer.",
     "columns": {
@@ -56,8 +53,6 @@
     "noDate": "Kein Datum",
     "emptyTitle": "Noch keine Aufträge",
     "emptyDescription": "Sobald Aufträge angelegt sind, erscheinen sie hier.",
-    "emptyQuotesTitle": "Noch keine Angebote",
-    "emptyQuotesDescription": "Angebote und abgelehnte Angebote erscheinen in dieser Ansicht.",
     "loadErrorTitle": "Aufträge konnten nicht geladen werden",
     "loadErrorDescription": "Bitte prüfe die Verbindung und versuche es erneut.",
     "notFoundTitle": "Auftrag nicht gefunden",
@@ -205,14 +200,13 @@
   },
   "contacts": {
     "listTitle": "Kontakte",
-    "listDescription": "Kunden, Lieferanten, Subunternehmer und alle anderen Beteiligten, jeder nur einmal.",
+    "listDescription": "Deine Kunden, Lieferanten, Subunternehmer und sonstigen Kontakte.",
     "detailTitle": "Kontakt",
     "new": "Neuer Kontakt",
     "newCustomer": "Neuer Kunde",
     "newSupplier": "Neuer Lieferant",
     "newSubcontractor": "Neuer Subunternehmer",
     "tabs": {
-      "all": "Alle",
       "customers": "Kunden",
       "suppliers": "Lieferanten",
       "subcontractors": "Subunternehmer",
@@ -262,7 +256,7 @@
     "usageArticles": "Katalogartikel",
     "andMore": "und {{count}} weitere",
     "emptyTitle": "Noch keine Kontakte",
-    "emptyDescription": "Lege Kunden, Lieferanten und Partner an. Sie entstehen auch beim Erfassen von Aufträgen und Rechnungen.",
+    "emptyDescription": "Lege Kunden, Lieferanten und Partner an. Sie entstehen auch automatisch beim Erfassen von Aufträgen und Rechnungen.",
     "emptyResultsTitle": "Keine Treffer",
     "emptyResultsDescription": "In diesem Reiter steht niemand, der zur Suche passt.",
     "loadErrorTitle": "Kontakte konnten nicht geladen werden",
@@ -283,7 +277,7 @@
     "contactFirstName": "Vorname (Ansprechpartner)",
     "contactLastName": "Nachname (Ansprechpartner)",
     "sectionRoles": "Rollen",
-    "rolesHint": "Ein Kontakt kann mehrere Rollen haben, z. B. Kunde und Subunternehmer. Eine vorhandene Rolle beendest du auf der Kontaktseite.",
+    "rolesHint": "Ein Kontakt kann mehrere Rollen haben, z. B. Kunde und Lieferant.",
     "sectionAddress": "Anschrift und Erreichbarkeit",
     "moreDetails": "Weitere Angaben (optional)",
     "sectionMoreContact": "Ansprechpartner, Mobil, Website, Land",
@@ -318,7 +312,7 @@
     "exemptionHint": "Die §48b-Freistellungsbescheinigung hinterlegst du nach dem Speichern auf der Kontaktseite.",
     "function": "Funktion",
     "notes": "Notizen",
-    "nameRequired": "Bitte einen Namen angeben: bei Firmen den Firmennamen, bei Personen Vor- oder Nachname.",
+    "nameRequired": "Bitte einen Namen angeben. Bei Firmen den Firmennamen, bei Personen Vor- oder Nachname.",
     "roleRequired": "Bitte mindestens eine Rolle wählen.",
     "daysInvalid": "Tage bitte als ganze Zahl angeben.",
     "buyerReferenceTooLong": "Die Leitweg-ID darf höchstens {{max}} Zeichen haben.",
@@ -857,7 +851,7 @@
       "paid": "Bezahlt"
     },
     "emptyFilterTitle": "Keine Eingangsrechnungen mit diesem Status",
-    "emptyFilterDescription": "Unter „Alle“ stehen die übrigen.",
+    "emptyFilterDescription": "Im Filter „Alle“ wählen, um die übrigen zu sehen.",
     "emptyExpensesTitle": "Keine Ausgaben erfasst",
     "emptyExpensesDescription": "Gemeinkosten und sonstige Belege erscheinen hier."
   },
@@ -965,11 +959,222 @@
       "description": "Stammdaten und Arbeitszeiten.",
       "until": "Bis",
       "notFoundTitle": "Mitarbeiter nicht gefunden",
-      "notFoundDescription": "Diesen Mitarbeiter gibt es nicht oder nicht in diesem Betrieb.",
-      "timesTitle": "Zeiten",
-      "periodTotal": "Summe: {{hours}}",
-      "timesEmptyTitle": "Noch keine Zeiten",
-      "timesEmptyDescription": "Erfasste Zeiten dieses Mitarbeiters erscheinen hier."
+      "notFoundDescription": "Diesen Mitarbeiter gibt es nicht oder nicht in diesem Betrieb."
+    }
+  },
+  "employeeProfile": {
+    "masterData": "Stammdaten",
+    "stats": {
+      "leaveTitle": "Urlaub {{year}}",
+      "leaveValue_one": "{{remaining}} Tag übrig",
+      "leaveValue_other": "{{remaining}} Tage übrig",
+      "leaveNote": "von {{total}} · {{used}} genommen",
+      "leaveNotePending": "von {{total}} · {{used}} genommen · {{pending}} beantragt",
+      "leaveOverbooked": "{{days}} Tage überbucht",
+      "sickTitle": "Krankheitstage {{year}}",
+      "sickNote": "Arbeitstage, ohne Wochenende und Feiertage",
+      "ordersTitle": "Aufträge",
+      "ordersNote": "Aus Einsatzplanung und Zeiten",
+      "hoursTitle": "Stunden im {{month}}",
+      "hoursNote": "{{hours}} diese Woche"
+    },
+    "absences": {
+      "title": "Fehlzeiten {{year}}",
+      "empty": "In diesem Jahr keine Fehlzeiten.",
+      "days_one": "{{count}} Tag",
+      "days_other": "{{count}} Tage",
+      "recent": "Letzte Einträge",
+      "showAll": "Alle Abwesenheiten"
+    },
+    "leave": {
+      "edit": "Anspruch anpassen",
+      "title": "Urlaubsanspruch",
+      "description": "Urlaubstage pro Jahr für {{name}}.",
+      "useCustom": "Eigenen Anspruch festlegen",
+      "companyDefault": "Ohne eigenen Wert gilt der Anspruch des Betriebs: {{days}} Tage im Jahr {{year}}, anteilig ab Eintritt.",
+      "daysLabel": "Urlaubstage pro Jahr",
+      "invalid": "Bitte eine Zahl von 0 bis 365 eingeben. Halbe Tage sind möglich.",
+      "saved": "Urlaubsanspruch gespeichert.",
+      "saveError": "Der Urlaubsanspruch konnte nicht gespeichert werden."
+    },
+    "orders": {
+      "title": "Aufträge",
+      "empty": "Bisher bei keinem Auftrag eingeteilt und keine Zeiten gebucht.",
+      "lastOn": "zuletzt {{date}}",
+      "more_one": "{{count}} weiterer Auftrag",
+      "more_other": "{{count}} weitere Aufträge"
+    },
+    "times": {
+      "title": "Zeiten",
+      "week": "Diese Woche",
+      "month": "Dieser Monat",
+      "recent": "Letzte Einträge",
+      "empty": "Noch keine Zeiten erfasst."
+    },
+    "rights": {
+      "title": "Rolle & Rechte",
+      "label": "Rechte",
+      "on": "An",
+      "off": "Aus",
+      "standard": "Standardrechte der Rolle",
+      "overrides_one": "{{count}} persönliche Abweichung",
+      "overrides_other": "{{count}} persönliche Abweichungen",
+      "edit": "Rechte bearbeiten",
+      "view": "Rechte ansehen",
+      "drawerTitle": "Rechte von {{name}}",
+      "drawerDescription": "Ausgangspunkt sind die Rechte der Rolle „{{role}}“. Änderungen hier gelten nur für diese Person.",
+      "custom": "Abweichend",
+      "reset": "Auf Rolle zurücksetzen",
+      "grantLocked": "Rechte, die du selbst nicht hast, kannst du nicht vergeben.",
+      "readOnly": "Die Rechte dieser Person darfst du nicht ändern.",
+      "saveError": "Die Rechte konnten nicht gespeichert werden."
+    },
+    "permissions": {
+      "groups": {
+        "site": "Baustelle & Dokumentation",
+        "documents": "Dokumente",
+        "orders": "Aufträge & Kalender",
+        "finance": "Finanzen",
+        "company": "Unternehmen"
+      },
+      "items": {
+        "canTrackTime": {
+          "title": "Zeiterfassung",
+          "description": "Eigene Arbeitszeiten erfassen und bearbeiten"
+        },
+        "canTrackTimeForTeam": {
+          "title": "Zeiterfassung für Team",
+          "description": "Zeiten für andere Mitarbeiter erfassen und verwalten"
+        },
+        "canCreateAndViewReports": {
+          "title": "Bautagebuch",
+          "description": "Bautagebücher erstellen und einsehen"
+        },
+        "canRecordMaterials": {
+          "title": "Material erfassen",
+          "description": "Materialverbrauch auf Aufträgen buchen"
+        },
+        "canViewChecklist": {
+          "title": "Checkliste einsehen",
+          "description": "Auftrags-Checklisten ansehen, ohne sie zu ändern"
+        },
+        "canEditChecklist": {
+          "title": "Checkliste bearbeiten",
+          "description": "Punkte anlegen, abhaken, bearbeiten und löschen"
+        },
+        "canViewNotes": {
+          "title": "Notizen einsehen",
+          "description": "Auftrags-Notizen ansehen, ohne sie zu ändern"
+        },
+        "canCreateNotes": {
+          "title": "Notizen bearbeiten",
+          "description": "Notizen anlegen, bearbeiten und löschen"
+        },
+        "canTakePhotos": {
+          "title": "Fotos & Galerie",
+          "description": "Bilder aufnehmen und verwalten"
+        },
+        "canViewDocuments": {
+          "title": "Dokumente einsehen",
+          "description": "Hochgeladene Dokumente anzeigen"
+        },
+        "canUploadAndEditDocuments": {
+          "title": "Dokumente bearbeiten",
+          "description": "Dokumente hochladen und ändern"
+        },
+        "canCreateOrders": {
+          "title": "Aufträge anlegen",
+          "description": "Neue Aufträge erstellen"
+        },
+        "canManageOrders": {
+          "title": "Aufträge verwalten",
+          "description": "Bestehende Aufträge bearbeiten"
+        },
+        "canCompleteOrders": {
+          "title": "Aufträge abschließen",
+          "description": "Aufträge als abgeschlossen markieren"
+        },
+        "canManageAllCalendar": {
+          "title": "Kalender (alle)",
+          "description": "Termine für alle Mitarbeiter verwalten"
+        },
+        "canManageWorkAssignments": {
+          "title": "Einsatzplanung",
+          "description": "Mitarbeiter auf Baustellen einteilen und planen"
+        },
+        "canUseBillingModule": {
+          "title": "Rechnungsmodul",
+          "description": "Rechnungen erstellen und versenden"
+        },
+        "canViewManagementInvoices": {
+          "title": "Rechnungen einsehen",
+          "description": "Finanzübersicht im Management"
+        },
+        "canViewOrderFinance": {
+          "title": "Auftragsfinanzen",
+          "description": "Kosten und Margen eines Auftrags einsehen (ohne Kollegenlöhne)"
+        },
+        "canViewWageCosts": {
+          "title": "Lohnkosten einsehen",
+          "description": "Individuelle Lohn- und Kostensätze der Mitarbeiter sehen"
+        },
+        "canManageRates": {
+          "title": "Stundensätze pflegen",
+          "description": "Kosten- und Verrechnungssätze anlegen und ändern"
+        },
+        "canManageOverheadCosts": {
+          "title": "Gemeinkosten pflegen",
+          "description": "Gemeinkosten und Kostenarten erfassen und verwalten"
+        },
+        "canViewCompanyFinance": {
+          "title": "Betriebsergebnis",
+          "description": "Firmenweite Auswertungen und Charts im Finanzbereich"
+        },
+        "canManageCustomers": {
+          "title": "Kunden verwalten",
+          "description": "Kunden anlegen und bearbeiten"
+        },
+        "canManageSuppliers": {
+          "title": "Lieferanten verwalten",
+          "description": "Lieferanten, Subunternehmer und Freistellungsbescheinigungen pflegen"
+        },
+        "canManageCostCenters": {
+          "title": "Kostenstellen",
+          "description": "Kostenstellen anlegen und bearbeiten"
+        },
+        "canManageEmployees": {
+          "title": "Mitarbeiter verwalten",
+          "description": "Mitarbeiter hinzufügen und bearbeiten"
+        },
+        "canManageAbsences": {
+          "title": "Fehlzeiten verwalten",
+          "description": "Anträge einsehen, genehmigen, ablehnen und Fehlzeiten direkt erfassen"
+        },
+        "canManageRoles": {
+          "title": "Rollen verwalten",
+          "description": "Rollen anlegen, löschen und Standardrechte bearbeiten"
+        },
+        "canSendNotifications": {
+          "title": "Benachrichtigungen",
+          "description": "Push- und In-App-Nachrichten senden"
+        },
+        "canEditCompanyMasterData": {
+          "title": "Stammdaten",
+          "description": "Unternehmensdaten bearbeiten"
+        },
+        "canManageCompanySettings": {
+          "title": "Einstellungen",
+          "description": "Allgemeine Unternehmenseinstellungen"
+        },
+        "canManageCatalog": {
+          "title": "Materialkatalog",
+          "description": "Artikel und Preise im Unternehmenskatalog pflegen"
+        },
+        "canManageLicenses": {
+          "title": "Lizenzen",
+          "description": "Lizenzen und Abonnements verwalten"
+        }
+      }
     }
   },
   "absences": {
@@ -1854,7 +2059,11 @@
     "action": {
       "approved": "Freigegeben",
       "rejected": "Abgelehnt",
-      "mail_sent": "Mail an den Absender gesendet"
+      "mail_sent": "Mail an den Absender gesendet",
+      "captured": "Erfasst",
+      "status_changed": "Status geändert",
+      "assignment_changed": "Zuordnung geändert",
+      "unknown": "Änderung"
     },
     "by": "{{name}} · {{at}}",
     "unknownActor": "Unbekannt",
@@ -1878,6 +2087,17 @@
     "errors": {
       "reasonRequired": "Bitte begründe die Ablehnung.",
       "reasonTooLong": "Höchstens {{max}} Zeichen."
+    },
+    "change": {
+      "status": "Status: {{from}} → {{to}}",
+      "statusInitial": "Status: {{to}}",
+      "none": "keine",
+      "missing": "nicht mehr vorhanden",
+      "field": {
+        "order_id": "Auftrag: {{from}} → {{to}}",
+        "cost_category_id": "Kostenart: {{from}} → {{to}}",
+        "supplier_id": "Lieferant (Stamm): {{from}} → {{to}}"
+      }
     }
   },
   "incomingSkonto": {
@@ -1945,9 +2165,42 @@
     "description": "Stammdaten und Rolle im Betrieb.",
     "nameRequired": "Bitte einen Namen angeben.",
     "roleRequired": "Bitte eine Rolle wählen.",
-    "inviteHint": "Wird ohne Benutzerkonto angelegt. Die Einladung in die App läuft separat über die Handy-App.",
     "saved": "Mitarbeiter gespeichert.",
     "saveError": "Mitarbeiter konnte nicht gespeichert werden."
+  },
+  "employeeNew": {
+    "titleInvite": "Mitarbeiter einladen",
+    "titleManual": "Mitarbeiter anlegen",
+    "description": "Neue Person in meinen Betrieb holen: per QR-Code, Einladungscode oder ohne Konto.",
+    "methodLabel": "Hinzufügen über",
+    "methods": {
+      "qr": "QR-Code",
+      "token": "Code",
+      "manual": "Ohne Konto"
+    },
+    "roleHint": "Mit dieser Rolle tritt die Person bei. Eine andere Rolle erzeugt eine neue Einladung.",
+    "noRoles": "Du darfst keine Rolle vergeben.",
+    "qrHeading": "Mit der Bautakt-App scannen",
+    "qrInfo": "Die Person scannt den QR-Code und tritt meinem Betrieb bei. Er ist 7 Tage gültig und mehrfach nutzbar.",
+    "tokenHeading": "Code weitergeben",
+    "tokenInfo": "Die Person gibt den Code in der Bautakt-App beim Onboarding ein. Er ist 7 Tage gültig und einmalig nutzbar.",
+    "manualHeading": "Ohne Konto anlegen",
+    "manualInfo": "Für Mitarbeiter ohne Handy oder Konto. Sie stehen in der Teamliste, brauchen aber kein Login.",
+    "qrTitle": "QR-Code zum Beitreten",
+    "creating": "Einladung wird erstellt …",
+    "inviteError": "Die Einladung konnte nicht erstellt werden. Bitte versuche es erneut.",
+    "validUntil": "Gültig bis {{date}}",
+    "regenerate": "Neu generieren",
+    "copyCode": "Code kopieren",
+    "copyText": "Einladungstext kopieren",
+    "copied": "Kopiert",
+    "copyError": "Kopieren hat nicht geklappt. Markiere den Code und kopiere ihn von Hand.",
+    "shareText": "Tritt unserem Team bei! Dein Einladungscode: {{code}}\n\nGültig bis: {{date}}\n\nGib den Code in der Bautakt-App beim Onboarding ein.",
+    "firstNamePlaceholder": "Max",
+    "lastNamePlaceholder": "Mustermann",
+    "nameRequired": "Bitte Vor- und Nachnamen angeben.",
+    "create": "Anlegen",
+    "created": "Mitarbeiter angelegt."
   },
   "invoiceDesk": {
     "title": "Rechnungen",
@@ -2210,7 +2463,8 @@
     "recipientFrom": {
       "eInvoice": "Aus der E-Rechnung übernommen.",
       "contact": "Aus dem Lieferanten-Kontakt übernommen.",
-      "none": "Keine Adresse in E-Rechnung oder Kontakt, bitte eintragen."
+      "none": "Keine Adresse in E-Rechnung oder Kontakt, bitte eintragen.",
+      "retry": "Empfänger aus dem Fehlversuch."
     },
     "templateBuiltin": "Betreff und Text kommen aus der Standard-Vorlage.",
     "templateCustom": "Betreff und Text kommen aus der Vorlage deines Betriebs.",
@@ -2257,8 +2511,60 @@
       "to": "An: {{to}}",
       "subject": "Betreff: {{subject}}",
       "show": "Mail ansehen",
-      "archivedTitle": "Gesendete Mail vom {{at}}",
-      "loadError": "Die gesendete Mail konnte nicht geladen werden."
+      "archivedTitle": "Archivierte Mail vom {{at}}",
+      "loadError": "Die gesendete Mail konnte nicht geladen werden.",
+      "sentAt": "Versendet am {{at}}",
+      "messageId": "Message-ID: {{id}}"
+    },
+    "issues": {
+      "loadError": "Der Versandstatus der Ablehnungs-Mails konnte nicht geladen werden.",
+      "recordError": "Der Protokolleintrag konnte nicht nachgetragen werden.",
+      "errorCode": "Fehler des Mail-Dienstes: {{code}}",
+      "resend": "Erneut senden",
+      "record": "Eintrag nachtragen",
+      "failed": {
+        "title": "Ablehnungs-Mail nicht versendet",
+        "body": "Die Mail an {{to}} vom {{at}} hat der Mail-Dienst nicht angenommen. Sie steht unverändert im Archiv."
+      },
+      "unknown": {
+        "title": "Unklar, ob die Ablehnungs-Mail rausging",
+        "body": "Bei der Mail an {{to}} vom {{at}} kam keine Bestätigung vom Mail-Dienst. Frag erst beim Empfänger nach, bevor du sie erneut sendest."
+      },
+      "unlogged": {
+        "title": "Ablehnungs-Mail versendet, Protokolleintrag fehlt",
+        "body": "Die Mail an {{to}} ging am {{at}} raus, steht aber noch nicht im Prüfprotokoll."
+      }
+    }
+  },
+  "incomingTaxLines": {
+    "kind": "Steuerart",
+    "choose": "Bitte wählen",
+    "mode": {
+      "standard": "{{rate}} % Umsatzsteuer",
+      "reverse_charge": "§13b: Steuer schuldet der Empfänger ({{rate}} %)",
+      "tax_free": "Steuerfrei",
+      "small_business": "Kleinunternehmer (§19, ohne Umsatzsteuer)"
+    },
+    "help": {
+      "reverse_charge": "Auf der Rechnung steht keine Umsatzsteuer; der Betrieb führt sie selbst ab (z. B. Bauleistungen von Subunternehmern).",
+      "tax_free": "Die Leistung ist steuerfrei, auf der Rechnung steht keine Umsatzsteuer.",
+      "small_business": "Der Lieferant weist als Kleinunternehmer keine Umsatzsteuer aus."
+    },
+    "guessed": "Aus Netto und Umsatzsteuer erkannt.",
+    "deviation": "Die Umsatzsteuer weicht um {{amount}} vom Satz ab. Bitte mit der Rechnung vergleichen; übernommen wird der Betrag von der Rechnung.",
+    "split": "Mehrere Steuersätze",
+    "splitTitle": "Steuersätze",
+    "add": "Satz hinzufügen",
+    "remove": "Satz entfernen",
+    "sumOk": "Die Sätze ergeben Netto und Umsatzsteuer der Rechnung.",
+    "sumHint": "Die Sätze ergeben netto {{net}} und Umsatzsteuer {{vat}}, die Rechnung netto {{headerNet}} und Umsatzsteuer {{headerVat}}.",
+    "errors": {
+      "kindRequired": "Bitte die Steuerart wählen.",
+      "amountRequired": "Bitte bei jedem Steuersatz Netto und Umsatzsteuer eintragen.",
+      "duplicate": "Jeder Steuersatz darf nur einmal vorkommen.",
+      "vatNotAllowed": "Bei §13b, steuerfrei und Kleinunternehmer steht keine Umsatzsteuer auf der Rechnung.",
+      "vatMissing": "Umsatzsteuer 0 bei einem Steuersatz: Ist es §13b, steuerfrei oder ein Kleinunternehmer?",
+      "sumMismatch": "Die Steuersätze ergeben nicht Netto und Umsatzsteuer der Rechnung."
     }
   }
 }

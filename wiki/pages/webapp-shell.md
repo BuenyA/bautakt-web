@@ -241,25 +241,23 @@ weiter mit, ohne Chip-Oberfläche. Die Typ-Chips lassen den Param stehen.
 
 ## Auftragsliste
 
-Stand 2026-10-10. `/auftraege` schaltet die Art mit Fluents `TabList`
-(bis 2026-10-10 ein grauer shadcn-`Tabs`-Pill). Das ist nicht
-`ListFilterChips`. Werte `order` · `quote`, Labels Aufträge ·
-Angebote. Default ist **Aufträge**. Ohne Query oder bei unbekanntem
-`status` gilt `order`. `?status=quote` ist Angebote — derselbe Param wie
-der bisherige Angebote-Tab.
+Stand 2026-10-30. `/auftraege` filtert mit Fluents `TabList` nach Status:
+Alle · Laufend · Abgeschlossen (`features/orders/orderList.ts`). Default ist
+**Laufend**, ohne Param. `?status=alle` und `?status=abgeschlossen` wählen
+die anderen Tabs; jeder andere Wert, auch der alte Angebote-Link
+`?status=quote`, fällt auf Laufend zurück.
 
-Keine Status-Chips. `sectionOf` setzt „Laufende Aufträge“ und
-„Abgeschlossen“ bzw. „Angebote“ und „Abgelehnt“. Beide Gruppen der Art
-stehen in der Liste; ein Chip „nur aktiv“ gibt es nicht. Eine leere
-Gruppe hat keine Überschrift, weil `sectionOf` nur über Zeilen läuft.
-Sortiert der Nutzer, verschwinden die Überschriften. Innerhalb einer
-Gruppe bleibt `created_at` absteigend.
+Der Angebote-Tab ist am 2026-10-30 entfallen: Angebote als Auftragsstatus
+waren falsch modelliert, Angebote leben als Belege auf `/angebote`. Die
+Tabelle hat keine Abschnittsüberschriften („Laufende Aufträge“ usw.) mehr,
+der Tab sagt, was zu sehen ist. Sortierung ohne Klick: `created_at`
+absteigend aus der Abfrage.
 
-`finished` ist abgeschlossen. `active` und jeder Status, der weder
-Angebot noch abgelehnt ist, läuft. `quote` ist das offene Angebot,
-`declined` ist abgelehnt. Die Abfrage lädt alle Aufträge des Betriebs;
-die Art filtert clientseitig, damit beide Gruppen aus demselben Cache
-kommen. `useOrders` hat keinen Filter-Parameter mehr.
+`finished` ist abgeschlossen. `active` und jeder unbekannte Status läuft.
+Zeilen mit `quote` oder `declined` (Altbestand der Angebote-Ansicht)
+erscheinen nur unter Alle. Die Abfrage lädt alle Aufträge des Betriebs;
+gefiltert wird clientseitig aus demselben Cache. `useOrders` hat keinen
+Filter-Parameter.
 
 ## Zeitenliste
 
@@ -410,7 +408,6 @@ bearbeiten: [auftrag-bearbeiten.md](auftrag-bearbeiten.md). Kostenstellen:
   Id auf `/rechnungen/:id/druck` zeigt denselben Nicht-gefunden- bzw.
   Ladefehler wie die Detailseite, mit Rückweg zur Liste — keinen Spinner.
   Der Briefkopf lädt weiter parallel und blockiert die Seite nicht.
-- **Einladung von Mitarbeitern in die App** — läuft weiter über das Handy.
 - **Katalog pflegen** — bisher nur lesend. Kostenstellen anlegen und löschen
   steht, siehe [kostenstellen.md](kostenstellen.md).
 - **Mobilansicht** ist gebaut, aber noch nicht an einem echten Gerät geprüft.

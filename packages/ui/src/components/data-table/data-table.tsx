@@ -117,6 +117,8 @@ export type DataTableProps<TData extends RowData> = {
   onRowClick?: (row: TData) => void;
   /** Zusaetzliche Filter links neben der Suche (Status-Chips, Zeitraum …). */
   toolbar?: React.ReactNode;
+  /** Weitere Knoepfe rechts vor CSV und Spalten, z. B. ein Filter-Menue. */
+  actions?: React.ReactNode;
   /**
    * Gruppenueberschrift, wenn sich der Wert gegenueber der vorherigen Zeile
    * aendert. Nur ohne aktive Sortierung — sonst zerfallen die Gruppen.
@@ -137,6 +139,7 @@ export function DataTable<TData extends RowData>({
   empty,
   onRowClick,
   toolbar,
+  actions,
   sectionOf,
   labels: labelOverrides,
   className,
@@ -182,6 +185,7 @@ export function DataTable<TData extends RowData>({
         ) : null}
 
         <div className="ml-auto flex items-center gap-2">
+          {actions}
           {exportFileName ? (
             <Button
               icon={<ArrowDownloadRegular />}

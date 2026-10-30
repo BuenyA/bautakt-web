@@ -59,14 +59,8 @@ export function ContactsListPage() {
   const panelId = useId();
   const [draft, setDraft] = useState<ContactDraft | null>(null);
 
-  function defaultRoleFor(current: ContactTab): ContactRole | null {
-    const role = roleOfTab(current);
-    if (role) return role;
-    return canCustomers ? 'customer' : canSuppliers ? 'supplier' : null;
-  }
-
   // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel mit der Rolle des Reiters.
-  useCreateFromUrl(canCreate, () => setDraft(emptyContact(defaultRoleFor(tab))));
+  useCreateFromUrl(canCreate, () => setDraft(emptyContact(roleOfTab(tab))));
 
   const contacts = useContacts();
   const { data, isError, refetch } = contacts;
@@ -91,7 +85,6 @@ export function ContactsListPage() {
 
   const counts = useMemo(() => {
     const result: Record<ContactTab, number> = {
-      all: 0,
       customers: 0,
       suppliers: 0,
       subcontractors: 0,
@@ -202,7 +195,8 @@ export function ContactsListPage() {
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <TabList
-            selectedValue={showArchived ? 'all' : tab}
+            // Im Archiv ist kein Reiter aktiv: archivierte Kontakte haben keine aktive Rolle.
+            selectedValue={showArchived ? null : tab}
             onTabSelect={(_, { value }) =>
               updateParams({ tab: value as ContactTab, archived: false })
             }
@@ -219,7 +213,7 @@ export function ContactsListPage() {
           <Switch
             label={t('domain:contacts.showArchived')}
             checked={showArchived}
-            onChange={(_, { checked }) => updateParams({ tab: 'all', archived: checked })}
+            onChange={(_, { checked }) => updateParams({ archived: checked })}
           />
         </div>
 

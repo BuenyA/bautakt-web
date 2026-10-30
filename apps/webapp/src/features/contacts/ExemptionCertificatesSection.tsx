@@ -149,7 +149,7 @@ export function ExemptionCertificatesSection({
         </ul>
       ) : null}
 
-      <FormDrawer open={draft !== null} onOpenChange={(o) => !o && setDraft(null)} size="small">
+      <FormDrawer open={draft !== null} onOpenChange={(o) => !o && setDraft(null)}>
         {draft ? (
           <ExemptionForm contactId={contactId} initial={draft} onDone={() => setDraft(null)} />
         ) : null}

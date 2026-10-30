@@ -23,6 +23,8 @@ export const signInSchema = z.object({
 
 export const signUpSchema = z
   .object({
+    firstName: z.string().trim().min(1, { message: 'auth:setup.errors.firstName' }),
+    lastName: z.string().trim().min(1, { message: 'auth:setup.errors.lastName' }),
     email: emailSchema,
     password: passwordSchema,
     passwordConfirm: z.string(),
