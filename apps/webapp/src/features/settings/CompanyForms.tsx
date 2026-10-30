@@ -2,12 +2,10 @@ import type { TablesUpdate } from '@bautakt/supabase';
 import { toast } from '@bautakt/ui';
 import {
   Button,
-  Combobox,
   Field,
   Input,
   MessageBar,
   MessageBarBody,
-  Option,
   Select,
   Spinner,
   Switch,
@@ -24,7 +22,6 @@ import { supabase } from '@/lib/supabase';
 
 import {
   COMPANY_COUNTRIES,
-  COMPANY_TYPES,
   type CompanyCountry,
   formatIbanInput,
   isValidBic,
@@ -43,6 +40,7 @@ import {
   PLACEHOLDERS,
   toCompanyCountry,
 } from './companyValidation';
+import { TradeCombobox } from './TradeCombobox';
 
 /** Die Spalten von `companies`, die diese Seite liest und schreibt. */
 export type CompanyMasterData = {
@@ -270,18 +268,11 @@ export function CompanyCard({
           required
           validationMessage={form.errorFor('type')}
         >
-          <Combobox
-            freeform
+          <TradeCombobox
             disabled={!canEdit}
             value={v.type}
-            selectedOptions={v.type ? [v.type] : []}
-            onChange={(event) => form.set({ type: event.target.value })}
-            onOptionSelect={(_, d) => form.set({ type: d.optionText ?? '' })}
-          >
-            {COMPANY_TYPES.map((type) => (
-              <Option key={type}>{type}</Option>
-            ))}
-          </Combobox>
+            onChange={(type) => form.set({ type })}
+          />
         </Field>
         <Field
           label={t('domain:settings.street')}

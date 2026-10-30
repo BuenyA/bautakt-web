@@ -1,10 +1,11 @@
 import { hasPermission } from '@bautakt/core';
-import { Combobox, Option, OptionGroup } from '@fluentui/react-components';
+import { Option, OptionGroup } from '@fluentui/react-components';
 import { AddCircle20Regular, type FluentIcon, Search20Regular } from '@fluentui/react-icons';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { Combobox } from '@/components/form/Combobox';
 import { useMembership } from '@/features/company/useMembership';
 import { hubs, visibleHubCards } from '@/features/hubs/hubs';
 import { routes, withCreate } from '@/lib/routes';

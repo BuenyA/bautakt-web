@@ -1,12 +1,10 @@
 import { parseIsoDay } from '@bautakt/ui';
 import {
   Button,
-  Combobox,
   Field,
   Input,
   MessageBar,
   MessageBarBody,
-  Option,
   Radio,
   RadioGroup,
   Select,
@@ -24,12 +22,12 @@ import { AuthCard } from '@/features/auth/pages/AuthCard';
 import { useAuth } from '@/features/auth/useAuth';
 import {
   COMPANY_COUNTRIES,
-  COMPANY_TYPES,
   type CompanyCountry,
   isValidEmail,
   isValidPhone,
   isValidPostalCode,
 } from '@/features/settings/companyValidation';
+import { TradeCombobox } from '@/features/settings/TradeCombobox';
 import { HOME_ROUTE } from '@/lib/routes';
 import { supabase } from '@/lib/supabase';
 
@@ -378,7 +376,7 @@ export function CompanySetupPage() {
   const heading: Record<Exclude<Step, 'welcome'>, { title: string; subtitle?: string }> = {
     profile: { title: t('auth:setup.profile.title'), subtitle: t('auth:setup.profile.subtitle') },
     choice: { title: t('auth:setup.choice.title') },
-    company: { title: t('auth:setup.company.title'), subtitle: t('auth:setup.company.subtitle') },
+    company: { title: t('auth:setup.company.title') },
     address: { title: t('auth:setup.address.title'), subtitle: t('auth:setup.address.subtitle') },
     join: { title: t('auth:setup.join.title'), subtitle: t('auth:setup.join.subtitle') },
   };
@@ -401,8 +399,7 @@ export function CompanySetupPage() {
     <AuthCard
       title={current.title}
       subtitle={current.subtitle}
-      titleSize={step === 'choice' ? 600 : 500}
-      centerTitle={step === 'choice'}
+      titleSize={600}
       headerAction={signOutButton}
     >
       <form className="flex flex-col gap-4" noValidate onSubmit={handleSubmit}>
@@ -487,27 +484,14 @@ export function CompanySetupPage() {
               validationMessage={errors.type}
               validationState={errors.type ? 'error' : 'none'}
             >
-              <Combobox
-                freeform
+              <TradeCombobox
                 placeholder={t('auth:setup.trade.placeholder')}
                 value={trade}
-                selectedOptions={trade ? [trade] : []}
-                onChange={(event) => {
-                  setTrade(event.target.value);
-                  if (event.target.value.trim().length >= 2) clearError('type');
-                }}
-                onOptionSelect={(_, data) => {
-                  const value = data.optionText ?? '';
+                onChange={(value) => {
                   setTrade(value);
                   if (value.trim().length >= 2) clearError('type');
                 }}
-              >
-                {COMPANY_TYPES.map((type) => (
-                  <Option key={type} value={type}>
-                    {type}
-                  </Option>
-                ))}
-              </Combobox>
+              />
             </Field>
             <Field
               label={t('auth:setup.size.label')}
