@@ -74,11 +74,11 @@ describe('activeRoles', () => {
 });
 
 describe('Reiter der Kontaktliste', () => {
-  it('URL-Werte sind deutsch, unbekannt heißt Alle', () => {
+  it('URL-Werte sind deutsch, unbekannt heißt Kunden', () => {
     assert.equal(contactTabFromSearch('lieferanten'), 'suppliers');
-    assert.equal(contactTabFromSearch('quatsch'), 'all');
+    assert.equal(contactTabFromSearch('quatsch'), 'customers');
     assert.equal(contactTabToSearch('subcontractors'), 'subunternehmer');
-    assert.equal(contactTabToSearch('all'), null);
+    assert.equal(contactTabToSearch('customers'), null);
   });
   it('ein Kontakt mit zwei Rollen steht in beiden Reitern', () => {
     const row = { archived_at: null, roles: ['customer', 'subcontractor'] as const };
@@ -92,9 +92,9 @@ describe('Reiter der Kontaktliste', () => {
   it('archivierte nur mit dem Schalter, dann nur sie', () => {
     const archived = { archived_at: '2026-10-01', roles: [] };
     const active = { archived_at: null, roles: ['customer' as const] };
-    assert.equal(matchesContactTab(archived, 'all', false), false);
-    assert.equal(matchesContactTab(archived, 'all', true), true);
-    assert.equal(matchesContactTab(active, 'all', true), false);
+    assert.equal(matchesContactTab(archived, 'suppliers', false), false);
+    assert.equal(matchesContactTab(archived, 'suppliers', true), true);
+    assert.equal(matchesContactTab(active, 'customers', true), false);
   });
 });
 
