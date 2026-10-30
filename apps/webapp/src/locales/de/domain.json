@@ -282,7 +282,7 @@
     "contactFirstName": "Vorname (Ansprechpartner)",
     "contactLastName": "Nachname (Ansprechpartner)",
     "sectionRoles": "Rollen",
-    "rolesHint": "Ein Kontakt kann mehrere Rollen haben, z. B. Kunde und Subunternehmer. Eine vorhandene Rolle beendest du auf der Kontaktseite.",
+    "rolesHint": "Ein Kontakt kann mehrere Rollen haben, z. B. Kunde und Lieferant.",
     "sectionAddress": "Anschrift und Erreichbarkeit",
     "moreDetails": "Weitere Angaben (optional)",
     "sectionMoreContact": "Ansprechpartner, Mobil, Website, Land",

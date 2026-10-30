@@ -4,6 +4,8 @@ import { describe, it } from 'node:test';
 
 import {
   changedFields,
+  type ContactDetail,
+  draftFromContact,
   emptyContact,
   hasOptionalValues,
   ibanPlacement,
@@ -106,6 +108,18 @@ describe('Rollen im Formular', () => {
     assert.deepEqual(withoutRole(['customer', 'supplier', 'subcontractor'], 'supplier'), [
       'customer',
     ]);
+  });
+  it('archivierte Rolle ist nicht angehakt, das Profil bleibt bekannt', () => {
+    const contact = {
+      id: 'c1',
+      kind: 'company',
+      customer: { archived_at: '2026-10-01T00:00:00Z' },
+      supplier: { archived_at: null, subcontractor: { archived_at: null } },
+      other: null,
+    } as unknown as ContactDetail;
+    const draft = draftFromContact(contact);
+    assert.deepEqual(draft.roles, ['supplier', 'subcontractor']);
+    assert.deepEqual(draft.existingRoles, ['customer', 'supplier', 'subcontractor']);
   });
   it('neuer Kontakt mit Rolle aus dem Reiter, Land Deutschland', () => {
     const draft = emptyContact('customer');

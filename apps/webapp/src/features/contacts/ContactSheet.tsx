@@ -320,20 +320,16 @@ function ContactForm({
             hint={t('domain:contactForm.rolesHint')}
           >
             <div className="grid gap-1 sm:grid-cols-2">
-              {CONTACT_ROLES.map((role) => {
-                const existing = draft.existingRoles.includes(role);
-                return (
-                  <Checkbox
-                    key={role}
-                    checked={has(role)}
-                    // Eine vorhandene Rolle entfernt die Detailseite (Archivieren),
-                    // nicht das Formular: an ihr können Belege hängen.
-                    disabled={existing || !mayEditRole(role)}
-                    onChange={(_, { checked }) => toggleRole(role, checked === true)}
-                    label={t(`domain:contactRoles.${role}`)}
-                  />
-                );
-              })}
+              {CONTACT_ROLES.map((role) => (
+                <Checkbox
+                  key={role}
+                  checked={has(role)}
+                  // Abwählen archiviert die Rolle beim Speichern (useSaveContact).
+                  disabled={!mayEditRole(role)}
+                  onChange={(_, { checked }) => toggleRole(role, checked === true)}
+                  label={t(`domain:contactRoles.${role}`)}
+                />
+              ))}
             </div>
           </Section>
 
