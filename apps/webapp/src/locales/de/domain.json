@@ -892,7 +892,12 @@
   },
   "datevExport": {
     "title": "Export im DATEV-Format",
-    "description": "Buchungsstapel und Belege meiner Ausgangsrechnungen, Stornos und Gutschriften für die Steuerberatung, je Monat.",
+    "description": "Buchungsstapel und Belege meiner Ausgangs- und Eingangsrechnungen für die Steuerberatung, je Monat.",
+    "directionLabel": "Belege",
+    "direction": {
+      "outgoing": "Ausgangsrechnungen",
+      "incoming": "Eingangsrechnungen"
+    },
     "monthLabel": "Monat",
     "checking": "Monat wird geprüft …",
     "ready_one": "Bereit: 1 Buchung.",
@@ -900,8 +905,12 @@
     "download": "Buchungsstapel und Belege herunterladen",
     "downloaded_one": "{{csvName}} und {{zipName}} mit 1 Beleg wurden heruntergeladen.",
     "downloaded_other": "{{csvName}} und {{zipName}} mit {{count}} Belegen wurden heruntergeladen.",
+    "downloadedWithoutZip": "{{csvName}} wurde heruntergeladen. Zu keiner Rechnung liegt ein Original vor, deshalb gibt es kein Beleg-ZIP.",
+    "withoutOriginal_one": "Für {{documents}} liegt kein Original vor. Die Rechnung fehlt im Beleg-ZIP; gib sie der Steuerberatung bitte auf anderem Weg.",
+    "withoutOriginal_other": "Für {{documents}} liegt kein Original vor. Diese Rechnungen fehlen im Beleg-ZIP; gib sie der Steuerberatung bitte auf anderem Weg.",
     "archiveMissing": "Für {{documents}} fehlt das Archiv-PDF. Ohne Original gibt es kein Beleg-ZIP; es wurde nichts heruntergeladen.",
     "empty": "In diesem Monat gibt es keine festgeschriebenen Ausgangsrechnungen, also nichts zu exportieren.",
+    "emptyIncoming": "In diesem Monat gibt es keine erfassten Eingangsrechnungen, also nichts zu exportieren.",
     "blocked": "So lässt sich der Monat nicht in DATEV importieren. Bitte behebe zuerst diese Punkte:",
     "warnings": "Bitte prüfe vor dem Import:",
     "toSettings": "Zu den DATEV-Einstellungen",
@@ -925,6 +934,22 @@
       "collective_debtor": "{{document}}: wird auf den Sammel-Debitor {{value}} gebucht.",
       "document_number_changed": "{{document}}: Die Belegnummer enthält Zeichen, die DATEV nicht annimmt. Sie wird ohne diese Zeichen übergeben.",
       "chars_replaced": "{{document}}: Die Zeichen {{value}} gibt es in DATEV nicht. Sie werden durch ? ersetzt.",
+      "no_bookings": "{{document}}: Der Betrag ist 0, es entsteht keine Buchung.",
+      "creditor_missing": "{{document}}: Es ist weder eine Lieferantennummer noch ein Sammel-Kreditor hinterlegt.",
+      "creditor_length": "{{document}}: Der Sammel-Kreditor {{value}} passt nicht zur eingestellten Kontenlänge.",
+      "supplier_number_invalid": "{{document}}: Die Lieferantennummer {{value}} ist kein Kreditorenkonto (beginnt mit 7, 8 oder 9 und hat eine Stelle mehr als die Sachkonten).",
+      "collective_creditor": "{{document}}: wird auf den Sammel-Kreditor {{value}} gebucht.",
+      "not_approved": "{{document}}: Die Rechnung ist noch nicht freigegeben.",
+      "tax_lines_missing": "{{document}}: Die Rechnung hat keine Steueraufteilung. Bitte Steuerart und Beträge in der Rechnung erfassen.",
+      "category_account_length": "{{document}}: Das Konto {{value}} der Kostenart passt nicht zur Kontenlänge. Gebucht wird stattdessen auf das Konto aus den DATEV-Einstellungen.",
+      "tax_key_unknown": "{{document}}: Für {{value}} kennt Bautakt keinen BU-Schlüssel. Bitte mit der Steuerberatung klären.",
+      "document_number_missing": "{{document}}: Die Rechnung hat keine Rechnungsnummer."
+    },
+    "findingsIncoming": {
+      "account_missing": "{{document}}: Für {{value}} gibt es kein Aufwandskonto. Bitte ordne der Rechnung eine Kostenart zu oder hinterlege das Konto in den DATEV-Einstellungen.",
+      "account_length": "{{document}}: Das Aufwandskonto {{value}} passt nicht zur eingestellten Kontenlänge.",
+      "total_mismatch": "{{document}}: Die Steueraufteilung ergibt nicht den Bruttobetrag der Rechnung.",
+      "document_number_changed": "{{document}}: Die Rechnungsnummer enthält Zeichen, die DATEV nicht annimmt. Sie wird ohne diese Zeichen übergeben.",
       "no_bookings": "{{document}}: Der Betrag ist 0, es entsteht keine Buchung."
     }
   },

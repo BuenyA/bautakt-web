@@ -124,6 +124,7 @@ verlinkt, nie kopiert.
 | 2026-10-30 | [Registrierung und Einrichtung wie in der App](logs/2026-10-30-registrierung-wie-app.md)               |
 | 2026-10-30 | [Auftragsliste: Statusfilter statt Angebote-Tab](logs/2026-10-30-auftraege-statusfilter.md)            |
 | 2026-10-30 | [Eingangsrechnungen: Filter-Knopf statt Reiter](logs/2026-10-30-eingangsrechnungen-filterknopf.md)     |
+| 2026-10-30 | [DATEV-Export: Eingangsrechnungen](logs/2026-10-30-datev-export-eingang.md)                            |
 
 ## Die drei wichtigsten Sätze
 

@@ -46,6 +46,24 @@ leitet auf die Übersicht um (`routes.legacyFinance`), `/ausgaben` mit Query auf
   (`ListFilterMenu` im `DataTable`-Slot `actions`). `?status=` bleibt. Die Überschrift
   erscheint nur, wenn rechts daneben „Sonstige Ausgaben“ stehen.
 
+## DATEV-Export (`/rechnungen/datev-export`)
+
+`pages/DatevExportPage.tsx`, Logik in `datevExport.ts`. Den Buchungsstapel baut die
+Edge Function `datev-export` (bautakt-app, Wiki `finanzmodul.md`).
+
+- **Belegart und Monat wählen.** Ausgangs- und Eingangsrechnungen sind getrennte
+  Stapel (`direction`). Die Auswahl „Belege“ erscheint nur mit
+  `canViewCompanyFinance` oder `canManageOverheadCosts`, den Rechten von
+  `datev_incoming_export`. Ohne sie bleibt es beim Ausgang.
+- **Prüfung beim Wechsel** (`check_only`). Fehler und Warnungen stehen vor dem
+  Download. Der Eingang hat eigene Texte, wo das Konto anders heißt
+  (`findingsIncoming`, sonst `findings`). Steuerart und Satz im Befund werden
+  lesbar („§ 13b, 19 %“).
+- **Ein Klick: CSV + ZIP.** Ausgang: Archiv-PDFs; ohne Archiv-PDF gibt es nichts.
+  Eingang: die Originale mit ihrer Endung (PDF, XML, Bild), benannt nach
+  Belegfeld 1. Eine Eingangsrechnung ohne Original (Papierbeleg) blockiert nicht:
+  Sie fehlt im ZIP und wird danach genannt. Hat keine ein Original, gibt es nur die CSV.
+
 ## Regeln
 
 - **Rechte je Karte**, wie auf der Startseite. Ohne Recht fehlt die Karte, keine Nullen.

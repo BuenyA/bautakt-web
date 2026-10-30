@@ -12,10 +12,19 @@ import { zipSync } from 'fflate';
 
 export type ExportMonth = { year: number; month: number };
 
+/** Ausgangs- oder Eingangsrechnungen; je Richtung ein eigener Buchungsstapel. */
+export type ExportDirection = 'outgoing' | 'incoming';
+
+export const EXPORT_DIRECTIONS: readonly ExportDirection[] = ['outgoing', 'incoming'];
+
+export function parseDirection(value: string): ExportDirection {
+  return value === 'incoming' ? 'incoming' : 'outgoing';
+}
+
 /** Beleg im Export: ID und Belegfeld 1, wie es im Buchungsstapel steht. */
 export type ExportDocumentRef = { id: string; documentNumber: string; documentField1: string };
 
-/** Befund-Codes von `datev-export` (`bookings.ts`). */
+/** Befund-Codes von `datev-export` (`bookings.ts`, Eingang `incoming.ts`). */
 export const FINDING_CODES = [
   'numbers_missing',
   'currency',
@@ -32,6 +41,15 @@ export const FINDING_CODES = [
   'document_number_changed',
   'chars_replaced',
   'no_bookings',
+  'creditor_missing',
+  'creditor_length',
+  'supplier_number_invalid',
+  'collective_creditor',
+  'not_approved',
+  'tax_lines_missing',
+  'category_account_length',
+  'tax_key_unknown',
+  'document_number_missing',
 ] as const;
 
 export type FindingCode = (typeof FINDING_CODES)[number];
@@ -230,28 +248,64 @@ export function readCheckResponse(status: number, body: unknown): CheckOutcome {
   };
 }
 
-export function zipFileName({ year, month }: ExportMonth): string {
-  return `Belege_Ausgang_${year}-${String(month).padStart(2, '0')}.zip`;
+export function zipFileName({ year, month }: ExportMonth, direction: ExportDirection): string {
+  const kind = direction === 'incoming' ? 'Eingang' : 'Ausgang';
+  return `Belege_${kind}_${year}-${String(month).padStart(2, '0')}.zip`;
 }
 
 /**
- * Dateiname je Beleg im ZIP: Belegfeld 1 + `.pdf`, damit die Steuerberatung
- * Buchung und Beleg zusammenbringt. `/` und `*` erlaubt DATEV im Belegfeld,
- * Windows aber nicht im Dateinamen; sie werden zu `_`. Doppelte Namen
- * bekommen `_2`, `_3` …, statt sich im ZIP zu überschreiben.
+ * Endung aus dem Speicherpfad (`…/incoming/{id}.xml`). Die Ablage setzt sie
+ * aus dem Inhalt (#161); ohne Endung bleibt `pdf`.
  */
-export function zipEntryNames(documents: readonly ExportDocumentRef[]): Map<string, string> {
+export function storageExtension(path: string): string {
+  const match = /\.([a-z0-9]{1,5})$/i.exec(path);
+  return match ? match[1]!.toLowerCase() : 'pdf';
+}
+
+/**
+ * Dateiname je Beleg im ZIP: Belegfeld 1 + Endung (Vorgabe `pdf`), damit die
+ * Steuerberatung Buchung und Beleg zusammenbringt. `/` und `*` erlaubt DATEV
+ * im Belegfeld, Windows aber nicht im Dateinamen; sie werden zu `_`. Doppelte
+ * Namen bekommen `_2`, `_3` …, statt sich im ZIP zu überschreiben.
+ */
+export function zipEntryNames(
+  documents: readonly ExportDocumentRef[],
+  extensionOf: (id: string) => string = () => 'pdf',
+): Map<string, string> {
   const names = new Map<string, string>();
   const used = new Set<string>();
   for (const document of documents) {
     const base =
       document.documentField1.replace(/[/*]/g, '_') || `Beleg_${document.id.slice(0, 8)}`;
-    let name = `${base}.pdf`;
-    for (let index = 2; used.has(name.toLowerCase()); index += 1) name = `${base}_${index}.pdf`;
+    const extension = extensionOf(document.id);
+    let name = `${base}.${extension}`;
+    for (let index = 2; used.has(name.toLowerCase()); index += 1) {
+      name = `${base}_${index}.${extension}`;
+    }
     used.add(name.toLowerCase());
     names.set(document.id, name);
   }
   return names;
+}
+
+const TAX_MODE_LABEL: Record<string, string> = {
+  standard: '',
+  reverse_charge: '§ 13b, ',
+  tax_free: 'steuerfrei',
+  small_business: 'Kleinunternehmer',
+};
+
+/**
+ * Steuerart und Satz aus einem Befund (`reverse_charge|19.00`) lesbar machen:
+ * „§ 13b, 19 %“, „7 %“, „steuerfrei“. Andere Werte bleiben, wie sie sind.
+ */
+export function formatTaxValue(value: string): string {
+  const match = /^([a-z_]+)\|(-?\d+(?:\.\d+)?)$/.exec(value);
+  const label = match ? TAX_MODE_LABEL[match[1]!] : undefined;
+  if (!match || label === undefined) return value;
+  if (match[1] === 'tax_free' || match[1] === 'small_business') return label;
+  const rate = Number(match[2]).toLocaleString('de-DE', { maximumFractionDigits: 2 });
+  return `${label}${rate} %`;
 }
 
 /**
