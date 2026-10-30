@@ -88,6 +88,17 @@ const MESSAGES: Record<string, string> = {
     'Freigeben und Ablehnen geht nur über die Knöpfe in der Prüfung. Bitte lade die Seite neu.',
   INCOMING_NOT_FOUND:
     'Diese Eingangsrechnung gibt es nicht, oder dir fehlt die Berechtigung, sie zu prüfen.',
+  // Skonto-Vermerk (bautakt-app 20261030120000_b_incoming_invoice_adjustments, bautakt-web#166).
+  INCOMING_ADJUSTMENT_EXISTS:
+    'Für diese Rechnung ist schon ein Skonto vermerkt. Hebe es erst auf, dann vermerke es neu. Bitte lade die Seite neu.',
+  INCOMING_ADJUSTMENT_REVERSED: 'Dieser Vermerk ist schon aufgehoben. Bitte lade die Seite neu.',
+  INCOMING_ADJUSTMENT_REJECTED: 'Eine abgelehnte Rechnung wird nicht bezahlt, deshalb kein Skonto.',
+  INCOMING_ADJUSTMENT_DRAFT: 'Ein Entwurf wird erst erfasst, dann lässt sich Skonto vermerken.',
+  INCOMING_ADJUSTMENT_AMOUNT:
+    'Der Skontobetrag passt nicht: größer als 0, höchstens der Bruttobetrag, und zum Prozentsatz passend.',
+  INCOMING_ADJUSTMENT_REASON: 'Bitte begründe den Eintrag.',
+  INCOMING_ADJUSTMENT_AGREEMENT: 'Bitte gib an, mit wem und wann das Skonto vereinbart wurde.',
+  INCOMING_ADJUSTMENT_INVALID: 'Der Skonto-Vermerk ist unvollständig. Bitte prüfe die Angaben.',
   CONTACT_IN_USE:
     'Der Kontakt hängt noch an Aufträgen oder Belegen. Archiviere ihn stattdessen – dann verschwindet er aus Listen und Auswahlfeldern.',
 };

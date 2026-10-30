@@ -71,6 +71,7 @@ import {
 } from '../incomingInvoiceUpload';
 import { isFrozen, isIncomingReviewStatus } from '../incomingReview';
 import { IncomingReviewSection } from '../IncomingReviewSection';
+import { IncomingSkontoSection } from '../IncomingSkontoSection';
 import { checkOriginal, OriginalHashMismatch } from '../originalIntegrity';
 import { PdfViewer } from '../PdfViewer';
 import { useCostCategories } from '../useCostCategories';
@@ -650,6 +651,16 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
               </p>
             ) : null}
           </Section>
+
+          {saved && savedStatus && savedStatus !== 'draft' && reviewStatus ? (
+            <Section title={t('domain:incomingSkonto.title')}>
+              <IncomingSkontoSection
+                invoice={saved}
+                status={savedStatus}
+                reviewStatus={reviewStatus}
+              />
+            </Section>
+          ) : null}
 
           <Section title={t('domain:incomingInvoiceForm.sections.assignment')}>
             <div className="grid gap-4 @lg:grid-cols-2">
