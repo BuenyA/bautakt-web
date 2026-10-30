@@ -128,6 +128,7 @@ verlinkt, nie kopiert.
 | 2026-10-30 | [DATEV-Export: Eingangsrechnungen](logs/2026-10-30-datev-export-eingang.md)                                    |
 | 2026-10-30 | [Profilmenü neu: Mein Profil, Unternehmen, Einstellungen](logs/2026-10-30-profil-unternehmen-einstellungen.md) |
 | 2026-10-30 | [Einrichtung statt Übersicht, keine Gedankenstriche](logs/2026-10-30-einrichtung-und-gedankenstriche.md)       |
+| 2026-10-30 | [DATEV-Export verlinkt die DATEV-Einstellungen](logs/2026-10-30-datev-einstellungen-link.md)                   |
 
 ## Die drei wichtigsten Sätze
 
