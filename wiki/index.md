@@ -119,6 +119,7 @@ verlinkt, nie kopiert.
 | 2026-10-27 | [Leerzustand in „Zu erledigen“ mittig](logs/2026-10-27-zu-erledigen-leerzustand.md)                    |
 | 2026-10-27 | [Rechtsseiten in der Web-App](logs/2026-10-27-rechtsseiten-webapp.md)                                  |
 | 2026-10-28 | [Betrieb einrichten nach der Anmeldung](logs/2026-10-28-betrieb-einrichten.md)                         |
+| 2026-10-30 | [Registrierung und Einrichtung wie in der App](logs/2026-10-30-registrierung-wie-app.md)               |
 
 ## Die drei wichtigsten Sätze
 

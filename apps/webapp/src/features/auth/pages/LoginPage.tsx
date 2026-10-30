@@ -1,6 +1,6 @@
 import { Button, Input, Label } from '@fluentui/react-components';
 import { type FormEvent, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { RouterLink } from '@/components/common/RouterLink';
 import { routes } from '@/lib/routes';
@@ -36,7 +36,16 @@ export function LoginPage() {
   }
 
   return (
-    <AuthCard title={t('auth:signIn.title')} subtitle={t('auth:signIn.subtitle')}>
+    <AuthCard
+      title={t('auth:signIn.title')}
+      subtitle={t('auth:signIn.subtitle')}
+      footer={
+        <Trans
+          i18nKey="auth:signIn.noAccount"
+          components={{ register: <RouterLink to={routes.register} /> }}
+        />
+      }
+    >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
         <FormError messageKey={errorKey} />
 
