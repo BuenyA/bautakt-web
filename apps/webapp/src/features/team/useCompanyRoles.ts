@@ -1,3 +1,4 @@
+import { dbPermissionsToApp, type EmployeePermissions } from '@bautakt/core';
 import { useQuery } from '@tanstack/react-query';
 
 import { useMembership } from '@/features/company/useMembership';
@@ -8,6 +9,8 @@ export type CompanyRole = {
   name: string;
   sort_order: number;
   system_key: string | null;
+  /** Standardrechte der Rolle, ohne die Grundwerte aus `DEFAULT_PERMISSIONS`. */
+  permissions: Partial<EmployeePermissions>;
 };
 
 /** Rollen dieses Betriebs — die Auswahl kommt aus der Datenbank, nicht aus einer Liste im Code. */
@@ -21,12 +24,15 @@ export function useCompanyRoles() {
     queryFn: async (): Promise<CompanyRole[]> => {
       const { data, error } = await supabase
         .from('company_roles')
-        .select('id, name, sort_order, system_key')
+        .select('id, name, sort_order, system_key, permissions')
         .eq('company_id', companyId!)
         .order('sort_order', { ascending: true });
 
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []).map((role) => ({
+        ...role,
+        permissions: dbPermissionsToApp(role.permissions as Record<string, unknown> | null),
+      }));
     },
   });
 }
@@ -44,4 +50,21 @@ export function assignableRoles(roles: CompanyRole[], myRole: string | undefined
   if (!mine) return [];
   if (mine.system_key === 'owner') return roles;
   return roles.filter((role) => role.system_key !== 'owner' && role.sort_order < mine.sort_order);
+}
+
+/**
+ * Darf ich diesen Mitarbeiter verwalten (Rolle, Rechte)? Wie
+ * `can_manage_employment_target` der Datenbank: der Inhaber jeden, alle
+ * anderen nur Mitarbeiter strikt unter dem eigenen Rang.
+ */
+export function canManageTarget(
+  roles: CompanyRole[],
+  myRole: string | undefined,
+  targetRole: string,
+): boolean {
+  const mine = roles.find((role) => role.name === myRole);
+  if (!mine) return false;
+  if (mine.system_key === 'owner') return true;
+  const target = roles.find((role) => role.name === targetRole);
+  return Boolean(target) && target!.system_key !== 'owner' && target!.sort_order < mine.sort_order;
 }

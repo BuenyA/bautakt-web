@@ -959,11 +959,222 @@
       "description": "Stammdaten und Arbeitszeiten.",
       "until": "Bis",
       "notFoundTitle": "Mitarbeiter nicht gefunden",
-      "notFoundDescription": "Diesen Mitarbeiter gibt es nicht oder nicht in diesem Betrieb.",
-      "timesTitle": "Zeiten",
-      "periodTotal": "Summe: {{hours}}",
-      "timesEmptyTitle": "Noch keine Zeiten",
-      "timesEmptyDescription": "Erfasste Zeiten dieses Mitarbeiters erscheinen hier."
+      "notFoundDescription": "Diesen Mitarbeiter gibt es nicht oder nicht in diesem Betrieb."
+    }
+  },
+  "employeeProfile": {
+    "masterData": "Stammdaten",
+    "stats": {
+      "leaveTitle": "Urlaub {{year}}",
+      "leaveValue_one": "{{remaining}} Tag übrig",
+      "leaveValue_other": "{{remaining}} Tage übrig",
+      "leaveNote": "von {{total}} · {{used}} genommen",
+      "leaveNotePending": "von {{total}} · {{used}} genommen · {{pending}} beantragt",
+      "leaveOverbooked": "{{days}} Tage überbucht",
+      "sickTitle": "Krankheitstage {{year}}",
+      "sickNote": "Arbeitstage, ohne Wochenende und Feiertage",
+      "ordersTitle": "Aufträge",
+      "ordersNote": "Aus Einsatzplanung und Zeiten",
+      "hoursTitle": "Stunden im {{month}}",
+      "hoursNote": "{{hours}} diese Woche"
+    },
+    "absences": {
+      "title": "Fehlzeiten {{year}}",
+      "empty": "In diesem Jahr keine Fehlzeiten.",
+      "days_one": "{{count}} Tag",
+      "days_other": "{{count}} Tage",
+      "recent": "Letzte Einträge",
+      "showAll": "Alle Abwesenheiten"
+    },
+    "leave": {
+      "edit": "Anspruch anpassen",
+      "title": "Urlaubsanspruch",
+      "description": "Urlaubstage pro Jahr für {{name}}.",
+      "useCustom": "Eigenen Anspruch festlegen",
+      "companyDefault": "Ohne eigenen Wert gilt der Anspruch des Betriebs: {{days}} Tage im Jahr {{year}}, anteilig ab Eintritt.",
+      "daysLabel": "Urlaubstage pro Jahr",
+      "invalid": "Bitte eine Zahl von 0 bis 365 eingeben. Halbe Tage sind möglich.",
+      "saved": "Urlaubsanspruch gespeichert.",
+      "saveError": "Der Urlaubsanspruch konnte nicht gespeichert werden."
+    },
+    "orders": {
+      "title": "Aufträge",
+      "empty": "Bisher bei keinem Auftrag eingeteilt und keine Zeiten gebucht.",
+      "lastOn": "zuletzt {{date}}",
+      "more_one": "{{count}} weiterer Auftrag",
+      "more_other": "{{count}} weitere Aufträge"
+    },
+    "times": {
+      "title": "Zeiten",
+      "week": "Diese Woche",
+      "month": "Dieser Monat",
+      "recent": "Letzte Einträge",
+      "empty": "Noch keine Zeiten erfasst."
+    },
+    "rights": {
+      "title": "Rolle & Rechte",
+      "label": "Rechte",
+      "on": "An",
+      "off": "Aus",
+      "standard": "Standardrechte der Rolle",
+      "overrides_one": "{{count}} persönliche Abweichung",
+      "overrides_other": "{{count}} persönliche Abweichungen",
+      "edit": "Rechte bearbeiten",
+      "view": "Rechte ansehen",
+      "drawerTitle": "Rechte von {{name}}",
+      "drawerDescription": "Ausgangspunkt sind die Rechte der Rolle „{{role}}“. Änderungen hier gelten nur für diese Person.",
+      "custom": "Abweichend",
+      "reset": "Auf Rolle zurücksetzen",
+      "grantLocked": "Rechte, die du selbst nicht hast, kannst du nicht vergeben.",
+      "readOnly": "Die Rechte dieser Person darfst du nicht ändern.",
+      "saveError": "Die Rechte konnten nicht gespeichert werden."
+    },
+    "permissions": {
+      "groups": {
+        "site": "Baustelle & Dokumentation",
+        "documents": "Dokumente",
+        "orders": "Aufträge & Kalender",
+        "finance": "Finanzen",
+        "company": "Unternehmen"
+      },
+      "items": {
+        "canTrackTime": {
+          "title": "Zeiterfassung",
+          "description": "Eigene Arbeitszeiten erfassen und bearbeiten"
+        },
+        "canTrackTimeForTeam": {
+          "title": "Zeiterfassung für Team",
+          "description": "Zeiten für andere Mitarbeiter erfassen und verwalten"
+        },
+        "canCreateAndViewReports": {
+          "title": "Bautagebuch",
+          "description": "Bautagebücher erstellen und einsehen"
+        },
+        "canRecordMaterials": {
+          "title": "Material erfassen",
+          "description": "Materialverbrauch auf Aufträgen buchen"
+        },
+        "canViewChecklist": {
+          "title": "Checkliste einsehen",
+          "description": "Auftrags-Checklisten ansehen, ohne sie zu ändern"
+        },
+        "canEditChecklist": {
+          "title": "Checkliste bearbeiten",
+          "description": "Punkte anlegen, abhaken, bearbeiten und löschen"
+        },
+        "canViewNotes": {
+          "title": "Notizen einsehen",
+          "description": "Auftrags-Notizen ansehen, ohne sie zu ändern"
+        },
+        "canCreateNotes": {
+          "title": "Notizen bearbeiten",
+          "description": "Notizen anlegen, bearbeiten und löschen"
+        },
+        "canTakePhotos": {
+          "title": "Fotos & Galerie",
+          "description": "Bilder aufnehmen und verwalten"
+        },
+        "canViewDocuments": {
+          "title": "Dokumente einsehen",
+          "description": "Hochgeladene Dokumente anzeigen"
+        },
+        "canUploadAndEditDocuments": {
+          "title": "Dokumente bearbeiten",
+          "description": "Dokumente hochladen und ändern"
+        },
+        "canCreateOrders": {
+          "title": "Aufträge anlegen",
+          "description": "Neue Aufträge erstellen"
+        },
+        "canManageOrders": {
+          "title": "Aufträge verwalten",
+          "description": "Bestehende Aufträge bearbeiten"
+        },
+        "canCompleteOrders": {
+          "title": "Aufträge abschließen",
+          "description": "Aufträge als abgeschlossen markieren"
+        },
+        "canManageAllCalendar": {
+          "title": "Kalender (alle)",
+          "description": "Termine für alle Mitarbeiter verwalten"
+        },
+        "canManageWorkAssignments": {
+          "title": "Einsatzplanung",
+          "description": "Mitarbeiter auf Baustellen einteilen und planen"
+        },
+        "canUseBillingModule": {
+          "title": "Rechnungsmodul",
+          "description": "Rechnungen erstellen und versenden"
+        },
+        "canViewManagementInvoices": {
+          "title": "Rechnungen einsehen",
+          "description": "Finanzübersicht im Management"
+        },
+        "canViewOrderFinance": {
+          "title": "Auftragsfinanzen",
+          "description": "Kosten und Margen eines Auftrags einsehen (ohne Kollegenlöhne)"
+        },
+        "canViewWageCosts": {
+          "title": "Lohnkosten einsehen",
+          "description": "Individuelle Lohn- und Kostensätze der Mitarbeiter sehen"
+        },
+        "canManageRates": {
+          "title": "Stundensätze pflegen",
+          "description": "Kosten- und Verrechnungssätze anlegen und ändern"
+        },
+        "canManageOverheadCosts": {
+          "title": "Gemeinkosten pflegen",
+          "description": "Gemeinkosten und Kostenarten erfassen und verwalten"
+        },
+        "canViewCompanyFinance": {
+          "title": "Betriebsergebnis",
+          "description": "Firmenweite Auswertungen und Charts im Finanzbereich"
+        },
+        "canManageCustomers": {
+          "title": "Kunden verwalten",
+          "description": "Kunden anlegen und bearbeiten"
+        },
+        "canManageSuppliers": {
+          "title": "Lieferanten verwalten",
+          "description": "Lieferanten, Subunternehmer und Freistellungsbescheinigungen pflegen"
+        },
+        "canManageCostCenters": {
+          "title": "Kostenstellen",
+          "description": "Kostenstellen anlegen und bearbeiten"
+        },
+        "canManageEmployees": {
+          "title": "Mitarbeiter verwalten",
+          "description": "Mitarbeiter hinzufügen und bearbeiten"
+        },
+        "canManageAbsences": {
+          "title": "Fehlzeiten verwalten",
+          "description": "Anträge einsehen, genehmigen, ablehnen und Fehlzeiten direkt erfassen"
+        },
+        "canManageRoles": {
+          "title": "Rollen verwalten",
+          "description": "Rollen anlegen, löschen und Standardrechte bearbeiten"
+        },
+        "canSendNotifications": {
+          "title": "Benachrichtigungen",
+          "description": "Push- und In-App-Nachrichten senden"
+        },
+        "canEditCompanyMasterData": {
+          "title": "Stammdaten",
+          "description": "Unternehmensdaten bearbeiten"
+        },
+        "canManageCompanySettings": {
+          "title": "Einstellungen",
+          "description": "Allgemeine Unternehmenseinstellungen"
+        },
+        "canManageCatalog": {
+          "title": "Materialkatalog",
+          "description": "Artikel und Preise im Unternehmenskatalog pflegen"
+        },
+        "canManageLicenses": {
+          "title": "Lizenzen",
+          "description": "Lizenzen und Abonnements verwalten"
+        }
+      }
     }
   },
   "absences": {

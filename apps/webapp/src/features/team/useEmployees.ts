@@ -1,3 +1,4 @@
+import { dbPermissionsToApp, type EmployeePermissions } from '@bautakt/core';
 import { useQuery } from '@tanstack/react-query';
 
 import { useMembership } from '@/features/company/useMembership';
@@ -15,6 +16,11 @@ export type EmployeeRow = {
   ended_at: string | null;
   /** Pfad im Bucket `profile-images`; anzeigen über `useProfileImageUrls`. */
   imagePath: string | null;
+  /** Persönliche Abweichungen von den Rechten der Rolle; sie gewinnen. */
+  permissionOverrides: Partial<EmployeePermissions>;
+  annualLeaveDaysOverride: number | null;
+  annualLeaveDaysOverrideIsManual: boolean;
+  weekendCountsAsLeaveOverride: boolean | null;
 };
 
 type QueryRow = {
@@ -27,6 +33,10 @@ type QueryRow = {
   ended_at: string | null;
   display_first_name: string | null;
   display_last_name: string | null;
+  permission_overrides: unknown;
+  annual_leave_days_override: number | null;
+  annual_leave_days_override_is_manual: boolean;
+  weekend_counts_as_leave_override: boolean | null;
   profiles: {
     first_name: string | null;
     last_name: string | null;
@@ -56,7 +66,7 @@ export function useEmployees(options?: { enabled?: boolean }) {
       const { data, error } = await supabase
         .from('employments')
         .select(
-          'id, role, job_title, contact_email, contact_phone, started_at, ended_at, display_first_name, display_last_name, profiles(first_name, last_name, profile_image_url)',
+          'id, role, job_title, contact_email, contact_phone, started_at, ended_at, display_first_name, display_last_name, permission_overrides, annual_leave_days_override, annual_leave_days_override_is_manual, weekend_counts_as_leave_override, profiles(first_name, last_name, profile_image_url)',
         )
         .eq('company_id', companyId!)
         .order('ended_at', { ascending: true, nullsFirst: true });
@@ -75,6 +85,12 @@ export function useEmployees(options?: { enabled?: boolean }) {
           started_at: row.started_at,
           ended_at: row.ended_at,
           imagePath: row.profiles?.profile_image_url || null,
+          permissionOverrides: dbPermissionsToApp(
+            row.permission_overrides as Record<string, unknown> | null,
+          ),
+          annualLeaveDaysOverride: row.annual_leave_days_override,
+          annualLeaveDaysOverrideIsManual: row.annual_leave_days_override_is_manual,
+          weekendCountsAsLeaveOverride: row.weekend_counts_as_leave_override,
         }));
     },
   });
