@@ -39,6 +39,12 @@ leitet auf die Übersicht um (`routes.legacyFinance`), `/ausgaben` mit Query auf
 - Die **Chips filtern in der Karte** (`overview/DeskCard.tsx`), ohne Seitenwechsel.
   Vorausgewählt ist die erste Gruppe mit Inhalt in der Reihenfolge der Karte, bis jemand
   klickt. Gruppen sind Teilmengen: „Überfällig“ steckt auch in „Offen“.
+- **Eingangsrechnungen-Liste** (`pages/ExpensesPage.tsx`): Stand 2026-10-30 ohne
+  Filter-Reiter und ohne zweite Überschrift „Eingangsrechnungen“ über der Tabelle, so
+  schlicht wie die Ausgangsrechnungen. Der Status (Alle / Offen / Überfällig / Entwurf /
+  Bezahlt, mit Anzahl) liegt im Knopf „Filter“ neben CSV und Spalten
+  (`ListFilterMenu` im `DataTable`-Slot `actions`). `?status=` bleibt. Die Überschrift
+  erscheint nur, wenn rechts daneben „Sonstige Ausgaben“ stehen.
 
 ## Regeln
 

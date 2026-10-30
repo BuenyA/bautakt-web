@@ -87,6 +87,9 @@ Festgelegt im zweiten Durchgang am 2026-10-10 nach Rückmeldung des Owners
 - **Alle Listenfilter sind eine Fluent-`TabList`** (`ListFilterChips` rendert
   sie). Sie stehen in der `DataTable` in einer eigenen Zeile über Suche, CSV
   und Spalten.
+  Ausnahme seit 2026-10-30 (Owner): Listen im Rechnungsbereich filtern über den
+  Knopf „Filter“ (`ListFilterMenu`, `DataTable`-Slot `actions`) neben CSV und
+  Spalten, ohne Zeile über der Tabelle. Bisher nur die Eingangsrechnungen.
 - **Text-Aktionen** („Erneut versuchen“, „Alle Zeiten“) sind Fluents `Link`,
   nicht eigene Knöpfe mit `text-brand`.
 - **Formularfelder füllen ihre Spalte.** Fluents `Input`, `Textarea` und

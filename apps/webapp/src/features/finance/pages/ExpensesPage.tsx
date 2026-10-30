@@ -7,7 +7,7 @@ import {
   todayIso,
 } from '@bautakt/finance';
 import { cn, DataTable, type DataTableColumn, StatusBadge, type StatusTone } from '@bautakt/ui';
-import { Button, Tab, TabList, Text } from '@fluentui/react-components';
+import { Button, Text } from '@fluentui/react-components';
 import { AddRegular } from '@fluentui/react-icons';
 import { type ReactNode, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +15,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
 import { LinkButton } from '@/components/common/LinkButton';
+import { ListFilterMenu } from '@/components/common/ListFilterMenu';
 import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
@@ -40,7 +41,10 @@ import {
  * es welche gibt. In der Handy-App liegt
  * beides unter „Ausgaben"; hier bleibt es zusammen, aber sichtbar getrennt —
  * die eine Liste ist eine Aufgabe, die andere eine Auswertung. Keine zweite
- * Reiterleiste unter den Bereichs-Reitern (Owner 17.10.2026).
+ * Reiterleiste unter den Bereichs-Reitern (Owner 17.10.2026). Der Statusfilter
+ * ist ein Knopf neben CSV und Spalten, keine Reiter über der Tabelle; die
+ * Überschrift „Eingangsrechnungen“ steht nur, wenn daneben die sonstigen
+ * Ausgaben stehen (Owner 30.10.2026).
  */
 export function ExpensesPage() {
   const { t } = useTranslation();
@@ -194,27 +198,25 @@ export function ExpensesPage() {
       />
 
       <div className={cn('grid gap-6', hasExpenses && 'xl:grid-cols-2')}>
-        <ListSection title={t('domain:expenses.tabIncoming')}>
-          <TabList
-            size="small"
-            selectedValue={statusFilter}
-            onTabSelect={(_, { value }) => selectStatus(value as IncomingStatusFilter)}
-          >
-            {INCOMING_FILTERS.map((filter) => (
-              <Tab key={filter} value={filter}>
-                {t(`domain:expenses.statusFilter.${filter}`)}
-                {counts[filter] > 0 ? (
-                  <span className="text-muted-foreground ml-1 tabular-nums">{counts[filter]}</span>
-                ) : null}
-              </Tab>
-            ))}
-          </TabList>
+        <ListSection title={hasExpenses ? t('domain:expenses.tabIncoming') : null}>
           <DataTable
             columns={incomingColumns}
             data={incomingRows}
             isLoading={isLoading}
             labels={labels}
             exportFileName="eingangsrechnungen"
+            actions={
+              <ListFilterMenu
+                value={statusFilter}
+                defaultValue="all"
+                onValueChange={selectStatus}
+                options={INCOMING_FILTERS.map((filter) => ({
+                  value: filter,
+                  label: t(`domain:expenses.statusFilter.${filter}`),
+                  count: counts[filter],
+                }))}
+              />
+            }
             onRowClick={
               canManage ? (row) => void navigate(routes.incomingInvoice(row.id)) : undefined
             }
@@ -297,12 +299,14 @@ function DueCell({ dueDate, status }: { dueDate: string | null; status: string }
   );
 }
 
-function ListSection({ title, children }: { title: string; children: ReactNode }) {
+function ListSection({ title, children }: { title: string | null; children: ReactNode }) {
   return (
     <section className="flex min-w-0 flex-col gap-3">
-      <Text as="h2" size={400} weight="semibold">
-        {title}
-      </Text>
+      {title ? (
+        <Text as="h2" size={400} weight="semibold">
+          {title}
+        </Text>
+      ) : null}
       {children}
     </section>
   );
