@@ -1,12 +1,11 @@
 import { Button, Input, Label } from '@fluentui/react-components';
-import { type FormEvent, type ReactNode, useState } from 'react';
+import { type FormEvent, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
 import { LinkButton } from '@/components/common/LinkButton';
 import { RouterLink } from '@/components/common/RouterLink';
 import { DatePicker } from '@/components/form/dateTime';
 import { type BirthDateIssue, birthDateIssue } from '@/features/company/birthDate';
-import { type LegalPageId, legalPath } from '@/lib/legal';
 import { routes } from '@/lib/routes';
 
 import { signUpSchema } from '../schema';
@@ -89,7 +88,7 @@ export function RegisterPage() {
   );
 
   return (
-    <AuthCard title={t('auth:signUp.title')} subtitle={t('auth:signUp.subtitle')} footer={footer}>
+    <AuthCard title={t('auth:signUp.title')} footer={footer}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
         <FormError messageKey={errorKey} />
 
@@ -165,27 +164,7 @@ export function RegisterPage() {
         <Button appearance="primary" type="submit" disabled={pending}>
           {t('auth:signUp.submit')}
         </Button>
-
-        <p className="text-muted-foreground text-xs leading-relaxed">
-          <Trans
-            i18nKey="auth:signUp.legalHint"
-            components={{
-              privacy: <LegalTextLink page="privacy" />,
-            }}
-          />
-        </p>
       </form>
     </AuthCard>
-  );
-}
-
-/** Link im Fließtext; den Text setzt `<Trans>` als `children` ein. */
-function LegalTextLink({ page, children }: { page: LegalPageId; children?: ReactNode }) {
-  const path = legalPath(page);
-  if (!path) return children;
-  return (
-    <RouterLink to={path} inline>
-      {children}
-    </RouterLink>
   );
 }
