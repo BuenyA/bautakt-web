@@ -72,16 +72,27 @@ import {
 import { isFrozen, isIncomingReviewStatus } from '../incomingReview';
 import { IncomingReviewSection } from '../IncomingReviewSection';
 import { IncomingSkontoSection } from '../IncomingSkontoSection';
+import {
+  guessTaxKind,
+  initialTaxLines,
+  type TaxLine,
+  taxLinesPayload,
+  validateTaxLines,
+} from '../incomingTaxLines';
+import { IncomingTaxLinesField } from '../IncomingTaxLinesField';
+import { taxDrafts, type TaxRow, taxRows } from '../incomingTaxRows';
 import { checkOriginal, OriginalHashMismatch } from '../originalIntegrity';
 import { PdfViewer } from '../PdfViewer';
 import { useCostCategories } from '../useCostCategories';
 import {
   downloadIncomingOriginal,
   type IncomingInvoiceRow,
+  IncomingSaveError,
   IncomingUploadError,
   parseIncomingFile,
   useDeleteIncomingDraft,
   useIncomingInvoice,
+  useIncomingTaxLines,
   useSaveIncomingInvoice,
   useStoreIncomingFile,
 } from '../useIncomingInvoice';
@@ -105,31 +116,42 @@ export function IncomingInvoicePage() {
   const { id } = useParams();
   const invoiceId = id ?? null;
   const invoice = useIncomingInvoice(invoiceId);
+  const taxLines = useIncomingTaxLines(invoiceId);
 
-  if (invoiceId === null) return <IncomingInvoiceForm saved={null} />;
-  if (invoice.isPending) {
+  if (invoiceId === null) return <IncomingInvoiceForm saved={null} savedTaxLines={[]} />;
+  if (invoice.isPending || taxLines.isPending) {
     return (
       <div className="flex justify-center py-16">
         <Spinner />
       </div>
     );
   }
-  if (invoice.isError) {
+  if (invoice.isError || taxLines.isError) {
     return (
       <div className="flex flex-col gap-4">
         <PageHeader title={t('domain:incomingInvoiceForm.editTitle')} />
         <MessageBar intent="error" layout="multiline">
           <MessageBarBody>
-            {readableDbError(invoice.error) ?? t('domain:incomingInvoiceForm.loadError')}
+            {readableDbError(invoice.error ?? taxLines.error) ??
+              t('domain:incomingInvoiceForm.loadError')}
           </MessageBarBody>
           <MessageBarActions>
-            <Button onClick={() => void invoice.refetch()}>{t('common:action.retry')}</Button>
+            <Button
+              onClick={() => {
+                if (invoice.isError) void invoice.refetch();
+                if (taxLines.isError) void taxLines.refetch();
+              }}
+            >
+              {t('common:action.retry')}
+            </Button>
           </MessageBarActions>
         </MessageBar>
       </div>
     );
   }
-  return <IncomingInvoiceForm key={invoice.data.id} saved={invoice.data} />;
+  return (
+    <IncomingInvoiceForm key={invoice.data.id} saved={invoice.data} savedTaxLines={taxLines.data} />
+  );
 }
 
 /**
@@ -157,7 +179,13 @@ type ReadState =
   | { state: 'none'; photo: boolean }
   | { state: 'error'; file: File; kind: UploadKind };
 
-function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
+function IncomingInvoiceForm({
+  saved,
+  savedTaxLines,
+}: {
+  saved: IncomingInvoiceRow | null;
+  savedTaxLines: TaxLine[];
+}) {
   const { t } = useTranslation();
   const leave = useLeave();
   const save = useSaveIncomingInvoice();
@@ -200,6 +228,16 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
   const [categoryId, setCategoryId] = useState(saved?.cost_category_id ?? '');
   const [notes, setNotes] = useState(saved?.notes ?? '');
   const [status, setStatus] = useState<IncomingInvoiceStatus>(savedStatus ?? 'open');
+  const [taxRowsState, setTaxRows] = useState<TaxRow[]>(() =>
+    taxRows(
+      initialTaxLines(savedTaxLines, {
+        netMinor: saved ? Math.round(saved.net_total * 100) : null,
+        vatMinor: saved ? Math.round(saved.vat_total * 100) : null,
+      }),
+    ),
+  );
+  // Angelegt, aber Zeilen oder Status scheiterten: weiter an diesem Entwurf.
+  const [createdId, setCreatedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
@@ -224,9 +262,10 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
     'vendorVatId' | 'sourceFormat'
   > | null>(null);
 
-  const invoiceId = saved?.id ?? attached?.id ?? null;
+  const invoiceId = saved?.id ?? attached?.id ?? createdId;
   const originalPath = attached?.storagePath ?? saved?.storage_path ?? null;
-  const draftStatus: IncomingInvoiceStatus | null = savedStatus ?? (attached ? 'draft' : null);
+  const draftStatus: IncomingInvoiceStatus | null =
+    savedStatus ?? (attached || createdId ? 'draft' : null);
   const uploading = storeFile.isPending || read.state === 'running';
 
   /** Wer ein vorgeschlagenes Feld ändert, hat es geprüft: Markierung weg. */
@@ -254,6 +293,7 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
     categoryId,
     notes,
     status,
+    taxRowsState,
   ]);
   const [baseline] = useState(snapshot);
   const dirty = snapshot !== baseline;
@@ -291,6 +331,13 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
     vatMinor: parseMoneyInput(vat),
     grossMinor: parseMoneyInput(gross),
   };
+
+  const taxHeader = { netMinor: fields.netMinor, vatMinor: fields.vatMinor };
+  const guessedKind = guessTaxKind(fields.netMinor, fields.vatMinor);
+  // Bei einem Satz ohne Wahl gilt der erratene (19 %/7 %), wie in der Datenbank.
+  const taxLineDrafts = taxDrafts(taxRowsState).map((line, _, all) =>
+    all.length === 1 && line.kind === null ? { ...line, kind: guessedKind } : line,
+  );
 
   function onSupplier(contact: ContactListRow | null) {
     setSupplierId(contact?.id ?? null);
@@ -400,9 +447,16 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
     setError(null);
 
     if (editable) {
-      const problems = validateIncomingInvoice(fields, status);
+      const problems = [
+        ...validateIncomingInvoice(fields, status).map((key) =>
+          t(`domain:incomingInvoiceForm.errors.${key}`),
+        ),
+        ...validateTaxLines(taxLineDrafts, taxHeader, status).map((key) =>
+          t(`domain:incomingTaxLines.errors.${key}`),
+        ),
+      ];
       if (problems.length > 0) {
-        setError(problems.map((key) => t(`domain:incomingInvoiceForm.errors.${key}`)).join(' '));
+        setError(problems.join(' '));
         return;
       }
     }
@@ -411,6 +465,7 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
       await save.mutateAsync({
         id: invoiceId,
         onlyStatus: !editable,
+        taxLines: taxLinesPayload(taxLineDrafts, taxHeader),
         values: {
           status,
           supplier_id: supplierId,
@@ -432,6 +487,7 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
       toast.success(t('domain:incomingInvoiceForm.saved'));
       done();
     } catch (caught) {
+      if (caught instanceof IncomingSaveError && invoiceId === null) setCreatedId(caught.id);
       setError(readableDbError(caught) ?? t('domain:incomingInvoiceForm.saveError'));
     }
   }
@@ -650,6 +706,14 @@ function IncomingInvoiceForm({ saved }: { saved: IncomingInvoiceRow | null }) {
                     })}
               </p>
             ) : null}
+            <IncomingTaxLinesField
+              rows={taxRowsState}
+              onChange={setTaxRows}
+              header={taxHeader}
+              guessedKind={guessedKind}
+              disabled={!editable}
+              required={status !== 'draft'}
+            />
           </Section>
 
           {saved && savedStatus && savedStatus !== 'draft' && reviewStatus ? (

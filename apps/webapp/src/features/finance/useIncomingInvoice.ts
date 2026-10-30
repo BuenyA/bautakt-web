@@ -19,6 +19,12 @@ import type {
   IncomingReviewDecision,
   IncomingReviewStatus,
 } from './incomingReview';
+import {
+  type IncomingTaxMode,
+  taxKind,
+  type TaxLine,
+  type TaxLinePayload,
+} from './incomingTaxLines';
 
 export type IncomingInvoiceRow = {
   id: string;
@@ -109,18 +115,72 @@ function useInvalidateIncoming() {
   return async (deletedId?: string) => {
     if (deletedId) {
       queryClient.removeQueries({ queryKey: ['incoming-invoice', companyId, deletedId] });
+      queryClient.removeQueries({ queryKey: ['incoming-tax-lines', companyId, deletedId] });
     }
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ['incoming-invoices-list', companyId] }),
       queryClient.invalidateQueries({ queryKey: ['incoming-invoice', companyId] }),
+      queryClient.invalidateQueries({ queryKey: ['incoming-tax-lines', companyId] }),
     ]);
   };
+}
+
+/**
+ * Steueraufteilung einer Rechnung (#168), höchster Satz zuerst. Zeilen mit
+ * einer Art, die das Formular nicht kennt, kommen trotzdem mit.
+ */
+export function useIncomingTaxLines(invoiceId: string | null) {
+  const { data: membership } = useMembership();
+  const companyId = membership?.companyId;
+
+  return useQuery({
+    queryKey: ['incoming-tax-lines', companyId, invoiceId],
+    enabled: Boolean(companyId && invoiceId),
+    queryFn: async (): Promise<TaxLine[]> => {
+      const { data, error } = await supabase
+        .from('incoming_invoice_tax_lines')
+        .select('tax_mode, tax_rate_percent, net_amount, vat_amount')
+        .eq('company_id', companyId!)
+        .eq('invoice_id', invoiceId!)
+        .order('tax_rate_percent', { ascending: false });
+      if (error) throw error;
+      return (data ?? []).map((row) => ({
+        kind: taxKind(row.tax_mode as IncomingTaxMode, Number(row.tax_rate_percent)),
+        netMinor: Math.round(Number(row.net_amount) * 100),
+        vatMinor: Math.round(Number(row.vat_amount) * 100),
+      }));
+    },
+  });
+}
+
+/**
+ * Speichern scheiterte, nachdem die Rechnung schon als Entwurf angelegt war.
+ * `id` gehört ins Formular, sonst legt der nächste Versuch eine zweite an.
+ */
+export class IncomingSaveError extends Error {
+  readonly id: string;
+  /** Code des eigentlichen Fehlers (z. B. 42501), für `readableDbError`. */
+  readonly code: string;
+  constructor(id: string, cause: unknown) {
+    const source = (cause ?? {}) as { message?: unknown; code?: unknown };
+    super(typeof source.message === 'string' ? source.message : 'INCOMING_INVOICE_NOT_SAVED', {
+      cause,
+    });
+    this.id = id;
+    this.code = typeof source.code === 'string' ? source.code : '';
+  }
 }
 
 /**
  * Anlegen oder ändern. Ein erfasster Beleg ändert nur noch den Status
  * (`onlyStatus`); was sonst im Formular steht, wird dann nicht gesendet.
  * 0 geänderte Zeilen ist ein Fehler, kein stiller Erfolg.
+ *
+ * Mit Steueraufteilung (#168) in drei Schritten, weil die Zeilen nur im
+ * Entwurf geschrieben werden dürfen: Kopf als Entwurf, Zeilen
+ * (`set_incoming_invoice_tax_lines`, ersetzt alle in einem Schritt), dann der
+ * Status. Erst der letzte Schritt erfasst; dort prüft die Datenbank, dass die
+ * Zeilen zum Kopf passen. Scheitert ein Schritt, bleibt ein gültiger Entwurf.
  */
 export function useSaveIncomingInvoice() {
   const { data: membership } = useMembership();
@@ -128,38 +188,65 @@ export function useSaveIncomingInvoice() {
   const companyId = membership?.companyId;
   const invalidate = useInvalidateIncoming();
 
+  async function update(id: string, patch: Partial<IncomingInvoiceWrite>) {
+    const { data, error } = await supabase
+      .from('incoming_invoices')
+      .update({ ...patch, modified_at: new Date().toISOString() })
+      .eq('company_id', companyId!)
+      .eq('id', id)
+      .select('id');
+    if (error) throw error;
+    if (!data || data.length !== 1) throw new Error('INCOMING_INVOICE_NOT_SAVED');
+  }
+
   return useMutation({
     mutationFn: async ({
       id,
       values,
       onlyStatus,
+      taxLines,
     }: {
       id: string | null;
       values: IncomingInvoiceWrite;
       onlyStatus: boolean;
+      taxLines: TaxLinePayload[];
     }): Promise<string> => {
-      if (id === null) {
+      if (onlyStatus) {
+        if (id === null) throw new Error('INCOMING_INVOICE_NOT_SAVED');
+        await update(id, { status: values.status });
+        return id;
+      }
+
+      const draft = { ...values, status: 'draft' as const };
+      let savedId = id;
+      if (savedId === null) {
         const { data, error } = await supabase
           .from('incoming_invoices')
-          .insert({ ...values, company_id: companyId!, created_by: user?.id ?? null })
+          .insert({ ...draft, company_id: companyId!, created_by: user?.id ?? null })
           .select('id')
           .single();
         if (error) throw error;
-        return data.id;
+        savedId = data.id as string;
+      } else {
+        await update(savedId, draft);
       }
 
-      const patch = onlyStatus ? { status: values.status } : values;
-      const { data, error } = await supabase
-        .from('incoming_invoices')
-        .update({ ...patch, modified_at: new Date().toISOString() })
-        .eq('company_id', companyId!)
-        .eq('id', id)
-        .select('id');
-      if (error) throw error;
-      if (!data || data.length !== 1) throw new Error('INCOMING_INVOICE_NOT_SAVED');
-      return id;
+      try {
+        const { data, error } = await supabase.rpc('set_incoming_invoice_tax_lines', {
+          p_invoice_id: savedId,
+          p_lines: taxLines,
+        });
+        if (error) throw error;
+        if (!Array.isArray(data) || data.length !== taxLines.length) {
+          throw new Error('INCOMING_TAX_LINES_NOT_SAVED');
+        }
+        if (values.status !== 'draft') await update(savedId, { status: values.status });
+      } catch (caught) {
+        throw new IncomingSaveError(savedId, caught);
+      }
+      return savedId;
     },
-    onSuccess: () => invalidate(),
+    onSettled: () => invalidate(),
   });
 }
 

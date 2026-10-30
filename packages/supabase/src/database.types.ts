@@ -2160,9 +2160,12 @@ export type Database = {
           actor_name: string
           company_id: string
           created_at: string
+          field: string | null
           id: string
           invoice_id: string
           mail_reference: string | null
+          new_value: string | null
+          old_value: string | null
           reason: string
         }
         Insert: {
@@ -2171,9 +2174,12 @@ export type Database = {
           actor_name?: string
           company_id: string
           created_at?: string
+          field?: string | null
           id?: string
           invoice_id: string
           mail_reference?: string | null
+          new_value?: string | null
+          old_value?: string | null
           reason?: string
         }
         Update: {
@@ -2182,9 +2188,12 @@ export type Database = {
           actor_name?: string
           company_id?: string
           created_at?: string
+          field?: string | null
           id?: string
           invoice_id?: string
           mail_reference?: string | null
+          new_value?: string | null
+          old_value?: string | null
           reason?: string
         }
         Relationships: [
@@ -2260,6 +2269,61 @@ export type Database = {
           {
             foreignKeyName: "incoming_invoice_payments_incoming_invoice_id_fkey"
             columns: ["incoming_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incoming_invoice_tax_lines: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          invoice_id: string
+          net_amount: number
+          tax_mode: string
+          tax_rate_percent: number
+          vat_amount: number
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          invoice_id: string
+          net_amount: number
+          tax_mode: string
+          tax_rate_percent: number
+          vat_amount: number
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          invoice_id?: string
+          net_amount?: number
+          tax_mode?: string
+          tax_rate_percent?: number
+          vat_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incoming_invoice_tax_lines_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incoming_invoice_tax_lines_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoice_payables"
+            referencedColumns: ["invoice_id"]
+          },
+          {
+            foreignKeyName: "incoming_invoice_tax_lines_invoice_id_fkey"
+            columns: ["invoice_id"]
             isOneToOne: false
             referencedRelation: "incoming_invoices"
             referencedColumns: ["id"]
@@ -4682,6 +4746,10 @@ export type Database = {
         Args: { p_company_id: string }
         Returns: undefined
       }
+      derive_incoming_invoice_tax_line: {
+        Args: { p_invoice_id: string }
+        Returns: boolean
+      }
       dispatch_pending_push: { Args: never; Returns: undefined }
       employment_role_rank: {
         Args: { p_company_id: string; p_role: string }
@@ -4917,9 +4985,12 @@ export type Database = {
           actor_name: string
           company_id: string
           created_at: string
+          field: string | null
           id: string
           invoice_id: string
           mail_reference: string | null
+          new_value: string | null
+          old_value: string | null
           reason: string
         }
         SetofOptions: {
@@ -4980,9 +5051,12 @@ export type Database = {
           actor_name: string
           company_id: string
           created_at: string
+          field: string | null
           id: string
           invoice_id: string
           mail_reference: string | null
+          new_value: string | null
+          old_value: string | null
           reason: string
         }
         SetofOptions: {
@@ -5061,6 +5135,25 @@ export type Database = {
           p_prefix: string
         }
         Returns: undefined
+      }
+      set_incoming_invoice_tax_lines: {
+        Args: { p_invoice_id: string; p_lines: Json }
+        Returns: {
+          company_id: string
+          created_at: string
+          id: string
+          invoice_id: string
+          net_amount: number
+          tax_mode: string
+          tax_rate_percent: number
+          vat_amount: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "incoming_invoice_tax_lines"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       set_role_labor_rate: {
         Args: {
