@@ -1,5 +1,5 @@
 import { DataTable, type DataTableColumn, StatusBadge } from '@bautakt/ui';
-import { Button, Link as FluentLink } from '@fluentui/react-components';
+import { Avatar, Button, Link as FluentLink } from '@fluentui/react-components';
 import { AddRegular, BeachRegular } from '@fluentui/react-icons';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +22,7 @@ import {
   employmentListStatus,
 } from '../employeeStatus';
 import { type EmployeeRow, useEmployees } from '../useEmployees';
+import { useProfileImageUrls } from '../useProfileImageUrls';
 
 export function EmployeesListPage() {
   const { t } = useTranslation();
@@ -35,6 +36,7 @@ export function EmployeesListPage() {
   useCreateFromUrl(canManage, () => void navigate(routes.employeeNew));
   const employees = useEmployees();
   const { data, isError, refetch } = employees;
+  const imageUrls = useProfileImageUrls(data?.map((row) => row.imagePath) ?? []).data;
 
   const isLoading = useCompanyListLoading(employees);
 
@@ -84,6 +86,16 @@ export function EmployeesListPage() {
         header: t('domain:employees.columns.name'),
         cell: ({ row }) => (
           <span className="flex items-center gap-2">
+            <Avatar
+              name={row.original.name || undefined}
+              size={28}
+              color="colorful"
+              image={
+                row.original.imagePath && imageUrls?.[row.original.imagePath]
+                  ? { src: imageUrls[row.original.imagePath] }
+                  : undefined
+              }
+            />
             <span className="text-foreground font-medium">
               {row.original.name || t('domain:employees.unnamed')}
             </span>
@@ -125,7 +137,7 @@ export function EmployeesListPage() {
         ),
       },
     ],
-    [t],
+    [t, imageUrls],
   );
 
   if (isError) {

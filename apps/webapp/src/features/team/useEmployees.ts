@@ -13,6 +13,8 @@ export type EmployeeRow = {
   contact_phone: string;
   started_at: string | null;
   ended_at: string | null;
+  /** Pfad im Bucket `profile-images`; anzeigen über `useProfileImageUrls`. */
+  imagePath: string | null;
 };
 
 type QueryRow = {
@@ -25,7 +27,11 @@ type QueryRow = {
   ended_at: string | null;
   display_first_name: string | null;
   display_last_name: string | null;
-  profiles: { first_name: string | null; last_name: string | null } | null;
+  profiles: {
+    first_name: string | null;
+    last_name: string | null;
+    profile_image_url: string | null;
+  } | null;
 };
 
 /**
@@ -50,7 +56,7 @@ export function useEmployees(options?: { enabled?: boolean }) {
       const { data, error } = await supabase
         .from('employments')
         .select(
-          'id, role, job_title, contact_email, contact_phone, started_at, ended_at, display_first_name, display_last_name, profiles(first_name, last_name)',
+          'id, role, job_title, contact_email, contact_phone, started_at, ended_at, display_first_name, display_last_name, profiles(first_name, last_name, profile_image_url)',
         )
         .eq('company_id', companyId!)
         .order('ended_at', { ascending: true, nullsFirst: true });
@@ -68,6 +74,7 @@ export function useEmployees(options?: { enabled?: boolean }) {
           contact_phone: row.contact_phone ?? '',
           started_at: row.started_at,
           ended_at: row.ended_at,
+          imagePath: row.profiles?.profile_image_url || null,
         }));
     },
   });

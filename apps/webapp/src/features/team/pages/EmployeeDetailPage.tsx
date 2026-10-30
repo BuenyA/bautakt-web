@@ -1,5 +1,5 @@
 import { StatusBadge } from '@bautakt/ui';
-import { Button, Link as FluentLink } from '@fluentui/react-components';
+import { Avatar, Button, Link as FluentLink } from '@fluentui/react-components';
 import { EditRegular } from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,7 @@ import { draftFromEmployee, type EmployeeDraft } from '../employeeDraft';
 import { EmployeeSheet } from '../EmployeeSheet';
 import { EmployeeTimes } from '../EmployeeTimes';
 import { useEmployees } from '../useEmployees';
+import { useProfileImageUrls } from '../useProfileImageUrls';
 
 /**
  * Seite eines Mitarbeiters: Stammdaten und seine Zeiten.
@@ -42,6 +43,7 @@ export function EmployeeDetailPage() {
   const { data, isError, refetch } = employees;
   const isLoading = useCompanyListLoading(employees);
   const employee = data?.find((row) => row.id === id);
+  const imageUrl = useProfileImageUrls([employee?.imagePath]).data?.[employee?.imagePath ?? ''];
   const back = <LinkButton to={routes.employees}>{t('common:action.back')}</LinkButton>;
 
   if (isLoading) {
@@ -86,6 +88,15 @@ export function EmployeeDetailPage() {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
+        // Ohne Bild zeigt Fluent die Initialen, wie in der Einsatzplanung.
+        leading={
+          <Avatar
+            name={employee.name || undefined}
+            size={64}
+            color="colorful"
+            image={imageUrl ? { src: imageUrl } : undefined}
+          />
+        }
         title={employee.name || t('domain:employees.unnamed')}
         description={t('domain:employees.detail.description')}
         actions={
