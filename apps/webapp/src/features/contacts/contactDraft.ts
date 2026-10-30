@@ -130,11 +130,22 @@ const numberText = (value: number | null | undefined) => (value == null ? '' : S
 /** Geladener Kontakt → Formular. */
 export function draftFromContact(contact: ContactDetail): ContactDraft {
   const base = emptyContact();
+  // `roles` sind die aktiven Rollen (Haken im Formular), `existingRoles` alle
+  // Profile, auch archivierte: die werden beim erneuten Anhaken nur reaktiviert.
+  const existing: ContactRole[] = [];
+  if (contact.customer) existing.push('customer');
+  if (contact.supplier) existing.push('supplier');
+  if (contact.supplier?.subcontractor) existing.push('subcontractor');
+  if (contact.other) existing.push('other');
   const roles: ContactRole[] = [];
-  if (contact.customer) roles.push('customer');
-  if (contact.supplier) roles.push('supplier');
-  if (contact.supplier?.subcontractor) roles.push('subcontractor');
-  if (contact.other) roles.push('other');
+  if (contact.customer && !contact.customer.archived_at) roles.push('customer');
+  if (contact.supplier && !contact.supplier.archived_at) {
+    roles.push('supplier');
+    if (contact.supplier.subcontractor && !contact.supplier.subcontractor.archived_at) {
+      roles.push('subcontractor');
+    }
+  }
+  if (contact.other && !contact.other.archived_at) roles.push('other');
 
   return {
     id: contact.id,
@@ -155,7 +166,7 @@ export function draftFromContact(contact: ContactDetail): ContactDraft {
     tax_number: contact.tax_number,
     notes: contact.notes,
     roles,
-    existingRoles: [...roles],
+    existingRoles: existing,
     customer: contact.customer
       ? {
           customer_number: contact.customer.customer_number,

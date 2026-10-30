@@ -139,12 +139,16 @@ export function useSaveContact() {
         }
       }
 
-      const stamp = () => ({ modified_at: new Date().toISOString() });
+      const now = () => new Date().toISOString();
+      const stamp = () => ({ modified_at: now() });
+      // Ein archiviertes Profil, das wieder angehakt ist, wird reaktiviert.
+      const revive = (role: ContactRole) =>
+        initial.roles.includes(role) ? {} : { archived_at: null };
 
       try {
         if (has('supplier')) {
           const row = supplierRow(draft);
-          const patch = changedFields(supplierRow(initial), row);
+          const patch = { ...changedFields(supplierRow(initial), row), ...revive('supplier') };
           const { error } = !had('supplier')
             ? await supabase.from('supplier_profiles').insert({ ...scope, ...row })
             : Object.keys(patch).length > 0
@@ -157,7 +161,10 @@ export function useSaveContact() {
         }
         if (has('subcontractor')) {
           const row = subcontractorRow(draft);
-          const patch = changedFields(subcontractorRow(initial), row);
+          const patch = {
+            ...changedFields(subcontractorRow(initial), row),
+            ...revive('subcontractor'),
+          };
           const { error } = !had('subcontractor')
             ? await supabase.from('subcontractor_profiles').insert({ ...scope, ...row })
             : Object.keys(patch).length > 0
@@ -170,7 +177,7 @@ export function useSaveContact() {
         }
         if (has('customer')) {
           const row = customerRow(draft);
-          const patch = changedFields(customerRow(initial), row);
+          const patch = { ...changedFields(customerRow(initial), row), ...revive('customer') };
           const { error } = !had('customer')
             ? await supabase.from('customer_profiles').insert({ ...scope, ...row })
             : Object.keys(patch).length > 0
@@ -182,18 +189,33 @@ export function useSaveContact() {
           if (error) throw error;
         }
         if (has('other')) {
-          if (!had('other')) {
-            const { error } = await supabase
-              .from('other_profiles')
-              .insert({ ...scope, function: draft.other.function });
-            if (error) throw error;
-          } else if (initial.other.function !== draft.other.function) {
-            const { error } = await supabase
-              .from('other_profiles')
-              .update({ function: draft.other.function, modified_at: new Date().toISOString() })
-              .eq('contact_id', id);
-            if (error) throw error;
-          }
+          const patch = {
+            ...(initial.other.function !== draft.other.function
+              ? { function: draft.other.function }
+              : {}),
+            ...revive('other'),
+          };
+          const { error } = !had('other')
+            ? await supabase
+                .from('other_profiles')
+                .insert({ ...scope, function: draft.other.function })
+            : Object.keys(patch).length > 0
+              ? await supabase
+                  .from('other_profiles')
+                  .update({ ...patch, ...stamp() })
+                  .eq('contact_id', id)
+              : { error: null };
+          if (error) throw error;
+        }
+        // Abgewählte Rollen werden archiviert, nicht gelöscht: an ihnen können
+        // Belege hängen. Auf der Kontaktseite lassen sie sich zurückholen.
+        for (const role of initial.roles) {
+          if (has(role)) continue;
+          const { error } = await supabase
+            .from(profileTable(role))
+            .update({ archived_at: now(), ...stamp() })
+            .eq('contact_id', id);
+          if (error) throw error;
         }
         if (iban.trim()) {
           await insertFirstBankAccount({ ...scope, modified_by: user?.id ?? null }, draft, iban);

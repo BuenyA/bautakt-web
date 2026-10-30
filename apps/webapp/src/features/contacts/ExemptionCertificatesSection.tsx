@@ -121,7 +121,7 @@ export function ExemptionCertificatesSection({
             <li key={certificate.id} className="flex items-center justify-between gap-3 py-2">
               <span className="flex flex-col">
                 <span className="tabular-nums">
-                  {formatDate(certificate.valid_from)} – {formatDate(certificate.valid_until)}
+                  {formatDate(certificate.valid_from)} bis {formatDate(certificate.valid_until)}
                 </span>
                 <span className="text-muted-foreground">
                   {[certificate.certificate_number, certificate.tax_office]
@@ -149,7 +149,7 @@ export function ExemptionCertificatesSection({
         </ul>
       ) : null}
 
-      <FormDrawer open={draft !== null} onOpenChange={(o) => !o && setDraft(null)} size="small">
+      <FormDrawer open={draft !== null} onOpenChange={(o) => !o && setDraft(null)}>
         {draft ? (
           <ExemptionForm contactId={contactId} initial={draft} onDone={() => setDraft(null)} />
         ) : null}

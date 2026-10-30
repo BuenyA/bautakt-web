@@ -193,7 +193,7 @@ export function OrderContacts({ orderId }: { orderId: string }) {
         )}
       </SectionCard>
 
-      <FormDrawer open={adding} onOpenChange={setAdding} size="small">
+      <FormDrawer open={adding} onOpenChange={setAdding}>
         {adding ? (
           <OrderContactForm
             orderId={orderId}

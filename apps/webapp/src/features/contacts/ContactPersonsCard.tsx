@@ -138,11 +138,7 @@ export function ContactPersonsCard({
         </ul>
       )}
 
-      <FormDrawer
-        open={draft !== null}
-        onOpenChange={(open) => !open && setDraft(null)}
-        size="small"
-      >
+      <FormDrawer open={draft !== null} onOpenChange={(open) => !open && setDraft(null)}>
         {draft ? (
           <PersonForm contactId={contactId} initial={draft} onDone={() => setDraft(null)} />
         ) : null}
