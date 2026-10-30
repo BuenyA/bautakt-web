@@ -1880,6 +1880,58 @@
       "reasonTooLong": "Höchstens {{max}} Zeichen."
     }
   },
+  "incomingSkonto": {
+    "title": "Skonto und Zahlbetrag",
+    "gross": "Brutto laut Rechnung",
+    "skonto": "Skonto",
+    "skontoPercent": "Skonto ({{percent}} %)",
+    "payable": "Zahlbetrag",
+    "discountUntil": "Skontofrist",
+    "expired": "Abgelaufen",
+    "expiredHint": "Die Skontofrist ist vorbei. Zahlst du trotzdem mit Abzug, kläre das mit dem Lieferanten; sonst hebe den Vermerk auf.",
+    "agreed": "Vereinbart mit {{with}} am {{on}}",
+    "note": "Skonto vermerken",
+    "reverse": "Vermerk aufheben",
+    "originalHint": "Die Rechnung selbst bleibt unverändert. Das Skonto steht als Vermerk daneben und lässt sich nur per Gegen-Eintrag aufheben.",
+    "log": "Verlauf",
+    "action": {
+      "noted": "Skonto {{amount}} vermerkt, Frist bis {{until}}",
+      "reversed": "Skonto {{amount}} aufgehoben"
+    },
+    "noted": "Skonto vermerkt.",
+    "reversed": "Vermerk aufgehoben.",
+    "loadError": "Der Skonto-Vermerk konnte nicht geladen werden.",
+    "saveError": "Der Eintrag konnte nicht gespeichert werden.",
+    "dialog": {
+      "title": "Skonto vermerken",
+      "text": "Für mündlich vereinbartes Skonto. Die Rechnung bleibt unverändert; der Vermerk lässt sich danach nicht ändern, nur per Gegen-Eintrag aufheben.",
+      "percent": "Prozent",
+      "percentHint": "Optional. Rechnet den Betrag vom Brutto aus.",
+      "amount": "Skontobetrag",
+      "agreedWith": "Vereinbart mit",
+      "agreedOn": "Vereinbart am",
+      "reason": "Begründung",
+      "submit": "Vermerken",
+      "termsError": "Die Skonto-Bedingungen des Lieferanten konnten nicht geladen werden. Du kannst die Angaben trotzdem selbst eintragen."
+    },
+    "reverseDialog": {
+      "title": "Skonto-Vermerk aufheben?",
+      "text": "Ein Gegen-Eintrag über {{amount}} hebt den Vermerk auf. Beide bleiben im Verlauf. Danach kannst du ein neues Skonto vermerken.",
+      "reason": "Begründung"
+    },
+    "errors": {
+      "amountRequired": "Bitte einen Betrag größer als 0 angeben.",
+      "amountTooHigh": "Höchstens der Bruttobetrag ({{gross}}).",
+      "percentInvalid": "Über 0 und höchstens 100, bis zu vier Nachkommastellen.",
+      "percentMismatch": "Passt nicht zum Betrag: das wären {{expected}}.",
+      "reasonRequired": "Bitte begründe den Eintrag.",
+      "reasonTooLong": "Höchstens {{max}} Zeichen.",
+      "agreedWithRequired": "Bitte angeben, mit wem vereinbart wurde.",
+      "agreedWithTooLong": "Höchstens {{max}} Zeichen.",
+      "agreedOnRequired": "Bitte das Datum der Vereinbarung angeben.",
+      "discountUntilRequired": "Bitte die Skontofrist angeben."
+    }
+  },
   "incomingInvoiceStatus": {
     "draft": "Entwurf",
     "open": "Offen",

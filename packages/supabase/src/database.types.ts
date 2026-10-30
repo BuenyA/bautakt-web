@@ -2070,6 +2070,89 @@ export type Database = {
           },
         ]
       }
+      incoming_invoice_adjustments: {
+        Row: {
+          actor_id: string | null
+          actor_name: string
+          agreed_on: string | null
+          agreed_with: string | null
+          amount: number
+          company_id: string
+          created_at: string
+          details: Json
+          discount_until: string | null
+          id: string
+          invoice_id: string
+          kind: string
+          percent: number | null
+          reason: string
+          reverses_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_name?: string
+          agreed_on?: string | null
+          agreed_with?: string | null
+          amount: number
+          company_id: string
+          created_at?: string
+          details?: Json
+          discount_until?: string | null
+          id?: string
+          invoice_id: string
+          kind: string
+          percent?: number | null
+          reason: string
+          reverses_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          actor_name?: string
+          agreed_on?: string | null
+          agreed_with?: string | null
+          amount?: number
+          company_id?: string
+          created_at?: string
+          details?: Json
+          discount_until?: string | null
+          id?: string
+          invoice_id?: string
+          kind?: string
+          percent?: number | null
+          reason?: string
+          reverses_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incoming_invoice_adjustments_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incoming_invoice_adjustments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoice_payables"
+            referencedColumns: ["invoice_id"]
+          },
+          {
+            foreignKeyName: "incoming_invoice_adjustments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incoming_invoice_adjustments_reverses_id_fkey"
+            columns: ["reverses_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoice_adjustments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       incoming_invoice_events: {
         Row: {
           action: string
@@ -2111,6 +2194,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incoming_invoice_events_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoice_payables"
+            referencedColumns: ["invoice_id"]
           },
           {
             foreignKeyName: "incoming_invoice_events_invoice_id_fkey"
@@ -2159,6 +2249,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incoming_invoice_payments_incoming_invoice_id_fkey"
+            columns: ["incoming_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoice_payables"
+            referencedColumns: ["invoice_id"]
           },
           {
             foreignKeyName: "incoming_invoice_payments_incoming_invoice_id_fkey"
@@ -2481,6 +2578,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mail_messages_incoming_invoice_id_fkey"
+            columns: ["incoming_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoice_payables"
+            referencedColumns: ["invoice_id"]
           },
           {
             foreignKeyName: "mail_messages_incoming_invoice_id_fkey"
@@ -4281,7 +4385,25 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      incoming_invoice_payables: {
+        Row: {
+          company_id: string | null
+          discount_until: string | null
+          gross_total: number | null
+          invoice_id: string | null
+          payable_total: number | null
+          skonto_total: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incoming_invoices_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       accept_employment_invitation: {
@@ -4739,6 +4861,42 @@ export type Database = {
         Args: { p_company_id: string; p_date?: string }
         Returns: Json
       }
+      note_incoming_invoice_adjustment: {
+        Args: {
+          p_agreed_on: string
+          p_agreed_with: string
+          p_amount: number
+          p_details?: Json
+          p_discount_until: string
+          p_invoice_id: string
+          p_kind: string
+          p_percent: number
+          p_reason: string
+        }
+        Returns: {
+          actor_id: string | null
+          actor_name: string
+          agreed_on: string | null
+          agreed_with: string | null
+          amount: number
+          company_id: string
+          created_at: string
+          details: Json
+          discount_until: string | null
+          id: string
+          invoice_id: string
+          kind: string
+          percent: number | null
+          reason: string
+          reverses_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "incoming_invoice_adjustments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       notification_recipients: {
         Args: {
           p_company_id: string
@@ -4787,6 +4945,32 @@ export type Database = {
           billing_rate: number
           cost_rate: number
         }[]
+      }
+      reverse_incoming_invoice_adjustment: {
+        Args: { p_adjustment_id: string; p_reason: string }
+        Returns: {
+          actor_id: string | null
+          actor_name: string
+          agreed_on: string | null
+          agreed_with: string | null
+          amount: number
+          company_id: string
+          created_at: string
+          details: Json
+          discount_until: string | null
+          id: string
+          invoice_id: string
+          kind: string
+          percent: number | null
+          reason: string
+          reverses_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "incoming_invoice_adjustments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       review_incoming_invoice: {
         Args: { p_decision: string; p_invoice_id: string; p_reason?: string }
