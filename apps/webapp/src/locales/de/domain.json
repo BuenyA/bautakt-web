@@ -2329,5 +2329,36 @@
         "body": "Die Mail an {{to}} ging am {{at}} raus, steht aber noch nicht im Prüfprotokoll."
       }
     }
+  },
+  "incomingTaxLines": {
+    "kind": "Steuerart",
+    "choose": "Bitte wählen",
+    "mode": {
+      "standard": "{{rate}} % Umsatzsteuer",
+      "reverse_charge": "§13b – Steuer schuldet der Empfänger ({{rate}} %)",
+      "tax_free": "Steuerfrei",
+      "small_business": "Kleinunternehmer (§19, ohne Umsatzsteuer)"
+    },
+    "help": {
+      "reverse_charge": "Auf der Rechnung steht keine Umsatzsteuer; der Betrieb führt sie selbst ab (z. B. Bauleistungen von Subunternehmern).",
+      "tax_free": "Die Leistung ist steuerfrei, auf der Rechnung steht keine Umsatzsteuer.",
+      "small_business": "Der Lieferant weist als Kleinunternehmer keine Umsatzsteuer aus."
+    },
+    "guessed": "Aus Netto und Umsatzsteuer erkannt.",
+    "deviation": "Die Umsatzsteuer weicht um {{amount}} vom Satz ab. Bitte mit der Rechnung vergleichen; übernommen wird der Betrag von der Rechnung.",
+    "split": "Mehrere Steuersätze",
+    "splitTitle": "Steuersätze",
+    "add": "Satz hinzufügen",
+    "remove": "Satz entfernen",
+    "sumOk": "Die Sätze ergeben Netto und Umsatzsteuer der Rechnung.",
+    "sumHint": "Die Sätze ergeben netto {{net}} und Umsatzsteuer {{vat}}, die Rechnung netto {{headerNet}} und Umsatzsteuer {{headerVat}}.",
+    "errors": {
+      "kindRequired": "Bitte die Steuerart wählen.",
+      "amountRequired": "Bitte bei jedem Steuersatz Netto und Umsatzsteuer eintragen.",
+      "duplicate": "Jeder Steuersatz darf nur einmal vorkommen.",
+      "vatNotAllowed": "Bei §13b, steuerfrei und Kleinunternehmer steht keine Umsatzsteuer auf der Rechnung.",
+      "vatMissing": "Umsatzsteuer 0 bei einem Steuersatz: Ist es §13b, steuerfrei oder ein Kleinunternehmer?",
+      "sumMismatch": "Die Steuersätze ergeben nicht Netto und Umsatzsteuer der Rechnung."
+    }
   }
 }
