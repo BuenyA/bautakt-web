@@ -125,6 +125,7 @@ verlinkt, nie kopiert.
 | 2026-10-30 | [Registrierung und Einrichtung wie in der App](logs/2026-10-30-registrierung-wie-app.md)                       |
 | 2026-10-30 | [Auftragsliste: Statusfilter statt Angebote-Tab](logs/2026-10-30-auftraege-statusfilter.md)                    |
 | 2026-10-30 | [Eingangsrechnungen: Filter-Knopf statt Reiter](logs/2026-10-30-eingangsrechnungen-filterknopf.md)             |
+| 2026-10-30 | [DATEV-Export: Eingangsrechnungen](logs/2026-10-30-datev-export-eingang.md)                                    |
 | 2026-10-30 | [Profilmenü neu: Mein Profil, Unternehmen, Einstellungen](logs/2026-10-30-profil-unternehmen-einstellungen.md) |
 | 2026-10-30 | [Einrichtung statt Übersicht, keine Gedankenstriche](logs/2026-10-30-einrichtung-und-gedankenstriche.md)       |
 
