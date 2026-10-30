@@ -271,7 +271,6 @@ export function TimesCard({
           </ul>
         </div>
       )}
-
     </SectionCard>
   );
 }
