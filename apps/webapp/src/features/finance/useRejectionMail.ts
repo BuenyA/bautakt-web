@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMembership } from '@/features/company/useMembership';
 import { supabase } from '@/lib/supabase';
 
+import type { MailEventRow } from './mailDelivery';
 import {
   type MailTemplate,
   originalKind,
@@ -265,12 +266,16 @@ export type ArchivedMail = {
   to_addresses: string[];
   subject: string;
   html: string;
+  mode: string;
   created_at: string;
+  events: MailEventRow[];
 };
 
 /**
- * Archivierte Ablehnungs-Mails der Rechnung (`mail_messages`, unveränderbar),
- * für Empfänger, Betreff und Text im Protokoll. Lesen darf, wer Gemeinkosten
+ * Archivierte Ablehnungs-Mails der Rechnung (`mail_messages`) mit ihren
+ * Versandereignissen (`mail_message_events`), beides unveränderbar: für
+ * Empfänger, Betreff, Text und Versandnachweis im Protokoll und für
+ * Fehlversuche, die sonst niemand mehr sieht. Lesen darf, wer Gemeinkosten
  * verwaltet oder die Finanzen sieht (`mail_can_read`).
  */
 export function useRejectionMails(invoiceId: string, enabled: boolean) {
@@ -282,12 +287,44 @@ export function useRejectionMails(invoiceId: string, enabled: boolean) {
     queryFn: async (): Promise<ArchivedMail[]> => {
       const { data, error } = await supabase
         .from('mail_messages')
-        .select('id, to_addresses, subject, html, created_at')
+        .select(
+          'id, to_addresses, subject, html, mode, created_at, mail_message_events(kind, provider_message_id, error_code, created_at)',
+        )
         .eq('company_id', companyId!)
         .eq('incoming_invoice_id', invoiceId)
-        .eq('purpose', REJECTION_PURPOSE);
+        .eq('purpose', REJECTION_PURPOSE)
+        .order('created_at', { ascending: true });
       if (error) throw error;
-      return data;
+      return data.map(({ mail_message_events, ...mail }) => ({
+        ...mail,
+        events: mail_message_events,
+      }));
     },
+  });
+}
+
+/**
+ * Fehlenden Eintrag `mail_sent` nachtragen, wenn die Mail rausging, das
+ * Protokollieren danach aber scheiterte. `record_incoming_rejection_mail`
+ * prüft, dass die Mail zu dieser Rechnung gehört und versendet ist, und
+ * schreibt je Mail höchstens einen Eintrag.
+ */
+export function useRecordRejectionMail(invoiceId: string) {
+  const queryClient = useQueryClient();
+  const { data: membership } = useMembership();
+  const companyId = membership?.companyId;
+  return useMutation({
+    mutationFn: async (mailId: string) => {
+      const { data, error } = await supabase.rpc('record_incoming_rejection_mail', {
+        p_invoice_id: invoiceId,
+        p_mail_id: mailId,
+      });
+      if (error) throw error;
+      if (!data?.id) throw new Error('INCOMING_MAIL_NOT_RECORDED');
+    },
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: ['incoming-invoice-events', companyId, invoiceId],
+      }),
   });
 }

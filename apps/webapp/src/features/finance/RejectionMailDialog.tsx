@@ -69,6 +69,8 @@ export type RejectableInvoice = Pick<
 
 type Draft = { to: string; subject: string; text: string };
 
+export type RejectionRetry = { to: string[]; subject: string };
+
 /** Die eingebaute Vorlage, solange der Betrieb keine eigene gespeichert hat. */
 function useBuiltinTemplate(): MailTemplate {
   const { t } = useTranslation();
@@ -105,14 +107,20 @@ function errorText(t: TFunction, code: string): string {
  * Empfänger, Betreff und Text aus der Vorlage, dann die Vorschau vom Server
  * mit Fußzeile. Gesendet wird nur nach ausdrücklicher Bestätigung; danach
  * steht die Mail im Prüfprotokoll.
+ *
+ * `retry`: neuer Versuch nach einem Fehlversuch (#171), mit dessen Empfängern
+ * und Betreff. Es ist eine neue Mail mit neuer Bestätigung; der Fehlversuch
+ * bleibt im Archiv.
  */
 export function RejectionMailDialog({
   invoice,
   reason,
+  retry,
   onClose,
 }: {
   invoice: RejectableInvoice;
   reason: string;
+  retry?: RejectionRetry;
   onClose: () => void;
 }) {
   const { t } = useTranslation();
@@ -177,6 +185,7 @@ export function RejectionMailDialog({
             template={template.data ?? builtin}
             customTemplate={Boolean(template.data)}
             recipient={recipient.data ?? { address: '', source: null }}
+            retry={retry}
             onClose={onClose}
           />
         )}
@@ -191,6 +200,7 @@ function RejectionMailForm({
   template,
   customTemplate,
   recipient,
+  retry,
   onClose,
 }: {
   invoice: RejectableInvoice;
@@ -198,6 +208,7 @@ function RejectionMailForm({
   template: MailTemplate;
   customTemplate: boolean;
   recipient: { address: string; source: 'eInvoice' | 'contact' | null };
+  retry: RejectionRetry | undefined;
   onClose: () => void;
 }) {
   const { t } = useTranslation();
@@ -209,10 +220,12 @@ function RejectionMailForm({
     const filled = fillTemplate(source, values);
     return { subject: filled.subject, text: filled.body };
   };
-  const [draft, setDraft] = useState<Draft>(() => ({
-    to: recipient.address,
-    ...fromTemplate(template),
-  }));
+  const [draft, setDraft] = useState<Draft>(() => {
+    const filled = fromTemplate(template);
+    return retry
+      ? { to: retry.to.join(', '), subject: retry.subject, text: filled.text }
+      : { to: recipient.address, ...filled };
+  });
   const [step, setStep] = useState<'edit' | 'preview'>('edit');
   const [confirmed, setConfirmed] = useState(false);
   const [idempotencyKey, setIdempotencyKey] = useState('');
@@ -268,8 +281,9 @@ function RejectionMailForm({
     }
   }
 
-  const recipientHint =
-    recipient.source === 'eInvoice'
+  const recipientHint = retry
+    ? t('domain:rejectionMail.recipientFrom.retry')
+    : recipient.source === 'eInvoice'
       ? t('domain:rejectionMail.recipientFrom.eInvoice')
       : recipient.source === 'contact'
         ? t('domain:rejectionMail.recipientFrom.contact')

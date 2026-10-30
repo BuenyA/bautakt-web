@@ -2210,7 +2210,8 @@
     "recipientFrom": {
       "eInvoice": "Aus der E-Rechnung übernommen.",
       "contact": "Aus dem Lieferanten-Kontakt übernommen.",
-      "none": "Keine Adresse in E-Rechnung oder Kontakt, bitte eintragen."
+      "none": "Keine Adresse in E-Rechnung oder Kontakt, bitte eintragen.",
+      "retry": "Empfänger aus dem Fehlversuch."
     },
     "templateBuiltin": "Betreff und Text kommen aus der Standard-Vorlage.",
     "templateCustom": "Betreff und Text kommen aus der Vorlage deines Betriebs.",
@@ -2257,8 +2258,29 @@
       "to": "An: {{to}}",
       "subject": "Betreff: {{subject}}",
       "show": "Mail ansehen",
-      "archivedTitle": "Gesendete Mail vom {{at}}",
-      "loadError": "Die gesendete Mail konnte nicht geladen werden."
+      "archivedTitle": "Archivierte Mail vom {{at}}",
+      "loadError": "Die gesendete Mail konnte nicht geladen werden.",
+      "sentAt": "Versendet am {{at}}",
+      "messageId": "Message-ID: {{id}}"
+    },
+    "issues": {
+      "loadError": "Der Versandstatus der Ablehnungs-Mails konnte nicht geladen werden.",
+      "recordError": "Der Protokolleintrag konnte nicht nachgetragen werden.",
+      "errorCode": "Fehler des Mail-Dienstes: {{code}}",
+      "resend": "Erneut senden",
+      "record": "Eintrag nachtragen",
+      "failed": {
+        "title": "Ablehnungs-Mail nicht versendet",
+        "body": "Die Mail an {{to}} vom {{at}} hat der Mail-Dienst nicht angenommen. Sie steht unverändert im Archiv."
+      },
+      "unknown": {
+        "title": "Unklar, ob die Ablehnungs-Mail rausging",
+        "body": "Bei der Mail an {{to}} vom {{at}} kam keine Bestätigung vom Mail-Dienst. Frag erst beim Empfänger nach, bevor du sie erneut sendest."
+      },
+      "unlogged": {
+        "title": "Ablehnungs-Mail versendet, Protokolleintrag fehlt",
+        "body": "Die Mail an {{to}} ging am {{at}} raus, steht aber noch nicht im Prüfprotokoll."
+      }
     }
   }
 }
