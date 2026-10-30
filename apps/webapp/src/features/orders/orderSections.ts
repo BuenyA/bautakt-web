@@ -6,6 +6,7 @@ import type { OrderSection } from '@/lib/routes';
 
 import { canCreateDailyReport } from './dailyReportAccess';
 import type { OrderDetail } from './useOrder';
+import { canSeeOrderFinance, orderFinanceAccess } from './useOrderFinance';
 
 /** Reihenfolge der Reiter und der Vorschau-Karten. */
 export const ORDER_SECTIONS: readonly OrderSection[] = [
@@ -15,6 +16,7 @@ export const ORDER_SECTIONS: readonly OrderSection[] = [
   'times',
   'materials',
   'reports',
+  'finance',
 ];
 
 /** Überschrift je Unterseite; zugleich Beschriftung des Reiters und der Karte. */
@@ -25,12 +27,14 @@ export const ORDER_SECTION_TITLE = {
   times: 'domain:orders.times.title',
   materials: 'domain:orders.materials.title',
   reports: 'domain:orders.dailyReports.title',
+  finance: 'domain:orders.finance.title',
 } as const satisfies Record<OrderSection, string>;
 
 /**
  * Welche Unterseiten eines Auftrags sichtbar sind. Dieselben Rechte, mit
  * denen sich die Abschnitte bisher selbst ausgeblendet haben: Checkliste mit
- * Lese- oder Schreibrecht, Bautagebuch nur mit Recht zum Anlegen. `null`,
+ * Lese- oder Schreibrecht, Bautagebuch nur mit Recht zum Anlegen, Finanzen
+ * mit Belegen oder Kosten (`orderFinanceAccess`). `null`,
  * solange die Mitgliedschaft lädt.
  */
 export function useVisibleOrderSections(): ReadonlySet<OrderSection> | null {
@@ -46,6 +50,7 @@ export function useVisibleOrderSections(): ReadonlySet<OrderSection> | null {
         );
       }
       if (section === 'reports') return canCreateDailyReport(permissions);
+      if (section === 'finance') return canSeeOrderFinance(orderFinanceAccess(permissions));
       return true;
     }),
   );

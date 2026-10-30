@@ -45,6 +45,7 @@ export const orderSectionPaths = {
   times: 'zeiten',
   materials: 'material',
   reports: 'bautagebuch',
+  finance: 'finanzen',
 } as const;
 
 export type OrderSection = keyof typeof orderSectionPaths;

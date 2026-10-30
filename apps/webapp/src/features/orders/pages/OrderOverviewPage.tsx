@@ -6,6 +6,7 @@ import { formatCurrency, formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
 import { OrderContacts } from '../OrderContacts';
+import { FinancePreview } from '../OrderFinance';
 import {
   ChecklistPreview,
   MaterialsPreview,
@@ -19,7 +20,7 @@ import { orderAddress, orderPeriod } from '../orderSummary';
 
 /**
  * Startseite eines Auftrags: Stammdaten und Ansprechpartner nebeneinander,
- * darunter je Bereich eine kurze Vorschau. Die vollen Listen stehen auf den
+ * darunter die Finanzkarte (mit Recht) und je Bereich eine kurze Vorschau. Die vollen Listen stehen auf den
  * Unterseiten (`/auftraege/:id/fotos` …).
  */
 export function OrderOverviewPage() {
@@ -65,6 +66,8 @@ export function OrderOverviewPage() {
         </DetailCard>
         <OrderContacts orderId={data.id} />
       </div>
+
+      <FinancePreview order={data} />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <PhotosPreview orderId={data.id} />

@@ -175,6 +175,30 @@
       "newReport": "Neuer Bericht",
       "checklistDone": "Alle Punkte erledigt.",
       "reportNoText": "Ohne Beschreibung"
+    },
+    "finance": {
+      "title": "Finanzen",
+      "costs": "Kosten",
+      "costsNoLabor": "Kosten ohne Lohn",
+      "billed": "Abgerechnet",
+      "ofTotal": "{{amount}} von {{total}} · {{percent}} %",
+      "open": "{{amount}} noch offen",
+      "overrun": "Auftragssumme um {{amount}} überschritten",
+      "noContract": "Keine Auftragssumme hinterlegt – ohne sie gibt es keine Anteile.",
+      "percentOfContract": "{{percent}} % der Auftragssumme",
+      "result": "Ergebnis",
+      "resultNote": "Abgerechnet minus Kosten, netto",
+      "labor": "Lohn",
+      "material": "Material",
+      "other": "Sonstiges",
+      "total": "Summe",
+      "noLaborHint": "Lohnkosten siehst du nur mit dem Recht auf Lohnkosten.",
+      "costDocuments": "Kostenbelege",
+      "noCostDocuments": "Keine Ausgaben oder Eingangsrechnungen an diesem Auftrag.",
+      "incoming": "Eingangsrechnung",
+      "expense": "Ausgabe",
+      "documents": "Angebote und Rechnungen",
+      "noDocuments": "Noch keine Belege zu diesem Auftrag."
     }
   },
   "contactKind": {

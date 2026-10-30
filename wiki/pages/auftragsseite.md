@@ -13,12 +13,13 @@ Bereich eine eigene Adresse.
   Rechnung erstellen, Bearbeiten) und die Fluent-`TabList`. Darunter das
   `Outlet`. Laden, Fehler und Nicht-gefunden bleiben hier.
 - **Reiter**: Übersicht · Fotos · Notizen · Checkliste · Zeiten · Material ·
-  Bautagebuch. Jeder Reiter ist eine Route (`routes.orderSection`), die Pfade
-  stehen in `orderSectionPaths` (`fotos`, `notizen`, `checkliste`, `zeiten`,
-  `material`, `bautagebuch`).
+  Bautagebuch · Finanzen. Jeder Reiter ist eine Route (`routes.orderSection`),
+  die Pfade stehen in `orderSectionPaths` (`fotos`, `notizen`, `checkliste`,
+  `zeiten`, `material`, `bautagebuch`, `finanzen`).
 - **Übersicht** `OrderOverviewPage`: Stammdaten (Beginn und Ende als ein
   „Zeitraum“, Beschreibung als Zeile) und Beteiligte nebeneinander, darunter
-  ein Raster aus Vorschau-Karten (`md` zwei, `xl` drei Spalten).
+  die Finanzkarte über die volle Breite, dann ein Raster aus Vorschau-Karten
+  (`md` zwei, `xl` drei Spalten).
 - **Unterseiten** `OrderSectionPage`: die bisherigen Abschnitte
   (`OrderPhotos`, `OrderNotes` …) unverändert in voller Breite.
 
@@ -54,9 +55,61 @@ führt deshalb auf die Upload-Fläche.
 vorher selbst ausgeblendet haben. Eine Unterseite ohne Recht leitet auf die
 Übersicht. Die Grenze bleibt RLS.
 
+## Finanzen
+
+Karte auf der Übersicht, zwei Leisten gegen die Auftragssumme:
+
+- **Kosten** — Fluent-`ProgressBar` in Markenfarbe, `warning` ab 90 %,
+  `error` über 100 % (`ORDER_COST_WARNING_PERCENT`, `orderCostLevel`).
+  Darunter Lohn · Material · Sonstiges, bei Überschreitung stattdessen
+  „Auftragssumme um … überschritten“.
+- **Abgerechnet** — ausgestellte Rechnungen, darunter „… noch offen“
+  (Auftragssumme − abgerechnet, nie unter 0). Grün ab 100 %.
+
+Ohne Auftragssumme nur die Beträge, keine Leisten, und ein Hinweis.
+
+Unterseite `/auftraege/:id/finanzen`: Kennzahlen (Auftragssumme, Kosten,
+Abgerechnet, Ergebnis = abgerechnet − Kosten), links die Kostenaufteilung mit
+den Kostenbelegen (Eingangsrechnungen verlinkt, Ausgaben auf die Liste),
+rechts Angebote und Rechnungen mit Status.
+
+**Rechnung** in `@bautakt/finance` (`computeOrderFinance`, getestet), Quellen
+wie der Finanz-Teaser der App (`orderTeaserKpis.ts`):
+
+- Beleg gehört zum Auftrag, wenn eine Position `order_id` trägt
+  (`sales_documents` mit `sales_document_lines!inner`).
+- Abgerechnet: `invoice`, `partial_invoice`, `final_invoice` in
+  `ISSUED_STATUSES`, netto. Entwürfe, Stornos und Angebote zählen nicht.
+- Material: Menge × `unit_cost`; Zeilen ohne EK zählen nicht.
+- Sonstiges: `expenses` am Auftrag ohne kalkulatorische, dazu
+  `incoming_invoices` am Auftrag außer `review_status = rejected`.
+- Lohn: alle Zeiten des Auftrags × Kostensatz (`resolveCostRate`, ohne
+  Zeitraum, geblättert über 1000 Zeilen).
+
+Abweichungen von der App, bewusst: alles netto (der App-Teaser rechnet
+Einnahmen brutto — gegen Netto-Kosten verglichen wäre das Ergebnis um die
+Umsatzsteuer zu gut), und Eingangsrechnungen mit `order_id` zählen als
+Kosten (die App lässt sie dort Stand 2026-10-30 weg). Stand 2026-10-30 hat
+keine Eingangsrechnung und keine Ausgabe ein `order_id`.
+
+**Rechte** (`orderFinanceAccess`), nach den Select-Policies vom 2026-10-30:
+
+| Teil   | Recht                                                                         |
+| ------ | ----------------------------------------------------------------------------- |
+| Belege | `canViewOrderFinance`, `canUseBillingModule` oder `canViewManagementInvoices` |
+| Kosten | `canViewOrderFinance` oder `canViewCompanyFinance`                            |
+| Lohn   | Kosten und `canViewWageCosts`                                                 |
+
+Kosten brauchen mehr als die Policy auf `expenses`: `order_materials` zeigt
+ohne eines der beiden Rechte nur eigene Zeilen, die Summe wäre still zu
+klein. Lohn braucht `canViewWageCosts`, weil `time_entries` sonst nur eigene
+oder (mit `canTrackTimeForTeam`) Teamzeiten liefert und `labor_rates` ohne
+das Recht leer sein kann. Ohne Lohn heißt die Leiste „Kosten ohne Lohn“.
+Reiter und Karte erscheinen, sobald Belege oder Kosten sichtbar sind; wer
+nur eines sieht, bekommt nur die eine Leiste.
+
 ## Offen
 
-- Finanzen (Kosten gegen Auftragssumme, Abgerechnet) als Karte und Reiter.
 - Dokumente auf `order_documents`, wie in der App.
 
 ## Code
@@ -66,4 +119,6 @@ vorher selbst ausgeblendet haben. Eine Unterseite ohne Recht leitet auf die
 - `apps/webapp/src/features/orders/pages/OrderSectionPage.tsx`
 - `apps/webapp/src/features/orders/OrderPreviewCard.tsx`, `OrderPreviews.tsx`
 - `apps/webapp/src/features/orders/orderSections.ts`
+- `apps/webapp/src/features/orders/OrderFinance.tsx`, `useOrderFinance.ts`
+- `packages/finance/src/orderFinance.ts`
 - `apps/webapp/src/lib/routes.ts` (`orderSectionPaths`, `orderSection`)
