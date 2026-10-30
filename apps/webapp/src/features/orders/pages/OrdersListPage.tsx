@@ -15,7 +15,12 @@ import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
-import { compareOrdersForKind, orderKindFromSearch, orderSection } from '../orderList';
+import {
+  matchesOrderFilter,
+  type OrderFilter,
+  orderFilterFromSearch,
+  orderFilterParam,
+} from '../orderList';
 import { OrderSheet } from '../OrderSheet';
 import { OrderStatusBadge } from '../OrderStatusBadge';
 import { type OrderListRow, useOrders } from '../useOrders';
@@ -46,24 +51,24 @@ export function OrdersListPage() {
   // `?neu=1` aus der Schnellsuche öffnet das Anlege-Panel.
   useCreateFromUrl(canCreate, () => setSheetOpen(true));
   const [searchParams, setSearchParams] = useSearchParams();
-  const kind = orderKindFromSearch(searchParams.get('status'));
+  const filter = orderFilterFromSearch(searchParams.get('status'));
   const orders = useOrders();
   const { data, isError, refetch } = orders;
 
-  function setKind(next: string) {
+  function setFilter(next: OrderFilter) {
     const params = new URLSearchParams(searchParams);
-    // Default ist Aufträge — ohne Param. `?status=quote` bleibt der
-    // bisherige Deep-Link auf Angebote.
-    if (next === 'quote') params.set('status', 'quote');
+    // Default ist Laufend — ohne Param.
+    const value = orderFilterParam(next);
+    if (value) params.set('status', value);
     else params.delete('status');
     setSearchParams(params, { replace: true });
   }
 
-  const rows = useMemo(() => {
-    return (data ?? [])
-      .filter((row) => orderSection(row.status, kind) !== null)
-      .sort((a, b) => compareOrdersForKind(kind, a, b));
-  }, [data, kind]);
+  // `useOrders` liefert schon `created_at` absteigend.
+  const rows = useMemo(
+    () => (data ?? []).filter((row) => matchesOrderFilter(row.status, filter)),
+    [data, filter],
+  );
 
   const hasAny = (data?.length ?? 0) > 0;
 
@@ -159,43 +164,22 @@ export function OrdersListPage() {
         onRowClick={(order) => void navigate(routes.order(order.id))}
         toolbar={
           <TabList
-            selectedValue={kind}
-            onTabSelect={(_, data) => setKind(data.value as typeof kind)}
+            selectedValue={filter}
+            onTabSelect={(_, data) => setFilter(data.value as OrderFilter)}
             aria-label={t('domain:orders.filtersLabel')}
           >
-            <Tab value="order">{t('domain:orders.kindOrders')}</Tab>
-            <Tab value="quote">{t('domain:orders.kindQuotes')}</Tab>
+            <Tab value="all">{t('domain:orders.filterAll')}</Tab>
+            <Tab value="running">{t('domain:orders.filterRunning')}</Tab>
+            <Tab value="finished">{t('domain:orders.filterFinished')}</Tab>
           </TabList>
         }
-        sectionOf={(row) => {
-          switch (orderSection(row.status, kind)) {
-            case 'running':
-              return t('domain:orders.sectionRunning');
-            case 'finished':
-              return t('domain:orders.sectionFinished');
-            case 'quotes':
-              return t('domain:orders.sectionQuotes');
-            case 'declined':
-              return t('domain:orders.sectionDeclined');
-            default:
-              return null;
-          }
-        }}
         empty={
           <EmptyState
-            title={
-              hasAny
-                ? t('domain:orders.emptyResultsTitle')
-                : kind === 'quote'
-                  ? t('domain:orders.emptyQuotesTitle')
-                  : t('domain:orders.emptyTitle')
-            }
+            title={hasAny ? t('domain:orders.emptyResultsTitle') : t('domain:orders.emptyTitle')}
             description={
               hasAny
                 ? t('domain:orders.emptyResultsDescription')
-                : kind === 'quote'
-                  ? t('domain:orders.emptyQuotesDescription')
-                  : t('domain:orders.emptyDescription')
+                : t('domain:orders.emptyDescription')
             }
           />
         }
