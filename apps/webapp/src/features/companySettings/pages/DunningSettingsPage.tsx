@@ -118,7 +118,7 @@ function DunningCard({ company, canEdit }: { company: CompanyRecord; canEdit: bo
                 <Text weight="semibold">
                   {index + 1}. {t(`companySettings:dunning.steps.${step.key}.label`)}
                 </Text>
-                <Text size={200} className="text-muted-foreground">
+                <Text className="text-muted-foreground">
                   {t(`companySettings:dunning.steps.${step.key}.hint`)}
                 </Text>
                 <Switch
@@ -146,7 +146,7 @@ function DunningCard({ company, canEdit }: { company: CompanyRecord; canEdit: bo
                   inputMode="numeric"
                   placeholder={step.placeholder}
                   disabled={!canEdit || !auto}
-                  contentAfter={<Text size={200}>{t('companySettings:numbers.daysUnit')}</Text>}
+                  contentAfter={<Text>{t('companySettings:numbers.daysUnit')}</Text>}
                   onChange={(_, d) =>
                     form.set({ [`${step.key}Days`]: d.value.replace(/\D/g, '') } as Partial<Values>)
                   }

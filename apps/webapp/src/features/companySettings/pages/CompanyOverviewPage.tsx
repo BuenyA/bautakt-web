@@ -2,7 +2,7 @@ import { SkeletonBlock } from '@bautakt/ui';
 import { Card, CardHeader, Field, Link, ProgressBar, Text } from '@fluentui/react-components';
 import {
   CheckmarkCircle20Filled,
-  ChevronRight16Regular,
+  ChevronRight20Regular,
   Circle20Regular,
 } from '@fluentui/react-icons';
 import { useTranslation } from 'react-i18next';
@@ -74,7 +74,7 @@ function CheckRow({ check }: { check: Check }) {
             {t(`companySettings:overview.checks.${check.key}.title`)}
           </Text>
           {check.done ? null : (
-            <Text size={200} className="text-muted-foreground">
+            <Text className="text-muted-foreground">
               {t(`companySettings:overview.checks.${check.key}.hint`)}
             </Text>
           )}
@@ -82,7 +82,7 @@ function CheckRow({ check }: { check: Check }) {
         <span className="sr-only">
           {t(check.done ? 'companySettings:overview.done' : 'companySettings:overview.open')}
         </span>
-        <ChevronRight16Regular className="text-muted-foreground shrink-0" aria-hidden />
+        <ChevronRight20Regular className="text-muted-foreground shrink-0" aria-hidden />
       </a>
     </li>
   );
@@ -112,7 +112,7 @@ function SectionTile({ item }: { item: SubNavItem }) {
           </Link>
         }
         description={
-          <Text size={200} className="text-muted-foreground">
+          <Text className="text-muted-foreground">
             {t(`companySettings:overview.tiles.${key}`)}
           </Text>
         }

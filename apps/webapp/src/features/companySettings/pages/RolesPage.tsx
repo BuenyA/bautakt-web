@@ -18,19 +18,19 @@ import {
   MessageBarBody,
   Option,
   Spinner,
-  Switch,
   Text,
   tokens,
 } from '@fluentui/react-components';
 import {
   Add20Regular,
-  CheckmarkCircle16Filled,
+  CheckmarkCircle20Filled,
   Delete20Regular,
-  DismissCircle16Regular,
+  DismissCircle20Regular,
 } from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { SwitchRow } from '@/components/common/SwitchRow';
 import { SubPage } from '@/components/layout/SubNavLayout';
 import { useMembership } from '@/features/company/useMembership';
 import { readableDbError } from '@/lib/dbErrors';
@@ -98,9 +98,7 @@ function RoleList({
               onClick={() => onSelect(role.id)}
             >
               <span className="min-w-0 flex-1 truncate">{role.name}</span>
-              <Text size={200} className="text-muted-foreground tabular-nums">
-                {role.memberCount}
-              </Text>
+              <Text className="text-muted-foreground tabular-nums">{role.memberCount}</Text>
             </Button>
           );
         })}
@@ -186,34 +184,34 @@ function RoleEditor({ role, canEdit }: { role: CompanyRole; canEdit: boolean }) 
           <MessageBarBody>{t('companySettings:roles.ownerLocked')}</MessageBarBody>
         </MessageBar>
       ) : null}
-      <Text size={200} className="text-muted-foreground">
-        {t('companySettings:roles.hint')}
-      </Text>
+      <Text className="text-muted-foreground">{t('companySettings:roles.hint')}</Text>
       {PERMISSION_GROUPS.map((group) => (
         <fieldset key={group.key} className="flex flex-col gap-1">
-          <legend className="pb-1">
-            <Text weight="semibold">{t(`companySettings:permissionGroups.${group.key}`)}</Text>
+          <legend className="pb-2">
+            <Text size={400} weight="semibold">
+              {t(`companySettings:permissionGroups.${group.key}`)}
+            </Text>
           </legend>
           {editable ? (
             group.items.map((key) => (
-              <Field key={key} hint={t(`companySettings:permissions.${key}.description`)}>
-                <Switch
-                  checked={draft[key]}
-                  label={t(`companySettings:permissions.${key}.title`)}
-                  onChange={(_, d) => toggle(key, d.checked)}
-                />
-              </Field>
+              <SwitchRow
+                key={key}
+                checked={draft[key]}
+                label={t(`companySettings:permissions.${key}.title`)}
+                description={t(`companySettings:permissions.${key}.description`)}
+                onChange={(checked) => toggle(key, checked)}
+              />
             ))
           ) : (
             // Nur lesend: Haken und Kreuz statt grauer Schalter, deren Stand
             // gesperrt kaum zu erkennen ist.
-            <ul className="grid gap-x-6 gap-y-1 md:grid-cols-2">
+            <ul className="grid gap-x-8 gap-y-2.5 md:grid-cols-2">
               {group.items.map((key) => (
-                <li key={key} className="flex items-start gap-2 py-0.5">
+                <li key={key} className="flex items-start gap-2.5">
                   {draft[key] ? (
-                    <CheckmarkCircle16Filled className="text-success mt-0.5 shrink-0" />
+                    <CheckmarkCircle20Filled className="text-success shrink-0" />
                   ) : (
-                    <DismissCircle16Regular className="text-muted-foreground mt-0.5 shrink-0" />
+                    <DismissCircle20Regular className="text-muted-foreground shrink-0" />
                   )}
                   <span className={draft[key] ? undefined : 'text-muted-foreground'}>
                     {t(`companySettings:permissions.${key}.title`)}

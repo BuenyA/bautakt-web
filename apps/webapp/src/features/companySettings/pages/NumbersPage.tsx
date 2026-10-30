@@ -289,7 +289,7 @@ function PaymentTermCard({ days, canEdit }: { days: number; canEdit: boolean }) 
           value={form.values.days}
           inputMode="numeric"
           disabled={!canEdit}
-          contentAfter={<Text size={200}>{t('companySettings:numbers.daysUnit')}</Text>}
+          contentAfter={<Text>{t('companySettings:numbers.daysUnit')}</Text>}
           onChange={(_, d) => form.set({ days: d.value.replace(/\D/g, '') })}
         />
       </Field>

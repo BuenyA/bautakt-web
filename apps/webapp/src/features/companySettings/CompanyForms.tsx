@@ -7,11 +7,11 @@ import {
   Option,
   Select,
   Spinner,
-  Switch,
 } from '@fluentui/react-components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { SwitchRow } from '@/components/common/SwitchRow';
 import { useLegalFooterMissing } from '@/features/company/useLegalFooter';
 import { supabase } from '@/lib/supabase';
 
@@ -443,14 +443,13 @@ export function LegalCard({ company, canEdit }: { company: CompanyMasterData; ca
           }
         />
       </Field>
-      <Field hint={t('domain:settings.smallBusinessHint')}>
-        <Switch
-          checked={v.is_small_business}
-          disabled={!canEdit}
-          label={t('domain:settings.smallBusinessLabel')}
-          onChange={(_, d) => form.set({ is_small_business: d.checked })}
-        />
-      </Field>
+      <SwitchRow
+        checked={v.is_small_business}
+        disabled={!canEdit}
+        label={t('domain:settings.smallBusinessLabel')}
+        description={t('domain:settings.smallBusinessHint')}
+        onChange={(checked) => form.set({ is_small_business: checked })}
+      />
     </FormCard>
   );
 }

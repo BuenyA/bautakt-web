@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 
 import { type Theme } from '@/app/ThemeContext';
 import { useTheme } from '@/app/useTheme';
+import { SwitchRow } from '@/components/common/SwitchRow';
 import { SubPage } from '@/components/layout/SubNavLayout';
 import { SectionCard } from '@/features/contacts/SectionCard';
 import { readableDbError } from '@/lib/dbErrors';
@@ -152,9 +153,7 @@ function AppearanceCard() {
           />
         ))}
       </RadioGroup>
-      <Text size={200} className="text-muted-foreground">
-        {t('account:settings.appearance.hint')}
-      </Text>
+      <Text className="text-muted-foreground">{t('account:settings.appearance.hint')}</Text>
     </SectionCard>
   );
 }
@@ -229,20 +228,17 @@ function NotificationsCard() {
           <div className="flex flex-col gap-1">
             <Text weight="semibold">{t('account:settings.notifications.types')}</Text>
             {CATEGORY_ORDER.map((category) => (
-              <Field
+              <SwitchRow
                 key={category}
-                hint={t(`account:settings.notifications.categories.${category}.hint`)}
-              >
-                <Switch
-                  checked={isCategoryEnabled(category, value.mutedTypes)}
-                  label={t(`account:settings.notifications.categories.${category}.label`)}
-                  onChange={(_, d) =>
-                    update({
-                      mutedTypes: setCategoryEnabled(category, d.checked, value.mutedTypes),
-                    })
-                  }
-                />
-              </Field>
+                checked={isCategoryEnabled(category, value.mutedTypes)}
+                label={t(`account:settings.notifications.categories.${category}.label`)}
+                description={t(`account:settings.notifications.categories.${category}.hint`)}
+                onChange={(checked) =>
+                  update({
+                    mutedTypes: setCategoryEnabled(category, checked, value.mutedTypes),
+                  })
+                }
+              />
             ))}
           </div>
         </div>

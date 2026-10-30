@@ -131,7 +131,7 @@ function LogoCard({ company, canEdit }: { company: CompanyRecord; canEdit: boole
             ) : null}
           </div>
         ) : (
-          <Text size={200} className="text-muted-foreground">
+          <Text className="text-muted-foreground">
             {t('companySettings:template.logoReadOnly')}
           </Text>
         )}
@@ -229,7 +229,7 @@ function TemplateEditor({
               )}
             </SwatchPicker>
           </Field>
-          <Text size={200} className="text-muted-foreground -mt-2">
+          <Text className="text-muted-foreground -mt-2">
             {t(
               `companySettings:template.accents.${
                 INVOICE_ACCENTS.find((accent) => accent.value === v.accent)?.key ?? 'default'

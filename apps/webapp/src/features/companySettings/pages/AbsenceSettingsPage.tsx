@@ -1,8 +1,9 @@
 import { SkeletonBlock, toast } from '@bautakt/ui';
-import { Field, Input, Switch, Text } from '@fluentui/react-components';
+import { Field, Input, Text } from '@fluentui/react-components';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
+import { SwitchRow } from '@/components/common/SwitchRow';
 import { SubPage } from '@/components/layout/SubNavLayout';
 import { useMembership } from '@/features/company/useMembership';
 import { readableDbError } from '@/lib/dbErrors';
@@ -123,18 +124,17 @@ function LeaveCard({ settings, canEdit }: { settings: AbsenceSettings; canEdit: 
           value={v.days}
           inputMode="decimal"
           disabled={!canEdit}
-          contentAfter={<Text size={200}>{t('companySettings:absences.daysUnit')}</Text>}
+          contentAfter={<Text>{t('companySettings:absences.daysUnit')}</Text>}
           onChange={(_, d) => form.set({ days: d.value.replace(/[^\d,.]/g, '') })}
         />
       </Field>
-      <Field hint={t('companySettings:absences.weekendsHint')}>
-        <Switch
-          checked={v.weekends}
-          disabled={!canEdit}
-          label={t('companySettings:absences.weekends')}
-          onChange={(_, d) => form.set({ weekends: d.checked })}
-        />
-      </Field>
+      <SwitchRow
+        checked={v.weekends}
+        disabled={!canEdit}
+        label={t('companySettings:absences.weekends')}
+        description={t('companySettings:absences.weekendsHint')}
+        onChange={(checked) => form.set({ weekends: checked })}
+      />
     </FormCard>
   );
 }

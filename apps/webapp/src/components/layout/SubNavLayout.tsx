@@ -1,6 +1,5 @@
 import {
   Button,
-  Caption1,
   makeStyles,
   mergeClasses,
   Nav,
@@ -46,8 +45,15 @@ const useStyles = makeStyles({
     // Fluents `Nav` bringt eigenen Innenabstand mit; hier bündig zur Überschrift.
     paddingInline: 0,
   },
+  // Gruppenüberschrift in Fließtextgröße statt Fluents 12 px, mit Luft zur
+  // vorigen Gruppe. Einträge wie in der Seitenleiste: Standarddichte, 20-px-Icons.
   sectionHeader: {
     paddingInlineStart: tokens.spacingHorizontalM,
+    paddingBlockStart: tokens.spacingVerticalL,
+    paddingBlockEnd: tokens.spacingVerticalXS,
+    fontSize: tokens.fontSizeBase300,
+    lineHeight: tokens.lineHeightBase300,
+    color: tokens.colorNeutralForeground3,
   },
   // Fluents `NavItem` trägt die Fläche der Seitenleiste. Hier steht die
   // Navigation auf der Seite: transparent, Fläche nur bei Hover und Auswahl.
@@ -72,6 +78,7 @@ const useStyles = makeStyles({
     gap: tokens.spacingHorizontalM,
     width: '100%',
     minHeight: '48px',
+    fontSize: tokens.fontSizeBase300,
     justifyContent: 'flex-start',
   },
 });
@@ -172,12 +179,12 @@ export function SubNavLayout({
   const backLink = useRouterLink(basePath);
 
   const heading = (
-    <div className="flex flex-col gap-0.5 px-3 pb-2">
+    <div className="flex flex-col gap-1 px-3 pb-3">
       {/* Kein h1: die Überschrift der Seite ist die des Abschnitts. */}
       <Text as="p" size={500} weight="semibold">
         {title}
       </Text>
-      {subtitle ? <Caption1 className="text-muted-foreground truncate">{subtitle}</Caption1> : null}
+      {subtitle ? <Text className="text-muted-foreground truncate">{subtitle}</Text> : null}
     </div>
   );
 
@@ -189,12 +196,7 @@ export function SubNavLayout({
           {visibleGroups.map((group, index) => (
             <section key={group.titleKey ?? index} className="flex flex-col">
               {group.titleKey ? (
-                <Text
-                  as="h2"
-                  size={200}
-                  weight="semibold"
-                  className="text-muted-foreground px-3 pb-1"
-                >
+                <Text as="h2" weight="semibold" className="text-muted-foreground px-3 pb-1">
                   {t(group.titleKey)}
                 </Text>
               ) : null}
@@ -232,15 +234,10 @@ export function SubNavLayout({
   }
 
   return (
-    <div className="flex items-start gap-8">
-      <aside className="sticky top-20 flex w-60 shrink-0 flex-col">
+    <div className="flex items-start gap-10">
+      <aside className="sticky top-20 flex w-64 shrink-0 flex-col">
         {heading}
-        <Nav
-          aria-label={ariaLabel}
-          selectedValue={selected?.to ?? ''}
-          className={styles.nav}
-          density="small"
-        >
+        <Nav aria-label={ariaLabel} selectedValue={selected?.to ?? ''} className={styles.nav}>
           {visibleGroups.map((group, index) => (
             <Fragment key={group.titleKey ?? index}>
               {index > 0 && !group.titleKey ? <NavDivider /> : null}
@@ -282,7 +279,14 @@ export function SubPage({
   children: ReactNode;
 }) {
   return (
-    <section className={wide ? 'flex flex-col gap-4' : 'flex max-w-3xl flex-col gap-4'}>
+    // `bautakt-readable`: Feldhinweise in Fließtextgröße (index.css).
+    <section
+      className={
+        wide
+          ? 'bautakt-readable flex flex-col gap-4'
+          : 'bautakt-readable flex max-w-3xl flex-col gap-4'
+      }
+    >
       <PageHeader title={title} description={description} actions={actions} />
       {children}
     </section>

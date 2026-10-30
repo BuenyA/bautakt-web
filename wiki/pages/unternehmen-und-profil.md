@@ -97,6 +97,15 @@ Den Menüpunkt „Unternehmen“ gibt es, sobald irgendein Abschnitt sichtbar is
   Web-Oberfläche bleibt deutsch (nur der `de`-Katalog wird gepflegt), und die
   Seite sagt das offen.
 
+## Schriftgrößen
+
+Die Unternavigation hat dieselbe Dichte wie die Seitenleiste (Fluent-Standard,
+20-px-Icons, Gruppenüberschriften in 14 px). In den Abschnitten gibt es keinen
+12-px-Text: Schalter mit Erklärung laufen über `SwitchRow`
+(`components/common/SwitchRow.tsx`), Feldhinweise hebt `.bautakt-readable` in
+`index.css` auf 14 px. Der Owner fand die Fluent-Kleinschrift dort unlesbar
+(2026-10-30).
+
 ## Ungespeicherte Eingaben
 
 `UnsavedChangesGuard` (ein Guard je Bereich, React Router erlaubt nur einen

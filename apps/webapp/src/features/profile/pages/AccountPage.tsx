@@ -286,7 +286,7 @@ function DeleteAccountCard() {
         >
           {t('account:security.deleteRequest')}
         </Button>
-        <Text size={200} className="text-muted-foreground">
+        <Text className="text-muted-foreground">
           {t('account:security.deleteDirect')}{' '}
           <Link href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</Link>
         </Text>
