@@ -2450,6 +2450,60 @@ export type Database = {
           },
         ]
       }
+      invoice_templates: {
+        Row: {
+          archived_at: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_default: boolean
+          layout: string
+          modified_at: string | null
+          name: string
+          settings: Json
+        }
+        Insert: {
+          archived_at?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_default?: boolean
+          layout?: string
+          modified_at?: string | null
+          name: string
+          settings?: Json
+        }
+        Update: {
+          archived_at?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_default?: boolean
+          layout?: string
+          modified_at?: string | null
+          name?: string
+          settings?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_templates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       labor_rates: {
         Row: {
           billing_rate: number
@@ -3942,6 +3996,7 @@ export type Database = {
           footer_text: string
           gross_total: number
           id: string
+          invoice_template_id: string | null
           intro_text: string
           issue_date: string | null
           issued_at: string | null
@@ -3970,6 +4025,7 @@ export type Database = {
           skonto_percent: number | null
           status: string
           storage_path: string | null
+          subject: string
           tax_mode: string
           type: string
           vat_total: number
@@ -4002,6 +4058,7 @@ export type Database = {
           footer_text?: string
           gross_total?: number
           id?: string
+          invoice_template_id?: string | null
           intro_text?: string
           issue_date?: string | null
           issued_at?: string | null
@@ -4030,6 +4087,7 @@ export type Database = {
           skonto_percent?: number | null
           status?: string
           storage_path?: string | null
+          subject?: string
           tax_mode?: string
           type: string
           vat_total?: number
@@ -4062,6 +4120,7 @@ export type Database = {
           footer_text?: string
           gross_total?: number
           id?: string
+          invoice_template_id?: string | null
           intro_text?: string
           issue_date?: string | null
           issued_at?: string | null
@@ -4090,11 +4149,19 @@ export type Database = {
           skonto_percent?: number | null
           status?: string
           storage_path?: string | null
+          subject?: string
           tax_mode?: string
           type?: string
           vat_total?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "sales_documents_invoice_template_fk"
+            columns: ["invoice_template_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "invoice_templates"
+            referencedColumns: ["id", "company_id"]
+          },
           {
             foreignKeyName: "sales_documents_company_id_fkey"
             columns: ["company_id"]
@@ -4569,6 +4636,7 @@ export type Database = {
           footer_text: string
           gross_total: number
           id: string
+          invoice_template_id: string | null
           intro_text: string
           issue_date: string | null
           issued_at: string | null
@@ -4597,6 +4665,7 @@ export type Database = {
           skonto_percent: number | null
           status: string
           storage_path: string | null
+          subject: string
           tax_mode: string
           type: string
           vat_total: number
@@ -4796,6 +4865,7 @@ export type Database = {
           footer_text: string
           gross_total: number
           id: string
+          invoice_template_id: string | null
           intro_text: string
           issue_date: string | null
           issued_at: string | null
@@ -4824,6 +4894,7 @@ export type Database = {
           skonto_percent: number | null
           status: string
           storage_path: string | null
+          subject: string
           tax_mode: string
           type: string
           vat_total: number
@@ -5125,6 +5196,10 @@ export type Database = {
       }
       set_contact_number_start: {
         Args: { p_company_id: string; p_kind: string; p_next: number }
+        Returns: undefined
+      }
+      set_default_invoice_template: {
+        Args: { p_company_id: string; p_template_id: string }
         Returns: undefined
       }
       set_document_number_start: {

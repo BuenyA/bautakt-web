@@ -28,6 +28,7 @@ verlinkt, nie kopiert.
 | [fluent-ui.md](pages/fluent-ui.md)                             | Fluent UI 2: Themes, Provider, Tailwind-Regel, Bausteine.                      |
 | [uebersicht.md](pages/uebersicht.md)                           | Startseite: Tagesplan, Zu erledigen, Jahresergebnis.                           |
 | [rechnungsbereich.md](pages/rechnungsbereich.md)               | Bereich „Rechnungen“: Reiter, Übersicht mit Ausgang, Eingang, Zahlen.          |
+| [rechnungsvorlagen.md](pages/rechnungsvorlagen.md)             | Vorlagenmodul für Ausgangsbelege, Briefbogen „Spahrbau“, Konzept und Ausbau.   |
 | [kontakte.md](pages/kontakte.md)                               | Kontakte: ein Geschäftspartner mit Rollen, Auswahl in Belegen.                 |
 | [auftragsfotos.md](pages/auftragsfotos.md)                     | Fotos am Auftrag anzeigen, hochladen und löschen.                              |
 | [auftragsnotizen.md](pages/auftragsnotizen.md)                 | Notizen am Auftrag lesen, anlegen, bearbeiten, löschen.                        |
@@ -124,6 +125,7 @@ verlinkt, nie kopiert.
 | 2026-10-30 | [Registrierung und Einrichtung wie in der App](logs/2026-10-30-registrierung-wie-app.md)               |
 | 2026-10-30 | [Auftragsliste: Statusfilter statt Angebote-Tab](logs/2026-10-30-auftraege-statusfilter.md)            |
 | 2026-10-30 | [Eingangsrechnungen: Filter-Knopf statt Reiter](logs/2026-10-30-eingangsrechnungen-filterknopf.md)     |
+| 2026-10-30 | [Rechnungsvorlagen und Briefbogen „Spahrbau“](logs/2026-10-30-rechnungsvorlagen.md)                    |
 
 ## Die drei wichtigsten Sätze
 

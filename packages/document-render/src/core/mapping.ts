@@ -22,6 +22,7 @@ import type {
   TaxCategoryCode,
   TaxMode,
 } from "./types.ts";
+import { type InvoiceTemplateRow, resolveLetterhead } from "./template.ts";
 
 /** Ursprungsbeleg eines Stornos oder einer Gutschrift, nur für BT-25. */
 export type ParentDocRow = {
@@ -41,6 +42,10 @@ export type SalesDocRow = {
   customer_id: string | null;
   /** Ursprungsbeleg bei Storno und Gutschrift (BT-25). */
   parent_document_id?: string | null;
+  /** Betreff / Bauvorhaben über dem Belegtitel (nur PDF). */
+  subject?: string | null;
+  /** Gewählte Rechnungsvorlage; leer = Standardvorlage des Betriebs. */
+  invoice_template_id?: string | null;
   /** BT-10 Leitweg-ID / Käuferreferenz. NOT NULL DEFAULT '' in der DB. */
   buyer_reference: string | null;
   issue_date: string | null;
@@ -145,6 +150,10 @@ export type CompanyRow = {
   currency: string | null;
   /** Akzentfarbe der Rechnungsvorlage (`#RRGGBB`, leer = Standard). */
   invoice_accent_color: string | null;
+  /** Registergericht, für die Rechtsangaben im Briefbogen-Fuß. */
+  register_court?: string | null;
+  /** Geschäftsführer, für die Rechtsangaben im Briefbogen-Fuß. */
+  managing_directors?: string[] | null;
 };
 
 /** `contacts` — Stammdaten des Geschäftspartners. */
@@ -657,6 +666,8 @@ export function buildInvoiceData(input: {
   credited?: CreditedDocRow[];
   /** Typcodes aus `sales_document_type_codes`, Schlüssel = Belegart. */
   typeCodes?: Record<string, string>;
+  /** Rechnungsvorlage des Belegs bzw. Standardvorlage des Betriebs. */
+  template?: InvoiceTemplateRow | null;
   today?: string;
 }): InvoiceData {
   const { doc, company, customer } = input;
@@ -966,7 +977,18 @@ export function buildInvoiceData(input: {
       customer.profile.tax_exemption_valid_until >= today,
   );
 
+  // --- Vorlage ---------------------------------------------------------------
+  // Beide Felder nur, wenn gesetzt: ein Standardbeleg behält damit exakt
+  // seinen bisherigen Fingerabdruck.
+  const subject = cleanText(doc.subject);
+  const letterhead = resolveLetterhead(input.template, doc.type, warnings);
+  if (letterhead && !letterhead.legalLine) {
+    letterhead.legalLine = composeLegalLine(company, seller);
+  }
+
   return {
+    ...(subject ? { subject } : {}),
+    ...(letterhead ? { layout: letterhead } : {}),
     documentId: doc.id,
     documentNumber: isDraft ? "" : cleanText(doc.document_number) || doc.id,
     // BT-10: leer heisst "nicht gesetzt" — das CII laesst das Element dann weg.
@@ -1005,6 +1027,26 @@ export function buildInvoiceData(input: {
     accentColorHex: cleanText(company?.invoice_accent_color),
     warnings,
   };
+}
+
+/**
+ * Rechtsangaben für den Briefbogen-Fuß: „Amtsgericht Stuttgart · HRB 290382 ·
+ * Geschäftsführer A und B · Steuer-Nr. …“. Nur, was am Betrieb gepflegt ist.
+ */
+function composeLegalLine(company: CompanyRow | null, seller: SellerParty): string {
+  const directors = (company?.managing_directors ?? []).map(cleanText).filter(Boolean);
+  const directorText = directors.length > 1
+    ? `${directors.slice(0, -1).join(", ")} und ${directors[directors.length - 1]}`
+    : directors[0] ?? "";
+  return [
+    cleanText(company?.register_court),
+    seller.tradeRegister ?? "",
+    directorText ? `Geschäftsführer ${directorText}` : "",
+    seller.taxNumber ? `Steuer-Nr. ${seller.taxNumber}` : "",
+    seller.vatId ? `USt-IdNr. ${seller.vatId}` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
 }
 
 // ---------------------------------------------------------------------------

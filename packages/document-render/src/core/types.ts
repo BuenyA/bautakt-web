@@ -1,3 +1,5 @@
+import type { LetterheadLayout } from "./template.ts";
+
 /**
  * Gemeinsame Datenstruktur für XML- und PDF-Erzeugung.
  *
@@ -226,6 +228,16 @@ export type InvoiceData = {
   accentColorHex: string;
   /** Warnungen für den Aufrufer (fehlende Pflichtfelder o. Ä.). */
   warnings: string[];
+  /**
+   * Betreff / Bauvorhaben über dem Belegtitel (`sales_documents.subject`).
+   * Fehlt, wenn leer — so bleibt der Fingerabdruck alter Belege gleich.
+   */
+  subject?: string;
+  /**
+   * Briefbogen aus der Rechnungsvorlage (`invoice_templates`, Layout
+   * `letterhead`). Fehlt beim Standardlayout.
+   */
+  layout?: LetterheadLayout;
 };
 
 export type PdfAssets = {

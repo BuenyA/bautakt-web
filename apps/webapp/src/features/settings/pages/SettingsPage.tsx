@@ -12,6 +12,7 @@ import { supabase } from '@/lib/supabase';
 
 import { BankCard, CompanyCard, LegalCard, RegisterCard } from '../CompanyForms';
 import { DatevSettingsCard } from '../DatevSettingsCard';
+import { InvoiceTemplatesCard } from '../InvoiceTemplatesCard';
 import { MailSettingsCard } from '../MailSettingsCard';
 
 /** Stammdaten des Betriebs und die Rollen, die es hier gibt. */
@@ -102,6 +103,8 @@ export function SettingsPage() {
           </DetailCard>
 
           <ContactNumberSettingsCard />
+
+          <InvoiceTemplatesCard />
 
           <MailSettingsCard />
 

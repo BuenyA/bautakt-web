@@ -1685,6 +1685,15 @@
       "refresh": "Aktualisieren",
       "warningsTitle": "Hinweise zur E-Rechnung",
       "warningsTitlePlain": "Hinweise zur Rechnung"
+    },
+    "template": {
+      "label": "Vorlage",
+      "companyDefault": "Standardvorlage ({{name}})",
+      "bautakt": "Bautakt-Standard"
+    },
+    "subject": {
+      "label": "Betreff / Bauvorhaben",
+      "placeholder": "z. B. BV: NB EFH, Lerchenweg 13, 74321 Bietigheim"
     }
   },
   "eInvoice": {
@@ -2565,6 +2574,94 @@
       "vatNotAllowed": "Bei §13b, steuerfrei und Kleinunternehmer steht keine Umsatzsteuer auf der Rechnung.",
       "vatMissing": "Umsatzsteuer 0 bei einem Steuersatz: Ist es §13b, steuerfrei oder ein Kleinunternehmer?",
       "sumMismatch": "Die Steuersätze ergeben nicht Netto und Umsatzsteuer der Rechnung."
+    }
+  },
+  "templates": {
+    "title": "Rechnungsvorlagen",
+    "description": "So sehen die Belege meines Betriebs aus. Die Standardvorlage gilt für jeden neuen Beleg; im Beleg kann ich eine andere wählen.",
+    "new": "Neue Vorlage",
+    "presetMenu": {
+      "spahrbau": "Briefbogen „Spahrbau“",
+      "letterhead": "Leerer Briefbogen",
+      "standard": "Bautakt-Standard"
+    },
+    "presets": {
+      "spahrbau": "Spahrbau",
+      "letterhead": "Briefbogen",
+      "standard": "Standard"
+    },
+    "layouts": {
+      "standard": "Bautakt-Standard",
+      "letterhead": "Briefbogen"
+    },
+    "default": "Standard",
+    "archived": "Archiviert",
+    "empty": "Noch keine Vorlage – meine Belege nutzen das Bautakt-Standardlayout.",
+    "loadError": "Die Vorlagen konnten nicht geladen werden.",
+    "more": "Weitere Aktionen",
+    "setDefault": "Als Standard verwenden",
+    "unsetDefault": "Nicht mehr Standard",
+    "archive": "Archivieren",
+    "restore": "Wiederherstellen",
+    "notFound": "Diese Vorlage gibt es nicht.",
+    "back": "Zur Einrichtung",
+    "untitled": "Vorlage ohne Namen",
+    "editDescription": "Rechnungsvorlage meines Betriebs. Rechts siehst du einen Beispielbeleg mit genau diesen Einstellungen.",
+    "nameRequired": "Bitte gib der Vorlage einen Namen.",
+    "colorInvalid": "Bitte eine Farbe im Format #RRGGBB angeben.",
+    "standardHint": "Das Bautakt-Standardlayout nutzt Logo, Firmendaten und die Akzentfarbe des Betriebs. Für einen eigenen Briefbogen wähle „Briefbogen“.",
+    "applySpahrbau": "Werte von „Spahrbau“ übernehmen",
+    "logoHint": "Das Logo kommt aus den Firmendaten (PNG oder JPG) und steht im Briefbogen groß oben rechts.",
+    "textsHint": "Diese Texte stehen in jedem neuen Beleg der gewählten Art schon drin und lassen sich dort anpassen.",
+    "previewHint": "Beispielbeleg mit Musterkunde – meine echten Belege bleiben unverändert.",
+    "previewEmpty": "Die Vorschau wird erstellt …",
+    "previewError": "Die Vorschau konnte nicht erstellt werden. Bitte prüfe die Verbindung.",
+    "sections": {
+      "basics": "Grundlagen",
+      "design": "Gestaltung",
+      "letter": "Brief",
+      "footer": "Fußzeile",
+      "texts": "Texte je Belegart"
+    },
+    "documentTypes": {
+      "invoice": "Rechnung",
+      "partial_invoice": "Abschlagsrechnung",
+      "final_invoice": "Schlussrechnung",
+      "credit_note": "Gutschrift",
+      "cancellation": "Stornorechnung",
+      "quote": "Angebot",
+      "order_confirmation": "Auftragsbestätigung",
+      "delivery_note": "Lieferschein"
+    },
+    "fields": {
+      "name": "Name",
+      "layout": "Layout",
+      "primaryColor": "Hauptfarbe",
+      "primaryColorHint": "Slogan, Leistungen, breiter Streifen",
+      "secondaryColor": "Zweitfarbe",
+      "secondaryColorHint": "Aufzählungspunkte, schmaler Streifen",
+      "sideStripes": "Farbstreifen am linken Rand",
+      "services": "Leistungen unter dem Logo",
+      "servicesHint": "Eine Leistung pro Zeile.",
+      "slogan": "Slogan über der Fußzeile",
+      "reference": "Zeichen hinter dem Datum",
+      "referenceHint": "Zum Beispiel ein Bearbeiterkürzel wie „ak-sz“.",
+      "closingGreeting": "Grußformel",
+      "signatureLines": "Unterschriftszeilen",
+      "linesHint": "Eine Zeile pro Zeile.",
+      "fax": "Telefax",
+      "website": "Internet",
+      "legalLine": "Rechtsangaben",
+      "legalLineHint": "Leer lassen, dann setzt Bautakt sie aus Registergericht, Handelsregister, Geschäftsführern und Steuernummer zusammen.",
+      "extraBanks": "Weitere Bankverbindungen",
+      "extraBanksHint": "Die Hauptbank kommt aus den Firmendaten; hier kannst du bis zu drei weitere ergänzen.",
+      "bankName": "Bank",
+      "addBank": "Bankverbindung hinzufügen",
+      "documentType": "Belegart",
+      "title": "Titel im Beleg",
+      "titleHint": "Zum Beispiel „Abschlagszahlung“ statt „Abschlagsrechnung“. Leer = Standardtitel.",
+      "intro": "Einleitungstext",
+      "footer": "Schlusstext"
     }
   }
 }

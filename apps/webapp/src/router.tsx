@@ -38,6 +38,7 @@ import { CostCentersPage } from '@/features/masterdata/pages/CostCentersPage';
 import { OrderDetailPage } from '@/features/orders/pages/OrderDetailPage';
 import { OrdersListPage } from '@/features/orders/pages/OrdersListPage';
 import { OverviewPage } from '@/features/overview/pages/OverviewPage';
+import { InvoiceTemplatePage } from '@/features/settings/pages/InvoiceTemplatePage';
 import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 import { AbsenceDetailPage } from '@/features/team/pages/AbsenceDetailPage';
 import { AbsencesPage } from '@/features/team/pages/AbsencesPage';
@@ -300,6 +301,14 @@ export const appRoutes: RouteObject[] = [
               },
 
               { path: routes.settings, element: <SettingsPage /> },
+              {
+                path: routes.invoiceTemplate(':id'),
+                element: (
+                  <RequirePermission anyOf={['canManageCompanySettings', 'canUseBillingModule']}>
+                    <InvoiceTemplatePage />
+                  </RequirePermission>
+                ),
+              },
 
               // Alte Pfade umleiten, damit Bookmarks nicht leer laufen.
               { path: routes.legacyFinance, element: <Navigate to={routes.financeHub} replace /> },

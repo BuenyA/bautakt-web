@@ -310,11 +310,7 @@ function EmployeeProfile({
           ) : null}
 
           {canSeeTeamTimes ? (
-            <TimesCard
-              entries={timeRows}
-              weekMinutes={weekMinutes}
-              monthMinutes={monthMinutes}
-            />
+            <TimesCard entries={timeRows} weekMinutes={weekMinutes} monthMinutes={monthMinutes} />
           ) : null}
         </div>
 

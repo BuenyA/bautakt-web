@@ -106,6 +106,7 @@ export const routes = {
   costCenters: '/kostenstellen',
 
   settings: '/einstellungen',
+  invoiceTemplate: (id: string) => `/einstellungen/rechnungsvorlagen/${id}`,
 
   // Alte Pfade: Redirects bleiben, bis Bookmarks und Mails umgezogen sind.
   // `/mitarbeiter` und `/kalender` sind echte Seiten.
