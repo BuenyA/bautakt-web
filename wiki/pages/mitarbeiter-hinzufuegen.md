@@ -35,15 +35,18 @@ Datenbank prüft das ohnehin; die Liste erspart nur den Fehler.
 die alte Einladung widerrufen und darf beim Zurückwechseln nicht kurz
 aufblitzen.
 
-## Abweichung von der App: Tokenlänge
+## Tokenlänge
 
-Die App verwirft jede Einladung, deren Token nicht 16 Zeichen hat
-(`isCurrentInvitationToken`). Die Datenbank erzeugt aber seit
-`20260809115703` 48 Zeichen (`gen_random_bytes(24)`, gemessen am 30.10.2026
-mit `pg_get_functiondef`). Folge in der App: Jedes Öffnen von „Mitarbeiter
-einladen“ widerruft den zuletzt verschickten Code. Das Web prüft die Länge
-nicht. Solange die App so bleibt, macht ein Öffnen der Einladen-Seite in der
-App einen im Web erzeugten Code ungültig.
+Die App behält eine aktive Einladung nur, wenn ihr Token 16 Zeichen hat
+(`isCurrentInvitationToken`), und widerruft sonst bei jedem Öffnen von
+„Mitarbeiter einladen“. Das Web prüft die Länge nicht.
+
+Von 09.08. bis 30.10.2026 erzeugte die Datenbank versehentlich 48 Zeichen;
+damit wurden verschickte Codes still ungültig. Seit
+`bautakt-app`-Migration `20261030182757_restore_short_invitation_tokens` sind
+es wieder 16 Zeichen (gemessen am 30.10.2026 mit `pg_get_functiondef`), siehe
+https://github.com/BuenyA/bautakt-app/pull/155. Ob 64 Bit reichen, ist offen
+in https://github.com/BuenyA/bautakt-app/issues/67.
 
 ## Bearbeiten
 

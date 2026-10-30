@@ -93,9 +93,8 @@ async function createInvitation(
  * wird neu generiert, wird die alte widerrufen, damit ein schon verschickter
  * Code mit falscher Rolle nicht mehr greift.
  *
- * Anders als die App prüft das Web nicht die Tokenlänge: Die App erwartet 16
- * Zeichen, die Datenbank erzeugt seit `20260809115703` aber 48 — die App
- * erneuert deshalb bei jedem Öffnen.
+ * Anders als die App prüft das Web nicht die Tokenlänge (die App behält nur
+ * 16 Zeichen, siehe wiki/pages/mitarbeiter-hinzufuegen.md).
  */
 export async function getOrCreateInvitation(
   companyId: string,
