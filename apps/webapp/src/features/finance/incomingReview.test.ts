@@ -3,6 +3,8 @@ import { describe, it } from 'node:test';
 
 import {
   canReview,
+  incomingInvoiceChange,
+  type IncomingInvoiceEvent,
   isFrozen,
   isIncomingReviewStatus,
   MAX_REVIEW_REASON,
@@ -60,5 +62,66 @@ describe('isIncomingReviewStatus', () => {
     assert.equal(isIncomingReviewStatus('approved'), true);
     assert.equal(isIncomingReviewStatus('rejected'), true);
     assert.equal(isIncomingReviewStatus('open'), false);
+  });
+});
+
+describe('incomingInvoiceChange', () => {
+  const base: IncomingInvoiceEvent = {
+    id: 'e',
+    action: 'approved',
+    reason: '',
+    mail_reference: null,
+    actor_name: 'Test',
+    created_at: '2026-10-30T10:00:00Z',
+  };
+
+  it('Erfassen aus dem Entwurf und direkt erfasst', () => {
+    assert.deepEqual(
+      incomingInvoiceChange({
+        ...base,
+        action: 'captured',
+        field: 'status',
+        old_value: 'draft',
+        new_value: 'open',
+      }),
+      { kind: 'status', from: 'draft', to: 'open' },
+    );
+    assert.deepEqual(
+      incomingInvoiceChange({ ...base, action: 'captured', field: 'status', new_value: 'paid' }),
+      { kind: 'status', from: null, to: 'paid' },
+    );
+  });
+
+  it('Statuswechsel braucht alten und neuen bekannten Status', () => {
+    const changed = { ...base, action: 'status_changed', field: 'status' } as const;
+    assert.deepEqual(incomingInvoiceChange({ ...changed, old_value: 'open', new_value: 'paid' }), {
+      kind: 'status',
+      from: 'open',
+      to: 'paid',
+    });
+    assert.equal(incomingInvoiceChange({ ...changed, new_value: 'paid' }), null);
+    assert.equal(incomingInvoiceChange({ ...changed, old_value: 'open', new_value: 'x' }), null);
+  });
+
+  it('Zuordnung mit Feld; leer heißt keine', () => {
+    assert.deepEqual(
+      incomingInvoiceChange({
+        ...base,
+        action: 'assignment_changed',
+        field: 'cost_category_id',
+        old_value: 'k1',
+        new_value: null,
+      }),
+      { kind: 'assignment', field: 'cost_category_id', from: 'k1', to: null },
+    );
+    assert.equal(
+      incomingInvoiceChange({ ...base, action: 'assignment_changed', field: 'vendor_name' }),
+      null,
+    );
+  });
+
+  it('Prüfentscheidungen und Einträge vor der Migration tragen keine Änderung', () => {
+    assert.equal(incomingInvoiceChange(base), null);
+    assert.equal(incomingInvoiceChange({ ...base, action: 'mail_sent' }), null);
   });
 });

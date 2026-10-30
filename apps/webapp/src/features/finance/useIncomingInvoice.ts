@@ -174,7 +174,9 @@ export function useIncomingInvoiceEvents(invoiceId: string | null) {
     queryFn: async (): Promise<IncomingInvoiceEvent[]> => {
       const { data, error } = await supabase
         .from('incoming_invoice_events')
-        .select('id, action, reason, mail_reference, actor_name, created_at')
+        // `*` statt Spaltenliste: field/old_value/new_value kommen erst mit der
+        // Migration zu #170; vorher fehlen sie, die Abfrage läuft trotzdem.
+        .select('*')
         .eq('company_id', companyId!)
         .eq('invoice_id', invoiceId!)
         .order('created_at', { ascending: true });

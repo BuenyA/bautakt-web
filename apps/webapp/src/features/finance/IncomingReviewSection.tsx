@@ -22,12 +22,17 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { usePermission } from '@/features/company/usePermission';
+import { useContacts } from '@/features/contacts/useContacts';
+import { useOrders } from '@/features/orders/useOrders';
 import { readableDbError } from '@/lib/dbErrors';
 import { formatDateTime } from '@/lib/format';
 
 import type { IncomingInvoiceStatus } from './incomingInvoiceForm';
 import {
+  type AssignmentField,
   canReview,
+  incomingInvoiceChange,
+  type IncomingInvoiceEvent,
   type IncomingReviewDecision,
   type IncomingReviewStatus,
   MAX_REVIEW_REASON,
@@ -41,6 +46,7 @@ import {
   RejectionMailDialog,
   type RejectionRetry,
 } from './RejectionMailDialog';
+import { useCostCategories } from './useCostCategories';
 import { useIncomingInvoiceEvents, useReviewIncomingInvoice } from './useIncomingInvoice';
 import { type ArchivedMail, useRecordRejectionMail, useRejectionMails } from './useRejectionMail';
 
@@ -333,7 +339,9 @@ function ReviewLog({ invoiceId }: { invoiceId: string }) {
           {events.data.map((event) => (
             <li key={event.id} className="flex flex-col gap-0.5">
               <Text size={200} weight="semibold">
-                {t(`domain:incomingReview.action.${event.action}`)}
+                {t(`domain:incomingReview.action.${event.action}`, {
+                  defaultValue: t('domain:incomingReview.action.unknown'),
+                })}
               </Text>
               <Text size={200} className="text-muted-foreground">
                 {t('domain:incomingReview.by', {
@@ -341,6 +349,7 @@ function ReviewLog({ invoiceId }: { invoiceId: string }) {
                   at: formatDateTime(event.created_at),
                 })}
               </Text>
+              <EventChange event={event} />
               {event.reason ? (
                 <Text size={200} className="whitespace-pre-wrap">
                   {event.reason}
@@ -363,6 +372,60 @@ function ReviewLog({ invoiceId }: { invoiceId: string }) {
         <ArchivedMailDialog mail={shownMail} onClose={() => setShownMail(null)} />
       ) : null}
     </div>
+  );
+}
+
+/** Alter und neuer Wert eines Protokolleintrags (#170). */
+function EventChange({ event }: { event: IncomingInvoiceEvent }) {
+  const { t } = useTranslation();
+  const change = incomingInvoiceChange(event);
+  if (!change) return null;
+  if (change.kind === 'assignment') {
+    return <AssignmentChange field={change.field} from={change.from} to={change.to} />;
+  }
+  const to = t(`domain:incomingInvoiceStatus.${change.to}`);
+  return (
+    <Text size={200}>
+      {change.from
+        ? t('domain:incomingReview.change.status', {
+            from: t(`domain:incomingInvoiceStatus.${change.from}`),
+            to,
+          })
+        : t('domain:incomingReview.change.statusInitial', { to })}
+    </Text>
+  );
+}
+
+/**
+ * Zuordnung mit Namen statt IDs. Die Listen kommen aus dem Cache der
+ * Erfassungsseite; ein gelöschter Eintrag heißt „nicht mehr vorhanden“.
+ */
+function AssignmentChange({
+  field,
+  from,
+  to,
+}: {
+  field: AssignmentField;
+  from: string | null;
+  to: string | null;
+}) {
+  const { t } = useTranslation();
+  const categories = useCostCategories();
+  const orders = useOrders({ enabled: field === 'order_id' });
+  const contacts = useContacts();
+  const list = field === 'order_id' ? orders : field === 'cost_category_id' ? categories : contacts;
+
+  function label(id: string | null): string {
+    if (id === null) return t('domain:incomingReview.change.none');
+    if (!list.isSuccess) return '…';
+    const rows: readonly { id: string; name: string }[] = list.data;
+    return rows.find((row) => row.id === id)?.name ?? t('domain:incomingReview.change.missing');
+  }
+
+  return (
+    <Text size={200}>
+      {t(`domain:incomingReview.change.field.${field}`, { from: label(from), to: label(to) })}
+    </Text>
   );
 }
 
