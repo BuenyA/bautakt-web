@@ -26,6 +26,8 @@ import {
   type AccountError,
   accountError,
   type AccountSlot,
+  CASH_DISCOUNT_BOOKINGS,
+  type CashDiscountBooking,
   type Chart,
   CHARTS,
   compareSlots,
@@ -44,6 +46,7 @@ type Settings = Pick<
   | 'chart_of_accounts'
   | 'account_length'
   | 'fiscal_year_start_month'
+  | 'cash_discount_booking'
 >;
 type DefaultAccount = Tables<'datev_default_accounts'>;
 type Mapping = Pick<
@@ -58,6 +61,7 @@ const DEFAULT_SETTINGS: Settings = {
   chart_of_accounts: 'SKR03',
   account_length: STANDARD_ACCOUNT_LENGTH,
   fiscal_year_start_month: 1,
+  cash_discount_booking: 'on_note',
 };
 
 const MONTHS = Array.from({ length: 12 }, (_, index) => index + 1);
@@ -79,7 +83,7 @@ function useDatevData() {
         supabase
           .from('company_datev_settings')
           .select(
-            'consultant_number, client_number, chart_of_accounts, account_length, fiscal_year_start_month',
+            'consultant_number, client_number, chart_of_accounts, account_length, fiscal_year_start_month, cash_discount_booking',
           )
           .eq('company_id', companyId!)
           .maybeSingle(),
@@ -131,7 +135,8 @@ function WriteError({ message, onRetry }: { message: string; onRetry: () => void
 /**
  * Einstellungen für den Export im DATEV-Format (#167): Berater- und
  * Mandantennummer, Kontenrahmen, Sachkontenlänge, Beginn des
- * Wirtschaftsjahrs und die Konten, die vom Standard abweichen.
+ * Wirtschaftsjahrs, wann erhaltenes Skonto gebucht wird (#172) und die
+ * Konten, die vom Standard abweichen.
  *
  * Die Standardkonten liegen in `datev_default_accounts`, nicht im Code. Der
  * Export fragt sie über `datev_resolve_account` ab (bautakt-app #126).
@@ -210,6 +215,7 @@ function MasterDataForm({
     chart: settings.chart_of_accounts,
     length: String(settings.account_length),
     month: String(settings.fiscal_year_start_month),
+    skonto: settings.cash_discount_booking,
   };
   const [values, setValues] = useState(initial);
   const [submitted, setSubmitted] = useState(false);
@@ -239,6 +245,7 @@ function MasterDataForm({
             chart_of_accounts: values.chart,
             account_length: Number(values.length),
             fiscal_year_start_month: Number(values.month),
+            cash_discount_booking: values.skonto,
           },
           { onConflict: 'company_id' },
         )
@@ -351,6 +358,24 @@ function MasterDataForm({
             {MONTHS.map((month) => (
               <option key={month} value={String(month)}>
                 {monthName(month)}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field
+          label={t('domain:datev.cashDiscountBooking')}
+          hint={t(`domain:datev.cashDiscountBookingHints.${values.skonto as CashDiscountBooking}`, {
+            defaultValue: '',
+          })}
+        >
+          <Select
+            value={values.skonto}
+            disabled={!canEdit}
+            onChange={(_, d) => setValues({ ...values, skonto: d.value })}
+          >
+            {CASH_DISCOUNT_BOOKINGS.map((booking) => (
+              <option key={booking} value={booking}>
+                {t(`domain:datev.cashDiscountBookings.${booking}`)}
               </option>
             ))}
           </Select>

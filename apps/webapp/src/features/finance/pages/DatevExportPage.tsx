@@ -162,7 +162,12 @@ async function buildOriginalsZip(
 }
 
 /** Befunde, deren Wert Steuerart und Satz ist (`reverse_charge|19.00`). */
-const TAX_VALUE_CODES = new Set(['account_missing', 'split_mismatch', 'tax_key_unknown']);
+const TAX_VALUE_CODES = new Set([
+  'account_missing',
+  'split_mismatch',
+  'tax_key_unknown',
+  'skonto_expense_account',
+]);
 
 function FindingList({ findings, direction }: { findings: Finding[]; direction: ExportDirection }) {
   const { t, i18n } = useTranslation();

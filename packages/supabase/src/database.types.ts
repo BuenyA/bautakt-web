@@ -2,7 +2,7 @@
  * GENERIERT — nicht von Hand bearbeiten.
  *
  * Quelle:  Supabase-Projekt "Bautakt" (bxivzvmlcnaxqlytumvz, eu-central-1)
- * Stand:   2026-10-30
+ * Stand:   2026-10-31
  *
  * Neu erzeugen:
  *   npx supabase gen types typescript --project-id bxivzvmlcnaxqlytumvz \
@@ -564,6 +564,7 @@ export type Database = {
       company_datev_settings: {
         Row: {
           account_length: number
+          cash_discount_booking: string
           chart_of_accounts: string
           client_number: number | null
           company_id: string
@@ -575,6 +576,7 @@ export type Database = {
         }
         Insert: {
           account_length?: number
+          cash_discount_booking?: string
           chart_of_accounts?: string
           client_number?: number | null
           company_id: string
@@ -586,6 +588,7 @@ export type Database = {
         }
         Update: {
           account_length?: number
+          cash_discount_booking?: string
           chart_of_accounts?: string
           client_number?: number | null
           company_id?: string
@@ -4761,6 +4764,14 @@ export type Database = {
           fiscal_year_start_month: number
           has_settings: boolean
         }[]
+      }
+      datev_incoming_export: {
+        Args: { p_company_id: string; p_from: string; p_to: string }
+        Returns: Json
+      }
+      datev_incoming_invoice_json: {
+        Args: { p_chart: string; p_collective: string; p_invoice_id: string }
+        Returns: Json
       }
       datev_resolve_account: {
         Args: {

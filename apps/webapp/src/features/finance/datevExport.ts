@@ -50,6 +50,9 @@ export const FINDING_CODES = [
   'category_account_length',
   'tax_key_unknown',
   'document_number_missing',
+  // Skonto der Eingangsrechnungen (bautakt-web#172)
+  'skonto_expense_account',
+  'skonto_payment_missing',
 ] as const;
 
 export type FindingCode = (typeof FINDING_CODES)[number];
