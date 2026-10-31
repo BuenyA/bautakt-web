@@ -20,9 +20,11 @@ _Stand 2026-08-26: 49 Tabellen in `public`, alle mit RLS._
 Das Schema gehört `bautakt-app`. Dieses Repo **liest** es. Auch eine Migration, die nur
 das Web braucht, wird dort geschrieben und gehorcht dort geltenden Regeln.
 
-`/supabase/` steht hier in der `.gitignore` — nicht aus Prinzipienreiterei, sondern
+`/supabase/*` steht hier in der `.gitignore` — nicht aus Prinzipienreiterei, sondern
 weil die Supabase-CLI beim Generieren der Types tatsächlich einen solchen Ordner anlegt
-und er schon einmal in einem Commit gelandet ist.
+und er schon einmal in einem Commit gelandet ist. `supabase/migrations/` ist ausgenommen,
+wenn eine Web-PR eine noch nicht angewendete Storage-Migration mitbringt. Das Schema
+gehört weiter `bautakt-app`.
 
 ## Was dupliziert ist und warum
 
