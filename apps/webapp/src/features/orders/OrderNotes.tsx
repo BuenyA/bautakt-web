@@ -5,6 +5,7 @@ import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { formatDateTime } from '@/lib/format';
@@ -16,7 +17,7 @@ import { type OrderNote, useOrderNotes } from './useOrderNotes';
 const SKELETON_COUNT = 2;
 
 /**
- * Notizen unter den Stammdaten eines Auftrags, unter den Fotos.
+ * Notizen eines Auftrags, Unterseite `/auftraege/:id/notizen`.
  *
  * Anlegen, Bearbeiten und Löschen laufen über ein Seitenpanel. Wer
  * `canCreateNotes` nicht hat, sieht die Liste nur — auch fremde Notizen
@@ -27,6 +28,8 @@ export function OrderNotes({ orderId }: { orderId: string }) {
   const { t } = useTranslation();
   const canCreate = usePermission('canCreateNotes');
   const [draft, setDraft] = useState<OrderNoteDraft | null>(null);
+  // „Neu“ auf der Auftragsübersicht führt mit `?neu=1` hierher.
+  useCreateFromUrl(canCreate, () => openNew());
   const notes = useOrderNotes(orderId);
   const { data, isError, refetch } = notes;
   const isLoading = useCompanyListLoading(notes);

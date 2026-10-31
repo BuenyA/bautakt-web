@@ -7,8 +7,8 @@ bleiben davon unberührt.
 
 ## Was die Seite tut
 
-`OrderNotes` steht unter der Stammdatenkarte auf `OrderDetailPage`, direkt
-unter der Fotogalerie. Vier Zustände: Skelett beim Laden, Fehler mit „Erneut
+`OrderNotes` ist die Unterseite `/auftraege/:id/notizen`; die Übersicht zeigt
+nur eine Vorschau (siehe [auftragsseite.md](auftragsseite.md)). Vier Zustände: Skelett beim Laden, Fehler mit „Erneut
 versuchen“, leerer Hinweis, Liste der Notizkarten. Jede Karte ist eine weiche
 Card (`rounded-xl`, `bg-card`, `shadow-sm`). Die Optik steht in
 [webapp-shell.md](webapp-shell.md#detailflächen).

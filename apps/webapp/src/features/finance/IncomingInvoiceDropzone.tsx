@@ -7,7 +7,7 @@ import { UPLOAD_ACCEPT } from './incomingInvoiceUpload';
 
 /**
  * Ablegefläche für genau einen Beleg (PDF, E-Rechnungs-XML oder Foto), wie
- * `OrderPhotoDropzone`. Bei mehreren Dateien zählt die erste.
+ * `FileDropzone`. Bei mehreren Dateien zählt die erste.
  */
 export function IncomingInvoiceDropzone({
   busy,

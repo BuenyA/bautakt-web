@@ -5,6 +5,7 @@ import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useAuth } from '@/features/auth/useAuth';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { useMembership } from '@/features/company/useMembership';
@@ -29,7 +30,7 @@ const EMPTY_STAFF: ReportStaff[] = [];
 const SKELETON_COUNT = 2;
 
 /**
- * Bautagebuch unter den Stammdaten eines Auftrags.
+ * Bautagebuch eines Auftrags, Unterseite `/auftraege/:id/bautagebuch`.
  *
  * Anlegen, Bearbeiten und Löschen laufen über ein Seitenpanel. Wer die
  * Berichte nicht lesen darf, sieht den Block nicht — eine leere Liste wäre
@@ -46,6 +47,8 @@ export function OrderDailyReports({ orderId }: { orderId: string }) {
   const { data, isError, refetch } = reports;
   const isLoading = useCompanyListLoading(reports);
   const [draft, setDraft] = useState<ReturnType<typeof emptyDailyReport> | null>(null);
+  // „Neu“ auf der Auftragsübersicht führt mit `?neu=1` hierher.
+  useCreateFromUrl(canCreate && !staff.isPending, () => openNew());
 
   if (!canCreate) return null;
 

@@ -292,6 +292,11 @@ Bis 2026-10-10 galt hier der „Meta-Feeling“-Look aus shadcn-Klassen (Pill-Kn
 
 ## Detailflächen
 
+Seit 2026-10-30 ist der Auftrag keine lange Spalte mehr: Übersicht mit
+Vorschau-Karten und je Bereich eine Unterseite mit Reiter. Siehe
+[auftragsseite.md](auftragsseite.md). Was unten zu Abschnitten des Auftrags
+steht, gilt jetzt auf den Unterseiten.
+
 Stand 2026-10-01, Optik. Auftrag-Detail (`/auftraege/:id`) und Rechnung-Detail
 (`/rechnungen/:id`) teilen eine Section-Hierarchie. Der Pass von damals hat
 keine neuen Texte und keinen Upload gebracht. Zeiten auf dem Auftrag lassen

@@ -6,6 +6,7 @@ import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useAuth } from '@/features/auth/useAuth';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { useMembership } from '@/features/company/useMembership';
@@ -26,7 +27,7 @@ import { formatDateTimeRange, formatNetDuration } from '@/lib/format';
 const SKELETON_COUNT = 2;
 
 /**
- * Zeiten unter den Stammdaten eines Auftrags, unter den Notizen.
+ * Zeiten eines Auftrags, Unterseite `/auftraege/:id/zeiten`.
  *
  * Oben die Summe je Mitarbeiter (wer hat wie viel gearbeitet), darunter die
  * einzelnen Einträge. Einen eigenen Bereich „Zeiten“ gibt es seit 2026-10-11
@@ -47,6 +48,8 @@ export function OrderTimes({ orderId, orderName }: { orderId: string; orderName:
   useOrders({ enabled: canCreate });
   useEmployees({ enabled: canCreate });
   const [draft, setDraft] = useState<TimeEntryDraft | null>(null);
+  // „Neu“ auf der Auftragsübersicht führt mit `?neu=1` hierher.
+  useCreateFromUrl(canCreate, () => openNew());
   const entries = useTimeEntries({ orderId });
   const { data, isError, refetch } = entries;
   const isLoading = useCompanyListLoading(entries);

@@ -5,6 +5,7 @@ import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { useCreateFromUrl } from '@/components/common/useCreateFromUrl';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
 import { useEmployees } from '@/features/team/useEmployees';
@@ -24,7 +25,7 @@ import { useSaveOrderChecklist } from './useOrderChecklistMutations';
 const SKELETON_COUNT = 3;
 
 /**
- * Checkliste unter den Notizen eines Auftrags.
+ * Checkliste eines Auftrags, Unterseite `/auftraege/:id/checkliste`.
  *
  * Anlegen, Umbenennen, Datum und Zuweisung laufen über ein Seitenpanel.
  * Abhaken sitzt auf der Zeile. Wer `canEditChecklist` nicht hat, sieht die
@@ -38,6 +39,8 @@ export function OrderChecklist({ orderId }: { orderId: string }) {
   const visible = canView || canEdit;
   useEmployees({ enabled: canEdit });
   const [draft, setDraft] = useState<ChecklistItemDraft | null>(null);
+  // „Neu“ auf der Auftragsübersicht führt mit `?neu=1` hierher.
+  useCreateFromUrl(canEdit, () => openNew());
   const save = useSaveOrderChecklist();
   const checklist = useOrderChecklist(orderId, visible);
   const { data, isError, refetch } = checklist;

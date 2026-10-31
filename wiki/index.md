@@ -31,6 +31,7 @@ verlinkt, nie kopiert.
 | [rechnungsbereich.md](pages/rechnungsbereich.md)               | Bereich „Rechnungen“: Reiter, Übersicht mit Ausgang, Eingang, Zahlen.          |
 | [rechnungsvorlagen.md](pages/rechnungsvorlagen.md)             | Vorlagenmodul für Ausgangsbelege, Briefbogen „Spahrbau“, Konzept und Ausbau.   |
 | [kontakte.md](pages/kontakte.md)                               | Kontakte: ein Geschäftspartner mit Rollen, Auswahl in Belegen.                 |
+| [auftragsseite.md](pages/auftragsseite.md)                     | Auftrag: Übersicht, Reiter, Unterseiten, Finanzen und Dokumente.               |
 | [auftragsfotos.md](pages/auftragsfotos.md)                     | Fotos am Auftrag anzeigen, hochladen und löschen.                              |
 | [auftragsnotizen.md](pages/auftragsnotizen.md)                 | Notizen am Auftrag lesen, anlegen, bearbeiten, löschen.                        |
 | [kalender.md](pages/kalender.md)                               | Kalender mit Terminen, Einsätzen, Abwesenheiten; Termine anlegen, Serien.      |
@@ -133,6 +134,9 @@ verlinkt, nie kopiert.
 | 2026-10-30 | [DATEV-Export verlinkt die DATEV-Einstellungen](logs/2026-10-30-datev-einstellungen-link.md)                   |
 | 2026-10-30 | [Rechnungsvorlagen und Briefbogen „Spahrbau“](logs/2026-10-30-rechnungsvorlagen.md)                            |
 | 2026-10-30 | [SVG als Logo der Rechnungsvorlage](logs/2026-10-30-svg-logo.md)                                               |
+| 2026-10-30 | [Auftrag: Übersicht mit Vorschau-Karten und Unterseiten](logs/2026-10-30-auftragsseite-uebersicht.md)          |
+| 2026-10-30 | [Auftrag: Finanzen](logs/2026-10-30-auftragsfinanzen.md)                                                       |
+| 2026-10-31 | [Auftrag: Dokumente](logs/2026-10-31-auftragsdokumente.md)                                                     |
 
 ## Die drei wichtigsten Sätze
 

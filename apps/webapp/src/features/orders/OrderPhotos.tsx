@@ -15,6 +15,7 @@ import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { FileDropzone } from '@/components/common/FileDropzone';
 import { useAuth } from '@/features/auth/useAuth';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { usePermission } from '@/features/company/usePermission';
@@ -23,14 +24,16 @@ import { formatDateTime } from '@/lib/format';
 
 import { canDeleteOrderPhoto } from './orderImageAccess';
 import { OrderPhotoDeleteDialog } from './OrderPhotoDeleteDialog';
-import { OrderPhotoDropzone } from './OrderPhotoDropzone';
 import { orderImageErrorCode, useUploadOrderImage } from './useOrderImageMutations';
 import { type OrderPhoto, useOrderImages } from './useOrderImages';
 
 const SKELETON_COUNT = 4;
 
+const PHOTO_ACCEPT =
+  'image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif';
+
 /**
- * Fotos unter den Stammdaten eines Auftrags.
+ * Fotos eines Auftrags, Unterseite `/auftraege/:id/fotos`.
  *
  * Hochladen mit `canTakePhotos`. Löschen der eigenen Fotos mit demselben
  * Recht, aller Fotos mit `canManageOrders`. Die Datenbank bleibt die Grenze.
@@ -180,7 +183,10 @@ export function OrderPhotos({ orderId }: { orderId: string }) {
       </div>
 
       {canTakePhotos ? (
-        <OrderPhotoDropzone
+        <FileDropzone
+          accept={PHOTO_ACCEPT}
+          title={t('domain:photoForm.dropTitle')}
+          hint={t('domain:photoForm.dropHint')}
           busy={progress !== null}
           inputRef={inputRef}
           onFiles={(files) => void uploadFiles(files)}

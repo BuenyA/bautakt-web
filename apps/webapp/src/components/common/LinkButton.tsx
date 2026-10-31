@@ -13,6 +13,7 @@ export function LinkButton({
   size,
   icon,
   className,
+  'aria-label': ariaLabel,
   children,
 }: {
   to: string;
@@ -20,6 +21,8 @@ export function LinkButton({
   size?: ButtonProps['size'];
   icon?: React.ReactElement;
   className?: string;
+  /** Pflicht, wenn der Knopf nur ein Symbol zeigt. */
+  'aria-label'?: string;
   children?: React.ReactNode;
 }) {
   const link = useRouterLink(to);
@@ -32,6 +35,7 @@ export function LinkButton({
       size={size}
       icon={icon}
       className={className}
+      aria-label={ariaLabel}
     >
       {children}
     </Button>

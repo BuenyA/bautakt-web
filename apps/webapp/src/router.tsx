@@ -51,7 +51,9 @@ import { MaterialHubPage, PersonalHubPage } from '@/features/hubs/HubPage';
 import { LegalPage } from '@/features/legal/LegalPage';
 import { CatalogPage } from '@/features/masterdata/pages/CatalogPage';
 import { CostCentersPage } from '@/features/masterdata/pages/CostCentersPage';
-import { OrderDetailPage } from '@/features/orders/pages/OrderDetailPage';
+import { OrderDetailLayout } from '@/features/orders/pages/OrderDetailLayout';
+import { OrderOverviewPage } from '@/features/orders/pages/OrderOverviewPage';
+import { OrderSectionPage } from '@/features/orders/pages/OrderSectionPage';
 import { OrdersListPage } from '@/features/orders/pages/OrdersListPage';
 import { OverviewPage } from '@/features/overview/pages/OverviewPage';
 import { AccountPage } from '@/features/profile/pages/AccountPage';
@@ -67,7 +69,7 @@ import { EmployeeDetailPage } from '@/features/team/pages/EmployeeDetailPage';
 import { EmployeeNewPage } from '@/features/team/pages/EmployeeNewPage';
 import { EmployeesListPage } from '@/features/team/pages/EmployeesListPage';
 import { LegacyTimesRedirect } from '@/features/times/LegacyTimesRedirect';
-import { HOME_ROUTE, routes } from '@/lib/routes';
+import { HOME_ROUTE, type OrderSection, orderSectionPaths, routes } from '@/lib/routes';
 
 /**
  * React Router im Data Mode.
@@ -127,7 +129,17 @@ export const appRoutes: RouteObject[] = [
 
               // --- Arbeit ---
               { path: routes.orders, element: <OrdersListPage /> },
-              { path: `${routes.orders}/:id`, element: <OrderDetailPage /> },
+              {
+                path: `${routes.orders}/:id`,
+                element: <OrderDetailLayout />,
+                children: [
+                  { index: true, element: <OrderOverviewPage /> },
+                  ...(Object.keys(orderSectionPaths) as OrderSection[]).map((section) => ({
+                    path: orderSectionPaths[section],
+                    element: <OrderSectionPage section={section} />,
+                  })),
+                ],
+              },
               { path: routes.assignments, element: <AssignmentsListPage /> },
               { path: `${routes.assignments}/:id`, element: <AssignmentDetailPage /> },
               { path: routes.calendar, element: <CalendarPage /> },

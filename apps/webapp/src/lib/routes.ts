@@ -34,6 +34,23 @@ export const creditNoteFromParam = 'gutschrift';
  */
 export const sendParam = 'versenden';
 
+/**
+ * Unterseiten eines Auftrags (`/auftraege/:id/fotos` …). Die Übersicht ist
+ * `/auftraege/:id` selbst.
+ */
+export const orderSectionPaths = {
+  photos: 'fotos',
+  documents: 'dokumente',
+  notes: 'notizen',
+  checklist: 'checkliste',
+  times: 'zeiten',
+  materials: 'material',
+  reports: 'bautagebuch',
+  finance: 'finanzen',
+} as const;
+
+export type OrderSection = keyof typeof orderSectionPaths;
+
 export const routes = {
   // Oeffentlich. Impressum und Datenschutz liegen ausserhalb der
   // Auth-Guards, damit sie ohne Sitzung und auch angemeldet erreichbar sind.
@@ -53,6 +70,11 @@ export const routes = {
   // Arbeit — direkt in der Leiste
   orders: '/auftraege',
   order: (id: string) => `/auftraege/${id}`,
+  orderSection: (id: string, section: OrderSection) =>
+    `/auftraege/${id}/${orderSectionPaths[section]}`,
+  /** Unterseite mit geöffnetem Anlege-Panel (`?neu=1`). */
+  orderSectionCreate: (id: string, section: OrderSection) =>
+    withCreate(`/auftraege/${id}/${orderSectionPaths[section]}`),
   assignments: '/einsatzplanung',
   assignment: (id: string) => `/einsatzplanung/${id}`,
   calendar: '/kalender',
