@@ -97,7 +97,11 @@ export function discountUntilFromTerms(invoiceDate: string, days: number | null)
   return date.toISOString().slice(0, 10);
 }
 
-/** Vermerken nur an einer erfassten, nicht abgelehnten Rechnung ohne aktives Skonto. */
+/**
+ * Vermerken nur an einer erfassten, nicht abgelehnten Rechnung ohne aktives
+ * Skonto. Bezahlt ist bezahlt: Seit #270 dürfte das Skonto den Zahlbetrag
+ * unter die Zahlungen drücken, das lehnt die Datenbank ab.
+ */
 export function canNoteSkonto(
   status: IncomingInvoiceStatus | null,
   review: IncomingReviewStatus | null,
@@ -107,6 +111,7 @@ export function canNoteSkonto(
   return (
     status !== null &&
     status !== 'draft' &&
+    status !== 'paid' &&
     review !== null &&
     review !== 'rejected' &&
     grossMinor > 0 &&

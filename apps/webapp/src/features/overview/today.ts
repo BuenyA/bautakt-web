@@ -159,6 +159,8 @@ export function collectDeadlines(
       due_date: string | null;
       status: string;
       gross_total: number | null;
+      /** Restbetrag nach Skonto und Zahlungen (#270); sonst zählt Brutto. */
+      open_total?: number | null;
     }[];
     invoices: readonly { id: string; label: string; due_date: string | null; amount: number }[];
     orders: readonly { id: string; name: string; end_date: string | null }[];
@@ -181,7 +183,7 @@ export function collectDeadlines(
         id: invoice.id,
         label: [invoice.vendor_name, invoice.invoice_number].filter(Boolean).join(' · '),
         dueIso: invoice.due_date.slice(0, 10),
-        amount: invoice.gross_total,
+        amount: invoice.open_total ?? invoice.gross_total,
       },
       true,
     );

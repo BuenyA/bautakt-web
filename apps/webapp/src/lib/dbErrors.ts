@@ -87,7 +87,7 @@ const MESSAGES: Record<string, string> = {
   INCOMING_REVIEW_RPC_ONLY:
     'Freigeben und Ablehnen geht nur über die Knöpfe in der Prüfung. Bitte lade die Seite neu.',
   INCOMING_NOT_FOUND:
-    'Diese Eingangsrechnung gibt es nicht, oder dir fehlt die Berechtigung, sie zu prüfen.',
+    'Diese Eingangsrechnung oder Zahlung gibt es nicht, oder dir fehlt die Berechtigung dafür.',
   // Protokolleintrag zur Ablehnungs-Mail nachtragen (record_incoming_rejection_mail, #171).
   INCOMING_MAIL_NOT_REJECTED: 'Ablehnungs-Mails gehören nur zu abgelehnten Rechnungen.',
   INCOMING_MAIL_NOT_SENT:
@@ -109,10 +109,27 @@ const MESSAGES: Record<string, string> = {
   INCOMING_ADJUSTMENT_REJECTED: 'Eine abgelehnte Rechnung wird nicht bezahlt, deshalb kein Skonto.',
   INCOMING_ADJUSTMENT_DRAFT: 'Ein Entwurf wird erst erfasst, dann lässt sich Skonto vermerken.',
   INCOMING_ADJUSTMENT_AMOUNT:
-    'Der Skontobetrag passt nicht: größer als 0, höchstens der Bruttobetrag, und zum Prozentsatz passend.',
+    'Der Skontobetrag passt nicht: größer als 0, höchstens der Bruttobetrag, nicht mehr als noch offen ist, und zum Prozentsatz passend.',
   INCOMING_ADJUSTMENT_REASON: 'Bitte begründe den Eintrag.',
   INCOMING_ADJUSTMENT_AGREEMENT: 'Bitte gib an, mit wem und wann das Skonto vereinbart wurde.',
   INCOMING_ADJUSTMENT_INVALID: 'Der Skonto-Vermerk ist unvollständig. Bitte prüfe die Angaben.',
+  // Zahlungen auf Eingangsrechnungen (bautakt-app 20261031150000_b_incoming_invoice_payments, bautakt-web#270).
+  INCOMING_PAYMENT_STATUS:
+    'Teilbezahlt und bezahlt ergeben sich aus den erfassten Zahlungen. Erfasse oder storniere dafür eine Zahlung. Bitte lade die Seite neu.',
+  INCOMING_PAYMENT_AMOUNT:
+    'Der Betrag muss größer als 0 sein, mit höchstens zwei Nachkommastellen.',
+  INCOMING_PAYMENT_DATE: 'Der Zahltag fehlt oder liegt in der Zukunft.',
+  INCOMING_PAYMENT_DRAFT: 'Ein Entwurf wird erst erfasst und freigegeben, dann bezahlt.',
+  INCOMING_PAYMENT_NOT_APPROVED: 'Zahlungen gibt es nur an einer freigegebenen Rechnung.',
+  INCOMING_PAYMENT_EXCEEDS:
+    'Der Betrag ist höher als der noch offene Betrag. Bitte lade die Seite neu, vielleicht wurde inzwischen schon gezahlt.',
+  INCOMING_PAYMENT_REASON: 'Bitte begründe das Storno.',
+  INCOMING_PAYMENT_REVERSED: 'Diese Zahlung ist schon storniert. Bitte lade die Seite neu.',
+  INCOMING_PAYMENT_INVALID:
+    'Die Angaben passen nicht: Zahlungsart höchstens 100, Notiz und Begründung höchstens 2000 Zeichen. Ein Storno lässt sich nicht stornieren.',
+  INCOMING_PAYMENT_NOT_SAVED:
+    'Die Zahlung wurde nicht bestätigt. Bitte lade die Seite neu und prüfe, ob sie in der Liste steht.',
+  APPEND_ONLY: 'Dieser Eintrag ist Teil des Protokolls und wird nie geändert oder gelöscht.',
   CONTACT_IN_USE:
     'Der Kontakt hängt noch an Aufträgen oder Belegen. Archiviere ihn stattdessen, dann verschwindet er aus Listen und Auswahlfeldern.',
 };

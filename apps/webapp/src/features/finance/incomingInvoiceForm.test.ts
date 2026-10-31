@@ -5,6 +5,7 @@ import {
   canDelete,
   canEditFields,
   type IncomingInvoiceFields,
+  isPaymentStatus,
   statusOptions,
   suggestGross,
   validateIncomingInvoice,
@@ -93,7 +94,7 @@ describe('suggestGross', () => {
 
 describe('Status, Bearbeiten, Löschen', () => {
   it('neu und Entwurf: alle Status, Felder offen, Entwurf löschbar', () => {
-    assert.deepEqual(statusOptions(null), ['draft', 'open', 'partially_paid', 'paid', 'overdue']);
+    assert.deepEqual(statusOptions(null), ['draft', 'open', 'overdue']);
     assert.deepEqual(statusOptions('draft'), statusOptions(null));
     assert.equal(canEditFields(null), true);
     assert.equal(canEditFields('draft'), true);
@@ -107,5 +108,16 @@ describe('Status, Bearbeiten, Löschen', () => {
       assert.equal(canEditFields(status), false);
       assert.equal(canDelete(status), false);
     }
+  });
+
+  it('teilbezahlt und bezahlt nie zur Auswahl, nur als Anzeige (#270)', () => {
+    assert.deepEqual(statusOptions('open'), ['open', 'overdue']);
+    assert.deepEqual(statusOptions('overdue'), ['open', 'overdue']);
+    assert.deepEqual(statusOptions('partially_paid'), ['partially_paid']);
+    assert.deepEqual(statusOptions('paid'), ['paid']);
+    assert.equal(isPaymentStatus('paid'), true);
+    assert.equal(isPaymentStatus('partially_paid'), true);
+    assert.equal(isPaymentStatus('open'), false);
+    assert.equal(isPaymentStatus(null), false);
   });
 });

@@ -46,6 +46,26 @@ leitet auf die Übersicht um (`routes.legacyFinance`), `/ausgaben` mit Query auf
   (`ListFilterMenu` im `DataTable`-Slot `actions`). `?status=` bleibt. Die Überschrift
   erscheint nur, wenn rechts daneben „Sonstige Ausgaben“ stehen.
 
+## Zahlungen auf Eingangsrechnungen (#270)
+
+Auf der Seite einer erfassten Eingangsrechnung steht unter „Skonto und Zahlbetrag“ der
+Abschnitt „Zahlungen“ (`IncomingPaymentsSection.tsx`): Zahlbetrag, gezahlt, noch offen
+und jede Zahlung mit Storno.
+
+- **Erfassen** nur an einer freigegebenen Rechnung mit offenem Betrag, Zahltag nicht in
+  der Zukunft, höchstens der offene Betrag (`incomingPayments.ts`, `paymentErrors`).
+  Vorgeschlagen ist der ganze offene Betrag mit Zahltag heute.
+- **Korrigieren** nur per Storno mit Begründung. Eine Zahlung wird nie geändert oder
+  gelöscht; Zahlung und Storno bleiben in der Liste.
+- **Status:** Teilbezahlt und bezahlt setzt die Datenbank aus den Zahlungen. Die
+  Statusauswahl bietet nur Offen und Überfällig (`statusOptions`); steht eine Rechnung
+  auf teilbezahlt oder bezahlt, ist die Auswahl gesperrt. Nach einer Zahlung übernimmt
+  das Formular den neuen Status, sonst würde Speichern den alten zurückschicken.
+- **Skonto** lässt sich an einer bezahlten Rechnung nicht mehr vermerken
+  (`canNoteSkonto`): Es würde den Zahlbetrag unter die Zahlungen drücken.
+- Regeln, Rechte und Fehlercodes stehen in bautakt-app, Wiki `finanzmodul.md`, Abschnitt
+  „Zahlungen auf Eingangsrechnungen“.
+
 ## DATEV-Export (`/rechnungen/datev-export`)
 
 `pages/DatevExportPage.tsx`, Logik in `datevExport.ts`. Den Buchungsstapel baut die
@@ -74,9 +94,9 @@ Edge Function `datev-export` (bautakt-app, Wiki `finanzmodul.md`).
   anteilig je Steuersatz auf „Erhaltene Skonti“. Wann gebucht wird, steht in den
   DATEV-Einstellungen unter „Erhaltenes Skonto buchen“ (`cash_discount_booking`):
   - „Am Tag des Vermerks“ ist der Standard.
-  - „Am Tag der Zahlung“ bucht erst, wenn die Zahlung erfasst ist. Zahlungen mit
-    Datum erfasst bisher nur die App, das Web zeigt bis dahin die Warnung
-    `skonto_payment_missing`.
+  - „Am Tag der Zahlung“ bucht erst, wenn die Rechnung voll bezahlt ist, mit dem Tag
+    aus `incoming_invoice_balances.paid_on` (Stornos zählen nicht). Bis dahin zeigt das
+    Web die Warnung `skonto_payment_missing`.
 
   Die Regeln stehen in bautakt-app, Wiki `finanzmodul.md`, Abschnitt
   „Skonto im Eingang“.
@@ -92,9 +112,13 @@ Edge Function `datev-export` (bautakt-app, Wiki `finanzmodul.md`).
   das tatsächlich fließt.
   - Bis 2026-10-14 rechneten `monthlyRevenue`, die Mini-Balken der Startseite und die
     Auswertungen (Umsatz, Ausgaben, Umsatz je Kunde) brutto, die Zahlen daneben netto.
-- **Eingangsrechnungen**: offen ist alles außer `paid`. Teilbezahlte zählen mit vollem
-  Brutto, weil Bautakt Zahlungen auf Eingangsrechnungen noch nicht erfasst. „Neu“ heißt
-  wie auf der Startseite: seit Beginn des letzten Arbeitstags (`newSince`).
+- **Eingangsrechnungen**: offen ist alles außer `paid`. Gezählt wird der Restbetrag
+  `open_total` aus der Sicht `incoming_invoice_balances` (Brutto minus Skonto minus
+  aktive Zahlungen), auf der Karte, in den Fristen der Startseite und in der Spalte
+  „Offen“ der Liste (`buildIncomingDesk`, `collectDeadlines`, `useIncomingInvoiceList`).
+  „Neu“ heißt wie auf der Startseite: seit Beginn des letzten Arbeitstags (`newSince`).
+  - Bis #270 (2026-10-31) zählten Teilbezahlte mit vollem Brutto, weil Bautakt
+    Zahlungen auf Eingangsrechnungen nicht erfasste.
 - Das Ausgaben-Diagramm der Auswertungen zeigt Ausgaben und Eingangsrechnungen, **ohne
   Lohn**. Das Ergebnis rechnet Lohn mit (`canViewWageCosts`). Ein negatives Ergebnis bei
   leerem Ausgaben-Diagramm ist deshalb möglich.

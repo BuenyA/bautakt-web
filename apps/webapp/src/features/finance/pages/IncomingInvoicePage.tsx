@@ -57,6 +57,7 @@ import {
   canEditFields,
   type IncomingInvoiceStatus,
   isIncomingInvoiceStatus,
+  isPaymentStatus,
   statusOptions,
   suggestGross,
   validateIncomingInvoice,
@@ -70,6 +71,7 @@ import {
   type UploadKind,
   uploadKind,
 } from '../incomingInvoiceUpload';
+import { IncomingPaymentsSection } from '../IncomingPaymentsSection';
 import { isFrozen, isIncomingReviewStatus } from '../incomingReview';
 import { IncomingReviewSection } from '../IncomingReviewSection';
 import { IncomingSkontoSection } from '../IncomingSkontoSection';
@@ -229,6 +231,14 @@ function IncomingInvoiceForm({
   const [categoryId, setCategoryId] = useState(saved?.cost_category_id ?? '');
   const [notes, setNotes] = useState(saved?.notes ?? '');
   const [status, setStatus] = useState<IncomingInvoiceStatus>(savedStatus ?? 'open');
+  // Teilbezahlt und bezahlt setzt die Datenbank nach einer Zahlung (#270). Die
+  // Auswahl folgt dem gespeicherten Status, sonst schickt Speichern den alten.
+  const [statusFrom, setStatusFrom] = useState(savedStatus);
+  if (savedStatus !== statusFrom) {
+    setStatusFrom(savedStatus);
+    if (savedStatus !== null) setStatus(savedStatus);
+  }
+  const statusFromPayments = isPaymentStatus(savedStatus);
   const [taxRowsState, setTaxRows] = useState<TaxRow[]>(() =>
     taxRows(
       initialTaxLines(savedTaxLines, {
@@ -727,6 +737,16 @@ function IncomingInvoiceForm({
             </Section>
           ) : null}
 
+          {saved && savedStatus && savedStatus !== 'draft' && reviewStatus ? (
+            <Section title={t('domain:incomingPayments.title')}>
+              <IncomingPaymentsSection
+                invoiceId={saved.id}
+                status={savedStatus}
+                reviewStatus={reviewStatus}
+              />
+            </Section>
+          ) : null}
+
           <Section title={t('domain:incomingInvoiceForm.sections.assignment')}>
             <div className="grid gap-4 @lg:grid-cols-2">
               <div className="grid gap-2">
@@ -767,7 +787,7 @@ function IncomingInvoiceForm({
                 <Select
                   id={ids.status}
                   value={status}
-                  disabled={frozen}
+                  disabled={frozen || statusFromPayments}
                   onChange={(_, { value }) => {
                     if (isIncomingInvoiceStatus(value)) setStatus(value);
                   }}
@@ -778,6 +798,9 @@ function IncomingInvoiceForm({
                     </option>
                   ))}
                 </Select>
+                <Text size={200} className="text-muted-foreground">
+                  {t('domain:incomingInvoiceForm.statusFromPayments')}
+                </Text>
               </div>
 
               <div className="grid gap-2 @lg:col-span-2">

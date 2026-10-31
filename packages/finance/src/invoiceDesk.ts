@@ -88,6 +88,11 @@ export type DeskIncomingRow = {
   invoice_date: string | null;
   due_date: string | null;
   gross_total: number | null;
+  /**
+   * Restbetrag aus `incoming_invoice_balances` (Zahlbetrag minus aktive
+   * Zahlungen, bautakt-web#270). Fehlt er, zählt das volle Brutto.
+   */
+  open_total?: number | null;
   created_at: string;
 };
 
@@ -133,9 +138,9 @@ export function matchesIncomingStatus(
 /**
  * Offene Eingangsrechnungen nach Fälligkeit.
  *
- * Offen ist alles außer `paid`, wie in `computeOpenTasks`. Teilbezahlte zählen
- * mit dem vollen Brutto: Zahlungen auf Eingangsrechnungen erfasst Bautakt noch
- * nicht.
+ * Offen ist alles außer `paid`, wie in `computeOpenTasks`. Gezählt wird der
+ * Restbetrag (`open_total`): Skonto und erfasste Zahlungen sind abgezogen,
+ * eine teilbezahlte Rechnung steht nur mit dem, was noch fehlt (#270).
  */
 export function buildIncomingDesk<T extends DeskIncomingRow>(
   incoming: readonly T[],
@@ -146,7 +151,7 @@ export function buildIncomingDesk<T extends DeskIncomingRow>(
     .sort((a, b) => byDueDate(a.due_date, b.due_date))
     .map((row) => ({
       item: row,
-      minor: eurosToMinor(row.gross_total),
+      minor: eurosToMinor(row.open_total ?? row.gross_total),
       due: dueOf(referenceIso, row.due_date),
     }));
   return { entries, minor: entries.reduce((sum, entry) => sum + entry.minor, 0) };

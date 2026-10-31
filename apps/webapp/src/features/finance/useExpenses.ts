@@ -27,6 +27,11 @@ export type IncomingInvoiceListRow = {
   net_total: number;
   vat_total: number;
   gross_total: number;
+  /**
+   * Restbetrag aus `incoming_invoice_balances`: Brutto minus Skonto minus
+   * aktive Zahlungen (#270). `null`, wenn die Sicht keine Zeile liefert.
+   */
+  open_total: number | null;
   /** Wann sie im System ankam — die Übersicht zeigt, was neu ist. */
   created_at: string;
   /** `manual`, `zugferd` oder `xrechnung`; die letzten beiden sind E-Rechnungen. */
@@ -79,16 +84,24 @@ export function useIncomingInvoiceList() {
     queryKey: ['incoming-invoices-list', companyId],
     enabled: Boolean(companyId),
     queryFn: async (): Promise<IncomingInvoiceListRow[]> => {
-      const { data, error } = await supabase
-        .from('incoming_invoices')
-        .select(
-          'id, invoice_number, vendor_name, invoice_date, due_date, status, net_total, vat_total, gross_total, created_at, source_format',
-        )
-        .eq('company_id', companyId!)
-        .order('due_date', { ascending: true, nullsFirst: false });
+      const [invoices, balances] = await Promise.all([
+        supabase
+          .from('incoming_invoices')
+          .select(
+            'id, invoice_number, vendor_name, invoice_date, due_date, status, net_total, vat_total, gross_total, created_at, source_format',
+          )
+          .eq('company_id', companyId!)
+          .order('due_date', { ascending: true, nullsFirst: false }),
+        supabase
+          .from('incoming_invoice_balances')
+          .select('invoice_id, open_total')
+          .eq('company_id', companyId!),
+      ]);
 
-      if (error) throw error;
-      return data ?? [];
+      if (invoices.error) throw invoices.error;
+      if (balances.error) throw balances.error;
+      const open = new Map(balances.data.map((row) => [row.invoice_id, row.open_total]));
+      return invoices.data.map((row) => ({ ...row, open_total: open.get(row.id) ?? null }));
     },
   });
 }
