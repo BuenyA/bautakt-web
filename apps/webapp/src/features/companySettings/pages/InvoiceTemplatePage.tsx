@@ -10,7 +10,6 @@ import {
   DialogTitle,
   Dropdown,
   Field,
-  Image,
   Input,
   makeStyles,
   Menu,
@@ -52,7 +51,7 @@ import { ImageResizeError } from '@/lib/imageResize';
 import { routes } from '@/lib/routes';
 
 import { useCompanyAccess } from '../companyAccess';
-import { useCompanyLogo, useCompanyLogoUrl } from '../invoiceTemplate';
+import { logoVectorSibling, useCompanyLogo, useCompanyLogoUrl } from '../invoiceTemplate';
 import {
   emptyTemplateForm,
   formFromTemplate,
@@ -67,6 +66,7 @@ import {
   useUpdateTemplate,
 } from '../invoiceTemplates';
 import { SectionGuard } from '../SectionGuard';
+import { CompanyLogoError } from '../svgLogo';
 import { Section, TemplateFields } from '../TemplateFields';
 import { type CompanyRecord, useCompanyRecord } from '../useCompanyRecord';
 import { PREVIEW_TYPES, type PreviewType, useTemplatePreview } from '../useLayoutTemplatePreview';
@@ -422,8 +422,14 @@ function LogoCard({ company, canEdit }: { company: CompanyRecord; canEdit: boole
   const { t } = useTranslation();
   const styles = useStyles();
   const logo = useCompanyLogo();
-  const url = useCompanyLogoUrl(company.logo_image_url);
+  const [vectorFailed, setVectorFailed] = useState(false);
+  const vectorPath = vectorFailed ? null : logoVectorSibling(company.logo_image_url);
+  const stored = useCompanyLogoUrl(company.logo_image_url);
+  const vector = useCompanyLogoUrl(vectorPath);
   const [input, setInput] = useState<HTMLInputElement | null>(null);
+  const waitingForVector = Boolean(vectorPath) && vector.isLoading;
+  // SVG über die signierte URL, sonst die Rasterfassung. Beides nur als `<img>`.
+  const src = vector.data ?? (waitingForVector ? undefined : stored.data);
 
   async function change(file: File | null) {
     try {
@@ -432,10 +438,13 @@ function LogoCard({ company, canEdit }: { company: CompanyRecord; canEdit: boole
         t(file ? 'companySettings:template.logoSaved' : 'companySettings:template.logoRemoved'),
       );
     } catch (caught) {
-      const description =
-        caught instanceof ImageResizeError
-          ? t(`companySettings:template.logoErrors.${caught.code}`)
-          : (readableDbError(caught) ?? undefined);
+      const code =
+        caught instanceof CompanyLogoError || caught instanceof ImageResizeError
+          ? caught.code
+          : null;
+      const description = code
+        ? t(`companySettings:template.logoErrors.${code}`)
+        : (readableDbError(caught) ?? undefined);
       toast.error(t('companySettings:template.logoError'), { description });
     }
   }
@@ -447,10 +456,19 @@ function LogoCard({ company, canEdit }: { company: CompanyRecord; canEdit: boole
     >
       <div className="flex flex-wrap items-center gap-4">
         <div className={styles.logoBox}>
-          {logo.isPending ? (
+          {logo.isPending || stored.isLoading || waitingForVector ? (
             <Spinner size="small" />
-          ) : url.data ? (
-            <Image src={url.data} alt={t('companySettings:template.logo')} fit="contain" />
+          ) : src ? (
+            // Nur `<img>`. Kein innerHTML, kein Inline-SVG, kein `<object>`:
+            // eine unbereinigte Datei aus dem Storage führt so kein Skript aus.
+            <img
+              src={src}
+              alt={t('companySettings:template.logo')}
+              className="max-h-full max-w-full object-contain"
+              onError={() => {
+                if (vectorPath) setVectorFailed(true);
+              }}
+            />
           ) : (
             <Image20Regular aria-label={t('companySettings:template.noLogo')} />
           )}
@@ -460,7 +478,7 @@ function LogoCard({ company, canEdit }: { company: CompanyRecord; canEdit: boole
             <input
               ref={setInput}
               type="file"
-              accept="image/png,image/jpeg,image/webp"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml,.svg"
               hidden
               onChange={(event) => {
                 const file = event.target.files?.[0] ?? null;

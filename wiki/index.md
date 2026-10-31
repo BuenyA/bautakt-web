@@ -132,6 +132,7 @@ verlinkt, nie kopiert.
 | 2026-10-30 | [„Verwerfen“ im Dialog ist rot](logs/2026-10-30-verwerfen-rot.md)                                              |
 | 2026-10-30 | [DATEV-Export verlinkt die DATEV-Einstellungen](logs/2026-10-30-datev-einstellungen-link.md)                   |
 | 2026-10-30 | [Rechnungsvorlagen und Briefbogen „Spahrbau“](logs/2026-10-30-rechnungsvorlagen.md)                            |
+| 2026-10-30 | [SVG als Logo der Rechnungsvorlage](logs/2026-10-30-svg-logo.md)                                               |
 
 ## Die drei wichtigsten Sätze
 

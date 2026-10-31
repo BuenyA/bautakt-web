@@ -36,9 +36,12 @@ blob-report/
 .vercel
 
 # Die Supabase-CLI legt beim Generieren ein supabase/ mit Scratch-State an.
-# Dieses Repo besitzt das Schema nicht — Migrationen leben in bautakt-app.
+# Dieses Repo besitzt das Schema nicht. Scratch-State bleibt ignoriert.
+# Ausnahme: supabase/migrations/ darf eine noch nicht angewendete Storage-Migration
+# enthalten, die vor dem Deploy am Projekt angewendet werden muss.
 # Siehe AGENTS.md, Abschnitt "Repository relationship".
-/supabase/
+/supabase/*
+!/supabase/migrations/
 
 # Logs
 *.log

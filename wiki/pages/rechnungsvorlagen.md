@@ -92,6 +92,40 @@ Was es schon an anderer Stelle gibt, steht **nicht** in der Vorlage: Logo, Ansch
 Telefon, E-Mail, Hauptbank, Steuernummer, Registerangaben bleiben Firmendaten. Eine
 Vorlage ergänzt nur. So ändert sich eine neue Bankverbindung an einer Stelle.
 
+### Logo (`companies.logo_image_url`)
+
+Gemessen 2026-10-30: Bucket `company-images` erlaubt nur `image/jpeg`, höchstens
+5 MiB (`file_size_limit` 5242880). Die Policies auf `storage.objects` prüfen nur
+Bucket und `canManageCompanySettings` bzw. Mitgliedschaft, nicht den MIME-Typ.
+Die Function `finance-document-render` lädt den Pfad per Storage-Download (kein
+`fetch`) und erkennt PNG oder JPEG an den Magic Bytes, höchstens 2 MiB. pdf-lib
+bettet nur diese beiden ein (`embedPng` / `embedJpg`). SVG als Wert von
+`logo_image_url` erschiene deshalb weder im PDF noch in der App.
+
+Seit 2026-10-30 nimmt die Web-Vorlage auch SVG an (`svgLogo.ts`):
+
+- DOMPurify 3.4, Profil `svg` und `svgFilters`, plus Nachlauf. Details im
+  Dateikopf.
+- Anzeige nur über `<img src>` (signierte URL der SVG, sonst der Rasterdatei).
+  Kein `innerHTML`, kein Inline-SVG, kein `<object>`.
+- Daneben eine transparente PNG, 3 px je Punkt des größeren Kastens (Briefbogen
+  250 × 92 pt, sonst mindestens 600 px breit), höchstens 2 MiB. `logo_image_url`
+  zeigt auf diese PNG, Content-Type `image/png`. Die SVG liegt unter demselben
+  Namen mit `.svg`, Content-Type `image/svg+xml`.
+- Raster (PNG, JPG, WebP) bleibt wie bisher JPEG, 512 px.
+- Ohne `viewBox` und ohne Breite wird die SVG abgelehnt.
+
+Die dafür nötige Änderung von `allowed_mime_types` (zusätzlich `image/png` und
+`image/svg+xml`, JPEG bleibt, Limit und Policies unverändert) liegt als
+**nicht angewendete** Datei `supabase/migrations/20261031120000_company_images_svg_png.sql`
+in diesem Repo. Vor Merge und Deploy anwenden, sonst lehnt der Bucket den Upload ab.
+
+Festgeschriebene Belege lesen das Archiv (`storage_path` und `content_hash`).
+Die Function schreibt es nicht neu, wenn beides schon steht. Ein neues Logo
+ändert nur Entwürfe und künftige Originale. Die App liest weiterhin
+`logo_image_url`. Eine PNG kann `Image` von React Native zeigen, eine SVG nicht.
+Das Mobile-Repo war aus dieser Umgebung nicht lesbar (Remote nicht erreichbar).
+
 ## 4. Renderer
 
 1. Die Edge Function lädt mit dem Bündel die Vorlage: die am Beleg gewählte, sonst die
@@ -157,8 +191,10 @@ nicht Helvetica.
 
 1. Migration einspielen (Supabase MCP `apply_migration`), Edge Function
    `finance-document-render` deployen, Typen neu erzeugen.
-2. Firmendaten des Demo-Betriebs: Logo als **PNG** (SVG kann der Renderer nicht
-   einbetten), Telefon `07147 / 2750-0`, E-Mail, Hauptbank KSK Ludwigsburg,
+2. Firmendaten des Demo-Betriebs: Logo als PNG oder als SVG (die Web-App legt
+   dann eine PNG-Fassung ab, die der Renderer einbettet; die Storage-Migration
+   für `image/svg+xml` und `image/png` muss vorher angewendet sein), Telefon
+   `07147 / 2750-0`, E-Mail, Hauptbank KSK Ludwigsburg,
    Steuernummer, Registergericht „Amtsgericht Stuttgart“, HRB 290382, Geschäftsführer.
 3. Unternehmen → Rechnungsvorlage → Neue Vorlage (startet mit den Spahrbau-Werten),
    Namen „Spahrbau“ geben, „In neuen Belegen vorauswählen“ an, Speichern.

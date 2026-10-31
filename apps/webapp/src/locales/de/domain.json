@@ -2610,7 +2610,7 @@
     "nameRequired": "Bitte gib der Vorlage einen Namen.",
     "colorInvalid": "Bitte eine Farbe im Format #RRGGBB angeben.",
     "applySpahrbau": "Auf Spahrbau-Werte zurücksetzen",
-    "logoHint": "Das Logo kommt aus den Firmendaten (PNG oder JPG) und steht im Briefbogen groß oben rechts.",
+    "logoHint": "Das Logo kommt aus den Firmendaten und steht im Briefbogen groß oben rechts.",
     "textsHint": "Diese Texte stehen in jedem neuen Beleg der gewählten Art schon drin und lassen sich dort anpassen.",
     "previewHint": "Beispielbeleg mit Musterkunde. Meine echten Belege bleiben unverändert.",
     "previewEmpty": "Die Vorschau wird erstellt …",
