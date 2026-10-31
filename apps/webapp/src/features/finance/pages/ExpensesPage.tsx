@@ -137,6 +137,19 @@ export function ExpensesPage() {
           </span>
         ),
       },
+      {
+        // Restbetrag nach Skonto und Zahlungen (#270); Entwürfe sind noch nicht zu zahlen.
+        accessorKey: 'open_total',
+        header: t('domain:expenses.columns.open'),
+        cell: ({ row }) =>
+          row.original.status === 'draft' || row.original.open_total === null ? (
+            <span className="text-muted-foreground block text-right">—</span>
+          ) : (
+            <span className="text-foreground block text-right tabular-nums">
+              {formatMoney(eurosToMinor(row.original.open_total))}
+            </span>
+          ),
+      },
     ],
     [t],
   );

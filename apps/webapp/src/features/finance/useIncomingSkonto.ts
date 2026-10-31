@@ -5,6 +5,7 @@ import { useMembership } from '@/features/company/useMembership';
 import { supabase } from '@/lib/supabase';
 
 import type { SkontoEntry } from './incomingSkonto';
+import { useInvalidatePayments } from './useIncomingPayments';
 
 /**
  * Skonto-Einträge einer Eingangsrechnung, älteste zuerst (#166). Die Tabelle
@@ -64,14 +65,19 @@ export type NoteSkontoInput = {
   discountUntil: string;
 };
 
+/** Skonto ändert den Zahlbetrag, also auch Restbetrag und Status (#270). */
 function useInvalidateSkonto(invoiceId: string) {
   const queryClient = useQueryClient();
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
+  const invalidatePayments = useInvalidatePayments(invoiceId);
   return () =>
-    queryClient.invalidateQueries({
-      queryKey: ['incoming-invoice-adjustments', companyId, invoiceId],
-    });
+    Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: ['incoming-invoice-adjustments', companyId, invoiceId],
+      }),
+      invalidatePayments(),
+    ]);
 }
 
 /**

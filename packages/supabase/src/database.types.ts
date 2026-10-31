@@ -2225,6 +2225,8 @@ export type Database = {
       }
       incoming_invoice_payments: {
         Row: {
+          actor_id: string | null
+          actor_name: string
           amount: number
           company_id: string
           created_at: string
@@ -2233,8 +2235,12 @@ export type Database = {
           method: string
           note: string
           paid_at: string
+          reason: string
+          reverses_id: string | null
         }
         Insert: {
+          actor_id?: string | null
+          actor_name?: string
           amount?: number
           company_id: string
           created_at?: string
@@ -2243,8 +2249,12 @@ export type Database = {
           method?: string
           note?: string
           paid_at?: string
+          reason?: string
+          reverses_id?: string | null
         }
         Update: {
+          actor_id?: string | null
+          actor_name?: string
           amount?: number
           company_id?: string
           created_at?: string
@@ -2253,6 +2263,8 @@ export type Database = {
           method?: string
           note?: string
           paid_at?: string
+          reason?: string
+          reverses_id?: string | null
         }
         Relationships: [
           {
@@ -2274,6 +2286,13 @@ export type Database = {
             columns: ["incoming_invoice_id"]
             isOneToOne: false
             referencedRelation: "incoming_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incoming_invoice_payments_reverses_id_fkey"
+            columns: ["reverses_id"]
+            isOneToOne: true
+            referencedRelation: "incoming_invoice_payments"
             referencedColumns: ["id"]
           },
         ]
@@ -4519,6 +4538,28 @@ export type Database = {
       }
     }
     Views: {
+      incoming_invoice_balances: {
+        Row: {
+          company_id: string | null
+          gross_total: number | null
+          invoice_id: string | null
+          last_paid_at: string | null
+          open_total: number | null
+          paid_on: string | null
+          paid_total: number | null
+          payable_total: number | null
+          skonto_total: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incoming_invoices_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       incoming_invoice_payables: {
         Row: {
           company_id: string | null
@@ -5059,6 +5100,35 @@ export type Database = {
         Args: { p_company_id: string; p_permission: string; p_user_id: string }
         Returns: boolean
       }
+      record_incoming_invoice_payment: {
+        Args: {
+          p_amount: number
+          p_invoice_id: string
+          p_method?: string
+          p_note?: string
+          p_paid_at: string
+        }
+        Returns: {
+          actor_id: string | null
+          actor_name: string
+          amount: number
+          company_id: string
+          created_at: string
+          id: string
+          incoming_invoice_id: string
+          method: string
+          note: string
+          paid_at: string
+          reason: string
+          reverses_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "incoming_invoice_payments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       record_incoming_rejection_mail: {
         Args: { p_invoice_id: string; p_mail_id: string }
         Returns: {
@@ -5121,6 +5191,29 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "incoming_invoice_adjustments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      reverse_incoming_invoice_payment: {
+        Args: { p_payment_id: string; p_reason: string }
+        Returns: {
+          actor_id: string | null
+          actor_name: string
+          amount: number
+          company_id: string
+          created_at: string
+          id: string
+          incoming_invoice_id: string
+          method: string
+          note: string
+          paid_at: string
+          reason: string
+          reverses_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "incoming_invoice_payments"
           isOneToOne: true
           isSetofReturn: false
         }

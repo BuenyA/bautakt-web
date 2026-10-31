@@ -102,6 +102,41 @@ describe('collectDeadlines', () => {
     );
   });
 
+  it('nennt bei Eingangsrechnungen den Restbetrag (#270)', () => {
+    const list = collectDeadlines(
+      {
+        ...empty,
+        incoming: [
+          {
+            id: 'teil',
+            vendor_name: 'Würth',
+            invoice_number: '1',
+            due_date: '2026-10-12',
+            status: 'partially_paid',
+            gross_total: 100,
+            open_total: 40,
+          },
+          {
+            id: 'alt',
+            vendor_name: 'Baustoff',
+            invoice_number: '2',
+            due_date: '2026-10-13',
+            status: 'open',
+            gross_total: 100,
+          },
+        ],
+      },
+      '2026-10-11',
+    );
+    assert.deepEqual(
+      list.map((item) => [item.id, item.amount]),
+      [
+        ['teil', 40],
+        ['alt', 100],
+      ],
+    );
+  });
+
   it('zeigt Ausgangsrechnungen nur mit künftiger Fälligkeit', () => {
     const list = collectDeadlines(
       {

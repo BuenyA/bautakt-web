@@ -136,6 +136,23 @@ describe('buildIncomingDesk', () => {
     ]);
     expect(desk.minor).toBe(4 * 5000);
   });
+
+  it('zählt den Restbetrag, wenn er bekannt ist (#270)', () => {
+    const desk = buildIncomingDesk(
+      [
+        eingang({ id: 'teil', status: 'partially_paid', open_total: 12.34 }),
+        eingang({ id: 'skonto', open_total: 0 }),
+        eingang({ id: 'ohne' }),
+      ],
+      HEUTE,
+    );
+    expect(desk.entries.map((entry) => [entry.item.id, entry.minor])).toEqual([
+      ['teil', 1234],
+      ['skonto', 0],
+      ['ohne', 5000],
+    ]);
+    expect(desk.minor).toBe(1234 + 5000);
+  });
 });
 
 describe('Netto-Umsatz', () => {

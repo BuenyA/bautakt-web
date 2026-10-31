@@ -910,6 +910,7 @@
       "date": "Datum",
       "due": "Fällig",
       "gross": "Brutto",
+      "open": "Offen",
       "title": "Bezeichnung",
       "category": "Kategorie",
       "net": "Netto"
@@ -2090,6 +2091,7 @@
     "noOrder": "Ohne Auftrag",
     "noCategory": "Ohne Kostenart",
     "status": "Status",
+    "statusFromPayments": "Teilbezahlt und bezahlt ergeben sich aus den erfassten Zahlungen.",
     "sumOk": "Netto + USt ergibt Brutto.",
     "sumHint": "Netto + USt ergibt {{expected}}, nicht den eingetragenen Bruttobetrag.",
     "saved": "Eingangsrechnung gespeichert.",
@@ -2262,6 +2264,51 @@
       "agreedWithTooLong": "Höchstens {{max}} Zeichen.",
       "agreedOnRequired": "Bitte das Datum der Vereinbarung angeben.",
       "discountUntilRequired": "Bitte die Skontofrist angeben."
+    }
+  },
+  "incomingPayments": {
+    "title": "Zahlungen",
+    "payable": "Zahlbetrag",
+    "paid": "Gezahlt",
+    "open": "Noch offen",
+    "record": "Zahlung erfassen",
+    "reverse": "Stornieren",
+    "empty": "Noch keine Zahlung erfasst.",
+    "notApproved": "Zahlungen erfasst du, sobald die Rechnung freigegeben ist.",
+    "fullyPaid": "Die Rechnung ist vollständig bezahlt.",
+    "hint": "Teilbezahlt und bezahlt ergeben sich aus den Zahlungen. Eine Zahlung lässt sich nicht ändern oder löschen, nur mit Begründung stornieren.",
+    "reversedBadge": "Storniert",
+    "entry": "{{amount}} am {{date}}",
+    "reversal": "Storno über {{amount}}",
+    "by": "Erfasst von {{name}} am {{at}}",
+    "recorded": "Zahlung erfasst.",
+    "reversed": "Zahlung storniert.",
+    "loadError": "Die Zahlungen konnten nicht geladen werden.",
+    "saveError": "Die Zahlung konnte nicht gespeichert werden.",
+    "dialog": {
+      "title": "Zahlung erfassen",
+      "text": "Offen sind noch {{open}}. Eine erfasste Zahlung lässt sich danach nicht ändern, nur stornieren.",
+      "paidAt": "Zahltag",
+      "amount": "Betrag",
+      "method": "Zahlungsart",
+      "methodHint": "Optional, etwa Überweisung oder bar.",
+      "note": "Notiz",
+      "submit": "Erfassen"
+    },
+    "reverseDialog": {
+      "title": "Zahlung stornieren?",
+      "text": "Ein Storno über {{amount}} vom {{date}} hebt die Zahlung auf. Beide bleiben in der Liste. Danach ist der Betrag wieder offen.",
+      "reason": "Begründung"
+    },
+    "errors": {
+      "amountRequired": "Bitte einen Betrag größer als 0 angeben.",
+      "amountTooHigh": "Höchstens der offene Betrag ({{open}}).",
+      "dateRequired": "Bitte den Zahltag angeben.",
+      "dateInFuture": "Der Zahltag darf nicht in der Zukunft liegen.",
+      "methodTooLong": "Höchstens {{max}} Zeichen.",
+      "noteTooLong": "Höchstens {{max}} Zeichen.",
+      "reasonRequired": "Bitte begründe das Storno.",
+      "reasonTooLong": "Höchstens {{max}} Zeichen."
     }
   },
   "incomingInvoiceStatus": {

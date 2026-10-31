@@ -123,9 +123,10 @@ describe('Skontofrist', () => {
 });
 
 describe('canNoteSkonto', () => {
-  it('nur erfasst, nicht abgelehnt, Brutto > 0, kein aktives Skonto', () => {
+  it('nur erfasst, nicht abgelehnt, nicht bezahlt, Brutto > 0, kein aktives Skonto', () => {
     assert.equal(canNoteSkonto('open', 'in_review', 11900, []), true);
-    assert.equal(canNoteSkonto('paid', 'approved', 11900, []), true);
+    assert.equal(canNoteSkonto('partially_paid', 'approved', 11900, []), true);
+    assert.equal(canNoteSkonto('paid', 'approved', 11900, []), false);
     assert.equal(canNoteSkonto('draft', 'in_review', 11900, []), false);
     assert.equal(canNoteSkonto('open', 'rejected', 11900, []), false);
     assert.equal(canNoteSkonto('open', 'approved', 0, []), false);

@@ -137,6 +137,7 @@ verlinkt, nie kopiert.
 | 2026-10-30 | [Auftrag: Übersicht mit Vorschau-Karten und Unterseiten](logs/2026-10-30-auftragsseite-uebersicht.md)          |
 | 2026-10-30 | [Auftrag: Finanzen](logs/2026-10-30-auftragsfinanzen.md)                                                       |
 | 2026-10-31 | [Auftrag: Dokumente](logs/2026-10-31-auftragsdokumente.md)                                                     |
+| 2026-10-31 | [Zahlungen auf Eingangsrechnungen](logs/2026-10-31-zahlungen-eingang.md)                                       |
 
 ## Die drei wichtigsten Sätze
 

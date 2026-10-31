@@ -92,10 +92,30 @@ export function suggestGross(fields: IncomingInvoiceFields): number | null {
   return fields.netMinor + fields.vatMinor;
 }
 
-/** Status, die das Formular anbietet. Ein erfasster Beleg wird nie wieder Entwurf. */
+/**
+ * Teilbezahlt und bezahlt ergeben sich aus den erfassten Zahlungen (#270);
+ * die Datenbank lehnt sie von Hand mit `INCOMING_PAYMENT_STATUS` ab.
+ */
+export const PAYMENT_STATUSES: ReadonlySet<IncomingInvoiceStatus> = new Set([
+  'partially_paid',
+  'paid',
+]);
+
+/** Status aus den Zahlungen: Die Auswahl zeigt ihn nur an. */
+export function isPaymentStatus(status: IncomingInvoiceStatus | null): boolean {
+  return status !== null && PAYMENT_STATUSES.has(status);
+}
+
+/**
+ * Status, die das Formular anbietet. Ein erfasster Beleg wird nie wieder
+ * Entwurf. Teilbezahlt und bezahlt stehen nur da, wenn die Rechnung schon so
+ * steht; dann ist die Auswahl gesperrt.
+ */
 export function statusOptions(savedStatus: IncomingInvoiceStatus | null): IncomingInvoiceStatus[] {
-  if (savedStatus === null || savedStatus === 'draft') return [...INCOMING_INVOICE_STATUSES];
-  return INCOMING_INVOICE_STATUSES.filter((status) => status !== 'draft');
+  if (savedStatus !== null && isPaymentStatus(savedStatus)) return [savedStatus];
+  const manual = INCOMING_INVOICE_STATUSES.filter((status) => !PAYMENT_STATUSES.has(status));
+  if (savedStatus === null || savedStatus === 'draft') return manual;
+  return manual.filter((status) => status !== 'draft');
 }
 
 /**
