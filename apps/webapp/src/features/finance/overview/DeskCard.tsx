@@ -22,7 +22,8 @@ const VISIBLE_ROWS = 12;
 
 /**
  * Eine Rechnungskarte der Übersicht: unter dem Titel die offene Summe, darunter
- * die Rechnungen nach Fälligkeit. „Alle anzeigen“ sitzt rechts im Kartenkopf.
+ * die Rechnungen nach Fälligkeit. Dass es nur um offene Rechnungen geht, sagt
+ * der Titel (Owner 31.10.2026), nicht eine Zeile unter der Summe. „Alle anzeigen“ sitzt rechts im Kartenkopf.
  *
  * Bewusst ohne Filter-Chips (Owner 28.10.2026): Ob eine Rechnung überfällig,
  * bald fällig oder offen ist, steht an der Zeile selbst (`DeskRow`). Ohne
@@ -33,7 +34,6 @@ export function DeskCard({
   title,
   icon: Icon,
   minor,
-  sumLabel,
   rows,
   allTo,
   empty,
@@ -46,8 +46,6 @@ export function DeskCard({
   icon: FluentIcon;
   /** Offene Summe in Cent. */
   minor: number;
-  /** Zeile unter der Summe, z. B. „Offene Eingangsrechnungen“. */
-  sumLabel: string;
   rows: ReactNode[];
   /** Ziel von „Alle anzeigen“. */
   allTo: string;
@@ -95,14 +93,9 @@ export function DeskCard({
         />
       ) : (
         <>
-          <div className="flex flex-col">
-            <Text size={700} weight="semibold" className="tabular-nums">
-              {formatMoney(minor)}
-            </Text>
-            <Text size={200} className="text-text-secondary">
-              {sumLabel}
-            </Text>
-          </div>
+          <Text size={700} weight="semibold" className="tabular-nums">
+            {formatMoney(minor)}
+          </Text>
 
           {/* Ab `lg` ist die Karte so hoch wie die Seite bis zum Fensterrand;
               die Liste füllt den Rest und scrollt in sich. */}

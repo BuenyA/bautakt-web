@@ -115,7 +115,6 @@ function OutgoingCard({
       title={t('domain:invoiceDesk.outgoing.title')}
       icon={DocumentArrowUpRegular}
       minor={minor}
-      sumLabel={t('domain:invoiceDesk.outgoing.sumLabel')}
       allTo={routes.receivables}
       empty={t('domain:invoiceDesk.outgoing.empty')}
       emptyAction={
@@ -164,7 +163,6 @@ function IncomingCard({
       title={t('domain:invoiceDesk.incoming.title')}
       icon={DocumentArrowDownRegular}
       minor={minor}
-      sumLabel={t('domain:invoiceDesk.incoming.sumLabel')}
       allTo={routes.expenses}
       empty={t('domain:invoiceDesk.incoming.empty')}
       emptyAction={

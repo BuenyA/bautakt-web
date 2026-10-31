@@ -2321,20 +2321,18 @@
     "newQuote": "Neues Angebot",
     "showAll": "Alle anzeigen",
     "outgoing": {
-      "title": "Ausgangsrechnungen",
+      "title": "Offene Ausgangsrechnungen",
       "empty": "Keine offenen Ausgangsrechnungen.",
       "noNumber": "Entwurf ohne Nummer",
       "unknownCustomer": "Ohne Kunde",
       "due": "fällig {{date}}",
       "created": "angelegt {{date}}",
-      "sumLabel": "Offene Ausgangsrechnungen",
       "create": "Ausgangsrechnung schreiben"
     },
     "incoming": {
-      "title": "Eingangsrechnungen",
+      "title": "Offene Eingangsrechnungen",
       "empty": "Keine offenen Eingangsrechnungen.",
       "noVendor": "Unbekannter Lieferant",
-      "sumLabel": "Offene Eingangsrechnungen",
       "create": "Eingangsrechnung erfassen"
     },
     "kpis": {
