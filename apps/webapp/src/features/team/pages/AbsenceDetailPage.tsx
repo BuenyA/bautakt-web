@@ -188,7 +188,7 @@ function AbsenceView({
             <span className="text-muted-foreground text-sm tabular-nums">
               {formatDate(absence.start_date)}
               {absence.start_date === absence.end_date ? null : (
-                <> – {formatDate(absence.end_date)}</>
+                <> bis {formatDate(absence.end_date)}</>
               )}
             </span>
           </span>
@@ -270,7 +270,7 @@ function AbsenceView({
             <Fact icon={<CalendarRegular />} label={t('domain:absences.detail.period')}>
               {absence.start_date === absence.end_date
                 ? formatDate(absence.start_date)
-                : `${formatDate(absence.start_date)} – ${formatDate(absence.end_date)}`}
+                : `${formatDate(absence.start_date)} bis ${formatDate(absence.end_date)}`}
             </Fact>
             <Fact icon={<TimerRegular />} label={t('domain:absences.detail.days')}>
               {t('domain:absences.detail.daysValue', { count: days })}

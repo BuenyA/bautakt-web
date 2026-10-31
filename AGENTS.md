@@ -123,6 +123,12 @@ explicit namespace: `t('auth:signIn.title')`. Only the `de` catalog is maintaine
 that is a scope decision, not a licence to skip the keys. `bautakt-app` retrofitted i18n
 and its `i18n:scan` still reports leftovers.
 
+**No dashes in user-facing text** (owner, 2026-10-30). No em dash (—) and no en
+dash (–) as punctuation: rewrite with a comma, colon or full stop. Ranges read
+„bis“ („1. März bis 5. März“, „1 bis 30 Tage“). Two exceptions stay: a lone
+„—“ as the placeholder for an empty value, and compact clock ranges like
+„08:00–16:00“ in calendars and lists. Code comments are not affected.
+
 ### Guiding principle: „So komplex wie nötig, so simpel wie möglich.“
 
 This is the owner's motto for the whole product, web app and mobile app alike.

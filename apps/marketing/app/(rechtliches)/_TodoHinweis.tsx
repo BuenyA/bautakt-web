@@ -12,7 +12,7 @@ export function TodoHinweis({ was }: { was: string }) {
       role="note"
       className="mt-6 rounded-md border border-warning-border bg-warning-bg p-4 text-sm text-foreground"
     >
-      <strong>TODO — juristisch prüfen.</strong> {was} Diese Seite ist ein Gerüst und darf so nicht
+      <strong>TODO: juristisch prüfen.</strong> {was} Diese Seite ist ein Gerüst und darf so nicht
       veröffentlicht werden.
     </p>
   );

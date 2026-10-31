@@ -66,7 +66,7 @@ function timeLabel(assignment: AssignmentListRow): string {
     return `${formatTime(assignment.starts_at)}–${formatTime(assignment.ends_at)}`;
   }
   const day = (date: Date) => weekdayShort.format(date).replace('.', '');
-  return `${day(start)} ${formatTime(assignment.starts_at)} – ${day(end)} ${formatTime(assignment.ends_at)}`;
+  return `${day(start)} ${formatTime(assignment.starts_at)} bis ${day(end)} ${formatTime(assignment.ends_at)}`;
 }
 
 function useAssignmentLabel() {

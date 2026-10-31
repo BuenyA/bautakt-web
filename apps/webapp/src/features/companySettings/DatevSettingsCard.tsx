@@ -151,11 +151,7 @@ export function DatevSettingsCard() {
     <div className="flex flex-col gap-4 xl:col-span-2">
       <SectionCard
         title={t('domain:datev.title')}
-        description={
-          <Text size={200} className="text-muted-foreground">
-            {t('domain:datev.description')}
-          </Text>
-        }
+        description={<Text className="text-muted-foreground">{t('domain:datev.description')}</Text>}
       >
         {isLoading ? (
           <SkeletonBlock className="h-40 w-full" />
@@ -430,9 +426,7 @@ function AccountsCard({
     <SectionCard
       title={t('domain:datev.accountsTitle', { chart })}
       description={
-        <Text size={200} className="text-muted-foreground">
-          {t('domain:datev.accountsDescription')}
-        </Text>
+        <Text className="text-muted-foreground">{t('domain:datev.accountsDescription')}</Text>
       }
     >
       {!standardApplies ? (
@@ -446,7 +440,7 @@ function AccountsCard({
       <div role="table" aria-label={t('domain:datev.accountsTitle', { chart })}>
         <div
           role="row"
-          className="text-muted-foreground hidden gap-3 border-b pb-2 text-xs font-semibold md:grid md:grid-cols-[minmax(0,1fr)_6rem_9rem_7rem_17rem]"
+          className="text-muted-foreground hidden gap-3 border-b pb-2 text-sm font-semibold md:grid md:grid-cols-[minmax(0,1fr)_6rem_9rem_7rem_17rem]"
         >
           <span role="columnheader">{t('domain:datev.columns.purpose')}</span>
           <span role="columnheader">{t('domain:datev.columns.standard')}</span>
@@ -583,7 +577,7 @@ function AccountRow({
           {missing ? <StatusBadge tone="warning">{t('domain:datev.missing')}</StatusBadge> : null}
         </div>
         <div role="cell" className="tabular-nums md:pt-1.5">
-          <span className="text-muted-foreground mr-2 text-xs md:hidden">
+          <span className="text-muted-foreground mr-2 text-sm md:hidden">
             {t('domain:datev.columns.standard')}
           </span>
           {standard ? (

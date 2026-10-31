@@ -27,9 +27,9 @@ import { useTranslation } from 'react-i18next';
 import { DatePicker } from '@/components/form/dateTime';
 import { useMembership } from '@/features/company/useMembership';
 import { usePermission } from '@/features/company/usePermission';
+import { isPlausibleVatId } from '@/features/companySettings/companyValidation';
 import { useCostCategories } from '@/features/finance/useCostCategories';
 import { BUYER_REFERENCE_MAX_LENGTH } from '@/features/finance/useDocumentEditor';
-import { isPlausibleVatId } from '@/features/settings/companyValidation';
 import { readableDbError } from '@/lib/dbErrors';
 
 import {

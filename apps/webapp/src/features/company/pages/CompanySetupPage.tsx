@@ -14,7 +14,7 @@ import { ChevronDownRegular, ChevronUpRegular, QrCodeRegular } from '@fluentui/r
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { FullPageSpinner } from '@/components/common/FullPageSpinner';
 import { DatePicker } from '@/components/form/dateTime';
@@ -26,9 +26,9 @@ import {
   isValidEmail,
   isValidPhone,
   isValidPostalCode,
-} from '@/features/settings/companyValidation';
-import { TradeCombobox } from '@/features/settings/TradeCombobox';
-import { HOME_ROUTE } from '@/lib/routes';
+} from '@/features/companySettings/companyValidation';
+import { TradeCombobox } from '@/features/companySettings/TradeCombobox';
+import { additionalCompanyParam, HOME_ROUTE } from '@/lib/routes';
 import { supabase } from '@/lib/supabase';
 
 import { type BirthDateIssue, birthDateIssue } from '../birthDate';
@@ -98,6 +98,11 @@ export function CompanySetupPage() {
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  // Aus dem Profilmenü: ein weiterer Betrieb neben dem bestehenden. Dann ohne
+  // Auswahl Chef/Mitarbeiter (Beitreten hat dort einen eigenen Dialog) und
+  // mit „Abbrechen“ statt „Abmelden“.
+  const [searchParams] = useSearchParams();
+  const additional = searchParams.get(additionalCompanyParam) === '1';
   const queryClient = useQueryClient();
   const submitting = useRef(false);
   const createdCompanyId = useRef<string | null>(null);
@@ -160,7 +165,8 @@ export function CompanySetupPage() {
     setBirthday(birth);
     setNeedsProfile(!stored);
     setShowProfileStep(!complete);
-    setStep(complete ? 'choice' : 'profile');
+    if (additional) setRole('owner');
+    setStep(complete ? (additional ? 'company' : 'choice') : 'profile');
   }
 
   function clearError(key: keyof Errors) {
@@ -255,6 +261,16 @@ export function CompanySetupPage() {
           createdCompanyId.current = created.id;
         }
         await markOnboardingComplete(user.id);
+        if (additional) {
+          // `createOwnerCompany` darf die alte Hauptbeschäftigung oft nicht
+          // zurücksetzen (RLS auf `employments` verlangt Personalrechte im
+          // alten Betrieb). `switch_primary_company` läuft als SECURITY
+          // DEFINER und setzt genau eine Zeile aktiv.
+          const { error } = await supabase.rpc('switch_primary_company', {
+            p_company_id: createdCompanyId.current,
+          });
+          if (error) throw error;
+        }
         setWelcome({ role: 'owner', companyName: name.trim() });
         setStep('welcome');
       },
@@ -294,7 +310,9 @@ export function CompanySetupPage() {
 
   async function finish() {
     if (!user) return;
-    await queryClient.invalidateQueries({ queryKey: ['membership', user.id] });
+    // Nach dem Wechsel gehören alle geladenen Daten zum alten Betrieb.
+    if (additional) await queryClient.resetQueries();
+    else await queryClient.invalidateQueries({ queryKey: ['membership', user.id] });
     navigate(HOME_ROUTE, { replace: true });
   }
 
@@ -308,7 +326,7 @@ export function CompanySetupPage() {
       if (step === 'address' && (nextErrors.phone || nextErrors.email)) setShowMore(true);
       return;
     }
-    if (step === 'profile') setStep('choice');
+    if (step === 'profile') setStep(additional ? 'company' : 'choice');
     else if (step === 'choice') setStep(role === 'owner' ? 'company' : 'join');
     else if (step === 'company') setStep('address');
     else if (step === 'address') void createCompany();
@@ -319,6 +337,7 @@ export function CompanySetupPage() {
     setErrors({});
     setServerError(null);
     if (step === 'choice' && showProfileStep) setStep('profile');
+    else if (additional && step === 'company') setStep('profile');
     else if (step === 'company' || step === 'join') setStep('choice');
     else if (step === 'address') setStep('company');
   }
@@ -367,11 +386,14 @@ export function CompanySetupPage() {
   // Schrittzähler über den gewählten Zweig: Chef hat zwei Schritte mehr.
   const flow: Step[] = [
     ...(showProfileStep ? (['profile'] as const) : []),
-    'choice',
+    ...(additional ? [] : (['choice'] as const)),
     ...(role === 'employee' ? (['join'] as const) : (['company', 'address'] as const)),
   ];
   const stepNumber = flow.indexOf(step!) + 1;
-  const canGoBack = step !== 'profile' && !(step === 'choice' && !showProfileStep);
+  const canGoBack =
+    step !== 'profile' &&
+    !(step === 'choice' && !showProfileStep) &&
+    !(additional && step === 'company' && !showProfileStep);
 
   const heading: Record<Exclude<Step, 'welcome'>, { title: string; subtitle?: string }> = {
     profile: { title: t('auth:setup.profile.title'), subtitle: t('auth:setup.profile.subtitle') },
@@ -389,7 +411,16 @@ export function CompanySetupPage() {
         ? t('auth:setup.join.submit')
         : t('auth:setup.next');
 
-  const signOutButton = (
+  const signOutButton = additional ? (
+    <Button
+      appearance="transparent"
+      size="small"
+      disabled={pending}
+      onClick={() => navigate(HOME_ROUTE)}
+    >
+      {t('common:action.cancel')}
+    </Button>
+  ) : (
     <Button appearance="transparent" size="small" disabled={pending} onClick={() => void signOut()}>
       {t('common:action.signOut')}
     </Button>

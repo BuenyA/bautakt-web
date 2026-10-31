@@ -358,7 +358,7 @@ function AbsenceRow({ absence, urls }: { absence: OverviewAbsence; urls: Record<
   const range =
     absence.startDate === absence.endDate
       ? formatDate(absence.startDate)
-      : `${formatDate(absence.startDate)} – ${formatDate(absence.endDate)}`;
+      : `${formatDate(absence.startDate)} bis ${formatDate(absence.endDate)}`;
 
   async function onApprove() {
     try {

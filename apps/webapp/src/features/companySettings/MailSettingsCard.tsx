@@ -63,9 +63,7 @@ export function MailSettingsCard() {
     <SectionCard
       title={t('domain:mailSettings.title')}
       description={
-        <Text size={200} className="text-muted-foreground">
-          {t('domain:mailSettings.description')}
-        </Text>
+        <Text className="text-muted-foreground">{t('domain:mailSettings.description')}</Text>
       }
     >
       {settings.isLoading || legal.isLoading ? (
@@ -122,14 +120,10 @@ function ModeNotice({ settings }: { settings: MailSettings }) {
         <Text weight="semibold">{t('domain:mailSettings.mode')}</Text>
         <StatusBadge tone={MODE_TONES[mode]}>{t(`domain:mailSettings.modes.${mode}`)}</StatusBadge>
       </div>
-      <Text size={200} className="text-muted-foreground">
-        {t(`domain:mailSettings.modeHints.${mode}`)}
-      </Text>
+      <Text className="text-muted-foreground">{t(`domain:mailSettings.modeHints.${mode}`)}</Text>
       {mode === 'allowlist' ? (
         <div className="flex flex-col gap-1">
-          <Text size={200} weight="semibold">
-            {t('domain:mailSettings.allowlist')}
-          </Text>
+          <Text weight="semibold">{t('domain:mailSettings.allowlist')}</Text>
           {settings.test_recipient_allowlist.length > 0 ? (
             <ul className="flex flex-wrap gap-2">
               {settings.test_recipient_allowlist.map((address) => (
@@ -139,9 +133,7 @@ function ModeNotice({ settings }: { settings: MailSettings }) {
               ))}
             </ul>
           ) : (
-            <Text size={200} className="text-muted-foreground">
-              {t('domain:mailSettings.allowlistEmpty')}
-            </Text>
+            <Text className="text-muted-foreground">{t('domain:mailSettings.allowlistEmpty')}</Text>
           )}
         </div>
       ) : null}

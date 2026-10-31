@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { LaborTimeEntry } from './laborCost';
-import { computeOrderFinance, orderCostLevel,type OrderFinanceInput } from './orderFinance';
+import { computeOrderFinance, orderCostLevel, type OrderFinanceInput } from './orderFinance';
 import type { SalesDocumentRow } from './receivables';
 
 function beleg(overrides: Partial<SalesDocumentRow> & { id: string }): SalesDocumentRow {

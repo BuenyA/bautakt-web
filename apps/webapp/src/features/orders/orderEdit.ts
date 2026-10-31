@@ -90,7 +90,7 @@ export type OrderEditIssue = 'name' | 'endBeforeStart';
 export function costCenterOptionLabel(code: string, name: string): string {
   const left = code.trim();
   const right = name.trim();
-  if (left && right) return `${left} – ${right}`;
+  if (left && right) return `${left} bis ${right}`;
   return left || right;
 }
 
