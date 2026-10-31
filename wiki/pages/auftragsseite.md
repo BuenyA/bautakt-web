@@ -1,6 +1,6 @@
 # Auftragsseite
 
-Stand 2026-10-30. `/auftraege/:id` war eine lange Spalte: Stammdaten,
+Stand 2026-10-31. `/auftraege/:id` war eine lange Spalte: Stammdaten,
 Beteiligte und darunter sieben volle Abschnitte (Fotos mit Ablegefläche,
 Notizen, Checkliste, Zeiten, Material, Bautagebuch). Breit, flach, viel
 Scrollen. Der Owner wollte eine kompakte Übersicht mit Vorschauen und je
@@ -12,9 +12,9 @@ Bereich eine eigene Adresse.
   Status-Badge, darunter Kunde · Adresse · Zeitraum, rechts Zurück,
   Rechnung erstellen, Bearbeiten) und die Fluent-`TabList`. Darunter das
   `Outlet`. Laden, Fehler und Nicht-gefunden bleiben hier.
-- **Reiter**: Übersicht · Fotos · Notizen · Checkliste · Zeiten · Material ·
+- **Reiter**: Übersicht · Fotos · Dokumente · Notizen · Checkliste · Zeiten · Material ·
   Bautagebuch · Finanzen. Jeder Reiter ist eine Route (`routes.orderSection`),
-  die Pfade stehen in `orderSectionPaths` (`fotos`, `notizen`, `checkliste`,
+  die Pfade stehen in `orderSectionPaths` (`fotos`, `dokumente`, `notizen`, `checkliste`,
   `zeiten`, `material`, `bautagebuch`, `finanzen`).
 - **Übersicht** `OrderOverviewPage`: Stammdaten (Beginn und Ende als ein
   „Zeitraum“, Beschreibung als Zeile) und Beteiligte nebeneinander, darunter
@@ -34,6 +34,7 @@ Reiter lädt nichts neu.
 | Karte       | Inhalt                                                       |
 | ----------- | ------------------------------------------------------------ |
 | Fotos       | Die vier neuesten Bilder                                     |
+| Dokumente   | Die drei neuesten, mit Symbol für die Dateiart, Datum        |
 | Notizen     | Die drei neuesten, Titel oder erste Zeile, Datum             |
 | Checkliste  | „x von y erledigt“, Fortschrittsbalken, nächste drei offene  |
 | Zeiten      | Stunden gesamt, die drei Mitarbeiter mit den meisten Stunden |
@@ -43,13 +44,14 @@ Reiter lädt nichts neu.
 Abhaken geht direkt in der Checklisten-Karte — die häufigste Handlung.
 
 **Schnellaktion „Neu“** führt mit `?neu=1` auf die Unterseite; dort öffnet
-`useCreateFromUrl` das Anlege-Panel. Ausnahme Fotos: ein Dateidialog lässt
+`useCreateFromUrl` das Anlege-Panel. Ausnahme Fotos und Dokumente: ein Dateidialog lässt
 sich nur aus einem Klick öffnen, nicht nach dem Seitenwechsel. Die Karte
 führt deshalb auf die Upload-Fläche.
 
 ## Rechte
 
-`useVisibleOrderSections` blendet Reiter und Karte aus: Checkliste ohne
+`useVisibleOrderSections` blendet Reiter und Karte aus: Dokumente ohne
+`canViewDocuments`, Checkliste ohne
 `canViewChecklist`/`canEditChecklist`, Bautagebuch ohne
 `canCreateAndViewReports` — dieselben Rechte, mit denen sich die Abschnitte
 vorher selbst ausgeblendet haben. Eine Unterseite ohne Recht leitet auf die
@@ -108,9 +110,36 @@ das Recht leer sein kann. Ohne Lohn heißt die Leiste „Kosten ohne Lohn“.
 Reiter und Karte erscheinen, sobald Belege oder Kosten sichtbar sind; wer
 nur eines sieht, bekommt nur die eine Leiste.
 
-## Offen
+## Dokumente
 
-- Dokumente auf `order_documents`, wie in der App.
+Dieselben Daten wie die Ordner-Ansicht der Handy-App: `order_documents`,
+die Ordner aus `order_document_categories` (firmenweit, beim Anlegen eines
+Betriebs gesät: Rechnungen, Angebote, Verträge, Baupläne, Mahnungen, Fotos &
+Scans, Sonstiges).
+
+- **Unterseite** `/auftraege/:id/dokumente`: oben „Ablegen in“ (Ordner,
+  vorbelegt „Sonstiges“) und „Dokumente hochladen“, darunter die
+  Ablegefläche (`FileDropzone`, dieselbe wie bei Fotos). Darunter je Ordner
+  mit Inhalt eine Karte, leere Ordner fehlen. Eine Zeile zeigt Symbol, Name
+  (Link öffnet die Datei in neuem Tab), Dateiname · Größe · Datum und ein
+  Menü mit „Umbenennen oder verschieben“ und „Löschen“.
+- **Hochladen**: PDF, JPEG, PNG, WebP, Word, Text, je bis 10 MB, wie der
+  Bucket `order-documents` es verlangt. Name ist der Dateiname ohne Endung.
+  Erst die Datei, dann die Zeile; scheitert das Insert, wird die Datei
+  wieder entfernt. Pfad `{companyId}/{orderId}/{documentId}{.ext}` wie in der
+  App. Fallstrick: supabase-js schickt eine Datei als Formulardaten, dann
+  zählt der Typ der Datei selbst, nicht `contentType`. Browser geben Word
+  oft ohne Typ weiter, deshalb wird die Datei mit dem geprüften Typ neu
+  verpackt.
+- **Archivierte Belege**: Rechnungen und Angebote aus dem Belegarchiv sind
+  keine Kopie, sie zeigen auf `{companyId}/sales/…` im Bucket
+  `finance-documents` (`isFinanceArchivePath`, wie in der App). Signiert
+  wird dort; Löschen entfernt nur die Zeile am Auftrag, das Original bleibt.
+  Ohne Finanzrecht liefert die Select-Policy diese Zeilen nicht.
+- **Rechte** (gemessen 2026-10-31): Lesen von Zeilen, Ordnern und Dateien
+  mit `canViewDocuments`; Hochladen, Ändern, Löschen mit
+  `canUploadAndEditDocuments`. Ordner anlegen oder umbenennen gibt es im Web
+  noch nicht.
 
 ## Code
 
@@ -120,5 +149,8 @@ nur eines sieht, bekommt nur die eine Leiste.
 - `apps/webapp/src/features/orders/OrderPreviewCard.tsx`, `OrderPreviews.tsx`
 - `apps/webapp/src/features/orders/orderSections.ts`
 - `apps/webapp/src/features/orders/OrderFinance.tsx`, `useOrderFinance.ts`
+- `apps/webapp/src/features/orders/OrderDocuments.tsx`, `OrderDocumentDialogs.tsx`,
+  `useOrderDocuments.ts`, `useOrderDocumentMutations.ts`, `orderDocumentFiles.ts`
+- `apps/webapp/src/components/common/FileDropzone.tsx`
 - `packages/finance/src/orderFinance.ts`
 - `apps/webapp/src/lib/routes.ts` (`orderSectionPaths`, `orderSection`)

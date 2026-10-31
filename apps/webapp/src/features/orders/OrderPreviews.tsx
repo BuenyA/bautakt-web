@@ -5,6 +5,7 @@ import {
   ArrowUploadRegular,
   BoxRegular,
   ClockRegular,
+  DocumentMultipleRegular,
   ImageMultipleRegular,
   NotebookRegular,
   NoteRegular,
@@ -23,6 +24,7 @@ import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
 import { canCreateDailyReport } from './dailyReportAccess';
+import { DocumentIcon } from './OrderDocuments';
 import { canCreateOrderMaterial } from './orderMaterialAccess';
 import {
   OrderPreviewCard,
@@ -35,6 +37,7 @@ import { ORDER_SECTION_TITLE } from './orderSections';
 import { useOrderChecklist } from './useOrderChecklist';
 import { useSaveOrderChecklist } from './useOrderChecklistMutations';
 import { formatReportDate, useOrderDailyReports } from './useOrderDailyReports';
+import { useOrderDocuments } from './useOrderDocuments';
 import { useOrderImages } from './useOrderImages';
 import { materialLabel, useOrderMaterials } from './useOrderMaterials';
 import { useOrderNotes } from './useOrderNotes';
@@ -103,6 +106,59 @@ export function PhotosPreview({ orderId }: { orderId: string }) {
                 className="bg-surface aspect-square w-full rounded-md object-cover"
               />
             </li>
+          ))}
+        </ul>
+      )}
+    </OrderPreviewCard>
+  );
+}
+
+/** Die neuesten Dokumente, unabhängig vom Ordner. Ohne Leserecht fehlt die Karte. */
+export function DocumentsPreview({ orderId }: { orderId: string }) {
+  const { t } = useTranslation();
+  const canUpload = usePermission('canUploadAndEditDocuments');
+  const documents = useOrderDocuments(orderId);
+  const isLoading = useCompanyListLoading(documents);
+  const list = documents.data ?? [];
+
+  return (
+    <OrderPreviewCard
+      icon={<DocumentMultipleRegular />}
+      title={t(ORDER_SECTION_TITLE.documents)}
+      count={list.length}
+      to={routes.orderSection(orderId, 'documents')}
+      quickAction={
+        canUpload
+          ? {
+              // Wie bei den Fotos: der Dateidialog gehört auf die Unterseite.
+              to: routes.orderSection(orderId, 'documents'),
+              label: t('domain:orders.documents.upload'),
+              icon: <ArrowUploadRegular />,
+            }
+          : undefined
+      }
+    >
+      {isLoading ? (
+        <PreviewSkeleton />
+      ) : documents.isError ? (
+        <PreviewError onRetry={() => void documents.refetch()} />
+      ) : list.length === 0 ? (
+        <PreviewEmpty>{t('domain:orders.documents.emptyTitle')}</PreviewEmpty>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {list.slice(0, PREVIEW_ROWS).map((document) => (
+            <PreviewRow
+              key={document.id}
+              primary={
+                <span className="flex items-center gap-2">
+                  <span className="text-muted-foreground flex shrink-0" aria-hidden>
+                    <DocumentIcon document={document} />
+                  </span>
+                  <span className="truncate">{document.name}</span>
+                </span>
+              }
+              secondary={formatDate(document.createdAt)}
+            />
           ))}
         </ul>
       )}

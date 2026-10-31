@@ -1,24 +1,25 @@
 import { CloudArrowUpRegular, HourglassHalfRegular } from '@fluentui/react-icons';
 import { type DragEvent, type RefObject, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-
-const ACCEPT =
-  'image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif';
 
 /**
  * Ablegefläche und Dateiauswahl. Mehrere Dateien auf einmal.
  * Die Fläche nutzt die Token, kein festes Hex — Hell und Dunkel bleiben lesbar.
  */
-export function OrderPhotoDropzone({
+export function FileDropzone({
+  accept,
+  title,
+  hint,
   busy,
   inputRef,
   onFiles,
 }: {
+  accept: string;
+  title: string;
+  hint: string;
   busy: boolean;
   inputRef: RefObject<HTMLInputElement | null>;
   onFiles: (files: File[]) => void;
 }) {
-  const { t } = useTranslation();
   const [dragging, setDragging] = useState(false);
   const depth = useRef(0);
 
@@ -67,7 +68,7 @@ export function OrderPhotoDropzone({
       <input
         ref={inputRef}
         type="file"
-        accept={ACCEPT}
+        accept={accept}
         multiple
         disabled={busy}
         className="sr-only"
@@ -81,8 +82,8 @@ export function OrderPhotoDropzone({
       ) : (
         <CloudArrowUpRegular fontSize={22} className="text-brand" />
       )}
-      <span className="text-foreground text-sm font-medium">{t('domain:photoForm.dropTitle')}</span>
-      <span className="text-muted-foreground text-xs">{t('domain:photoForm.dropHint')}</span>
+      <span className="text-foreground text-sm font-medium">{title}</span>
+      <span className="text-muted-foreground text-xs">{hint}</span>
     </label>
   );
 }

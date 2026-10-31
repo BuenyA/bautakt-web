@@ -40,6 +40,7 @@ export const sendParam = 'versenden';
  */
 export const orderSectionPaths = {
   photos: 'fotos',
+  documents: 'dokumente',
   notes: 'notizen',
   checklist: 'checkliste',
   times: 'zeiten',

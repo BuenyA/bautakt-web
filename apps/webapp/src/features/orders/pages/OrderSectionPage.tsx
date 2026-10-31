@@ -5,6 +5,7 @@ import { type OrderSection, routes } from '@/lib/routes';
 
 import { OrderChecklist } from '../OrderChecklist';
 import { OrderDailyReports } from '../OrderDailyReports';
+import { OrderDocuments } from '../OrderDocuments';
 import { OrderFinancePage } from '../OrderFinance';
 import { OrderMaterials } from '../OrderMaterials';
 import { OrderNotes } from '../OrderNotes';
@@ -26,6 +27,8 @@ export function OrderSectionPage({ section }: { section: OrderSection }) {
   switch (section) {
     case 'photos':
       return <OrderPhotos orderId={order.id} />;
+    case 'documents':
+      return <OrderDocuments orderId={order.id} />;
     case 'notes':
       return <OrderNotes orderId={order.id} />;
     case 'checklist':

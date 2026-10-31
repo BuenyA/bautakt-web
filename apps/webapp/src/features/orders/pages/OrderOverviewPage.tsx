@@ -9,6 +9,7 @@ import { OrderContacts } from '../OrderContacts';
 import { FinancePreview } from '../OrderFinance';
 import {
   ChecklistPreview,
+  DocumentsPreview,
   MaterialsPreview,
   NotesPreview,
   PhotosPreview,
@@ -71,6 +72,7 @@ export function OrderOverviewPage() {
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <PhotosPreview orderId={data.id} />
+        {visible?.has('documents') ? <DocumentsPreview orderId={data.id} /> : null}
         <NotesPreview orderId={data.id} />
         {visible?.has('checklist') ? <ChecklistPreview orderId={data.id} /> : null}
         <TimesPreview orderId={data.id} />

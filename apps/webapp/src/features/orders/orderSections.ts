@@ -11,6 +11,7 @@ import { canSeeOrderFinance, orderFinanceAccess } from './useOrderFinance';
 /** Reihenfolge der Reiter und der Vorschau-Karten. */
 export const ORDER_SECTIONS: readonly OrderSection[] = [
   'photos',
+  'documents',
   'notes',
   'checklist',
   'times',
@@ -22,6 +23,7 @@ export const ORDER_SECTIONS: readonly OrderSection[] = [
 /** Überschrift je Unterseite; zugleich Beschriftung des Reiters und der Karte. */
 export const ORDER_SECTION_TITLE = {
   photos: 'domain:orders.photos.title',
+  documents: 'domain:orders.documents.title',
   notes: 'domain:orders.notes.title',
   checklist: 'domain:orders.checklist.title',
   times: 'domain:orders.times.title',
@@ -33,7 +35,8 @@ export const ORDER_SECTION_TITLE = {
 /**
  * Welche Unterseiten eines Auftrags sichtbar sind. Dieselben Rechte, mit
  * denen sich die Abschnitte bisher selbst ausgeblendet haben: Checkliste mit
- * Lese- oder Schreibrecht, Bautagebuch nur mit Recht zum Anlegen, Finanzen
+ * Lese- oder Schreibrecht, Dokumente mit `canViewDocuments`,
+ * Bautagebuch nur mit Recht zum Anlegen, Finanzen
  * mit Belegen oder Kosten (`orderFinanceAccess`). `null`,
  * solange die Mitgliedschaft lädt.
  */
@@ -49,6 +52,7 @@ export function useVisibleOrderSections(): ReadonlySet<OrderSection> | null {
           hasPermission(permissions, 'canEditChecklist')
         );
       }
+      if (section === 'documents') return hasPermission(permissions, 'canViewDocuments');
       if (section === 'reports') return canCreateDailyReport(permissions);
       if (section === 'finance') return canSeeOrderFinance(orderFinanceAccess(permissions));
       return true;

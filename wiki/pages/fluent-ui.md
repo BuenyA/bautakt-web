@@ -170,7 +170,7 @@ Feld die erste — so beim Auftrag im Zeiteintrag (`TimeEntrySheet`).
 Stand 2026-10-11 nach einer Durchsicht aller Bedienelemente: Es gibt genau
 zwei native Elemente ohne Fluent-Gegenstück, beide ohne eigene Optik.
 
-- Das versteckte `<input type="file">` der Foto-Ablage (`OrderPhotoDropzone`).
+- Das versteckte `<input type="file">` der Foto-Ablage (`FileDropzone`, auch für Auftragsdokumente).
   Fluent hat keinen Datei-Upload; die sichtbare Fläche ist das `<label>`.
 - Der ungestylte `<button>` für den Text einer Checklisten-Zeile
   (`OrderChecklist`). Er liegt in einer Fluent-`Card` neben der Fluent-
