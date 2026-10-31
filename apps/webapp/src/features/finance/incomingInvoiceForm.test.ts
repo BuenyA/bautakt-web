@@ -4,7 +4,9 @@ import { describe, it } from 'node:test';
 import {
   canDelete,
   canEditFields,
+  followSavedStatus,
   type IncomingInvoiceFields,
+  isFormDirty,
   isPaymentStatus,
   statusOptions,
   suggestGross,
@@ -119,5 +121,29 @@ describe('Status, Bearbeiten, Löschen', () => {
     assert.equal(isPaymentStatus('partially_paid'), true);
     assert.equal(isPaymentStatus('open'), false);
     assert.equal(isPaymentStatus(null), false);
+  });
+});
+
+describe('ungespeichert und Status aus Zahlungen (#270)', () => {
+  const baseline = { fields: '["Muster"]', status: 'open' as const };
+
+  it('Zahlung setzt den Status: danach nichts ungespeichert', () => {
+    // Ohne Nachziehen meldete die Seite nach jeder Zahlung ungespeicherte Änderungen.
+    assert.equal(isFormDirty(baseline.fields, 'partially_paid', baseline), true);
+    const next = followSavedStatus(baseline, 'partially_paid');
+    assert.equal(next.status, 'partially_paid');
+    assert.equal(isFormDirty(baseline.fields, next.status, next.baseline), false);
+  });
+
+  it('Storno zurück auf offen: ebenfalls nichts ungespeichert', () => {
+    const paid = followSavedStatus(baseline, 'paid');
+    const back = followSavedStatus(paid.baseline, 'open');
+    assert.equal(isFormDirty(baseline.fields, back.status, back.baseline), false);
+  });
+
+  it('eigene Änderungen bleiben ungespeichert', () => {
+    const next = followSavedStatus(baseline, 'partially_paid');
+    assert.equal(isFormDirty('["Neu"]', next.status, next.baseline), true);
+    assert.equal(isFormDirty(baseline.fields, 'overdue', baseline), true);
   });
 });

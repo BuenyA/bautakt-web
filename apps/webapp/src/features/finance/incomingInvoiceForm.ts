@@ -107,6 +107,32 @@ export function isPaymentStatus(status: IncomingInvoiceStatus | null): boolean {
 }
 
 /**
+ * Vergleichsstand für „ungespeichert“: die übrigen Felder als Snapshot, der
+ * Status getrennt. Den Status setzt nach einer Zahlung oder einem Storno die
+ * Datenbank (#270); er ist dann gespeichert, nicht vom Nutzer geändert.
+ */
+export type FormBaseline = { fields: string; status: IncomingInvoiceStatus };
+
+export function isFormDirty(
+  fields: string,
+  status: IncomingInvoiceStatus,
+  baseline: FormBaseline,
+): boolean {
+  return fields !== baseline.fields || status !== baseline.status;
+}
+
+/**
+ * Der gespeicherte Status hat sich geändert: Auswahl und Vergleichsstand folgen
+ * ihm. Ungespeicherte Änderungen an anderen Feldern bleiben ungespeichert.
+ */
+export function followSavedStatus(
+  baseline: FormBaseline,
+  savedStatus: IncomingInvoiceStatus,
+): { status: IncomingInvoiceStatus; baseline: FormBaseline } {
+  return { status: savedStatus, baseline: { ...baseline, status: savedStatus } };
+}
+
+/**
  * Status, die das Formular anbietet. Ein erfasster Beleg wird nie wieder
  * Entwurf. Teilbezahlt und bezahlt stehen nur da, wenn die Rechnung schon so
  * steht; dann ist die Auswahl gesperrt.
