@@ -87,9 +87,9 @@
   },
   "template": {
     "title": "Rechnungsvorlage",
-    "description": "Wie meine Rechnungen aussehen. Gilt für neue Belege. Freigegebene bleiben so, wie sie archiviert sind.",
+    "description": "Wie meine Belege aussehen. Wähle eine Vorlage, passe sie an und speichere. Freigegebene Belege bleiben so, wie sie archiviert sind.",
     "logo": "Logo",
-    "logoHint": "Steht oben auf jedem Beleg. PNG, JPG oder WebP; Bautakt verkleinert es auf 512 px.",
+    "logoHint": "Gilt für alle Vorlagen. PNG, JPG, WebP oder SVG, höchstens 5 MB. Rasterbilder verkleinert Bautakt auf 512 px. Eine SVG bleibt in der Ansicht scharf, im PDF steht eine hochauflösende PNG-Fassung.",
     "noLogo": "Kein Logo",
     "uploadLogo": "Logo hochladen",
     "replaceLogo": "Logo ersetzen",
@@ -100,31 +100,13 @@
     "logoReadOnly": "Das Logo ändert, wer die Unternehmenseinstellungen verwalten darf.",
     "logoErrors": {
       "UNSUPPORTED_IMAGE": "Bitte ein PNG-, JPG- oder WebP-Bild wählen.",
-      "IMAGE_UNREADABLE": "Das Bild ließ sich nicht lesen."
-    },
-    "design": "Farbe und Texte",
-    "designHint": "Die Texte stehen in jedem neuen Beleg vorbelegt und lassen sich dort anpassen.",
-    "accent": "Akzentfarbe",
-    "accents": {
-      "default": "Standard",
-      "blue": "Blau",
-      "teal": "Petrol",
-      "slate": "Schiefer",
-      "green": "Grün",
-      "red": "Rot"
-    },
-    "intro": "Einleitung",
-    "introHint": "Steht über den Positionen.",
-    "introPlaceholder": "z. B. Vielen Dank für Ihren Auftrag. Wir berechnen Ihnen folgende Leistungen:",
-    "footer": "Schlusstext",
-    "footerHint": "Steht unter der Summe.",
-    "footerPlaceholder": "z. B. Bitte überweisen Sie den Betrag innerhalb des Zahlungsziels.",
-    "preview": "Vorschau",
-    "previewHint": "Musterrechnung mit Beispielpositionen; der Empfänger bleibt leer.",
-    "previewEmpty": "Die Vorschau wird erstellt …",
-    "previewError": "Die Vorschau konnte nicht erstellt werden.",
-    "sampleLabor": "Montagearbeiten",
-    "sampleMaterial": "Material"
+      "UNSUPPORTED_LOGO": "Bitte ein PNG-, JPG-, WebP- oder SVG-Bild wählen.",
+      "IMAGE_UNREADABLE": "Das Bild ließ sich nicht lesen.",
+      "IMAGE_TOO_LARGE": "Das Bild darf höchstens 5 MB groß sein.",
+      "SVG_NO_SIZE": "Die SVG-Datei braucht eine viewBox oder eine Breite.",
+      "SVG_EMPTY": "Nach der Prüfung bleibt in der SVG-Datei nichts übrig, das sich als Logo eignet.",
+      "LOGO_PNG_TOO_LARGE": "Die Fassung fürs PDF wird größer als 2 MB. Bitte eine einfachere SVG-Datei wählen."
+    }
   },
   "dunning": {
     "title": "Mahnwesen",

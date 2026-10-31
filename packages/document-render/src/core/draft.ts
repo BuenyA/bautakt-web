@@ -66,6 +66,11 @@ export function parseDraftInput(value: unknown): DraftInput | null {
       ? d.parent_document_id
       : null,
     buyer_reference: textOrNull(d.buyer_reference),
+    subject: textOrNull(d.subject),
+    invoice_template_id: typeof d.invoice_template_id === "string" &&
+        UUID_RE.test(d.invoice_template_id)
+      ? d.invoice_template_id
+      : null,
     issue_date: dateOrNull(d.issue_date),
     service_date: dateOrNull(d.service_date),
     due_date: dateOrNull(d.due_date),

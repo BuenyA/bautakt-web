@@ -16,10 +16,12 @@ Bautakt lives in two independent git repositories that share **one** Supabase pr
 Both target Supabase project `bxivzvmlcnaxqlytumvz` (`Bautakt`, `eu-central-1`,
 Postgres 17). _Stand 2026-08-26: 49 tables in `public`, every one with RLS enabled._
 
-⚠️ **Schema changes happen only in `bautakt-app/supabase/`. This repo never gets a
-`supabase/` folder** — `/supabase/` is in `.gitignore` precisely because the Supabase
-CLI creates one as scratch state whenever you generate types here, and it once made it
-into a commit.
+⚠️ **Schema changes happen only in `bautakt-app/supabase/`.** `/supabase/*` is in
+`.gitignore` because the Supabase CLI creates a folder as scratch state whenever you
+generate types here, and it once made it into a commit. The only exception is
+`supabase/migrations/`: a web PR may carry a migration that is **not applied** from
+this repo and must be applied on the project before deploy. Scratch files under
+`supabase/` stay ignored. Do not `supabase db push` from here.
 
 A migration the web app needs is still authored _over there_ and still obeys that
 repo's rules: never edit an already-applied migration; ⚠️ never `supabase db push`;

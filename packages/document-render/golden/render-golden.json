@@ -139,7 +139,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -322,7 +324,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -474,7 +478,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -627,7 +633,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -779,7 +787,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -932,7 +942,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -1069,7 +1081,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -1207,7 +1221,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -1389,7 +1405,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -1575,7 +1593,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -1715,7 +1735,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -1856,7 +1878,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -1996,7 +2020,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -2134,7 +2160,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -2301,7 +2329,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -2475,7 +2505,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -2663,7 +2695,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -2846,7 +2880,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -2998,7 +3034,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -3151,7 +3189,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -3303,7 +3343,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -3456,7 +3498,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -3593,7 +3637,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -3731,7 +3777,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -3913,7 +3961,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -4099,7 +4149,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -4239,7 +4291,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -4380,7 +4434,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -4520,7 +4576,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -4658,7 +4716,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -4825,7 +4885,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {
@@ -4999,7 +5061,9 @@
             "bank_name": "Deutsche Kreditbank Berlin",
             "payment_term_days": 14,
             "currency": "EUR",
-            "invoice_accent_color": ""
+            "invoice_accent_color": "",
+            "register_court": null,
+            "managing_directors": null
           },
           "customer": {
             "contact": {

@@ -109,6 +109,10 @@ export type EditorState = TermFields & {
   introText: string;
   footerText: string;
   notes: string;
+  /** Betreff / Bauvorhaben (`subject`), steht im PDF über dem Belegtitel. */
+  subject: string;
+  /** Rechnungsvorlage; `null` = Standardvorlage des Betriebs. */
+  invoiceTemplateId: string | null;
   /** E-Rechnung (Factur-X im PDF). Standard an; nur bei Rechnungsarten wählbar. */
   eInvoice: boolean;
   /** Format der E-Rechnung: fast immer ZUGFeRD, XRechnung für Behörden (#184). */
@@ -467,6 +471,8 @@ export function buildDraftRows(state: EditorState, companyId: string) {
     due_date: state.dueDate || null,
     intro_text: state.introText,
     footer_text: state.footerText,
+    subject: state.subject.trim(),
+    invoice_template_id: state.invoiceTemplateId,
     notes: state.notes,
     buyer_reference: state.buyerReference.trim(),
     payment_term_days: optionalNumber(state.paymentTermDays),

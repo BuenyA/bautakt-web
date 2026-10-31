@@ -31,6 +31,8 @@ export const CORE_FILES = [
   'assets.ts',
   'embeddedAssets.ts',
   'fingerprint.ts',
+  'template.ts',
+  'letterhead.ts',
 ];
 
 const args = process.argv.slice(2);

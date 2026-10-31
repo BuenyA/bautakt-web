@@ -59,6 +59,13 @@ Edge Function `datev-export` (bautakt-app, Wiki `finanzmodul.md`).
   Download. Der Eingang hat eigene Texte, wo das Konto anders heißt
   (`findingsIncoming`, sonst `findings`). Steuerart und Satz im Befund werden
   lesbar („§ 13b, 19 %“).
+- **„Zu den DATEV-Einstellungen“** (`datevExport.toSettings`) führt auf
+  `routes.companyDatev` (`/unternehmen/datev`). Das ist der Abschnitt im
+  Unternehmensbereich: eigene Adresse, in der Unternavigation ausgewählt, auch
+  beim direkten Aufruf. `/einstellungen` ist seit 2026-10-30 nur noch
+  Darstellung und Benachrichtigungen. Andere Stellen nennen die
+  DATEV-Einstellungen im Satz (Freigabe-Dialog) oder verlinken etwas anderes
+  (Schnellsuche, Versand, Ablehnungsmail) und führen nicht dorthin.
 - **Ein Klick: CSV + ZIP.** Ausgang: Archiv-PDFs; ohne Archiv-PDF gibt es nichts.
   Eingang: die Originale mit ihrer Endung (PDF, XML, Bild), benannt nach
   Belegfeld 1. Eine Eingangsrechnung ohne Original (Papierbeleg) blockiert nicht:

@@ -16,3 +16,13 @@ export {
   type RenderedDocument,
   renderPdf,
 } from './core/render.ts';
+export {
+  type InvoiceTemplateRow,
+  LETTERHEAD_DEFAULTS,
+  type LetterheadLayout,
+  TEMPLATE_TEXT_TYPES,
+  type TemplateBankAccount,
+  type TemplateLayoutKey,
+  templateLayoutKey,
+  templateTextsFor,
+} from './core/template.ts';

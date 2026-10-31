@@ -29,6 +29,7 @@ verlinkt, nie kopiert.
 | [fluent-ui.md](pages/fluent-ui.md)                             | Fluent UI 2: Themes, Provider, Tailwind-Regel, Bausteine.                      |
 | [uebersicht.md](pages/uebersicht.md)                           | Startseite: Tagesplan, Zu erledigen, Jahresergebnis.                           |
 | [rechnungsbereich.md](pages/rechnungsbereich.md)               | Bereich „Rechnungen“: Reiter, Übersicht mit Ausgang, Eingang, Zahlen.          |
+| [rechnungsvorlagen.md](pages/rechnungsvorlagen.md)             | Vorlagenmodul für Ausgangsbelege, Briefbogen „Spahrbau“, Konzept und Ausbau.   |
 | [kontakte.md](pages/kontakte.md)                               | Kontakte: ein Geschäftspartner mit Rollen, Auswahl in Belegen.                 |
 | [auftragsseite.md](pages/auftragsseite.md)                     | Auftrag: Übersicht, Reiter, Unterseiten, Finanzen und Dokumente.               |
 | [auftragsfotos.md](pages/auftragsfotos.md)                     | Fotos am Auftrag anzeigen, hochladen und löschen.                              |
@@ -129,6 +130,10 @@ verlinkt, nie kopiert.
 | 2026-10-30 | [DATEV-Export: Eingangsrechnungen](logs/2026-10-30-datev-export-eingang.md)                                    |
 | 2026-10-30 | [Profilmenü neu: Mein Profil, Unternehmen, Einstellungen](logs/2026-10-30-profil-unternehmen-einstellungen.md) |
 | 2026-10-30 | [Einrichtung statt Übersicht, keine Gedankenstriche](logs/2026-10-30-einrichtung-und-gedankenstriche.md)       |
+| 2026-10-30 | [„Verwerfen“ im Dialog ist rot](logs/2026-10-30-verwerfen-rot.md)                                              |
+| 2026-10-30 | [DATEV-Export verlinkt die DATEV-Einstellungen](logs/2026-10-30-datev-einstellungen-link.md)                   |
+| 2026-10-30 | [Rechnungsvorlagen und Briefbogen „Spahrbau“](logs/2026-10-30-rechnungsvorlagen.md)                            |
+| 2026-10-30 | [SVG als Logo der Rechnungsvorlage](logs/2026-10-30-svg-logo.md)                                               |
 | 2026-10-30 | [Auftrag: Übersicht mit Vorschau-Karten und Unterseiten](logs/2026-10-30-auftragsseite-uebersicht.md)          |
 | 2026-10-30 | [Auftrag: Finanzen](logs/2026-10-30-auftragsfinanzen.md)                                                       |
 | 2026-10-31 | [Auftrag: Dokumente](logs/2026-10-31-auftragsdokumente.md)                                                     |

@@ -1,3 +1,4 @@
+import { type InvoiceTemplateRow, templateTextsFor } from '@bautakt/document-render';
 import {
   eurosToMinor,
   formatMoney,
@@ -13,12 +14,6 @@ import {
   Button,
   Card,
   CardHeader,
-  Dialog,
-  DialogActions,
-  DialogBody,
-  DialogContent,
-  DialogSurface,
-  DialogTitle,
   Input,
   Label,
   makeStyles,
@@ -46,6 +41,7 @@ import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'rea
 import { useTranslation } from 'react-i18next';
 import { useBlocker, useNavigate, useParams, useSearchParams } from 'react-router';
 
+import { DiscardChangesDialog } from '@/components/common/DiscardChangesDialog';
 import { EmptyState } from '@/components/common/EmptyState';
 import { HelpButton } from '@/components/common/HelpButton';
 import { LinkButton } from '@/components/common/LinkButton';
@@ -54,6 +50,7 @@ import { PageSpinner } from '@/components/common/PageSpinner';
 import { DatePicker } from '@/components/form/dateTime';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
 import { useMembership } from '@/features/company/useMembership';
+import { useInvoiceTemplates } from '@/features/companySettings/invoiceTemplates';
 import { ContactPicker } from '@/features/contacts/ContactPicker';
 import { useContacts } from '@/features/contacts/useContacts';
 import { useOrders } from '@/features/orders/useOrders';
@@ -111,6 +108,8 @@ function initialState(type: EditableDocumentType, taxMode: TaxMode): EditorState
     introText: '',
     footerText: '',
     notes: '',
+    subject: '',
+    invoiceTemplateId: null,
     buyerReference: '',
     paymentTermDays: '',
     skontoPercent: '',
@@ -119,6 +118,29 @@ function initialState(type: EditableDocumentType, taxMode: TaxMode): EditorState
     eInvoice: true,
     eInvoiceFormat: 'zugferd',
     lines: [emptyLine()],
+  };
+}
+
+/**
+ * Vorlage am Beleg setzen und ihre Texte für die Belegart vorbelegen.
+ * Einleitung und Schlusstext werden nur ersetzt, wenn sie leer sind oder noch
+ * genau dem Text der bisherigen Vorlage entsprechen — Eigenes bleibt stehen.
+ */
+function withTemplate(
+  state: EditorState,
+  from: InvoiceTemplateRow | null,
+  to: InvoiceTemplateRow | null,
+  fromType: string = state.type,
+): EditorState {
+  const before = templateTextsFor(from, fromType);
+  const after = templateTextsFor(to, state.type);
+  const replace = (current: string, previous: string, next: string) =>
+    !current.trim() || current.trim() === previous ? next : current;
+  return {
+    ...state,
+    invoiceTemplateId: to?.id ?? null,
+    introText: replace(state.introText, before.intro, after.intro),
+    footerText: replace(state.footerText, before.footer, after.footer),
   };
 }
 
@@ -234,6 +256,8 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const orderFieldId = useId();
   const styles = useStyles();
   const typeFieldId = useId();
+  const templateFieldId = useId();
+  const subjectFieldId = useId();
   const taxModeFieldId = useId();
 
   const { data: membership } = useMembership();
@@ -246,6 +270,11 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   const contacts = useContacts();
   const orders = useOrders();
   const taxProfile = useCompanyTaxProfile();
+  const templates = useInvoiceTemplates();
+  const activeTemplates = (templates.data ?? []).filter((row) => !row.archived_at);
+  const defaultTemplate = activeTemplates.find((row) => row.is_default);
+  const templateById = (templateId: string | null) =>
+    (templates.data ?? []).find((row) => row.id === templateId) ?? null;
   const save = useSaveDraft();
   const finalize = useFinalizeDocument(id);
   const existingLoading = useCompanyListLoading(existing);
@@ -271,7 +300,16 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
   // sonst stünde kurz `standard` statt § 19 im Formular, oder der Kunde fehlte.
   const ordersReady = !fromOrderId || orders.isFetched;
   const parentReady = !creditFromId || parentDocument.isFetched;
-  if (!id && state === null && taxProfile.isFetched && ordersReady && parentReady) {
+  // Vorlagen: Fehler (etwa ohne Leserecht) heißt nur „keine Vorlage“.
+  const templatesReady = !templates.isLoading;
+  if (
+    !id &&
+    state === null &&
+    taxProfile.isFetched &&
+    ordersReady &&
+    parentReady &&
+    templatesReady
+  ) {
     const order = fromOrderId
       ? (orders.data ?? []).find((row) => row.id === fromOrderId)
       : undefined;
@@ -280,13 +318,19 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
           parentDocument.data,
           isSmallBusiness ? 'small_business' : toTaxMode(parentDocument.data.tax_mode),
         )
+      : initialState(type, defaultTaxMode);
+    const ordered = order ? { ...fresh, orderId: order.id, customerId: order.customer_id } : fresh;
+    // Standardvorlage samt ihrer Texte für diese Belegart vorbelegen.
+    const templated = withTemplate(ordered, null, defaultTemplate ?? null);
+    // Was die Vorlage offenlässt, füllen Einleitung und Schlusstext aus
+    // Unternehmen → Rechnungsvorlage (nur bei neuen Belegen, nicht bei Gutschriften).
+    const start = parentDocument.data
+      ? templated
       : {
-          ...initialState(type, defaultTaxMode),
-          // Vorbelegung aus der Rechnungsvorlage des Betriebs.
-          introText: taxProfile.data?.introText ?? '',
-          footerText: taxProfile.data?.footerText ?? '',
+          ...templated,
+          introText: templated.introText || (taxProfile.data?.introText ?? ''),
+          footerText: templated.footerText || (taxProfile.data?.footerText ?? ''),
         };
-    const start = order ? { ...fresh, orderId: order.id, customerId: order.customer_id } : fresh;
     if (order) pendingOrderImport.current = order.id;
     setState(start);
     setBaseline(JSON.stringify(start));
@@ -313,6 +357,8 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
       introText: existing.data.intro_text,
       footerText: existing.data.footer_text,
       notes: existing.data.notes,
+      subject: existing.data.subject ?? '',
+      invoiceTemplateId: existing.data.invoice_template_id ?? null,
       buyerReference: existing.data.buyer_reference,
       paymentTermDays: numberText(existing.data.payment_term_days),
       skontoPercent: numberText(existing.data.skonto_percent),
@@ -522,6 +568,15 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
 
   function update(patch: Partial<EditorState>) {
     setState((current) => (current ? { ...current, ...patch } : current));
+  }
+
+  /** Vorlage wechseln; unveränderte Vorlagentexte wandern mit (`withTemplate`). */
+  function selectTemplate(templateId: string | null) {
+    setState((current) =>
+      current
+        ? withTemplate(current, templateById(current.invoiceTemplateId), templateById(templateId))
+        : current,
+    );
   }
 
   // Die letzte Position darf weg; dann steht eine leere zum Neuanfangen da.
@@ -837,7 +892,18 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                   <Select
                     id={typeFieldId}
                     value={state.type}
-                    onChange={(_, { value }) => update({ type: value as EditableDocumentType })}
+                    onChange={(_, { value }) =>
+                      setState((current) => {
+                        if (!current) return current;
+                        const template = templateById(current.invoiceTemplateId);
+                        return withTemplate(
+                          { ...current, type: value as EditableDocumentType },
+                          template,
+                          template,
+                          current.type,
+                        );
+                      })
+                    }
                   >
                     {INVOICE_EDITOR_TYPES.map((value) => (
                       <option key={value} value={value}>
@@ -875,6 +941,42 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
                     </Tooltip>
                   ) : null}
                 </div>
+              </div>
+              {activeTemplates.length > 0 || state.invoiceTemplateId ? (
+                <div className="grid gap-2">
+                  <Label htmlFor={templateFieldId}>{t('domain:editor.template.label')}</Label>
+                  <Select
+                    id={templateFieldId}
+                    value={state.invoiceTemplateId ?? ''}
+                    onChange={(_, { value }) => selectTemplate(value || null)}
+                  >
+                    <option value="">
+                      {defaultTemplate
+                        ? t('domain:editor.template.companyDefault', { name: defaultTemplate.name })
+                        : t('domain:editor.template.bautakt')}
+                    </option>
+                    {[
+                      ...activeTemplates,
+                      ...(templateById(state.invoiceTemplateId)?.archived_at
+                        ? [templateById(state.invoiceTemplateId)!]
+                        : []),
+                    ].map((row) => (
+                      <option key={row.id} value={row.id}>
+                        {row.name}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+              ) : null}
+              <div className="grid gap-2 @lg:col-span-2">
+                <Label htmlFor={subjectFieldId}>{t('domain:editor.subject.label')}</Label>
+                <Input
+                  id={subjectFieldId}
+                  value={state.subject}
+                  maxLength={300}
+                  placeholder={t('domain:editor.subject.placeholder')}
+                  onChange={(event) => update({ subject: event.target.value })}
+                />
               </div>
             </div>
           </Section>
@@ -1250,20 +1352,16 @@ export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
         onClose={() => setConfirmRelease(false)}
       />
 
-      <Dialog open={discardOpen} onOpenChange={(_, data) => !data.open && onDiscardKept()}>
-        <DialogSurface>
-          <DialogBody>
-            <DialogTitle>{t('domain:editor.discard.title')}</DialogTitle>
-            <DialogContent>{t('domain:editor.discard.description')}</DialogContent>
-            <DialogActions>
-              <Button onClick={onDiscardKept}>{t('domain:editor.discard.keep')}</Button>
-              <Button appearance="primary" onClick={onDiscardConfirmed}>
-                {t('domain:editor.discard.confirm')}
-              </Button>
-            </DialogActions>
-          </DialogBody>
-        </DialogSurface>
-      </Dialog>
+      <DiscardChangesDialog
+        open={discardOpen}
+        onDismiss={onDiscardKept}
+        title={t('domain:editor.discard.title')}
+        description={t('domain:editor.discard.description')}
+        keepLabel={t('domain:editor.discard.keep')}
+        discardLabel={t('domain:editor.discard.confirm')}
+        onKeep={onDiscardKept}
+        onDiscard={onDiscardConfirmed}
+      />
     </div>
   );
 }

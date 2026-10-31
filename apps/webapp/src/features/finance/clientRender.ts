@@ -58,6 +58,8 @@ export function bundleKey(draft: DraftBody): string {
     document.company_id,
     document.customer_id ?? null,
     document.parent_document_id ?? null,
+    // Die Vorlage kommt mit dem Bündel; eine andere Auswahl braucht ein neues.
+    document.invoice_template_id ?? null,
     credited,
   ]);
 }

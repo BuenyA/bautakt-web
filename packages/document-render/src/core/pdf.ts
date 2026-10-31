@@ -21,6 +21,7 @@ import {
   PDFDocument,
   PDFFont,
   PDFHexString,
+  PDFImage,
   PDFName,
   PDFPage,
   PDFString,
@@ -31,6 +32,11 @@ import fontkit from "@pdf-lib/fontkit";
 
 import { formatCents, formatGermanDate, formatGermanNumber, formatQuantity } from "./mapping.ts";
 import type { InvoiceData, PdfAssets, RenderLine } from "./types.ts";
+import {
+  drawLetterheadDecorations,
+  drawLetterheadDocument,
+  LETTERHEAD_BODY_BOTTOM,
+} from "./letterhead.ts";
 
 // ---------------------------------------------------------------------------
 // Layout-Konstanten (A4)
@@ -50,14 +56,14 @@ const CONTENT_R = PAGE_W - MARGIN_R;
 const FOOTER_RESERVE = 74;
 const BODY_BOTTOM = MARGIN_B + FOOTER_RESERVE;
 
-const SIZE_TINY = 6.8;
+export const SIZE_TINY = 6.8;
 const SIZE_SMALL = 8;
 const SIZE_BASE = 9;
 const SIZE_TITLE = 17;
 
-const COLOR_TEXT: RGB = rgb(0.11, 0.12, 0.14);
-const COLOR_MUTED: RGB = rgb(0.42, 0.45, 0.5);
-const COLOR_RULE: RGB = rgb(0.78, 0.8, 0.83);
+export const COLOR_TEXT: RGB = rgb(0.11, 0.12, 0.14);
+export const COLOR_MUTED: RGB = rgb(0.42, 0.45, 0.5);
+export const COLOR_RULE: RGB = rgb(0.78, 0.8, 0.83);
 const COLOR_BAND: RGB = rgb(0.94, 0.95, 0.96);
 const COLOR_PAPER: RGB = rgb(1, 1, 1);
 
@@ -192,7 +198,7 @@ const COL_AMOUNT_R = CONTENT_R;
 // ---------------------------------------------------------------------------
 
 /** Zeichen entfernen, die pdf-lib/fontkit nicht setzen kann. */
-function sanitize(text: string): string {
+export function sanitize(text: string): string {
   return (text ?? "")
     // deno-lint-ignore no-control-regex
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
@@ -200,7 +206,7 @@ function sanitize(text: string): string {
     .replace(/\u00A0/g, " ");
 }
 
-function wrapText(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
+export function wrapText(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
   const clean = sanitize(text);
   if (!clean) return [];
   const out: string[] = [];
@@ -393,7 +399,7 @@ function buildXmp(opts: {
 // Renderer
 // ---------------------------------------------------------------------------
 
-type Ctx = {
+export type Ctx = {
   doc: PDFDocument;
   regular: PDFFont;
   bold: PDFFont;
@@ -402,10 +408,12 @@ type Ctx = {
   y: number;
   data: InvoiceData;
   accent: AccentPalette;
+  /** Unterkante des Textbereichs; der Briefbogen braucht mehr Platz für den Fuß. */
+  bodyBottom: number;
 };
 
 /** „Rechnung RE00002“; ein Entwurf hat noch keine Nummer, nur „Rechnung“. */
-function documentHeading(data: InvoiceData): string {
+export function documentHeading(data: InvoiceData): string {
   return data.documentNumber ? `${data.documentTitle} ${data.documentNumber}` : data.documentTitle;
 }
 
@@ -428,7 +436,7 @@ function newPage(ctx: Ctx): void {
   }
 }
 
-function text(
+export function text(
   ctx: Ctx,
   value: string,
   x: number,
@@ -445,7 +453,7 @@ function text(
   });
 }
 
-function textRight(
+export function textRight(
   ctx: Ctx,
   value: string,
   right: number,
@@ -467,8 +475,8 @@ function rule(ctx: Ctx, y: number, color: RGB = COLOR_RULE, thickness = 0.6): vo
   });
 }
 
-function ensureSpace(ctx: Ctx, needed: number, onNewPage?: (ctx: Ctx) => void): void {
-  if (ctx.y - needed >= BODY_BOTTOM) return;
+export function ensureSpace(ctx: Ctx, needed: number, onNewPage?: (ctx: Ctx) => void): void {
+  if (ctx.y - needed >= ctx.bodyBottom) return;
   newPage(ctx);
   onNewPage?.(ctx);
 }
@@ -683,7 +691,7 @@ function drawTotals(ctx: Ctx): void {
 
 type TotalRow = { label: string; value: string; bold?: boolean };
 
-function vatRateText(ratePercent: number): string {
+export function vatRateText(ratePercent: number): string {
   return formatGermanNumber(ratePercent, ratePercent % 1 === 0 ? 0 : 2);
 }
 
@@ -856,6 +864,116 @@ function drawFooters(ctx: Ctx): void {
   }
 }
 
+/** Bisheriges Layout (ohne Vorlage oder mit Vorlage `standard`). */
+function drawStandardDocument(ctx: Ctx, logo: PDFImage | null): void {
+  const { data, regular } = ctx;
+  let logoBox: { width: number; height: number } | null = null;
+  if (logo) {
+    const maxW = 150;
+    const maxH = 54;
+    const scale = Math.min(maxW / logo.width, maxH / logo.height, 1);
+    const width = logo.width * scale;
+    const height = logo.height * scale;
+    ctx.page.drawImage(logo, {
+      x: CONTENT_L,
+      y: PAGE_H - MARGIN_T - height,
+      width,
+      height,
+    });
+    logoBox = { width, height };
+  }
+
+  const headTop = drawLetterhead(ctx, logoBox);
+  ctx.y = drawAddressAndMeta(ctx, headTop);
+
+  // Betreff / Bauvorhaben, nur wenn gesetzt
+  if (data.subject) {
+    for (const line of wrapText(data.subject, ctx.bold, SIZE_BASE + 1, CONTENT_R - CONTENT_L)) {
+      ensureSpace(ctx, 14);
+      text(ctx, line, CONTENT_L, ctx.y, { size: SIZE_BASE + 1, bold: true });
+      ctx.y -= 13;
+    }
+    ctx.y -= 6;
+  }
+
+  // Titel
+  ensureSpace(ctx, 40);
+  const title = documentHeading(data);
+  text(ctx, title, CONTENT_L, ctx.y, { size: SIZE_TITLE, bold: true, color: ctx.accent.title });
+  ctx.y -= 20;
+
+  if (data.introText) {
+    const introLines = wrapText(data.introText, regular, SIZE_BASE, CONTENT_R - CONTENT_L);
+    for (const line of introLines) {
+      ensureSpace(ctx, 12);
+      text(ctx, line, CONTENT_L, ctx.y, { size: SIZE_BASE });
+      ctx.y -= 11;
+    }
+    ctx.y -= 6;
+  }
+
+  // Positionstabelle
+  ctx.y -= 6;
+  ensureSpace(ctx, 40);
+  drawTableHeader(ctx);
+  ctx.y -= 4;
+
+  for (const line of data.lines) {
+    const needed = lineHeight(ctx, line);
+    ensureSpace(ctx, needed + 4, (c) => {
+      drawTableHeader(c);
+      c.y -= 4;
+    });
+    drawLine(ctx, line, data.currency);
+    ctx.page.drawLine({
+      start: { x: CONTENT_L, y: ctx.y + 4 },
+      end: { x: CONTENT_R, y: ctx.y + 4 },
+      thickness: 0.3,
+      color: COLOR_RULE,
+    });
+    ctx.y -= 4;
+  }
+
+  drawTotals(ctx);
+
+  // Zahlungsbedingungen; eine Gutschrift wird verrechnet, nicht überwiesen.
+  const paymentLines: string[] = [data.payment.termsText];
+  const isCreditNote = data.documentType === "credit_note";
+  if (
+    data.payment.skontoPercent != null &&
+    data.payment.skontoDays != null &&
+    data.payment.skontoGrossCents != null
+  ) {
+    paymentLines.push(
+      `Skontobetrag: ${formatCents(data.payment.skontoAmountCents ?? 0, data.currency)}, Zahlbetrag bei Skontoabzug: ${formatCents(data.payment.skontoGrossCents, data.currency)}.`,
+    );
+  }
+  if (data.seller.iban && !isCreditNote) {
+    const bank = [
+      data.seller.bankName ? `Bank: ${data.seller.bankName}` : null,
+      `IBAN: ${data.seller.iban}`,
+      data.seller.bic ? `BIC: ${data.seller.bic}` : null,
+    ]
+      .filter(Boolean)
+      .join("   ");
+    paymentLines.push(bank);
+    if (data.documentNumber) paymentLines.push(`Verwendungszweck: ${data.documentNumber}`);
+  }
+  drawParagraphBlock(ctx, isCreditNote ? "Verrechnung" : "Zahlungsbedingungen", paymentLines, 14);
+
+  if (data.taxHints.length > 0) {
+    drawParagraphBlock(ctx, "Hinweise", data.taxHints, 12);
+  }
+  if (data.notes) {
+    drawParagraphBlock(ctx, "Anmerkungen", [data.notes], 12);
+  }
+  if (data.footerText) {
+    drawParagraphBlock(ctx, null, [data.footerText], 12);
+  }
+
+  drawFooters(ctx);
+}
+
 // ---------------------------------------------------------------------------
 // PDF/A-Infrastruktur
 // ---------------------------------------------------------------------------
@@ -1021,28 +1139,17 @@ export async function buildInvoicePdf(opts: {
     y: 0,
     data,
     accent: accent.palette,
+    bodyBottom: data.layout ? LETTERHEAD_BODY_BOTTOM : BODY_BOTTOM,
   };
   newPage(ctx);
 
   // Logo defensiv: ein fehlendes oder kaputtes Bild darf den Render nie kippen.
-  let logoBox: { width: number; height: number } | null = null;
+  let logo: PDFImage | null = null;
   if (assets.logo?.bytes && assets.logo.bytes.length > 0) {
     try {
-      const image = assets.logo.mime.includes("png")
+      logo = assets.logo.mime.includes("png")
         ? await doc.embedPng(assets.logo.bytes)
         : await doc.embedJpg(assets.logo.bytes);
-      const maxW = 150;
-      const maxH = 54;
-      const scale = Math.min(maxW / image.width, maxH / image.height, 1);
-      const width = image.width * scale;
-      const height = image.height * scale;
-      ctx.page.drawImage(image, {
-        x: CONTENT_L,
-        y: PAGE_H - MARGIN_T - height,
-        width,
-        height,
-      });
-      logoBox = { width, height };
     } catch (e) {
       warnings.push(
         `Firmenlogo konnte nicht eingebettet werden, Beleg wurde ohne Logo erzeugt: ${
@@ -1052,85 +1159,14 @@ export async function buildInvoicePdf(opts: {
     }
   }
 
-  const headTop = drawLetterhead(ctx, logoBox);
-  ctx.y = drawAddressAndMeta(ctx, headTop);
-
-  // Titel
-  ensureSpace(ctx, 40);
-  const title = documentHeading(data);
-  text(ctx, title, CONTENT_L, ctx.y, { size: SIZE_TITLE, bold: true, color: ctx.accent.title });
-  ctx.y -= 20;
-
-  if (data.introText) {
-    const introLines = wrapText(data.introText, regular, SIZE_BASE, CONTENT_R - CONTENT_L);
-    for (const line of introLines) {
-      ensureSpace(ctx, 12);
-      text(ctx, line, CONTENT_L, ctx.y, { size: SIZE_BASE });
-      ctx.y -= 11;
-    }
-    ctx.y -= 6;
+  // Vorlage: Briefbogen oder bisheriges Layout.
+  if (data.layout) {
+    drawLetterheadDocument(ctx, data.layout, logo);
+    drawLetterheadDecorations(ctx, data.layout);
+  } else {
+    drawStandardDocument(ctx, logo);
   }
 
-  // Positionstabelle
-  ctx.y -= 6;
-  ensureSpace(ctx, 40);
-  drawTableHeader(ctx);
-  ctx.y -= 4;
-
-  for (const line of data.lines) {
-    const needed = lineHeight(ctx, line);
-    ensureSpace(ctx, needed + 4, (c) => {
-      drawTableHeader(c);
-      c.y -= 4;
-    });
-    drawLine(ctx, line, data.currency);
-    ctx.page.drawLine({
-      start: { x: CONTENT_L, y: ctx.y + 4 },
-      end: { x: CONTENT_R, y: ctx.y + 4 },
-      thickness: 0.3,
-      color: COLOR_RULE,
-    });
-    ctx.y -= 4;
-  }
-
-  drawTotals(ctx);
-
-  // Zahlungsbedingungen; eine Gutschrift wird verrechnet, nicht überwiesen.
-  const paymentLines: string[] = [data.payment.termsText];
-  const isCreditNote = data.documentType === "credit_note";
-  if (
-    data.payment.skontoPercent != null &&
-    data.payment.skontoDays != null &&
-    data.payment.skontoGrossCents != null
-  ) {
-    paymentLines.push(
-      `Skontobetrag: ${formatCents(data.payment.skontoAmountCents ?? 0, data.currency)}, Zahlbetrag bei Skontoabzug: ${formatCents(data.payment.skontoGrossCents, data.currency)}.`,
-    );
-  }
-  if (data.seller.iban && !isCreditNote) {
-    const bank = [
-      data.seller.bankName ? `Bank: ${data.seller.bankName}` : null,
-      `IBAN: ${data.seller.iban}`,
-      data.seller.bic ? `BIC: ${data.seller.bic}` : null,
-    ]
-      .filter(Boolean)
-      .join("   ");
-    paymentLines.push(bank);
-    if (data.documentNumber) paymentLines.push(`Verwendungszweck: ${data.documentNumber}`);
-  }
-  drawParagraphBlock(ctx, isCreditNote ? "Verrechnung" : "Zahlungsbedingungen", paymentLines, 14);
-
-  if (data.taxHints.length > 0) {
-    drawParagraphBlock(ctx, "Hinweise", data.taxHints, 12);
-  }
-  if (data.notes) {
-    drawParagraphBlock(ctx, "Anmerkungen", [data.notes], 12);
-  }
-  if (data.footerText) {
-    drawParagraphBlock(ctx, null, [data.footerText], 12);
-  }
-
-  drawFooters(ctx);
 
   const xmlBytes = opts.facturXml ? new TextEncoder().encode(opts.facturXml) : null;
   const embedded = embeddedXmlFor(data.einvoiceFormat);
