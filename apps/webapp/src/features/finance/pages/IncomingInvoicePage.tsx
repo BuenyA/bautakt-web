@@ -55,7 +55,10 @@ import { IncomingInvoiceDropzone } from '../IncomingInvoiceDropzone';
 import {
   canDelete,
   canEditFields,
+  followSavedStatus,
+  type FormBaseline,
   type IncomingInvoiceStatus,
+  isFormDirty,
   isIncomingInvoiceStatus,
   isPaymentStatus,
   statusOptions,
@@ -231,13 +234,6 @@ function IncomingInvoiceForm({
   const [categoryId, setCategoryId] = useState(saved?.cost_category_id ?? '');
   const [notes, setNotes] = useState(saved?.notes ?? '');
   const [status, setStatus] = useState<IncomingInvoiceStatus>(savedStatus ?? 'open');
-  // Teilbezahlt und bezahlt setzt die Datenbank nach einer Zahlung (#270). Die
-  // Auswahl folgt dem gespeicherten Status, sonst schickt Speichern den alten.
-  const [statusFrom, setStatusFrom] = useState(savedStatus);
-  if (savedStatus !== statusFrom) {
-    setStatusFrom(savedStatus);
-    if (savedStatus !== null) setStatus(savedStatus);
-  }
   const statusFromPayments = isPaymentStatus(savedStatus);
   const [taxRowsState, setTaxRows] = useState<TaxRow[]>(() =>
     taxRows(
@@ -303,11 +299,26 @@ function IncomingInvoiceForm({
     orderId,
     categoryId,
     notes,
-    status,
     taxRowsState,
   ]);
-  const [baseline] = useState(snapshot);
-  const dirty = snapshot !== baseline;
+  const [baseline, setBaseline] = useState<FormBaseline>(() => ({
+    fields: snapshot,
+    status,
+  }));
+  // Teilbezahlt und bezahlt setzt die Datenbank nach einer Zahlung, ein Storno
+  // nimmt es zurück (#270). Auswahl und Vergleichsstand folgen dem gespeicherten
+  // Status: Speichern schickt nicht den alten, und die Seite meldet danach
+  // nichts Ungespeichertes.
+  const [statusFrom, setStatusFrom] = useState(savedStatus);
+  if (savedStatus !== statusFrom) {
+    setStatusFrom(savedStatus);
+    if (savedStatus !== null) {
+      const next = followSavedStatus(baseline, savedStatus);
+      setStatus(next.status);
+      setBaseline(next.baseline);
+    }
+  }
+  const dirty = isFormDirty(snapshot, status, baseline);
   const dirtyRef = useRef(dirty);
   const leavingRef = useRef(false);
   useEffect(() => {
