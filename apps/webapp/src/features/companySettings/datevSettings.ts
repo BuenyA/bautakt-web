@@ -11,6 +11,14 @@ export type Chart = (typeof CHARTS)[number];
 
 export const ACCOUNT_LENGTHS = [4, 5, 6, 7, 8] as const;
 
+/**
+ * Wann erhaltenes Skonto im Export gebucht wird (#172): am Tag des Vermerks
+ * oder am Tag der Zahlung. Wie der CHECK an
+ * `company_datev_settings.cash_discount_booking`.
+ */
+export const CASH_DISCOUNT_BOOKINGS = ['on_note', 'on_payment'] as const;
+export type CashDiscountBooking = (typeof CASH_DISCOUNT_BOOKINGS)[number];
+
 /** Mit dieser Sachkontenlänge gelten die hinterlegten Standardkonten. */
 export const STANDARD_ACCOUNT_LENGTH = 4;
 

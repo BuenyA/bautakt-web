@@ -1,11 +1,13 @@
 /// <reference types="node" />
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 
 import { unzipSync } from 'fflate';
 
 import {
   buildZip,
+  FINDING_CODES,
   formatTaxValue,
   monthOptions,
   monthValue,
@@ -268,5 +270,40 @@ describe('Eingangsrechnungen', () => {
     assert.equal(formatTaxValue('small_business|0.00'), 'Kleinunternehmer');
     assert.equal(formatTaxValue('3400'), '3400');
     assert.equal(formatTaxValue('unbekannt|1.00'), 'unbekannt|1.00');
+  });
+});
+
+describe('Texte der Befunde', () => {
+  const domain = JSON.parse(
+    readFileSync(new URL('../../locales/de/domain.json', import.meta.url), 'utf8'),
+  ) as { datevExport: { findings: Record<string, string> } };
+
+  it('jeder Code hat einen Text, auch die Skonto-Befunde (#172)', () => {
+    const missing = FINDING_CODES.filter((code) => !domain.datevExport.findings[code]);
+    assert.deepEqual(missing, []);
+  });
+
+  it('Skonto-Befunde werden gelesen, nicht als unbekannt gezählt', () => {
+    const result = readCheckResponse(200, {
+      ok: true,
+      check_only: true,
+      importable: true,
+      bookings: 2,
+      findings: [
+        {
+          code: 'skonto_expense_account',
+          severity: 'warning',
+          document: 'SUB-13B',
+          value: 'reverse_charge|19.00',
+        },
+        { code: 'skonto_payment_missing', severity: 'warning', document: 'ER-4711', value: '8.57' },
+      ],
+      documents: [],
+    });
+    assert.equal(result.kind, 'checked');
+    assert.deepEqual(result.kind === 'checked' ? result.findings.map((f) => f.code) : [], [
+      'skonto_expense_account',
+      'skonto_payment_missing',
+    ]);
   });
 });

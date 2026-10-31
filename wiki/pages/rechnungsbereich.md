@@ -70,6 +70,16 @@ Edge Function `datev-export` (bautakt-app, Wiki `finanzmodul.md`).
   Eingang: die Originale mit ihrer Endung (PDF, XML, Bild), benannt nach
   Belegfeld 1. Eine Eingangsrechnung ohne Original (Papierbeleg) blockiert nicht:
   Sie fehlt im ZIP und wird danach genannt. Hat keine ein Original, gibt es nur die CSV.
+- **Skonto im Eingang** (#172): Der Eingangsstapel enthält auch vermerktes Skonto,
+  anteilig je Steuersatz auf „Erhaltene Skonti“. Wann gebucht wird, steht in den
+  DATEV-Einstellungen unter „Erhaltenes Skonto buchen“ (`cash_discount_booking`):
+  - „Am Tag des Vermerks“ ist der Standard.
+  - „Am Tag der Zahlung“ bucht erst, wenn die Zahlung erfasst ist. Zahlungen mit
+    Datum erfasst bisher nur die App, das Web zeigt bis dahin die Warnung
+    `skonto_payment_missing`.
+
+  Die Regeln stehen in bautakt-app, Wiki `finanzmodul.md`, Abschnitt
+  „Skonto im Eingang“.
 
 ## Regeln
 

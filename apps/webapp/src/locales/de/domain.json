@@ -1019,11 +1019,13 @@
       "tax_lines_missing": "{{document}}: Die Rechnung hat keine Steueraufteilung. Bitte Steuerart und Beträge in der Rechnung erfassen.",
       "category_account_length": "{{document}}: Das Konto {{value}} der Kostenart passt nicht zur Kontenlänge. Gebucht wird stattdessen auf das Konto aus den DATEV-Einstellungen.",
       "tax_key_unknown": "{{document}}: Für {{value}} kennt Bautakt keinen BU-Schlüssel. Bitte mit der Steuerberatung klären.",
-      "document_number_missing": "{{document}}: Die Rechnung hat keine Rechnungsnummer."
+      "document_number_missing": "{{document}}: Die Rechnung hat keine Rechnungsnummer.",
+      "skonto_expense_account": "{{document}}: Für {{value}} gibt es kein Skontokonto. Das Skonto mindert das Aufwandskonto der Rechnung.",
+      "skonto_payment_missing": "{{document}}: Das Skonto wird erst gebucht, wenn die Zahlung erfasst ist."
     },
     "findingsIncoming": {
       "account_missing": "{{document}}: Für {{value}} gibt es kein Aufwandskonto. Bitte ordne der Rechnung eine Kostenart zu oder hinterlege das Konto in den DATEV-Einstellungen.",
-      "account_length": "{{document}}: Das Aufwandskonto {{value}} passt nicht zur eingestellten Kontenlänge.",
+      "account_length": "{{document}}: Das Konto {{value}} (Aufwand oder Skonto) passt nicht zur eingestellten Kontenlänge.",
       "total_mismatch": "{{document}}: Die Steueraufteilung ergibt nicht den Bruttobetrag der Rechnung.",
       "document_number_changed": "{{document}}: Die Rechnungsnummer enthält Zeichen, die DATEV nicht annimmt. Sie wird ohne diese Zeichen übergeben.",
       "no_bookings": "{{document}}: Der Betrag ist 0, es entsteht keine Buchung."
@@ -2411,6 +2413,15 @@
     "digits_one": "{{count}} Stelle",
     "digits_other": "{{count}} Stellen",
     "fiscalYearStart": "Beginn des Wirtschaftsjahrs",
+    "cashDiscountBooking": "Erhaltenes Skonto buchen",
+    "cashDiscountBookings": {
+      "on_note": "Am Tag des Vermerks",
+      "on_payment": "Am Tag der Zahlung"
+    },
+    "cashDiscountBookingHints": {
+      "on_note": "Gebucht wird, sobald das Skonto an der Rechnung vermerkt ist.",
+      "on_payment": "Gebucht wird erst, wenn die Zahlung erfasst ist. Zahlungen mit Datum erfasst bisher nur die App."
+    },
     "accountsTitle": "Konten im {{chart}}",
     "accountsDescription": "Leer gelassen gilt das Standardkonto. Trag nur ein, was dein Steuerberater anders bucht. Den Steuerschlüssel brauchst du nur bei Konten ohne Automatik.",
     "standardNotApplicable_one": "Mit {{count}}-stelligen Sachkonten gelten die Standardkonten nicht. Trag alle Konten selbst ein, sonst fehlen sie im Export.",
