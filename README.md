@@ -34,4 +34,4 @@ npm run build
 Beide Apps werden aus diesem Repo als zwei getrennte Vercel-Projekte deployt
 (Root Directory `apps/marketing` bzw. `apps/webapp`).
 
-Agenten-Richtlinien stehen in [AGENTS.md](./AGENTS.md).
+Agenten-Richtlinien stehen in [CLAUDE.md](./CLAUDE.md).

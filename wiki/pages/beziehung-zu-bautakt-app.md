@@ -2,7 +2,7 @@
 
 Bautakt liegt in **zwei unabhängigen Git-Repos**, die sich **ein** Supabase-Projekt
 teilen. Das ist die wichtigste Tatsache über dieses Repo, und fast jede Regel in
-[AGENTS.md](../../AGENTS.md) folgt daraus.
+[CLAUDE.md](../../CLAUDE.md) folgt daraus.
 
 | Repo          | Enthält                                                                                             | Remote               |
 | ------------- | --------------------------------------------------------------------------------------------------- | -------------------- |

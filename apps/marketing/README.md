@@ -19,4 +19,4 @@ Hinweise:
   `LayoutProps` aus `.next/types`; ohne vorherigen typegen scheitert `tsc` auf
   einem frischen Clone.
 
-Architektur und Regeln stehen in der [AGENTS.md](../../AGENTS.md) der Repo-Wurzel.
+Architektur und Regeln stehen in der [CLAUDE.md](../../CLAUDE.md) der Repo-Wurzel.

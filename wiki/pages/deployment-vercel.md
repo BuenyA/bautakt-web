@@ -9,7 +9,7 @@ Zwei Vercel-Projekte aus **einem** Repo.
 | Framework                  | Next.js                                                       | Vite                                    |
 | Build Command              | `cd ../.. && npx turbo run build --filter=@bautakt/marketing` | dasselbe mit `--filter=@bautakt/webapp` |
 | Output Directory           | (Standard)                                                    | `dist`                                  |
-| Ignored Build Step         | `npx turbo-ignore @bautakt/marketing`                         | `npx turbo-ignore @bautakt/webapp`      |
+| Ignored Build Step         | `npx turbo-ignore @bautakt/marketing` (in `vercel.json`)      | dasselbe mit `@bautakt/webapp`          |
 | Domain                     | `bautakt.com` (+ `www`-Redirect)                              | `app.bautakt.com`                       |
 
 „Include files outside root" ist **zwingend** — `packages/` liegt außerhalb der Root
@@ -17,6 +17,22 @@ Directory beider Projekte.
 
 Das zweite Projekt heißt `bautakt-webapp`, nicht `bautakt-app`. Der Name gehört dem
 Mobile-Repo, und die Verwechslung wäre dauerhaft.
+
+## Ignored Build Step und `pr-assets`
+
+Der Ignored Build Step steht seit 2026-11-01 als `ignoreCommand` in
+`apps/marketing/vercel.json` und `apps/webapp/vercel.json`, nicht mehr nur im
+Dashboard. `vercel.json` gewinnt gegen das Dashboard-Feld. `turbo-ignore` folgt dem
+Paketgraphen: Eine Änderung in `packages/ui` baut nur die Webapp, weil das
+Marketing `@bautakt/ui` nicht nutzt. Übersprungene Builds stehen in der
+Vercel-Übersicht als „Canceled by Ignored Build Step“. Lokal unter Windows
+scheitert `npx turbo-ignore` mit `spawn npx ENOENT`; auf Vercel (Linux) nicht.
+
+Beide Dateien setzen außerdem `git.deploymentEnabled` für `pr-assets` auf `false`.
+⚠️ `pr-assets` ist ein verwaister Branch ohne diese `vercel.json`, und Vercel liest die
+Konfiguration aus dem jeweils gebauten Commit. Ob die Sperre dort greift, ist nicht
+belegt; bis 2026-11-01 erzeugte jeder Push auf `pr-assets` zwei fehlgeschlagene
+Deployments.
 
 ## Der SPA-Rewrite ist nicht optional
 

@@ -17,4 +17,4 @@ liefert jeder direkte Aufruf einer Unterroute (z. B. ein Reload auf
 Vite-Dev-Server ohnehin alles auf `index.html` leitet — der Fehler tritt
 ausschliesslich in Produktion auf.
 
-Architektur und Regeln stehen in der [AGENTS.md](../../AGENTS.md) der Repo-Wurzel.
+Architektur und Regeln stehen in der [CLAUDE.md](../../CLAUDE.md) der Repo-Wurzel.

@@ -12,7 +12,7 @@
  * setzen, dann geht kein Build mit Platzhaltern mehr live. Die Variable steht
  * in `turbo.json` unter `build.env`, sonst filtert Turbos Strict-Mode sie weg.
  *
- * Agenten schreiben keinen Rechtstext — siehe AGENTS.md.
+ * Agenten schreiben keinen Rechtstext — siehe CLAUDE.md.
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';

@@ -1,7 +1,7 @@
 # Wiki-Regeln
 
 Wie dieses Wiki geführt wird. Die Verpflichtung dazu und das _Warum_ stehen in
-[AGENTS.md](../AGENTS.md). **Bei Widerspruch gilt AGENTS.md.**
+[CLAUDE.md](../CLAUDE.md). **Bei Widerspruch gilt CLAUDE.md.**
 
 ## Aufbau
 

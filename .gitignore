@@ -39,7 +39,7 @@ blob-report/
 # Dieses Repo besitzt das Schema nicht. Scratch-State bleibt ignoriert.
 # Ausnahme: supabase/migrations/ darf eine noch nicht angewendete Storage-Migration
 # enthalten, die vor dem Deploy am Projekt angewendet werden muss.
-# Siehe AGENTS.md, Abschnitt "Repository relationship".
+# Siehe CLAUDE.md, Abschnitt "Repository relationship".
 /supabase/*
 !/supabase/migrations/
 

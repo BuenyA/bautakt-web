@@ -206,7 +206,7 @@ Vite ersetzt `import.meta.env.VITE_*` zur **Build**-Zeit durch den Literalwert.
 _Passiert 2026-08-26, war bereits in einem Commit._
 
 **Symptom:** Nach `npx supabase gen types` existiert `supabase/.temp/` im Repo-Root —
-genau der Ordner, den die AGENTS.md-Regel hier verbietet.
+genau der Ordner, den die CLAUDE.md-Regel hier verbietet.
 
 **Lösung:** `/supabase/` steht in der `.gitignore`. Das Schema gehört `bautakt-app`;
 dieses Repo liest nur.
