@@ -82,6 +82,20 @@ Den Menüpunkt „Unternehmen“ gibt es, sobald irgendein Abschnitt sichtbar is
   und die Rollensätze über `set_company_labor_rate` / `set_role_labor_rate`.
   Die schließen den laufenden Satz zum heutigen Tag ab, damit vergangene Zeiten
   ihren Satz behalten.
+- **E-Mail** (`MailSettingsCard`, #274): Versandmodus und Testadressen
+  ändert nur die Geschäftsführung (`system_key = 'owner'`) über
+  `set_company_mail_settings`. Zur Wahl stehen Probelauf und Testmodus;
+  „Aktiv“ schaltet nur die Plattform frei und ist nur wählbar, solange der
+  Betrieb schon darauf steht (halten oder herabsetzen). Die Seite liest
+  Modus, Obergrenze und wirksame Stufe über `get_company_mail_settings`,
+  weil die Obergrenze in einer Tabelle ohne Clientrechte liegt. Senkt sie
+  den Modus ab, erklärt ein Hinweis ihren Vorrang. Adressen werden wie in
+  der RPC klein geschrieben und nach Bytes sortiert (`mailSettingsModel.ts`),
+  sonst meldete die Seite nach dem Speichern eine Änderung, die es nicht
+  gibt. Das Protokoll (`company_mail_settings_log`, RLS nur Owner) ist nur
+  lesbar; den Namen holt die Seite aus `employments`, weil `changed_by`
+  keinen Fremdschlüssel hat. Schema und Rechte: bautakt-app
+  [finanzmodul.md](https://github.com/BuenyA/bautakt-app/blob/main/wiki/pages/finanzmodul.md).
 - **Rolle Geschäftsführer** (`system_key = 'owner'`) ist im Web nur lesbar. So
   kann sich niemand die Rechte zur Einrichtung entziehen. Die App erlaubt das
   heute noch. Rollen lassen sich nicht umbenennen

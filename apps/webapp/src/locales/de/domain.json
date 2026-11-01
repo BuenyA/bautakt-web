@@ -2617,7 +2617,45 @@
     "replyToHint": "Leer lassen, dann gehen Antworten an die E-Mail-Adresse deines Betriebs ({{email}}).",
     "replyToHintNoEmail": "Leer lassen, dann gehen Antworten an die E-Mail-Adresse deines Betriebs. Dafür fehlt dort noch eine Adresse.",
     "replyToInvalid": "Bitte eine gültige E-Mail-Adresse angeben.",
-    "nothingWritten": "Du darfst die E-Mail-Einstellungen nicht ändern."
+    "nothingWritten": "Du darfst die E-Mail-Einstellungen nicht ändern.",
+    "effectiveMode": "Wirksam",
+    "cap": "Obergrenze der Plattform",
+    "capMissing": "Nicht hinterlegt, deshalb wird nichts verschickt",
+    "capWins": "Gewählt ist „{{chosen}}“. Die Obergrenze der Plattform hat Vorrang, deshalb gilt „{{effective}}“.",
+    "modeOwnerHint": "Den Versand an Kunden schaltet Bautakt frei, nachdem AVV und Pilotvertrag unterschrieben sind.",
+    "modeOptions": {
+      "dry_run": "Probelauf: nichts verschicken, nur prüfen und archivieren",
+      "allowlist": "Testmodus: nur an die freigegebenen Testadressen",
+      "live": "Aktiv: an die Empfänger, die beim Versenden angegeben sind"
+    },
+    "allowlistHint": "Im Testmodus gehen Mails nur an diese Adressen. Andere Empfänger lehnt Bautakt ab.",
+    "addAddress": "Testadresse hinzufügen",
+    "addAddressPlaceholder": "name@beispiel.de",
+    "addAddressButton": "Hinzufügen",
+    "removeAddress": "{{address}} entfernen",
+    "addErrors": {
+      "empty": "Bitte gib eine E-Mail-Adresse ein.",
+      "invalid": "Bitte gib eine einzelne gültige E-Mail-Adresse ein.",
+      "duplicate": "Diese Adresse ist schon freigegeben.",
+      "tooMany": "Es gehen höchstens 50 Testadressen."
+    },
+    "draftNotAdded": "Die eingegebene Adresse ist noch nicht in der Liste. Klicke auf „Hinzufügen“.",
+    "errors": {
+      "forbidden": "Versandmodus und Testadressen kann nur die Geschäftsführung des Betriebs ändern.",
+      "livePlatformOnly": "„Aktiv“ schaltet nur Bautakt frei. Wähle Probelauf oder Testmodus.",
+      "allowlistInvalid": "Mindestens eine Testadresse ist ungültig. Bitte prüfe die Liste.",
+      "allowlistTooLong": "Es gehen höchstens 50 Testadressen.",
+      "notSaved": "Die Einstellungen wurden nicht gespeichert. Bitte lade die Seite neu und versuche es noch einmal."
+    },
+    "logTitle": "Änderungsprotokoll",
+    "logDescription": "Wer Versandmodus und Testadressen meines Betriebs wann geändert hat. Die letzten 50 Änderungen, neueste zuerst.",
+    "logLoadError": "Das Änderungsprotokoll konnte nicht geladen werden.",
+    "logEmpty": "Noch keine Änderung.",
+    "logWhen": "{{when}} von {{who}}",
+    "logUnknownPerson": "einer Person, die nicht mehr im Betrieb ist",
+    "logMode": "Versandmodus: {{from}} → {{to}}",
+    "logAllowlist": "Testadressen: {{from}} → {{to}}",
+    "logNoAddresses": "keine"
   },
   "rejectionMail": {
     "action": "Ablehnungs-Mail senden",
