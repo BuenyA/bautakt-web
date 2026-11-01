@@ -2,7 +2,7 @@
  * GENERIERT — nicht von Hand bearbeiten.
  *
  * Quelle:  Supabase-Projekt "Bautakt" (bxivzvmlcnaxqlytumvz, eu-central-1)
- * Stand:   2026-10-31
+ * Stand:   2026-11-01
  *
  * Neu erzeugen:
  *   npx supabase gen types typescript --project-id bxivzvmlcnaxqlytumvz \
@@ -740,6 +740,47 @@ export type Database = {
             foreignKeyName: "company_mail_settings_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_mail_settings_log: {
+        Row: {
+          changed_at: string
+          changed_by: string
+          company_id: string
+          id: string
+          new_allowlist: string[]
+          new_mail_mode: string
+          old_allowlist: string[]
+          old_mail_mode: string
+        }
+        Insert: {
+          changed_at?: string
+          changed_by: string
+          company_id: string
+          id?: string
+          new_allowlist: string[]
+          new_mail_mode: string
+          old_allowlist: string[]
+          old_mail_mode: string
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string
+          company_id?: string
+          id?: string
+          new_allowlist?: string[]
+          new_mail_mode?: string
+          old_allowlist?: string[]
+          old_mail_mode?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_mail_settings_log_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
           },
@@ -2137,6 +2178,13 @@ export type Database = {
             foreignKeyName: "incoming_invoice_adjustments_invoice_id_fkey"
             columns: ["invoice_id"]
             isOneToOne: false
+            referencedRelation: "incoming_invoice_balances"
+            referencedColumns: ["invoice_id"]
+          },
+          {
+            foreignKeyName: "incoming_invoice_adjustments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
             referencedRelation: "incoming_invoice_payables"
             referencedColumns: ["invoice_id"]
           },
@@ -2211,6 +2259,13 @@ export type Database = {
             foreignKeyName: "incoming_invoice_events_invoice_id_fkey"
             columns: ["invoice_id"]
             isOneToOne: false
+            referencedRelation: "incoming_invoice_balances"
+            referencedColumns: ["invoice_id"]
+          },
+          {
+            foreignKeyName: "incoming_invoice_events_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
             referencedRelation: "incoming_invoice_payables"
             referencedColumns: ["invoice_id"]
           },
@@ -2278,6 +2333,13 @@ export type Database = {
             foreignKeyName: "incoming_invoice_payments_incoming_invoice_id_fkey"
             columns: ["incoming_invoice_id"]
             isOneToOne: false
+            referencedRelation: "incoming_invoice_balances"
+            referencedColumns: ["invoice_id"]
+          },
+          {
+            foreignKeyName: "incoming_invoice_payments_incoming_invoice_id_fkey"
+            columns: ["incoming_invoice_id"]
+            isOneToOne: false
             referencedRelation: "incoming_invoice_payables"
             referencedColumns: ["invoice_id"]
           },
@@ -2291,7 +2353,7 @@ export type Database = {
           {
             foreignKeyName: "incoming_invoice_payments_reverses_id_fkey"
             columns: ["reverses_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "incoming_invoice_payments"
             referencedColumns: ["id"]
           },
@@ -2335,6 +2397,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incoming_invoice_tax_lines_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoice_balances"
+            referencedColumns: ["invoice_id"]
           },
           {
             foreignKeyName: "incoming_invoice_tax_lines_invoice_id_fkey"
@@ -2723,6 +2792,13 @@ export type Database = {
             foreignKeyName: "mail_messages_incoming_invoice_id_fkey"
             columns: ["incoming_invoice_id"]
             isOneToOne: false
+            referencedRelation: "incoming_invoice_balances"
+            referencedColumns: ["invoice_id"]
+          },
+          {
+            foreignKeyName: "mail_messages_incoming_invoice_id_fkey"
+            columns: ["incoming_invoice_id"]
+            isOneToOne: false
             referencedRelation: "incoming_invoice_payables"
             referencedColumns: ["invoice_id"]
           },
@@ -2741,6 +2817,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      mail_platform_settings: {
+        Row: {
+          id: boolean
+          mode_cap: string
+          modified_at: string
+        }
+        Insert: {
+          id?: boolean
+          mode_cap?: string
+          modified_at?: string
+        }
+        Update: {
+          id?: boolean
+          mode_cap?: string
+          modified_at?: string
+        }
+        Relationships: []
       }
       notes: {
         Row: {
@@ -4018,8 +4112,8 @@ export type Database = {
           footer_text: string
           gross_total: number
           id: string
-          invoice_template_id: string | null
           intro_text: string
+          invoice_template_id: string | null
           issue_date: string | null
           issued_at: string | null
           labor_share: number
@@ -4080,8 +4174,8 @@ export type Database = {
           footer_text?: string
           gross_total?: number
           id?: string
-          invoice_template_id?: string | null
           intro_text?: string
+          invoice_template_id?: string | null
           issue_date?: string | null
           issued_at?: string | null
           labor_share?: number
@@ -4142,8 +4236,8 @@ export type Database = {
           footer_text?: string
           gross_total?: number
           id?: string
-          invoice_template_id?: string | null
           intro_text?: string
+          invoice_template_id?: string | null
           issue_date?: string | null
           issued_at?: string | null
           labor_share?: number
@@ -4178,13 +4272,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "sales_documents_invoice_template_fk"
-            columns: ["invoice_template_id", "company_id"]
-            isOneToOne: false
-            referencedRelation: "invoice_templates"
-            referencedColumns: ["id", "company_id"]
-          },
-          {
             foreignKeyName: "sales_documents_company_id_fkey"
             columns: ["company_id"]
             isOneToOne: false
@@ -4197,6 +4284,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "customer_profiles"
             referencedColumns: ["contact_id", "company_id"]
+          },
+          {
+            foreignKeyName: "sales_documents_invoice_template_fk"
+            columns: ["invoice_template_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "invoice_templates"
+            referencedColumns: ["id", "company_id"]
           },
           {
             foreignKeyName: "sales_documents_parent_document_id_fkey"
@@ -4680,8 +4774,8 @@ export type Database = {
           footer_text: string
           gross_total: number
           id: string
-          invoice_template_id: string | null
           intro_text: string
+          invoice_template_id: string | null
           issue_date: string | null
           issued_at: string | null
           labor_share: number
@@ -4917,8 +5011,8 @@ export type Database = {
           footer_text: string
           gross_total: number
           id: string
-          invoice_template_id: string | null
           intro_text: string
+          invoice_template_id: string | null
           issue_date: string | null
           issued_at: string | null
           labor_share: number
@@ -4960,6 +5054,15 @@ export type Database = {
       }
       generate_morning_briefings: { Args: never; Returns: undefined }
       generate_scheduled_notifications: { Args: never; Returns: undefined }
+      get_company_mail_settings: {
+        Args: { p_company_id: string }
+        Returns: {
+          effective_mode: string
+          mail_mode: string
+          mode_cap: string
+          test_recipient_allowlist: string[]
+        }[]
+      }
       get_user_primary_company_id: { Args: never; Returns: string }
       has_company_permission: {
         Args: { p_company_id: string; p_permission: string }
@@ -4968,6 +5071,10 @@ export type Database = {
       has_valid_exemption: {
         Args: { p_contact_id: string; p_on: string }
         Returns: boolean
+      }
+      incoming_invoice_sync_payment_status: {
+        Args: { p_invoice_id: string }
+        Returns: undefined
       }
       is_company_chef: { Args: { p_company_id: string }; Returns: boolean }
       is_company_member: { Args: { p_company_id: string }; Returns: boolean }
@@ -5027,6 +5134,11 @@ export type Database = {
         Args: { p_company_id: string; p_purpose: string }
         Returns: boolean
       }
+      mail_effective_mode: {
+        Args: { p_cap: string; p_tenant_mode: string }
+        Returns: string
+      }
+      mail_mode_cap: { Args: never; Returns: string }
       mail_provider_token: { Args: { p_company_id: string }; Returns: string }
       mail_record_event: {
         Args: {
@@ -5297,6 +5409,19 @@ export type Database = {
       set_company_labor_rate: {
         Args: { p_billing: number; p_company_id: string; p_cost: number }
         Returns: undefined
+      }
+      set_company_mail_settings: {
+        Args: {
+          p_allowlist: string[]
+          p_company_id: string
+          p_mail_mode: string
+        }
+        Returns: {
+          effective_mode: string
+          mail_mode: string
+          mode_cap: string
+          test_recipient_allowlist: string[]
+        }[]
       }
       set_contact_number_start: {
         Args: { p_company_id: string; p_kind: string; p_next: number }
