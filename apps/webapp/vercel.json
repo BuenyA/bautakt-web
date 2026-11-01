@@ -1,5 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "ignoreCommand": "npx turbo-ignore @bautakt/webapp",
+  "git": {
+    "deploymentEnabled": {
+      "pr-assets": false
+    }
+  },
   "rewrites": [
     {
       "source": "/(.*)",

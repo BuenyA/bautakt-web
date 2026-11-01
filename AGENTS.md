@@ -327,14 +327,20 @@ specific than the root's `!.env.example` and wins, which is how
 
 Two Vercel projects out of this one repo.
 
-|                            | `bautakt-marketing`                                           | `bautakt-webapp`                   |
-| -------------------------- | ------------------------------------------------------------- | ---------------------------------- |
-| Root Directory             | `apps/marketing`                                              | `apps/webapp`                      |
-| Include files outside root | **on** — `packages/` live outside                             | **on**                             |
-| Build Command              | `cd ../.. && npx turbo run build --filter=@bautakt/marketing` | `… --filter=@bautakt/webapp`       |
-| Output Directory           | (default)                                                     | `dist`                             |
-| Ignored Build Step         | `npx turbo-ignore @bautakt/marketing`                         | `npx turbo-ignore @bautakt/webapp` |
-| Domain                     | `bautakt.com` (+ `www` redirect)                              | `app.bautakt.com`                  |
+|                            | `bautakt-marketing`                                           | `bautakt-webapp`             |
+| -------------------------- | ------------------------------------------------------------- | ---------------------------- |
+| Root Directory             | `apps/marketing`                                              | `apps/webapp`                |
+| Include files outside root | **on** — `packages/` live outside                             | **on**                       |
+| Build Command              | `cd ../.. && npx turbo run build --filter=@bautakt/marketing` | `… --filter=@bautakt/webapp` |
+| Output Directory           | (default)                                                     | `dist`                       |
+| Ignored Build Step         | `npx turbo-ignore @bautakt/marketing` (in `vercel.json`)      | same, `@bautakt/webapp`      |
+| Domain                     | `bautakt.com` (+ `www` redirect)                              | `app.bautakt.com`            |
+
+The Ignored Build Step lives in each app's `vercel.json` (`ignoreCommand`), not in the
+dashboard — `vercel.json` wins over the dashboard field. `turbo-ignore` follows the
+package graph: a change in `packages/ui` rebuilds the webapp only, because marketing
+does not depend on it. Both files also set `git.deploymentEnabled` to `false` for
+`pr-assets`.
 
 The second project is called `bautakt-webapp`, not `bautakt-app` — that name belongs to
 the mobile repo.

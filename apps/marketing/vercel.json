@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "ignoreCommand": "npx turbo-ignore @bautakt/marketing",
+  "git": {
+    "deploymentEnabled": {
+      "pr-assets": false
+    }
+  }
+}
