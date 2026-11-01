@@ -2,7 +2,7 @@
 
 Langzeitgedächtnis für Agenten und Menschen, die an `bautakt-web` arbeiten. Was hier
 steht, ist das _Warum_ hinter dem Code und das, was hier schon schiefgegangen ist. Die
-Verpflichtung zur Pflege steht in [AGENTS.md](../AGENTS.md); das _Wie_ in
+Verpflichtung zur Pflege steht in [CLAUDE.md](../CLAUDE.md); das _Wie_ in
 [rules.md](rules.md).
 
 Das Wiki der Mobile-App und des Backends liegt im Repo `bautakt-app` unter `wiki/`.
@@ -138,6 +138,7 @@ verlinkt, nie kopiert.
 | 2026-10-30 | [Auftrag: Finanzen](logs/2026-10-30-auftragsfinanzen.md)                                                       |
 | 2026-10-31 | [Auftrag: Dokumente](logs/2026-10-31-auftragsdokumente.md)                                                     |
 | 2026-10-31 | [Zahlungen auf Eingangsrechnungen](logs/2026-10-31-zahlungen-eingang.md)                                       |
+| 2026-11-01 | [Nur noch CLAUDE.md, keine AGENTS.md](logs/2026-11-01-claude-md-statt-agents-md.md)                            |
 
 ## Die drei wichtigsten Sätze
 

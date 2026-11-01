@@ -43,7 +43,7 @@ Verifikations-Vokabular ist bei dieser Größe mehr wert als oxlints Tempo.
 ## Warum Prettier, obwohl die App keinen hat
 
 `bautakt-app` hat bewusst keinen Formatter, und die Folge steht in dessen eigener
-AGENTS.md: gemischte Quotes und Semikolons quer durch die Codebase. In einem Repo, in
+CLAUDE.md: gemischte Quotes und Semikolons quer durch die Codebase. In einem Repo, in
 dem Agenten arbeiten, hat das konkrete Kosten — jeder rät den Stil aus der zuletzt
 gelesenen Datei zusammen, und Formatierungsrauschen verdeckt im Review die eigentliche
 Änderung. Dasselbe Motiv steht hinter der erzwungenen Import-Sortierung.
