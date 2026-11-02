@@ -140,6 +140,8 @@ verlinkt, nie kopiert.
 | 2026-10-31 | [Zahlungen auf Eingangsrechnungen](logs/2026-10-31-zahlungen-eingang.md)                                       |
 | 2026-11-01 | [Nur noch CLAUDE.md, keine AGENTS.md](logs/2026-11-01-claude-md-statt-agents-md.md)                            |
 | 2026-11-02 | [Zustellstatus am Beleg und an der Eingangsrechnung](logs/2026-11-02-zustellstatus-anzeige.md)                 |
+| 2026-11-02 | [Verzögerte Mail nach 72 Stunden](logs/2026-11-02-verzoegerte-mail.md)                                         |
+| 2026-11-02 | [Empfangsadresse für Eingangsrechnungen](logs/2026-11-02-empfangsadresse.md)                                   |
 
 ## Die drei wichtigsten Sätze
 

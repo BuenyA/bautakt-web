@@ -17,7 +17,7 @@
     "rates": "Stundensätze",
     "costCenters": "Kostenstellen",
     "catalog": "Katalog & Preise",
-    "mail": "E-Mail-Versand",
+    "mail": "E-Mail",
     "datev": "DATEV & Steuerberatung",
     "roles": "Rollen & Berechtigungen",
     "absences": "Urlaub & Abwesenheit",
@@ -153,8 +153,8 @@
     "history": "Verlauf aller Sätze"
   },
   "mail": {
-    "title": "E-Mail-Versand",
-    "description": "Wie Bautakt Belege für meinen Betrieb verschickt."
+    "title": "E-Mail",
+    "description": "Wie Bautakt Belege für meinen Betrieb verschickt und Rechnungen empfängt."
   },
   "datev": {
     "title": "DATEV & Steuerberatung",
