@@ -2657,6 +2657,29 @@
     "logAllowlist": "Testadressen: {{from}} → {{to}}",
     "logNoAddresses": "keine"
   },
+  "mailDeliveryStatus": {
+    "status": {
+      "sent": "Versendet",
+      "deferred": "Verzögert",
+      "delivered": "Zugestellt",
+      "undeliverable": "Nicht zustellbar",
+      "complained": "Als Spam gemeldet"
+    },
+    "to": "an {{to}}",
+    "partial": "{{delivered}} von {{total}} zugestellt",
+    "loadError": "Der Zustellstatus konnte nicht geladen werden.",
+    "problem": {
+      "undeliverable": {
+        "title": "Mail nicht zustellbar",
+        "body": "Die Mail an {{to}} konnte nicht zugestellt werden. Prüfe die Adresse und sende sie erneut."
+      },
+      "complained": {
+        "title": "Mail als Spam gemeldet",
+        "body": "{{to}} hat die Mail als Spam gemeldet. Kläre das am besten direkt mit dem Empfänger."
+      },
+      "reason": "Grund: {{reason}}"
+    }
+  },
   "rejectionMail": {
     "action": "Ablehnungs-Mail senden",
     "title": "Ablehnung an den Absender schicken",

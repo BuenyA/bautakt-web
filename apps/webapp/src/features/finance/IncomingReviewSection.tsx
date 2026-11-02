@@ -39,6 +39,7 @@ import {
   reviewReasonError,
 } from './incomingReview';
 import { type MailDelivery, mailDelivery, type MailIssue, openMailIssues } from './mailDelivery';
+import { MailDeliveryStatus } from './MailDeliveryStatus';
 import { rejectionReason } from './rejectionMail';
 import {
   MailPreviewFrame,
@@ -139,6 +140,8 @@ export function IncomingReviewSection({
           }}
         />
       ) : null}
+
+      <MailDeliveryStatus target={{ incomingInvoiceId: invoiceId }} />
 
       <ReviewLog invoiceId={invoiceId} />
 

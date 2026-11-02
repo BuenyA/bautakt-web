@@ -8,8 +8,8 @@
  * `dry_run` im Probelauf. Beides ist unveränderbar. Ein Retry mit demselben
  * idempotencyKey hängt an dieselbe Mail ein weiteres Ereignis an.
  *
- * Zustellstatus (delivered, bounced) liefert Lettermint ohne Webhook nicht;
- * „versendet“ heißt hier: vom Mail-Dienst angenommen.
+ * „Versendet“ heißt hier: vom Mail-Dienst angenommen. Ob die Mail ankam, steht
+ * im Zustellstatus weiter unten (bautakt-web#276).
  */
 
 /** Fehlercode von `mail-send`, wenn unklar ist, ob die Mail rausging. */
@@ -106,4 +106,102 @@ export function openMailIssues(
     }
   }
   return issues;
+}
+
+/**
+ * Zustellstatus aus der View `mail_delivery_status` (bautakt-app#247), gespeist
+ * vom Lettermint-Webhook. Jede tatsächlich versendete Mail hat eine Zeile.
+ */
+export type DeliveryStatus = 'sent' | 'deferred' | 'delivered' | 'undeliverable' | 'complained';
+
+const DELIVERY_STATUSES: readonly string[] = [
+  'sent',
+  'deferred',
+  'delivered',
+  'undeliverable',
+  'complained',
+];
+
+/** Spalten, wie sie die generierten Typen der View beschreiben (alle nullable). */
+export type DeliveryStatusRaw = {
+  mail_id: string | null;
+  sent_at: string | null;
+  status: string | null;
+  recipients_total: number | null;
+  recipients_delivered: number | null;
+  status_at: string | null;
+  problem_recipient: string | null;
+  problem_code: string | null;
+  problem_message: string | null;
+};
+
+export type MailDeliveryRow = {
+  mailId: string;
+  sentAt: string;
+  status: DeliveryStatus;
+  recipientsTotal: number;
+  recipientsDelivered: number;
+  /** Letzte Rückmeldung, sonst der Versand. */
+  at: string;
+  problemRecipient: string | null;
+  /** SMTP-Code und Antwort des Empfängers, soweit bekannt. */
+  problemReason: string | null;
+};
+
+/**
+ * Zeilen der View, älteste zuerst. Ein unbekannter Status gilt als `sent`: Er
+ * darf nie „zugestellt“ vortäuschen.
+ */
+export function toDeliveryRows(raw: readonly DeliveryStatusRaw[]): MailDeliveryRow[] {
+  return raw
+    .flatMap((row): MailDeliveryRow[] => {
+      if (!row.mail_id || !row.sent_at) return [];
+      const reason = [row.problem_code, row.problem_message].filter(Boolean).join(': ');
+      return [
+        {
+          mailId: row.mail_id,
+          sentAt: row.sent_at,
+          status:
+            row.status && DELIVERY_STATUSES.includes(row.status)
+              ? (row.status as DeliveryStatus)
+              : 'sent',
+          recipientsTotal: row.recipients_total ?? 0,
+          recipientsDelivered: row.recipients_delivered ?? 0,
+          at: row.status_at ?? row.sent_at,
+          problemRecipient: row.problem_recipient,
+          problemReason: reason || null,
+        },
+      ];
+    })
+    .sort((a, b) => Date.parse(a.sentAt) - Date.parse(b.sentAt));
+}
+
+/**
+ * Mails, die eine Warnung brauchen. Unzustellbar erledigt sich, sobald eine
+ * spätere Mail zugestellt wurde (auch an eine korrigierte Adresse). Eine
+ * Spam-Beschwerde bleibt: Sie lässt sich durch erneutes Senden nicht beheben.
+ */
+export function openDeliveryProblems(rows: readonly MailDeliveryRow[]): MailDeliveryRow[] {
+  const lastDelivered = Math.max(
+    ...rows.filter((row) => row.status === 'delivered').map((row) => Date.parse(row.sentAt)),
+    Number.NEGATIVE_INFINITY,
+  );
+  return rows.filter(
+    (row) =>
+      row.status === 'complained' ||
+      (row.status === 'undeliverable' && Date.parse(row.sentAt) > lastDelivered),
+  );
+}
+
+/** So lange nach dem Versand kommen Rückmeldungen typischerweise an. */
+export const DELIVERY_POLL_WINDOW_MS = 15 * 60 * 1000;
+
+/** Offene Zeilen frisch nach dem Versand nachladen, ältere nicht mehr. */
+export function shouldPollDelivery(rows: readonly MailDeliveryRow[], nowIso: string): boolean {
+  const now = Date.parse(nowIso);
+  return rows.some(
+    (row) =>
+      (row.status === 'sent' || row.status === 'deferred') &&
+      now - Date.parse(row.sentAt) < DELIVERY_POLL_WINDOW_MS,
+  );
 }

@@ -32,6 +32,7 @@ import { supabase } from '@/lib/supabase';
 
 import { documentFileBaseName } from './archiveFiles';
 import { attachmentFileName, parseRecipients } from './sendMail';
+import { mailDeliveryKey } from './useMailDeliveryStatus';
 import { chargeableMinorOf, type SalesDocumentDetail } from './useSalesDocument';
 
 type SendableDocument = Pick<
@@ -129,6 +130,7 @@ function useSendDocument(documentId: string) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['sales-document', companyId, documentId] });
       await queryClient.invalidateQueries({ queryKey: ['sales-documents', companyId] });
+      await queryClient.invalidateQueries({ queryKey: mailDeliveryKey(companyId) });
     },
   });
 }

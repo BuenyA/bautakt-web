@@ -12,6 +12,7 @@ import {
   suggestedRecipient,
 } from './rejectionMail';
 import { downloadIncomingOriginal } from './useIncomingInvoice';
+import { mailDeliveryKey } from './useMailDeliveryStatus';
 
 /** Fehlercodes von `finance-inbound-reject-send` bzw. `mail-send` (#149). */
 const SEND_ERRORS = new Set([
@@ -257,6 +258,7 @@ export function useSendRejectionMail(invoiceId: string) {
           queryKey: ['incoming-invoice-events', companyId, invoiceId],
         }),
         queryClient.invalidateQueries({ queryKey: ['rejection-mails', companyId, invoiceId] }),
+        queryClient.invalidateQueries({ queryKey: mailDeliveryKey(companyId) }),
       ]),
   });
 }

@@ -2,7 +2,7 @@
  * GENERIERT — nicht von Hand bearbeiten.
  *
  * Quelle:  Supabase-Projekt "Bautakt" (bxivzvmlcnaxqlytumvz, eu-central-1)
- * Stand:   2026-11-01
+ * Stand:   2026-11-02
  *
  * Neu erzeugen:
  *   npx supabase gen types typescript --project-id bxivzvmlcnaxqlytumvz \
@@ -2672,8 +2672,11 @@ export type Database = {
           kind: string
           mail_id: string
           message_id: string | null
+          occurred_at: string | null
           payload: Json | null
+          provider_event_id: string | null
           provider_message_id: string | null
+          recipient: string | null
         }
         Insert: {
           company_id: string
@@ -2684,8 +2687,11 @@ export type Database = {
           kind: string
           mail_id: string
           message_id?: string | null
+          occurred_at?: string | null
           payload?: Json | null
+          provider_event_id?: string | null
           provider_message_id?: string | null
+          recipient?: string | null
         }
         Update: {
           company_id?: string
@@ -2696,8 +2702,11 @@ export type Database = {
           kind?: string
           mail_id?: string
           message_id?: string | null
+          occurred_at?: string | null
           payload?: Json | null
+          provider_event_id?: string | null
           provider_message_id?: string | null
+          recipient?: string | null
         }
         Relationships: [
           {
@@ -2706,6 +2715,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mail_message_events_mail_id_fkey"
+            columns: ["mail_id"]
+            isOneToOne: false
+            referencedRelation: "mail_delivery_status"
+            referencedColumns: ["mail_id"]
           },
           {
             foreignKeyName: "mail_message_events_mail_id_fkey"
@@ -4673,6 +4689,61 @@ export type Database = {
           },
         ]
       }
+      mail_delivery_status: {
+        Row: {
+          company_id: string | null
+          incoming_invoice_id: string | null
+          mail_id: string | null
+          problem_code: string | null
+          problem_kind: string | null
+          problem_message: string | null
+          problem_recipient: string | null
+          purpose: string | null
+          recipients_delivered: number | null
+          recipients_total: number | null
+          sales_document_id: string | null
+          sent_at: string | null
+          status: string | null
+          status_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mail_messages_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mail_messages_incoming_invoice_id_fkey"
+            columns: ["incoming_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoice_balances"
+            referencedColumns: ["invoice_id"]
+          },
+          {
+            foreignKeyName: "mail_messages_incoming_invoice_id_fkey"
+            columns: ["incoming_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoice_payables"
+            referencedColumns: ["invoice_id"]
+          },
+          {
+            foreignKeyName: "mail_messages_incoming_invoice_id_fkey"
+            columns: ["incoming_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mail_messages_sales_document_id_fkey"
+            columns: ["sales_document_id"]
+            isOneToOne: false
+            referencedRelation: "sales_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       accept_employment_invitation: {
@@ -5134,12 +5205,27 @@ export type Database = {
         Args: { p_company_id: string; p_purpose: string }
         Returns: boolean
       }
+      mail_delivery_rank: { Args: { p_kind: string }; Returns: number }
       mail_effective_mode: {
         Args: { p_cap: string; p_tenant_mode: string }
         Returns: string
       }
       mail_mode_cap: { Args: never; Returns: string }
       mail_provider_token: { Args: { p_company_id: string }; Returns: string }
+      mail_record_delivery_event: {
+        Args: {
+          p_error_code: string
+          p_error_message: string
+          p_kind: string
+          p_mail_id: string
+          p_occurred_at: string
+          p_project_id: string
+          p_provider_event_id: string
+          p_provider_message_id: string
+          p_recipient: string
+        }
+        Returns: string
+      }
       mail_record_event: {
         Args: {
           p_error_code: string

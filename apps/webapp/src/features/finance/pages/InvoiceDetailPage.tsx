@@ -62,6 +62,7 @@ import { CancelDialog } from '../CancelDialog';
 import { DocumentStatusBadge } from '../DocumentStatusBadge';
 import { DraftDeleteDialog } from '../DraftDeleteDialog';
 import { EInvoiceBadge } from '../EInvoiceBadge';
+import { MailDeliveryStatus } from '../MailDeliveryStatus';
 import { PaymentSheet } from '../PaymentSheet';
 import { PdfViewer } from '../PdfViewer';
 import { ReleaseDialog } from '../ReleaseDialog';
@@ -522,6 +523,8 @@ export function InvoiceDetailPage() {
             : t('domain:invoices.openAmount', { amount: formatMoney(openMinor) })}
         </span>
       </div>
+
+      {!isDraft ? <MailDeliveryStatus target={{ salesDocumentId: data.id }} /> : null}
 
       {isDraft ? (
         <Card size="large">
