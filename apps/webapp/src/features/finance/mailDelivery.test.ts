@@ -3,10 +3,14 @@ import { describe, it } from 'node:test';
 
 import {
   type ArchivedMailStatus,
+  type DeliveryStatusRaw,
   type MailDelivery,
   mailDelivery,
   type MailEventRow,
+  openDeliveryProblems,
   openMailIssues,
+  shouldPollDelivery,
+  toDeliveryRows,
 } from './mailDelivery.ts';
 
 const CREATED = '2026-10-30T10:00:00.000Z';
@@ -117,5 +121,93 @@ describe('openMailIssues', () => {
     assert.deepEqual(openMailIssues([sent, failed, dry, pending], new Set(['a'])), [
       { kind: 'failed', mailId: 'b' },
     ]);
+  });
+});
+
+describe('Zustellstatus (#276)', () => {
+  const raw = (over: Partial<DeliveryStatusRaw>): DeliveryStatusRaw => ({
+    mail_id: 'm1',
+    sent_at: '2026-11-02T12:00:00.000Z',
+    status: 'sent',
+    recipients_total: 1,
+    recipients_delivered: 0,
+    status_at: null,
+    problem_recipient: null,
+    problem_code: null,
+    problem_message: null,
+    ...over,
+  });
+
+  it('übersetzt Zeilen, älteste zuerst, Zeitpunkt fällt auf den Versand zurück', () => {
+    const rows = toDeliveryRows([
+      raw({
+        mail_id: 'neu',
+        sent_at: '2026-11-02T13:00:00.000Z',
+        status: 'delivered',
+        status_at: '2026-11-02T13:00:05.000Z',
+        recipients_delivered: 1,
+      }),
+      raw({ mail_id: 'alt' }),
+    ]);
+    assert.deepEqual(
+      rows.map((row) => [row.mailId, row.status, row.at]),
+      [
+        ['alt', 'sent', '2026-11-02T12:00:00.000Z'],
+        ['neu', 'delivered', '2026-11-02T13:00:05.000Z'],
+      ],
+    );
+  });
+
+  it('unbekannter Status gilt nie als zugestellt, Zeilen ohne ID fallen weg', () => {
+    assert.equal(toDeliveryRows([raw({ status: 'irgendwas' })])[0]!.status, 'sent');
+    assert.equal(toDeliveryRows([raw({ status: null })])[0]!.status, 'sent');
+    assert.deepEqual(toDeliveryRows([raw({ mail_id: null })]), []);
+  });
+
+  it('setzt den Grund aus Code und Text zusammen', () => {
+    const reason = (over: Partial<DeliveryStatusRaw>) =>
+      toDeliveryRows([raw(over)])[0]!.problemReason;
+    assert.equal(
+      reason({ problem_code: '5.1.1', problem_message: 'User unknown' }),
+      '5.1.1: User unknown',
+    );
+    assert.equal(reason({ problem_code: '5.1.1' }), '5.1.1');
+    assert.equal(reason({}), null);
+  });
+
+  it('unzustellbar erledigt sich erst durch eine spätere zugestellte Mail', () => {
+    const bounce = raw({ mail_id: 'b', status: 'undeliverable' });
+    const ok = (at: string) => raw({ mail_id: 'ok', status: 'delivered', sent_at: at });
+    const ids = (rows: DeliveryStatusRaw[]) =>
+      openDeliveryProblems(toDeliveryRows(rows)).map((row) => row.mailId);
+    assert.deepEqual(ids([bounce]), ['b']);
+    assert.deepEqual(ids([bounce, ok('2026-11-02T11:00:00.000Z')]), ['b']);
+    assert.deepEqual(ids([bounce, ok('2026-11-02T13:00:00.000Z')]), []);
+    assert.deepEqual(
+      ids([bounce, raw({ mail_id: 'x', status: 'sent', sent_at: '2026-11-02T13:00:00.000Z' })]),
+      ['b'],
+    );
+  });
+
+  it('eine Spam-Beschwerde bleibt offen', () => {
+    const rows = toDeliveryRows([
+      raw({ mail_id: 'c', status: 'complained' }),
+      raw({ mail_id: 'ok', status: 'delivered', sent_at: '2026-11-02T13:00:00.000Z' }),
+    ]);
+    assert.deepEqual(
+      openDeliveryProblems(rows).map((row) => row.mailId),
+      ['c'],
+    );
+  });
+
+  it('lädt nur offene Mails kurz nach dem Versand nach', () => {
+    const rows = (status: string) => toDeliveryRows([raw({ status })]);
+    const soon = '2026-11-02T12:14:00.000Z';
+    const late = '2026-11-02T12:16:00.000Z';
+    assert.equal(shouldPollDelivery(rows('sent'), soon), true);
+    assert.equal(shouldPollDelivery(rows('deferred'), soon), true);
+    assert.equal(shouldPollDelivery(rows('sent'), late), false);
+    assert.equal(shouldPollDelivery(rows('delivered'), soon), false);
+    assert.equal(shouldPollDelivery([], soon), false);
   });
 });
