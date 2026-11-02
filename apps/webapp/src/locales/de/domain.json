@@ -2054,6 +2054,26 @@
     "reverseChargeHint": "Subunternehmer mit §13b: Die Rechnung kommt ohne Umsatzsteuer, die Steuer schuldet dein Betrieb. Umsatzsteuer ist deshalb auf 0 % gesetzt.",
     "withholdingWarning": "Für diesen Subunternehmer liegt zum Rechnungsdatum keine gültige Freistellungsbescheinigung (§48b EStG) vor. Bei Zahlung müssen {{amount}} (15 %) als Bauabzugsteuer einbehalten und ans Finanzamt abgeführt werden."
   },
+  "inboundReview": {
+    "title": "Zu prüfen ({{count}})",
+    "description": "Mail-Anhänge ohne E-Rechnung. Entscheide, ob sie eine Rechnung sind. Bis dahin zählen sie nirgends mit.",
+    "open": "Öffnen",
+    "invoice": "Als Rechnung erfassen",
+    "invoiceAfterAll": "Doch als Rechnung erfassen",
+    "notInvoice": "Keine Rechnung",
+    "markedNotInvoice": "Als „keine Rechnung“ markiert.",
+    "nothingOpen": "Gerade ist nichts zu prüfen.",
+    "showNotInvoice": "Als „keine Rechnung“ markiert anzeigen ({{count}})",
+    "hideNotInvoice": "Als „keine Rechnung“ markiert ausblenden ({{count}})",
+    "loadError": "Die zu prüfenden Mail-Anhänge konnten nicht geladen werden.",
+    "openError": "Die Datei konnte nicht geöffnet werden. Prüfe, ob dein Browser das neue Fenster blockiert.",
+    "resolveError": "Die Entscheidung wurde nicht gespeichert.",
+    "errors": {
+      "forbidden": "Dafür fehlt dir die Berechtigung.",
+      "alreadyInvoice": "Diese Datei ist schon als Rechnung erfasst.",
+      "notSaved": "Bitte lade die Seite neu und versuche es noch einmal."
+    }
+  },
   "incomingInvoiceForm": {
     "upload": {
       "dropTitle": "Rechnung hier ablegen oder auswählen",
