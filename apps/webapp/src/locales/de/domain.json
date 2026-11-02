@@ -2667,7 +2667,7 @@
     },
     "deferredSince": "Verzögert seit {{at}}",
     "stale": {
-      "title": "Mail seit 72 Stunden ohne endgültige Rückmeldung",
+      "title": "Seit über 72 Stunden keine endgültige Rückmeldung",
       "body": "Die Mail an {{to}} ist bisher weder als zugestellt noch als unzustellbar gemeldet. Prüfe die Adresse und frag beim Empfänger nach, ob sie angekommen ist."
     },
     "to": "an {{to}}",
