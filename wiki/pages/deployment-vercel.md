@@ -150,19 +150,26 @@ Der einzige Marketing-Link in die Web-App ist `LOGIN_URL` (`${APP_URL}/login`).
 Eine gesetzte `NEXT_PUBLIC_APP_URL` gewinnt weiter über den Fallback.
 `IS_PRODUCTION_SITE` / noindex bleiben davon unberührt.
 
-## Marketing ohne Preise und ohne Registrierung
+## Marketing: Preise auf `/preise`, keine Registrierung
 
-_Stand 2026-10-09._ Die öffentliche Seite verlinkt keine Preise und keine
-Registrierung. `REGISTER_URL` gibt es in `lib/site.ts` nicht mehr. Die Route
-`/registrieren` der Web-App bleibt; die Login-Seite dort verlinkt sie weiter
-selbst.
+_Stand 2026-11-02._ Die öffentliche Seite zeigt die Pakete auf `/preise`.
+Verkauft wird dort nichts: kein Checkout. Die Paketknöpfe führen auf
+`/kontakt`, das Gründerprogramm per E-Mail an `site.supportEmail`.
+`REGISTER_URL` gibt es in `lib/site.ts` nicht. Die Route `/registrieren` der
+Web-App bleibt; die Login-Seite dort verlinkt sie weiter selbst.
 
-`/preise` und `/pricing` sind `redirects` in `apps/marketing/next.config.ts`
-mit `permanent: true` (308) auf `/`. Die Seite `app/preise` ist gelöscht.
-Sitemap und Navigation kommen aus `content/nav.ts` (`allRoutes`); „Preise“
-steht dort nicht. `robots.ts` zählt keine Einzelpfade auf, `/preise` ist
-dort also nicht eigens erlaubt. Ein `Disallow` wäre falsch: der Crawler soll
-den Redirect sehen.
+Vom 2026-10-09 bis zu diesem Beschluss waren Preise bewusst entfernt
+([Log](../logs/2026-10-09-marketing-nicht-kommerziell.md), Issue #136),
+damit die Hobby-Production nicht kommerziell wirkt. Seit dem
+Owner-Beschluss vom 1.11.2026 (Details 2.11.2026) sind die Pakete wieder
+öffentlich ([Log](../logs/2026-11-02-preisseite.md), Issue #283).
+
+Beträge, Merkmale und Wortlaute stehen in `apps/marketing/content/pricing.ts`.
+`/pricing` ist ein Redirect in `next.config.ts` mit `permanent: true` (308)
+auf `/preise`. `/preise` selbst ist eine Seite. Sitemap und Navigation
+kommen aus `content/nav.ts` (`allRoutes`); „Preise“ steht in `mainNav` und
+damit im Header ab `md`, im Footer und in der Sitemap (acht Routen).
+`robots.ts` zählt keine Einzelpfade auf.
 
 ### Go-live-Checkliste
 
@@ -184,7 +191,7 @@ echte Seite auf `noindex`.** Beim Schalten auf die eigene Domain deshalb der Rei
    `noindex`. Solange der Header noch da ist, hat Schritt 2 oder 4 gefehlt.
 9. Marketing-CTAs prüfen: „Anmelden“ zeigt auf `https://app.bautakt.com/login`.
    Die Marketing-Seite verlinkt nicht auf `/registrieren`. `/preise` antwortet
-   mit 308 auf `/`.
+   mit 200. `/pricing` antwortet mit 308 auf `/preise`.
 
 Schritt 6–9 gegen das ausgelieferte Ergebnis prüfen, nicht gegen die Einstellung.
 

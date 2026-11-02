@@ -94,8 +94,9 @@ export const IS_PRODUCTION_SITE = ((): boolean => {
 
 /**
  * Anmeldung für bestehende Nutzer. Die Registrierungsroute der Web-App
- * (`/registrieren`) bleibt dort, wird von der Marketing-Seite aber nicht
- * verlinkt: die öffentliche Seite ist nicht-kommerziell.
+ * (`/registrieren`) bleibt dort und wird von der Marketing-Seite nicht
+ * verlinkt. Pakete stehen auf `/preise` und führen zur Kontaktaufnahme,
+ * nicht in einen Checkout.
  */
 export const LOGIN_URL = `${APP_URL}/login`;
 
