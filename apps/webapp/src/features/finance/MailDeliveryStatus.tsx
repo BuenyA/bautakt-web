@@ -11,7 +11,12 @@ import { useTranslation } from 'react-i18next';
 
 import { formatDateTime } from '@/lib/format';
 
-import { type DeliveryStatus, type MailDeliveryRow, openDeliveryProblems } from './mailDelivery';
+import {
+  type DeliveryStatus,
+  type MailDeliveryRow,
+  openDeliveryProblems,
+  staleDeferredMails,
+} from './mailDelivery';
 import { type MailDeliveryTarget, useMailDeliveryStatus } from './useMailDeliveryStatus';
 
 const STATUS_TONE: Record<DeliveryStatus, StatusTone> = {
@@ -46,11 +51,26 @@ export function MailDeliveryStatus({ target }: { target: MailDeliveryTarget }) {
   if (rows.length === 0) return null;
 
   const toOf = (row: MailDeliveryRow) => recipients[row.mailId]?.join(', ') ?? '';
+  const stale = staleDeferredMails(rows, new Date().toISOString());
+  const staleIds = new Set(stale.map((row) => row.mailId));
 
   return (
     <div className="flex flex-col gap-2">
       {openDeliveryProblems(rows).map((row) => (
         <ProblemBar key={row.mailId} row={row} to={row.problemRecipient ?? toOf(row)} />
+      ))}
+      {stale.map((row) => (
+        <MessageBar key={row.mailId} intent="warning" layout="multiline">
+          <MessageBarBody>
+            <MessageBarTitle>{t('domain:mailDeliveryStatus.stale.title')}</MessageBarTitle>
+            {t('domain:mailDeliveryStatus.stale.body', {
+              to: row.problemRecipient ?? toOf(row),
+            })}
+            {row.problemReason ? (
+              <> {t('domain:mailDeliveryStatus.problem.reason', { reason: row.problemReason })}</>
+            ) : null}
+          </MessageBarBody>
+        </MessageBar>
       ))}
       <ul className="m-0 flex list-none flex-col gap-1 p-0">
         {rows.map((row) => {
@@ -59,7 +79,11 @@ export function MailDeliveryStatus({ target }: { target: MailDeliveryTarget }) {
           return (
             <li key={row.mailId} className="flex flex-wrap items-center gap-2">
               <StatusBadge tone={STATUS_TONE[row.status]}>
-                {t(`domain:mailDeliveryStatus.status.${row.status}`)}
+                {staleIds.has(row.mailId)
+                  ? t('domain:mailDeliveryStatus.deferredSince', {
+                      at: formatDateTime(row.sentAt),
+                    })
+                  : t(`domain:mailDeliveryStatus.status.${row.status}`)}
               </StatusBadge>
               <Text size={200} className="text-muted-foreground">
                 {to ? `${t('domain:mailDeliveryStatus.to', { to })} · ` : ''}
