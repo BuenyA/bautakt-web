@@ -4901,6 +4901,18 @@ export type Database = {
       }
     }
     Views: {
+      incoming_duplicate_matches: {
+        Row: {
+          company_id: string | null
+          id: string | null
+          kind: string | null
+          match: string | null
+          other_id: string | null
+          other_kind: string | null
+          other_label: string | null
+        }
+        Relationships: []
+      }
       incoming_invoice_balances: {
         Row: {
           company_id: string | null

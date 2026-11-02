@@ -2074,6 +2074,18 @@
       "notSaved": "Bitte lade die Seite neu und versuche es noch einmal."
     }
   },
+  "incomingDuplicates": {
+    "badge": "Mögliche Dublette",
+    "tooltipFile": "Dieselbe Datei liegt schon im Eingang.",
+    "tooltipNumber": "Dieselbe USt-IdNr. und Rechnungsnummer gibt es schon.",
+    "title": "Mögliche Dublette",
+    "description": "Prüfe vor dem Erfassen oder Bezahlen, ob diese Rechnung schon vorliegt. Bautakt verwirft nichts, die Entscheidung liegt bei dir.",
+    "sameFile": "Dieselbe Datei:",
+    "sameNumber": "Dieselbe USt-IdNr. und Rechnungsnummer:",
+    "toReview": "{{label}} (unter „Zu prüfen“)",
+    "noLabel": "Beleg ohne Angaben",
+    "loadError": "Die Prüfung auf Dubletten konnte nicht geladen werden."
+  },
   "incomingInvoiceForm": {
     "upload": {
       "dropTitle": "Rechnung hier ablegen oder auswählen",

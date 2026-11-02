@@ -24,10 +24,12 @@ import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
 import { isEInvoiceIncoming } from '../archiveFiles';
+import { DuplicateBadge } from '../DuplicateHint';
 import { EInvoiceBadge } from '../EInvoiceBadge';
 import { ExpenseSheet } from '../ExpenseSheet';
 import { FinanceHeader } from '../FinanceHeader';
 import { InboundReviewSection } from '../InboundReviewSection';
+import type { DuplicateMatch } from '../incomingDuplicates';
 import { invoiceStatusFromSearch, invoiceStatusToSearch } from '../invoiceListFilter';
 import {
   type ExpenseRow,
@@ -35,6 +37,7 @@ import {
   useExpenses,
   useIncomingInvoiceList,
 } from '../useExpenses';
+import { useIncomingDuplicates } from '../useIncomingDuplicates';
 
 /**
  * Ausgaben in zwei Listen nebeneinander: Eingangsrechnungen (was zu zahlen
@@ -47,6 +50,8 @@ import {
  * Überschrift „Eingangsrechnungen“ steht nur, wenn daneben die sonstigen
  * Ausgaben stehen (Owner 30.10.2026).
  */
+const NO_DUPLICATES: ReadonlyMap<string, readonly DuplicateMatch[]> = new Map();
+
 export function ExpensesPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
@@ -58,6 +63,8 @@ export function ExpensesPage() {
   useCreateFromUrl(canManage, () => setSheetOpen(true));
   const incoming = useIncomingInvoiceList();
   const expenses = useExpenses();
+  const duplicateQuery = useIncomingDuplicates();
+  const duplicates = duplicateQuery.data?.invoices ?? NO_DUPLICATES;
 
   // `?status=` wie in der Belegliste; „überfällig“ zählt wie die Übersicht.
   const [searchParams, setSearchParams] = useSearchParams();
@@ -122,11 +129,14 @@ export function ExpensesPage() {
         accessorKey: 'status',
         header: t('domain:incomingInvoiceForm.status'),
         cell: ({ row }) => (
-          <StatusBadge tone={STATUS_TONE[row.original.status] ?? 'neutral'}>
-            {t(`domain:incomingInvoiceStatus.${row.original.status}`, {
-              defaultValue: row.original.status,
-            })}
-          </StatusBadge>
+          <span className="inline-flex flex-col items-start gap-1 py-1">
+            <StatusBadge tone={STATUS_TONE[row.original.status] ?? 'neutral'}>
+              {t(`domain:incomingInvoiceStatus.${row.original.status}`, {
+                defaultValue: row.original.status,
+              })}
+            </StatusBadge>
+            <DuplicateBadge matches={duplicates.get(row.original.id) ?? []} />
+          </span>
         ),
       },
       {
@@ -152,7 +162,7 @@ export function ExpensesPage() {
           ),
       },
     ],
-    [t],
+    [t, duplicates],
   );
 
   const expenseColumns = useMemo<DataTableColumn<ExpenseRow>[]>(

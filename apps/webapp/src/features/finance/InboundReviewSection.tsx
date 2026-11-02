@@ -20,6 +20,7 @@ import { formatDateTime } from '@/lib/format';
 import { routes } from '@/lib/routes';
 import { supabase } from '@/lib/supabase';
 
+import { DuplicateBadge } from './DuplicateHint';
 import {
   type InboundFile,
   type InboundFileDecision,
@@ -27,6 +28,7 @@ import {
   resolvedInboundFile,
   splitInboundFiles,
 } from './inboundReview';
+import { useIncomingDuplicates } from './useIncomingDuplicates';
 import { downloadIncomingOriginal } from './useIncomingInvoice';
 
 /** Die Oberfläche zeigt je Stand die neuesten; ältere bleiben in der Datenbank. */
@@ -68,6 +70,7 @@ export function InboundReviewSection() {
   const companyId = membership?.companyId;
   const canManage = usePermission('canManageOverheadCosts');
   const files = useInboundFiles();
+  const duplicates = useIncomingDuplicates();
   const [showNotInvoice, setShowNotInvoice] = useState(false);
 
   const resolve = useMutation({
@@ -84,6 +87,7 @@ export function InboundReviewSection() {
     },
     onSuccess: async (resolved) => {
       await queryClient.invalidateQueries({ queryKey: ['inbound-mail-files', companyId] });
+      await queryClient.invalidateQueries({ queryKey: ['incoming-duplicates', companyId] });
       if (resolved.invoiceId) {
         await queryClient.invalidateQueries({ queryKey: ['incoming-invoices-list', companyId] });
         void navigate(routes.incomingInvoice(resolved.invoiceId));
@@ -135,6 +139,7 @@ export function InboundReviewSection() {
   const row = (file: InboundFile) => {
     const decided = notInvoice.includes(file);
     const pendingHere = busy && resolve.variables?.id === file.id;
+    const sameFile = duplicates.data?.files.get(file.id) ?? [];
     return (
       <li
         key={file.id}
@@ -151,6 +156,9 @@ export function InboundReviewSection() {
           <Text size={200} className="break-words">
             {file.subject ?? t('domain:mailSettings.inbound.noSubject')}
           </Text>
+          <div>
+            <DuplicateBadge matches={sameFile} />
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button disabled={open.isPending} onClick={() => open.mutate(file)}>

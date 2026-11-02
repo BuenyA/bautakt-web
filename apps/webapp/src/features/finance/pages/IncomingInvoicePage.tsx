@@ -49,6 +49,7 @@ import { readableDbError } from '@/lib/dbErrors';
 import { routes } from '@/lib/routes';
 
 import { downloadBytes, extractFacturX } from '../archiveFiles';
+import { DuplicateNotice } from '../DuplicateHint';
 import { EInvoiceXml } from '../EInvoiceReadable';
 import { originalDownload } from '../eInvoiceView';
 import { IncomingInvoiceDropzone } from '../IncomingInvoiceDropzone';
@@ -582,6 +583,8 @@ function IncomingInvoiceForm({
       <div className="grid gap-6 xl:grid-cols-2">
         <div className="@container flex min-w-0 flex-col gap-4">
           <ReadMessage read={read} onRetry={(file, kind) => void readEInvoice(file, kind)} />
+
+          {saved ? <DuplicateNotice invoiceId={saved.id} /> : null}
 
           {saved && savedStatus && savedStatus !== 'draft' && reviewStatus ? (
             <Section title={t('domain:incomingReview.title')}>

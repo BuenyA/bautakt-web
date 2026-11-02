@@ -121,6 +121,7 @@ function useInvalidateIncoming() {
       queryClient.invalidateQueries({ queryKey: ['incoming-invoices-list', companyId] }),
       queryClient.invalidateQueries({ queryKey: ['incoming-invoice', companyId] }),
       queryClient.invalidateQueries({ queryKey: ['incoming-tax-lines', companyId] }),
+      queryClient.invalidateQueries({ queryKey: ['incoming-duplicates', companyId] }),
     ]);
   };
 }
