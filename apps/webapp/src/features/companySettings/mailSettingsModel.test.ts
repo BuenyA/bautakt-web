@@ -6,6 +6,7 @@ import {
   addAddress,
   capLowersMode,
   effectiveMailMode,
+  inboundAddress,
   mailSettingsErrorKey,
   MAX_ALLOWLIST,
   removeAddress,
@@ -133,5 +134,17 @@ describe('mailSettingsErrorKey', () => {
   it('Unbekanntes bleibt null', () => {
     assert.equal(mailSettingsErrorKey('etwas anderes'), null);
     assert.equal(mailSettingsErrorKey(null), null);
+  });
+});
+
+describe('inboundAddress', () => {
+  it('baut die Adresse aus dem Slug', () => {
+    assert.equal(inboundAddress('muster-bau'), 'muster-bau@in.bautakt.com');
+  });
+
+  it('liefert ohne Slug keine Adresse', () => {
+    assert.equal(inboundAddress(null), null);
+    assert.equal(inboundAddress(undefined), null);
+    assert.equal(inboundAddress(''), null);
   });
 });

@@ -10,6 +10,13 @@
 export const MAIL_MODES = ['dry_run', 'allowlist', 'live'] as const;
 export type MailMode = (typeof MAIL_MODES)[number];
 
+/** Domain des Mail-Eingangs, wie `INBOUND_DOMAIN` in `finance-inbound-mail`. */
+export const INBOUND_DOMAIN = 'in.bautakt.com';
+
+/** Empfangsadresse des Betriebs; `null`, solange er keinen Slug hat (#221). */
+export const inboundAddress = (slug: string | null | undefined): string | null =>
+  slug ? `${slug}@${INBOUND_DOMAIN}` : null;
+
 /** Höchstens so viele Testadressen, wie eine Mail Empfänger haben darf. */
 export const MAX_ALLOWLIST = 50;
 

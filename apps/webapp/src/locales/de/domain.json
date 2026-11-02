@@ -2595,6 +2595,19 @@
   "mailSettings": {
     "title": "E-Mail",
     "description": "Wie Bautakt Rechnungen und andere Belege für deinen Betrieb verschickt.",
+    "inbound": {
+      "title": "Rechnungen per Mail empfangen",
+      "description": "Rechnungen, die an diese Adresse gehen, landen automatisch in den Eingangsrechnungen.",
+      "address": "Empfangsadresse",
+      "copy": "Adresse kopieren",
+      "copied": "Adresse kopiert.",
+      "copyError": "Die Adresse konnte nicht kopiert werden. Markiere sie und kopiere sie von Hand.",
+      "howTitle": "So richtest du die Weiterleitung ein",
+      "howForward": "Stell im Postfach deiner Rechnungsadresse, zum Beispiel rechnung@deinbetrieb.de, eine automatische Weiterleitung an die Empfangsadresse ein.",
+      "howSuppliers": "Deine Lieferanten schreiben weiter an die gewohnte Adresse.",
+      "howCheck": "Prüfe jede Rechnung in den Eingangsrechnungen, bevor du sie freigibst.",
+      "notSetUp": "Für deinen Betrieb ist noch keine Empfangsadresse eingerichtet. Bis dahin lädst du Rechnungen in den Eingangsrechnungen selbst hoch."
+    },
     "loadError": "Die E-Mail-Einstellungen konnten nicht geladen werden.",
     "notSetUp": "Der E-Mail-Versand ist für deinen Betrieb noch nicht eingerichtet. Bis dahin kannst du Belege herunterladen und selbst verschicken.",
     "mode": "Versandmodus",

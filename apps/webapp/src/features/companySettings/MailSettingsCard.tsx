@@ -42,6 +42,7 @@ import {
   addAddress,
   type AddAddressResult,
   capLowersMode,
+  inboundAddress,
   type MailMode,
   mailSettingsErrorKey,
   removeAddress,
@@ -159,8 +160,71 @@ export function MailSettingsCard() {
           </div>
         )}
       </SectionCard>
+      {!settings.isLoading && !settings.isError ? (
+        <InboundAddressCard slug={settings.data?.inbound_slug} />
+      ) : null}
       {isOwner && settings.data ? <MailSettingsLogCard /> : null}
     </div>
+  );
+}
+
+/**
+ * Empfangsadresse für Eingangsrechnungen (bautakt-web#221). Die Oberfläche
+ * vergibt keinen Slug; ohne Slug nimmt der Mail-Eingang für den Betrieb nichts an.
+ */
+function InboundAddressCard({ slug }: { slug: string | null | undefined }) {
+  const { t } = useTranslation();
+  const address = inboundAddress(slug);
+
+  const copy = async (value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      toast.success(t('domain:mailSettings.inbound.copied'));
+    } catch {
+      toast.error(t('domain:mailSettings.inbound.copyError'));
+    }
+  };
+
+  return (
+    <SectionCard
+      title={t('domain:mailSettings.inbound.title')}
+      description={
+        <Text className="text-muted-foreground">
+          {t('domain:mailSettings.inbound.description')}
+        </Text>
+      }
+    >
+      {address ? (
+        <div className="flex flex-col gap-4">
+          <dl className="m-0 flex flex-col gap-3">
+            <DetailRow label={t('domain:mailSettings.inbound.address')} value={address} />
+          </dl>
+          <div>
+            <Button onClick={() => void copy(address)}>
+              {t('domain:mailSettings.inbound.copy')}
+            </Button>
+          </div>
+          <div className="flex flex-col gap-1">
+            <Text weight="semibold">{t('domain:mailSettings.inbound.howTitle')}</Text>
+            <ol className="m-0 flex flex-col gap-1 pl-5">
+              <li>
+                <Text>{t('domain:mailSettings.inbound.howForward')}</Text>
+              </li>
+              <li>
+                <Text>{t('domain:mailSettings.inbound.howSuppliers')}</Text>
+              </li>
+              <li>
+                <Text>{t('domain:mailSettings.inbound.howCheck')}</Text>
+              </li>
+            </ol>
+          </div>
+        </div>
+      ) : (
+        <MessageBar intent="info" layout="multiline">
+          <MessageBarBody>{t('domain:mailSettings.inbound.notSetUp')}</MessageBarBody>
+        </MessageBar>
+      )}
+    </SectionCard>
   );
 }
 

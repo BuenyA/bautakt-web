@@ -1,19 +1,3 @@
-/**
- * GENERIERT — nicht von Hand bearbeiten.
- *
- * Quelle:  Supabase-Projekt "Bautakt" (bxivzvmlcnaxqlytumvz, eu-central-1)
- * Stand:   2026-11-02
- *
- * Neu erzeugen:
- *   npx supabase gen types typescript --project-id bxivzvmlcnaxqlytumvz \
- *     > packages/supabase/src/database.types.ts
- *   (Header danach wieder voranstellen.)
- *
- * Das Schema gehoert dem Repo bautakt-app. Aenderungen daran passieren
- * ausschliesslich dort in supabase/migrations/ — dieses Repo liest nur.
- * Nach jeder Schema-Aenderung diese Datei neu erzeugen.
- */
-
 export type Json =
   | string
   | number
@@ -2114,6 +2098,80 @@ export type Database = {
           },
         ]
       }
+      inbound_mails: {
+        Row: {
+          attachments: Json
+          company_id: string
+          created_at: string
+          dedup_key: string
+          dkim_result: string | null
+          dmarc_result: string | null
+          from_email: string | null
+          from_name: string | null
+          id: string
+          is_spam: boolean
+          provider_message_id: string
+          raw_sha256: string
+          raw_size_bytes: number
+          raw_storage_path: string
+          received_at: string
+          recipient: string
+          spam_score: number | null
+          spf_result: string | null
+          subject: string | null
+        }
+        Insert: {
+          attachments?: Json
+          company_id: string
+          created_at?: string
+          dedup_key: string
+          dkim_result?: string | null
+          dmarc_result?: string | null
+          from_email?: string | null
+          from_name?: string | null
+          id?: string
+          is_spam?: boolean
+          provider_message_id: string
+          raw_sha256: string
+          raw_size_bytes: number
+          raw_storage_path: string
+          received_at: string
+          recipient: string
+          spam_score?: number | null
+          spf_result?: string | null
+          subject?: string | null
+        }
+        Update: {
+          attachments?: Json
+          company_id?: string
+          created_at?: string
+          dedup_key?: string
+          dkim_result?: string | null
+          dmarc_result?: string | null
+          from_email?: string | null
+          from_name?: string | null
+          id?: string
+          is_spam?: boolean
+          provider_message_id?: string
+          raw_sha256?: string
+          raw_size_bytes?: number
+          raw_storage_path?: string
+          received_at?: string
+          recipient?: string
+          spam_score?: number | null
+          spf_result?: string | null
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inbound_mails_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       incoming_invoice_adjustments: {
         Row: {
           actor_id: string | null
@@ -2441,6 +2499,7 @@ export type Database = {
           parsed_payload: Json | null
           review_status: string
           source_format: string
+          source_inbound_mail_id: string | null
           status: string
           storage_path: string | null
           supplier_id: string | null
@@ -2468,6 +2527,7 @@ export type Database = {
           parsed_payload?: Json | null
           review_status?: string
           source_format?: string
+          source_inbound_mail_id?: string | null
           status?: string
           storage_path?: string | null
           supplier_id?: string | null
@@ -2495,6 +2555,7 @@ export type Database = {
           parsed_payload?: Json | null
           review_status?: string
           source_format?: string
+          source_inbound_mail_id?: string | null
           status?: string
           storage_path?: string | null
           supplier_id?: string | null
@@ -2530,6 +2591,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incoming_invoices_source_inbound_mail_id_fkey"
+            columns: ["source_inbound_mail_id"]
+            isOneToOne: false
+            referencedRelation: "inbound_mails"
             referencedColumns: ["id"]
           },
           {
@@ -5142,6 +5210,14 @@ export type Database = {
       has_valid_exemption: {
         Args: { p_contact_id: string; p_on: string }
         Returns: boolean
+      }
+      inbound_mail_lookup: {
+        Args: { p_dedup_key: string; p_slug: string }
+        Returns: Json
+      }
+      inbound_mail_record: {
+        Args: { p_company_id: string; p_invoices: Json; p_mail: Json }
+        Returns: Json
       }
       incoming_invoice_sync_payment_status: {
         Args: { p_invoice_id: string }

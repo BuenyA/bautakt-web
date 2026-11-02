@@ -12,6 +12,7 @@ import { supabase } from '@/lib/supabase';
 export type MailSettings = Pick<
   Tables<'company_mail_settings'>,
   | 'reply_to_email'
+  | 'inbound_slug'
   | 'mail_mode'
   | 'test_recipient_allowlist'
   | 'send_limit_per_hour'
@@ -34,7 +35,7 @@ export function useMailSettings() {
       const { data, error } = await supabase
         .from('company_mail_settings')
         .select(
-          'reply_to_email, mail_mode, test_recipient_allowlist, send_limit_per_hour, send_limit_per_day',
+          'reply_to_email, inbound_slug, mail_mode, test_recipient_allowlist, send_limit_per_hour, send_limit_per_day',
         )
         .eq('company_id', companyId!)
         .maybeSingle();
