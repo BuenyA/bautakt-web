@@ -206,7 +206,7 @@ function InboundAddressCard({ slug }: { slug: string | null | undefined }) {
           </div>
           <div className="flex flex-col gap-1">
             <Text weight="semibold">{t('domain:mailSettings.inbound.howTitle')}</Text>
-            <ol className="m-0 flex flex-col gap-1 pl-5">
+            <ol className="m-0 flex list-decimal flex-col gap-1 pl-5">
               <li>
                 <Text>{t('domain:mailSettings.inbound.howForward')}</Text>
               </li>
