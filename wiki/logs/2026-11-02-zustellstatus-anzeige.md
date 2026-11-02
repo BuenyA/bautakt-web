@@ -16,5 +16,6 @@ Das Schema steht im Wiki von `bautakt-app`.
 - `database.types.ts` neu erzeugt. `save_sales_document_draft.p_document_id` bleibt von Hand
   auf `string | null` gesetzt.
 - Browser-Test in der Testfirma, hell und dunkel, an der Eingangsrechnung mit den beiden
-  Test-Mails aus bautakt-app#247. Am Ausgangsbeleg nicht im Browser geprüft, weil die Testfirma
-  am 02.11.2026 keinen Ausgangsbeleg hat.
+  Test-Mails aus bautakt-app#247 und am Ausgangsbeleg: Rechnung RE00001 festgeschrieben und
+  an die Testadresse verschickt. Direkt danach stand „Versendet“, 30 Sekunden später ohne
+  Neuladen „Zugestellt“.
