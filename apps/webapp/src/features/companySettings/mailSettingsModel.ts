@@ -10,6 +10,12 @@
 export const MAIL_MODES = ['dry_run', 'allowlist', 'live'] as const;
 export type MailMode = (typeof MAIL_MODES)[number];
 
+/** Höchstens so viele Einträge in der Absender-Freigabeliste (bautakt-web#280). */
+export const MAX_INBOUND_SENDERS = 200;
+
+/** Volle Adresse oder `@domain`, wie die RPC `set_inbound_sender_allowlist`. */
+const INBOUND_SENDER = /^[^@\s<>",;]*@[^@\s<>",;]+\.[^@\s<>",;]+$/;
+
 /** Domain des Mail-Eingangs, wie `INBOUND_DOMAIN` in `finance-inbound-mail`. */
 export const INBOUND_DOMAIN = 'in.bautakt.com';
 
@@ -71,6 +77,26 @@ export function addAddress(list: readonly string[], input: string): AddAddressRe
   return { ok: true, list: sortAddresses([...list, address]) };
 }
 
+export type AddSenderResult = AddAddressResult;
+
+/** Fügt einen freigegebenen Absender hinzu: Adresse oder `@domain`. */
+export function addSender(list: readonly string[], input: string): AddSenderResult {
+  const sender = normalizeAddress(input);
+  if (!sender) return { ok: false, reason: 'empty' };
+  if (!INBOUND_SENDER.test(sender)) return { ok: false, reason: 'invalid' };
+  if (list.includes(sender)) return { ok: false, reason: 'duplicate' };
+  if (list.length >= MAX_INBOUND_SENDERS) return { ok: false, reason: 'tooMany' };
+  return { ok: true, list: sortAddresses([...list, sender]) };
+}
+
+/** Grund einer abgewiesenen Mail auf Textschlüssel. Unbekanntes wird `other`. */
+export const rejectionReasonKey = (reason: string): 'senderLimit' | 'senderNotAllowed' | 'other' =>
+  reason === 'sender_limit'
+    ? 'senderLimit'
+    : reason === 'sender_not_allowed'
+      ? 'senderNotAllowed'
+      : 'other';
+
 export const removeAddress = (list: readonly string[], address: string) =>
   list.filter((entry) => entry !== address);
 
@@ -97,7 +123,13 @@ export function sameSettings(
 }
 
 export type MailSettingsErrorKey =
-  'forbidden' | 'livePlatformOnly' | 'allowlistInvalid' | 'allowlistTooLong' | 'notSaved';
+  | 'forbidden'
+  | 'livePlatformOnly'
+  | 'allowlistInvalid'
+  | 'allowlistTooLong'
+  | 'sendersInvalid'
+  | 'sendersTooLong'
+  | 'notSaved';
 
 /**
  * Fehlercodes der RPCs auf Textschlüssel. Unbekanntes gibt `null`; dann
@@ -111,6 +143,8 @@ export function mailSettingsErrorKey(
   if (raw.includes('mail_mode_live_platform_only')) return 'livePlatformOnly';
   if (raw.includes('mail_allowlist_too_long')) return 'allowlistTooLong';
   if (raw.includes('mail_allowlist_invalid')) return 'allowlistInvalid';
+  if (raw.includes('inbound_senders_too_long')) return 'sendersTooLong';
+  if (raw.includes('inbound_senders_invalid')) return 'sendersInvalid';
   if (raw.includes('mail_settings_not_saved') || raw.includes('mail_mode_invalid'))
     return 'notSaved';
   return null;

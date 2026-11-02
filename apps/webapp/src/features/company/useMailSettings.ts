@@ -13,6 +13,7 @@ export type MailSettings = Pick<
   Tables<'company_mail_settings'>,
   | 'reply_to_email'
   | 'inbound_slug'
+  | 'inbound_sender_allowlist'
   | 'mail_mode'
   | 'test_recipient_allowlist'
   | 'send_limit_per_hour'
@@ -35,7 +36,7 @@ export function useMailSettings() {
       const { data, error } = await supabase
         .from('company_mail_settings')
         .select(
-          'reply_to_email, inbound_slug, mail_mode, test_recipient_allowlist, send_limit_per_hour, send_limit_per_day',
+          'reply_to_email, inbound_slug, inbound_sender_allowlist, mail_mode, test_recipient_allowlist, send_limit_per_hour, send_limit_per_day',
         )
         .eq('company_id', companyId!)
         .maybeSingle();
@@ -109,6 +110,8 @@ export type MailSettingsLogEntry = {
   newMode: string;
   oldAllowlist: string[];
   newAllowlist: string[];
+  oldInboundSenders: string[];
+  newInboundSenders: string[];
 };
 
 /** Wie viele Einträge die Seite zeigt; ältere bleiben in der Datenbank. */
@@ -133,7 +136,7 @@ export function useMailSettingsLog(enabled: boolean) {
       const { data, error } = await supabase
         .from('company_mail_settings_log')
         .select(
-          'id, changed_at, changed_by, old_mail_mode, new_mail_mode, old_allowlist, new_allowlist',
+          'id, changed_at, changed_by, old_mail_mode, new_mail_mode, old_allowlist, new_allowlist, old_inbound_sender_allowlist, new_inbound_sender_allowlist',
         )
         .eq('company_id', companyId!)
         .order('changed_at', { ascending: false })
@@ -167,7 +170,32 @@ export function useMailSettingsLog(enabled: boolean) {
         newMode: row.new_mail_mode,
         oldAllowlist: row.old_allowlist,
         newAllowlist: row.new_allowlist,
+        oldInboundSenders: row.old_inbound_sender_allowlist,
+        newInboundSenders: row.new_inbound_sender_allowlist,
       }));
+    },
+  });
+}
+
+/** Wie viele abgewiesene Mails die Seite zeigt; ältere bleiben in der Datenbank. */
+export const INBOUND_REJECTIONS_LIMIT = 50;
+
+/** Abgewiesene Mails ohne Inhalt, neueste zuerst (bautakt-web#280). */
+export function useInboundRejections() {
+  const { data: membership } = useMembership();
+  const companyId = membership?.companyId;
+  return useQuery({
+    queryKey: ['inbound-mail-rejections', companyId],
+    enabled: Boolean(companyId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('inbound_mail_rejections')
+        .select('id, from_email, subject, reason, received_at')
+        .eq('company_id', companyId!)
+        .order('received_at', { ascending: false })
+        .limit(INBOUND_REJECTIONS_LIMIT);
+      if (error) throw error;
+      return data;
     },
   });
 }

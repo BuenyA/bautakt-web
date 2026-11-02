@@ -4,11 +4,14 @@ import { describe, it } from 'node:test';
 
 import {
   addAddress,
+  addSender,
   capLowersMode,
   effectiveMailMode,
   inboundAddress,
   mailSettingsErrorKey,
   MAX_ALLOWLIST,
+  MAX_INBOUND_SENDERS,
+  rejectionReasonKey,
   removeAddress,
   sameSettings,
   selectableModes,
@@ -146,5 +149,49 @@ describe('inboundAddress', () => {
     assert.equal(inboundAddress(null), null);
     assert.equal(inboundAddress(undefined), null);
     assert.equal(inboundAddress(''), null);
+  });
+});
+
+describe('addSender', () => {
+  it('nimmt Adressen und Domains, klein geschrieben und sortiert', () => {
+    assert.deepEqual(addSender(['z@example.com'], ' @Lieferant.DE '), {
+      ok: true,
+      list: ['@lieferant.de', 'z@example.com'],
+    });
+    assert.deepEqual(addSender([], 'Rechnung@Lieferant.de'), {
+      ok: true,
+      list: ['rechnung@lieferant.de'],
+    });
+  });
+
+  it('lehnt Leeres, Ungültiges und Dubletten ab', () => {
+    assert.deepEqual(addSender([], '  '), { ok: false, reason: 'empty' });
+    for (const input of ['lieferant.de', '@lieferant', 'a@b@c.de', 'a b@c.de', 'a@c.de, b@c.de']) {
+      assert.deepEqual(addSender([], input), { ok: false, reason: 'invalid' }, input);
+    }
+    assert.deepEqual(addSender(['@lieferant.de'], '@LIEFERANT.de'), {
+      ok: false,
+      reason: 'duplicate',
+    });
+  });
+
+  it('begrenzt die Liste', () => {
+    const full = Array.from({ length: MAX_INBOUND_SENDERS }, (_, i) => `a${i}@example.com`);
+    assert.deepEqual(addSender(full, 'neu@example.com'), { ok: false, reason: 'tooMany' });
+  });
+});
+
+describe('rejectionReasonKey', () => {
+  it('kennt die Gründe, Unbekanntes wird other', () => {
+    assert.equal(rejectionReasonKey('sender_limit'), 'senderLimit');
+    assert.equal(rejectionReasonKey('sender_not_allowed'), 'senderNotAllowed');
+    assert.equal(rejectionReasonKey('neu'), 'other');
+  });
+});
+
+describe('mailSettingsErrorKey für die Freigabeliste', () => {
+  it('erkennt die Codes der RPC', () => {
+    assert.equal(mailSettingsErrorKey('inbound_senders_invalid'), 'sendersInvalid');
+    assert.equal(mailSettingsErrorKey('inbound_senders_too_long'), 'sendersTooLong');
   });
 });
