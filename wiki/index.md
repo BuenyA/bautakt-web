@@ -143,6 +143,7 @@ verlinkt, nie kopiert.
 | 2026-11-02 | [Verzögerte Mail nach 72 Stunden](logs/2026-11-02-verzoegerte-mail.md)                                         |
 | 2026-11-02 | [Empfangsadresse für Eingangsrechnungen](logs/2026-11-02-empfangsadresse.md)                                   |
 | 2026-11-02 | [Absender-Freigabeliste und abgewiesene Mails](logs/2026-11-02-absender-freigabeliste.md)                      |
+| 2026-11-02 | [Mail-Anhänge „Zu prüfen“](logs/2026-11-02-zu-pruefen.md)                                                      |
 
 ## Die drei wichtigsten Sätze
 

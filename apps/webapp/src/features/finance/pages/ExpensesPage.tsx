@@ -27,6 +27,7 @@ import { isEInvoiceIncoming } from '../archiveFiles';
 import { EInvoiceBadge } from '../EInvoiceBadge';
 import { ExpenseSheet } from '../ExpenseSheet';
 import { FinanceHeader } from '../FinanceHeader';
+import { InboundReviewSection } from '../InboundReviewSection';
 import { invoiceStatusFromSearch, invoiceStatusToSearch } from '../invoiceListFilter';
 import {
   type ExpenseRow,
@@ -209,6 +210,8 @@ export function ExpensesPage() {
           ) : null
         }
       />
+
+      <InboundReviewSection />
 
       <div className={cn('grid gap-6', hasExpenses && 'xl:grid-cols-2')}>
         <ListSection title={hasExpenses ? t('domain:expenses.tabIncoming') : null}>

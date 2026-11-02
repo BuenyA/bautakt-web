@@ -2155,6 +2155,87 @@ export type Database = {
           },
         ]
       }
+      inbound_mail_files: {
+        Row: {
+          company_id: string
+          content_hash: string
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          file_name: string
+          id: string
+          inbound_mail_id: string
+          invoice_id: string | null
+          size_bytes: number
+          status: string
+          storage_path: string
+        }
+        Insert: {
+          company_id: string
+          content_hash: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          file_name: string
+          id: string
+          inbound_mail_id: string
+          invoice_id?: string | null
+          size_bytes: number
+          status?: string
+          storage_path: string
+        }
+        Update: {
+          company_id?: string
+          content_hash?: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          file_name?: string
+          id?: string
+          inbound_mail_id?: string
+          invoice_id?: string | null
+          size_bytes?: number
+          status?: string
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inbound_mail_files_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inbound_mail_files_inbound_mail_id_fkey"
+            columns: ["inbound_mail_id"]
+            isOneToOne: false
+            referencedRelation: "inbound_mails"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inbound_mail_files_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoice_balances"
+            referencedColumns: ["invoice_id"]
+          },
+          {
+            foreignKeyName: "inbound_mail_files_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoice_payables"
+            referencedColumns: ["invoice_id"]
+          },
+          {
+            foreignKeyName: "inbound_mail_files_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "incoming_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inbound_mail_rejections: {
         Row: {
           company_id: string
@@ -5324,7 +5405,12 @@ export type Database = {
         Returns: Json
       }
       inbound_mail_record: {
-        Args: { p_company_id: string; p_invoices: Json; p_mail: Json }
+        Args: {
+          p_company_id: string
+          p_invoices: Json
+          p_mail: Json
+          p_review_files?: Json
+        }
         Returns: Json
       }
       incoming_invoice_sync_payment_status: {
@@ -5537,6 +5623,10 @@ export type Database = {
       recurrence_covers_date: {
         Args: { p_date: string; p_rule: string; p_series_start: string }
         Returns: boolean
+      }
+      resolve_inbound_mail_file: {
+        Args: { p_decision: string; p_file_id: string }
+        Returns: Json
       }
       resolve_labor_rate: {
         Args: {
