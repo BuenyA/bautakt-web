@@ -2606,7 +2606,29 @@
       "howForward": "Stell im Postfach deiner Rechnungsadresse, zum Beispiel rechnung@deinbetrieb.de, eine automatische Weiterleitung an die Empfangsadresse ein.",
       "howSuppliers": "Deine Lieferanten schreiben weiter an die gewohnte Adresse.",
       "howCheck": "Prüfe jede Rechnung in den Eingangsrechnungen, bevor du sie freigibst.",
-      "notSetUp": "Für deinen Betrieb ist noch keine Empfangsadresse eingerichtet. Bis dahin lädst du Rechnungen in den Eingangsrechnungen selbst hoch."
+      "notSetUp": "Für deinen Betrieb ist noch keine Empfangsadresse eingerichtet. Bis dahin lädst du Rechnungen in den Eingangsrechnungen selbst hoch.",
+      "senders": "Freigegebene Absender",
+      "sendersHint": "Optional. Ohne Einträge nimmt die Adresse Mails von allen an. Trag volle Adressen oder ganze Domains wie @lieferant.de ein. Manche Anbieter ändern beim Weiterleiten den Absender. Prüfe deshalb nach dem Einrichten die abgewiesenen Mails.",
+      "sendersEmpty": "Keine Einschränkung: Mails von allen Absendern werden angenommen.",
+      "addSender": "Absender hinzufügen",
+      "addSenderPlaceholder": "rechnung@lieferant.de oder @lieferant.de",
+      "addErrors": {
+        "empty": "Bitte gib eine Adresse oder Domain ein.",
+        "invalid": "Bitte gib eine einzelne Adresse oder eine Domain wie @lieferant.de ein.",
+        "duplicate": "Dieser Absender ist schon freigegeben.",
+        "tooMany": "Es gehen höchstens 200 Absender."
+      },
+      "draftNotAdded": "Der eingegebene Absender ist noch nicht in der Liste. Klicke auf „Hinzufügen“.",
+      "rejections": "Abgewiesene Mails",
+      "rejectionsHint": "Diese Mails wurden nicht gespeichert. Die letzten 50, neueste zuerst.",
+      "rejectionsLoadError": "Die abgewiesenen Mails konnten nicht geladen werden.",
+      "reasons": {
+        "senderLimit": "Zu viele Mails von diesem Absender an einem Tag",
+        "senderNotAllowed": "Absender nicht freigegeben",
+        "other": "Abgewiesen"
+      },
+      "noSender": "Ohne Absender",
+      "noSubject": "Ohne Betreff"
     },
     "loadError": "Die E-Mail-Einstellungen konnten nicht geladen werden.",
     "notSetUp": "Der E-Mail-Versand ist für deinen Betrieb noch nicht eingerichtet. Bis dahin kannst du Belege herunterladen und selbst verschicken.",
@@ -2654,20 +2676,23 @@
     },
     "draftNotAdded": "Die eingegebene Adresse ist noch nicht in der Liste. Klicke auf „Hinzufügen“.",
     "errors": {
-      "forbidden": "Versandmodus und Testadressen kann nur die Geschäftsführung des Betriebs ändern.",
+      "forbidden": "Diese Einstellungen kann nur die Geschäftsführung des Betriebs ändern.",
       "livePlatformOnly": "„Aktiv“ schaltet nur Bautakt frei. Wähle Probelauf oder Testmodus.",
       "allowlistInvalid": "Mindestens eine Testadresse ist ungültig. Bitte prüfe die Liste.",
       "allowlistTooLong": "Es gehen höchstens 50 Testadressen.",
+      "sendersInvalid": "Mindestens ein Absender ist ungültig. Bitte prüfe die Liste.",
+      "sendersTooLong": "Es gehen höchstens 200 Absender.",
       "notSaved": "Die Einstellungen wurden nicht gespeichert. Bitte lade die Seite neu und versuche es noch einmal."
     },
     "logTitle": "Änderungsprotokoll",
-    "logDescription": "Wer Versandmodus und Testadressen meines Betriebs wann geändert hat. Die letzten 50 Änderungen, neueste zuerst.",
+    "logDescription": "Wer die E-Mail-Einstellungen meines Betriebs wann geändert hat. Die letzten 50 Änderungen, neueste zuerst.",
     "logLoadError": "Das Änderungsprotokoll konnte nicht geladen werden.",
     "logEmpty": "Noch keine Änderung.",
     "logWhen": "{{when}} von {{who}}",
     "logUnknownPerson": "einer Person, die nicht mehr im Betrieb ist",
     "logMode": "Versandmodus: {{from}} → {{to}}",
     "logAllowlist": "Testadressen: {{from}} → {{to}}",
+    "logInboundSenders": "Freigegebene Absender: {{from}} → {{to}}",
     "logNoAddresses": "keine"
   },
   "mailDeliveryStatus": {

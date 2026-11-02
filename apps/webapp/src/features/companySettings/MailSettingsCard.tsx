@@ -11,7 +11,6 @@ import {
   Spinner,
   Text,
 } from '@fluentui/react-components';
-import { DismissRegular } from '@fluentui/react-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,12 +36,13 @@ import { readableDbError } from '@/lib/dbErrors';
 import { formatDateTime } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
 
+import { AddressList } from './AddressList';
 import { isValidEmail } from './companyValidation';
+import { InboundMailCard } from './InboundMailCard';
 import {
   addAddress,
   type AddAddressResult,
   capLowersMode,
-  inboundAddress,
   type MailMode,
   mailSettingsErrorKey,
   removeAddress,
@@ -161,70 +161,14 @@ export function MailSettingsCard() {
         )}
       </SectionCard>
       {!settings.isLoading && !settings.isError ? (
-        <InboundAddressCard slug={settings.data?.inbound_slug} />
+        <InboundMailCard
+          slug={settings.data?.inbound_slug}
+          senders={settings.data?.inbound_sender_allowlist ?? []}
+          isOwner={isOwner}
+        />
       ) : null}
       {isOwner && settings.data ? <MailSettingsLogCard /> : null}
     </div>
-  );
-}
-
-/**
- * Empfangsadresse für Eingangsrechnungen (bautakt-web#221). Die Oberfläche
- * vergibt keinen Slug; ohne Slug nimmt der Mail-Eingang für den Betrieb nichts an.
- */
-function InboundAddressCard({ slug }: { slug: string | null | undefined }) {
-  const { t } = useTranslation();
-  const address = inboundAddress(slug);
-
-  const copy = async (value: string) => {
-    try {
-      await navigator.clipboard.writeText(value);
-      toast.success(t('domain:mailSettings.inbound.copied'));
-    } catch {
-      toast.error(t('domain:mailSettings.inbound.copyError'));
-    }
-  };
-
-  return (
-    <SectionCard
-      title={t('domain:mailSettings.inbound.title')}
-      description={
-        <Text className="text-muted-foreground">
-          {t('domain:mailSettings.inbound.description')}
-        </Text>
-      }
-    >
-      {address ? (
-        <div className="flex flex-col gap-4">
-          <dl className="m-0 flex flex-col gap-3">
-            <DetailRow label={t('domain:mailSettings.inbound.address')} value={address} />
-          </dl>
-          <div>
-            <Button onClick={() => void copy(address)}>
-              {t('domain:mailSettings.inbound.copy')}
-            </Button>
-          </div>
-          <div className="flex flex-col gap-1">
-            <Text weight="semibold">{t('domain:mailSettings.inbound.howTitle')}</Text>
-            <ol className="m-0 flex list-decimal flex-col gap-1 pl-5">
-              <li>
-                <Text>{t('domain:mailSettings.inbound.howForward')}</Text>
-              </li>
-              <li>
-                <Text>{t('domain:mailSettings.inbound.howSuppliers')}</Text>
-              </li>
-              <li>
-                <Text>{t('domain:mailSettings.inbound.howCheck')}</Text>
-              </li>
-            </ol>
-          </div>
-        </div>
-      ) : (
-        <MessageBar intent="info" layout="multiline">
-          <MessageBarBody>{t('domain:mailSettings.inbound.notSetUp')}</MessageBarBody>
-        </MessageBar>
-      )}
-    </SectionCard>
   );
 }
 
@@ -284,44 +228,12 @@ function ModeNotice({ state }: { state: MailModeState }) {
       </dl>
       <div className="flex flex-col gap-1">
         <Text weight="semibold">{t('domain:mailSettings.allowlist')}</Text>
-        <AddressList addresses={state.allowlist} />
+        <AddressList
+          addresses={state.allowlist}
+          emptyText={t('domain:mailSettings.allowlistEmpty')}
+        />
       </div>
     </div>
-  );
-}
-
-function AddressList({
-  addresses,
-  onRemove,
-  disabled,
-}: {
-  addresses: readonly string[];
-  onRemove?: (address: string) => void;
-  disabled?: boolean;
-}) {
-  const { t } = useTranslation();
-  if (addresses.length === 0) {
-    return <Text className="text-muted-foreground">{t('domain:mailSettings.allowlistEmpty')}</Text>;
-  }
-  return (
-    <ul className="flex flex-wrap gap-2">
-      {addresses.map((address) => (
-        <li key={address} className="flex items-center gap-1">
-          <StatusBadge tone="outline">{address}</StatusBadge>
-          {onRemove ? (
-            <Button
-              appearance="subtle"
-              size="small"
-              icon={<DismissRegular />}
-              disabled={disabled}
-              aria-label={t('domain:mailSettings.removeAddress', { address })}
-              title={t('domain:mailSettings.removeAddress', { address })}
-              onClick={() => onRemove(address)}
-            />
-          ) : null}
-        </li>
-      ))}
-    </ul>
   );
 }
 
@@ -418,6 +330,7 @@ function ModeForm({ state }: { state: MailModeState }) {
         <Text className="text-muted-foreground">{t('domain:mailSettings.allowlistHint')}</Text>
         <AddressList
           addresses={allowlist}
+          emptyText={t('domain:mailSettings.allowlistEmpty')}
           disabled={busy}
           onRemove={(address) => setAllowlist(removeAddress(allowlist, address))}
         />
@@ -558,6 +471,17 @@ function MailSettingsLogCard() {
                   {t('domain:mailSettings.logAllowlist', {
                     from: addressText(entry.oldAllowlist),
                     to: addressText(entry.newAllowlist),
+                  })}
+                </Text>
+              ) : null}
+              {!sameSettings(
+                { mode: '', allowlist: entry.oldInboundSenders },
+                { mode: '', allowlist: entry.newInboundSenders },
+              ) ? (
+                <Text>
+                  {t('domain:mailSettings.logInboundSenders', {
+                    from: addressText(entry.oldInboundSenders),
+                    to: addressText(entry.newInboundSenders),
                   })}
                 </Text>
               ) : null}

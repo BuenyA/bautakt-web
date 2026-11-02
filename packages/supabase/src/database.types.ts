@@ -1,3 +1,19 @@
+/**
+ * GENERIERT — nicht von Hand bearbeiten.
+ *
+ * Quelle:  Supabase-Projekt "Bautakt" (bxivzvmlcnaxqlytumvz, eu-central-1)
+ * Stand:   2026-11-02
+ *
+ * Neu erzeugen:
+ *   npx supabase gen types typescript --project-id bxivzvmlcnaxqlytumvz \
+ *     > packages/supabase/src/database.types.ts
+ *   (Header danach wieder voranstellen.)
+ *
+ * Das Schema gehoert dem Repo bautakt-app. Aenderungen daran passieren
+ * ausschliesslich dort in supabase/migrations/ — dieses Repo liest nur.
+ * Nach jeder Schema-Aenderung diese Datei neu erzeugen.
+ */
+
 export type Json =
   | string
   | number
@@ -657,6 +673,8 @@ export type Database = {
           domain_checked_at: string | null
           domain_status: string
           inbound_forwarding_address: string | null
+          inbound_sender_allowlist: string[]
+          inbound_sender_limit_per_day: number
           inbound_slug: string | null
           mail_mode: string
           mail_provider: string
@@ -681,6 +699,8 @@ export type Database = {
           domain_checked_at?: string | null
           domain_status?: string
           inbound_forwarding_address?: string | null
+          inbound_sender_allowlist?: string[]
+          inbound_sender_limit_per_day?: number
           inbound_slug?: string | null
           mail_mode?: string
           mail_provider?: string
@@ -705,6 +725,8 @@ export type Database = {
           domain_checked_at?: string | null
           domain_status?: string
           inbound_forwarding_address?: string | null
+          inbound_sender_allowlist?: string[]
+          inbound_sender_limit_per_day?: number
           inbound_slug?: string | null
           mail_mode?: string
           mail_provider?: string
@@ -736,8 +758,10 @@ export type Database = {
           company_id: string
           id: string
           new_allowlist: string[]
+          new_inbound_sender_allowlist: string[]
           new_mail_mode: string
           old_allowlist: string[]
+          old_inbound_sender_allowlist: string[]
           old_mail_mode: string
         }
         Insert: {
@@ -746,8 +770,10 @@ export type Database = {
           company_id: string
           id?: string
           new_allowlist: string[]
+          new_inbound_sender_allowlist?: string[]
           new_mail_mode: string
           old_allowlist: string[]
+          old_inbound_sender_allowlist?: string[]
           old_mail_mode: string
         }
         Update: {
@@ -756,8 +782,10 @@ export type Database = {
           company_id?: string
           id?: string
           new_allowlist?: string[]
+          new_inbound_sender_allowlist?: string[]
           new_mail_mode?: string
           old_allowlist?: string[]
+          old_inbound_sender_allowlist?: string[]
           old_mail_mode?: string
         }
         Relationships: [
@@ -2094,6 +2122,82 @@ export type Database = {
             columns: ["cost_category_id"]
             isOneToOne: false
             referencedRelation: "cost_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inbound_mail_admissions: {
+        Row: {
+          admitted_at: string
+          company_id: string
+          dedup_key: string
+          sender_key: string
+        }
+        Insert: {
+          admitted_at?: string
+          company_id: string
+          dedup_key: string
+          sender_key: string
+        }
+        Update: {
+          admitted_at?: string
+          company_id?: string
+          dedup_key?: string
+          sender_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inbound_mail_admissions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inbound_mail_rejections: {
+        Row: {
+          company_id: string
+          created_at: string
+          dedup_key: string
+          from_email: string | null
+          from_name: string | null
+          id: string
+          provider_message_id: string
+          reason: string
+          received_at: string
+          subject: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          dedup_key: string
+          from_email?: string | null
+          from_name?: string | null
+          id?: string
+          provider_message_id: string
+          reason: string
+          received_at: string
+          subject?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          dedup_key?: string
+          from_email?: string | null
+          from_name?: string | null
+          id?: string
+          provider_message_id?: string
+          reason?: string
+          received_at?: string
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inbound_mail_rejections_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -5211,6 +5315,10 @@ export type Database = {
         Args: { p_contact_id: string; p_on: string }
         Returns: boolean
       }
+      inbound_mail_admit: {
+        Args: { p_company_id: string; p_mail: Json }
+        Returns: Json
+      }
       inbound_mail_lookup: {
         Args: { p_dedup_key: string; p_slug: string }
         Returns: Json
@@ -5601,6 +5709,10 @@ export type Database = {
           p_prefix: string
         }
         Returns: undefined
+      }
+      set_inbound_sender_allowlist: {
+        Args: { p_allowlist: string[]; p_company_id: string }
+        Returns: string[]
       }
       set_incoming_invoice_tax_lines: {
         Args: { p_invoice_id: string; p_lines: Json }
