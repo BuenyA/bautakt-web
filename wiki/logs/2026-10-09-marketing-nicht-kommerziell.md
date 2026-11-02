@@ -1,5 +1,10 @@
 # 2026-10-09 — Marketing ohne Preise und ohne Registrierung
 
+Die Preise sind seit 2026-11-02 wieder öffentlich, siehe
+[2026-11-02](2026-11-02-preisseite.md). Dieser Eintrag hält fest, warum sie
+damals weg waren. Die Entscheidung, keine Registrierung zu verlinken, gilt
+weiter.
+
 Owner-Entscheidung: bis zum ersten Kunden kein Vercel-Pro-Abo. Die öffentliche
 Marketing-Seite (Vercel-Projekt `bautakt-web-marketing`, Hobby) muss
 nicht-kommerziell wirken.
