@@ -2665,6 +2665,11 @@
       "undeliverable": "Nicht zustellbar",
       "complained": "Als Spam gemeldet"
     },
+    "deferredSince": "Verzögert seit {{at}}",
+    "stale": {
+      "title": "Seit über 72 Stunden keine endgültige Rückmeldung",
+      "body": "Die Mail an {{to}} ist bisher weder als zugestellt noch als unzustellbar gemeldet. Prüfe die Adresse und frag beim Empfänger nach, ob sie angekommen ist."
+    },
     "to": "an {{to}}",
     "partial": "{{delivered}} von {{total}} zugestellt",
     "loadError": "Der Zustellstatus konnte nicht geladen werden.",

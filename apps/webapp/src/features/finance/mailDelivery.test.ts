@@ -10,6 +10,7 @@ import {
   openDeliveryProblems,
   openMailIssues,
   shouldPollDelivery,
+  staleDeferredMails,
   toDeliveryRows,
 } from './mailDelivery.ts';
 
@@ -197,6 +198,38 @@ describe('Zustellstatus (#276)', () => {
     assert.deepEqual(
       openDeliveryProblems(rows).map((row) => row.mailId),
       ['c'],
+    );
+  });
+
+  it('meldet verzögerte Mails erst nach 72 Stunden', () => {
+    const rows = toDeliveryRows([raw({ status: 'deferred' })]);
+    assert.deepEqual(staleDeferredMails(rows, '2026-11-05T11:59:59.999Z'), []);
+    assert.equal(staleDeferredMails(rows, '2026-11-05T12:00:00.000Z').length, 1);
+  });
+
+  it('meldet nach 72 Stunden nur Mails, die noch verzögert sind', () => {
+    const later = '2026-11-20T12:00:00.000Z';
+    for (const status of ['sent', 'delivered', 'undeliverable', 'complained']) {
+      assert.deepEqual(staleDeferredMails(toDeliveryRows([raw({ status })]), later), [], status);
+    }
+  });
+
+  it('erledigt den Hinweis, sobald eine spätere Mail zugestellt wurde', () => {
+    const rows = toDeliveryRows([
+      raw({ mail_id: 'alt', status: 'deferred' }),
+      raw({ mail_id: 'neu', status: 'delivered', sent_at: '2026-11-03T12:00:00.000Z' }),
+    ]);
+    assert.deepEqual(staleDeferredMails(rows, '2026-11-20T12:00:00.000Z'), []);
+  });
+
+  it('lässt den Hinweis stehen, wenn nur eine frühere Mail zugestellt wurde', () => {
+    const rows = toDeliveryRows([
+      raw({ mail_id: 'alt', status: 'delivered', sent_at: '2026-11-01T12:00:00.000Z' }),
+      raw({ mail_id: 'neu', status: 'deferred' }),
+    ]);
+    assert.deepEqual(
+      staleDeferredMails(rows, '2026-11-20T12:00:00.000Z').map((row) => row.mailId),
+      ['neu'],
     );
   });
 

@@ -193,6 +193,32 @@ export function openDeliveryProblems(rows: readonly MailDeliveryRow[]): MailDeli
   );
 }
 
+/** So lange nach dem Versand gilt „Verzögert“ als normal (bautakt-web#278). */
+export const DEFERRED_CHECK_AFTER_MS = 72 * 60 * 60 * 1000;
+
+/**
+ * Verzögerte Mails ohne endgültige Meldung nach 72 Stunden. Lettermint meldet
+ * nach einem Soft-Bounce nicht sicher ein Ergebnis, deshalb bleibt der Status
+ * „Verzögert“ und springt nie von selbst auf „Nicht zustellbar“. Der Hinweis
+ * erledigt sich, sobald eine spätere Mail zugestellt wurde.
+ */
+export function staleDeferredMails(
+  rows: readonly MailDeliveryRow[],
+  nowIso: string,
+): MailDeliveryRow[] {
+  const now = Date.parse(nowIso);
+  const lastDelivered = Math.max(
+    ...rows.filter((row) => row.status === 'delivered').map((row) => Date.parse(row.sentAt)),
+    Number.NEGATIVE_INFINITY,
+  );
+  return rows.filter(
+    (row) =>
+      row.status === 'deferred' &&
+      now - Date.parse(row.sentAt) >= DEFERRED_CHECK_AFTER_MS &&
+      Date.parse(row.sentAt) > lastDelivered,
+  );
+}
+
 /** So lange nach dem Versand kommen Rückmeldungen typischerweise an. */
 export const DELIVERY_POLL_WINDOW_MS = 15 * 60 * 1000;
 
