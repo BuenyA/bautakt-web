@@ -109,7 +109,7 @@ export function openMailIssues(
 }
 
 /**
- * Zustellstatus aus der View `mail_delivery_status` (bautakt-app#247), gespeist
+ * Zustellstatus aus der View `mail_delivery_status` (#247), gespeist
  * vom Lettermint-Webhook. Jede tatsächlich versendete Mail hat eine Zeile.
  */
 export type DeliveryStatus = 'sent' | 'deferred' | 'delivered' | 'undeliverable' | 'complained';

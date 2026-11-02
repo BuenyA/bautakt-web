@@ -1,6 +1,6 @@
 # 2026-11-02 Zustellstatus am Beleg und an der Eingangsrechnung (#276)
 
-Seit [bautakt-app#247](https://github.com/BuenyA/bautakt-app/issues/247) schreibt der
+Seit [#247](https://github.com/BuenyA/bautakt-web/issues/247) schreibt der
 Lettermint-Webhook Rückmeldungen, die View `mail_delivery_status` fasst sie je Mail zusammen.
 Das Schema steht im Wiki von `bautakt-app`.
 
@@ -16,6 +16,6 @@ Das Schema steht im Wiki von `bautakt-app`.
 - `database.types.ts` neu erzeugt. `save_sales_document_draft.p_document_id` bleibt von Hand
   auf `string | null` gesetzt.
 - Browser-Test in der Testfirma, hell und dunkel, an der Eingangsrechnung mit den beiden
-  Test-Mails aus bautakt-app#247 und am Ausgangsbeleg: Rechnung RE00001 festgeschrieben und
+  Test-Mails aus #247 und am Ausgangsbeleg: Rechnung RE00001 festgeschrieben und
   an die Testadresse verschickt. Direkt danach stand „Versendet“, 30 Sekunden später ohne
   Neuladen „Zugestellt“.
