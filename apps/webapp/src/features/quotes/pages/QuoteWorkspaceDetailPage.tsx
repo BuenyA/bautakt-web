@@ -1,4 +1,4 @@
-import { eurosToMinor, formatMoney, type CurrencyCode } from '@bautakt/finance';
+import { type CurrencyCode, eurosToMinor, formatMoney } from '@bautakt/finance';
 import { toast } from '@bautakt/ui';
 import { Link as FluentLink } from '@fluentui/react-components';
 import { useTranslation } from 'react-i18next';

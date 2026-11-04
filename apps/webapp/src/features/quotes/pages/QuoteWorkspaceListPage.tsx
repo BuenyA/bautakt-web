@@ -1,4 +1,4 @@
-import { eurosToMinor, formatMoney, type CurrencyCode } from '@bautakt/finance';
+import { type CurrencyCode, eurosToMinor, formatMoney } from '@bautakt/finance';
 import { DataTable, type DataTableColumn } from '@bautakt/ui';
 import { Card, Field, Link as FluentLink, MessageBar, Select } from '@fluentui/react-components';
 import { useMemo } from 'react';
@@ -19,11 +19,11 @@ import {
   QUOTE_KINDS,
   QUOTE_STATUSES,
   quoteFigures,
-  quoteKindFromSearch,
   type QuoteKindFilter,
+  quoteKindFromSearch,
   quoteKindToSearch,
-  quoteStatusFromSearch,
   type QuoteStatusFilter,
+  quoteStatusFromSearch,
   quoteStatusToSearch,
 } from '../quoteList';
 import { QuoteStatusBadge } from '../QuoteStatusBadge';

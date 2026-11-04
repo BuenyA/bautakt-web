@@ -4,12 +4,12 @@ import { test } from 'node:test';
 import {
   berlinToday,
   matchesQuoteFilter,
+  QUOTE_STATUSES,
   quoteCustomerLabel,
   quoteFigures,
   quoteKindFromSearch,
   quoteKindToSearch,
   quoteStatusFromSearch,
-  QUOTE_STATUSES,
   quoteStatusToSearch,
 } from './quoteList.ts';
 

@@ -1,8 +1,8 @@
+import type { Tables } from '@bautakt/supabase';
 import { useQuery } from '@tanstack/react-query';
 
 import { useMembership } from '@/features/company/useMembership';
 import { supabase } from '@/lib/supabase';
-import type { Tables } from '@bautakt/supabase';
 
 import { QUOTE_CUSTOMER_SELECT, quoteCustomerLabel } from './quoteList';
 
