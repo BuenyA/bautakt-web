@@ -39,6 +39,14 @@ export type EmployeePermissions = {
   canViewManagementInvoices: boolean;
   canViewOrderFinance: boolean;
   canViewWageCosts: boolean;
+  /** Angebotsbereich (seit 2026-11-03, bautakt-app#182). */
+  canViewQuotes: boolean;
+  canCreateQuotes: boolean;
+  canEditQuotes: boolean;
+  canIssueQuotes: boolean;
+  canDecideQuotes: boolean;
+  canViewQuoteCalculation: boolean;
+  canManageQuoteCatalog: boolean;
   canManageRates: boolean;
   canManageOverheadCosts: boolean;
   canViewCompanyFinance: boolean;
@@ -80,6 +88,13 @@ export const DEFAULT_PERMISSIONS: EmployeePermissions = {
   canViewManagementInvoices: false,
   canViewOrderFinance: false,
   canViewWageCosts: false,
+  canViewQuotes: false,
+  canCreateQuotes: false,
+  canEditQuotes: false,
+  canIssueQuotes: false,
+  canDecideQuotes: false,
+  canViewQuoteCalculation: false,
+  canManageQuoteCatalog: false,
   canManageRates: false,
   canManageOverheadCosts: false,
   canViewCompanyFinance: false,
