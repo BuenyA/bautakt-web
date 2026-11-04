@@ -2640,7 +2640,7 @@
       "howCheck": "Prüfe jede Rechnung in den Eingangsrechnungen, bevor du sie freigibst.",
       "notSetUp": "Für deinen Betrieb ist noch keine Empfangsadresse eingerichtet. Bis dahin lädst du Rechnungen in den Eingangsrechnungen selbst hoch.",
       "senders": "Freigegebene Absender",
-      "sendersHint": "Optional. Ohne Einträge nimmt die Adresse Mails von allen an. Trag volle Adressen oder ganze Domains wie @lieferant.de ein. Manche Anbieter ändern beim Weiterleiten den Absender. Prüfe deshalb nach dem Einrichten die abgewiesenen Mails.",
+      "sendersHint": "Optional. Ohne Einträge nimmt die Adresse Mails von allen an. Trag volle Adressen oder ganze Domains wie @lieferant.de ein. Bei IONOS bleibt mit der Regel „Umleiten nach“ der ursprüngliche Absender erhalten: Trag dort deine Lieferanten ein, nicht deine eigene Adresse. Bei anderen Anbietern, etwa Gmail, ist das nicht geprüft. Kontrolliere deshalb nach dem Einrichten die abgewiesenen Mails.",
       "sendersEmpty": "Keine Einschränkung: Mails von allen Absendern werden angenommen.",
       "addSender": "Absender hinzufügen",
       "addSenderPlaceholder": "rechnung@lieferant.de oder @lieferant.de",
