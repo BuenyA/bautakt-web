@@ -62,6 +62,8 @@ import { LanguagePage } from '@/features/profile/pages/LanguagePage';
 import { PersonalDataPage } from '@/features/profile/pages/PersonalDataPage';
 import { ProfileLegalPage } from '@/features/profile/pages/ProfileLegalPage';
 import { ProfileLayout } from '@/features/profile/ProfileLayout';
+import { QuoteWorkspaceDetailPage } from '@/features/quotes/pages/QuoteWorkspaceDetailPage';
+import { QuoteWorkspaceListPage } from '@/features/quotes/pages/QuoteWorkspaceListPage';
 import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 import { AbsenceDetailPage } from '@/features/team/pages/AbsenceDetailPage';
 import { AbsencesPage } from '@/features/team/pages/AbsencesPage';
@@ -152,6 +154,22 @@ export const appRoutes: RouteObject[] = [
                 element: (
                   <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
                     <QuotesListPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: routes.quoteWorkspace,
+                element: (
+                  <RequirePermission anyOf={['canViewQuotes']}>
+                    <QuoteWorkspaceListPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: `${routes.quoteWorkspace}/:id`,
+                element: (
+                  <RequirePermission anyOf={['canViewQuotes']}>
+                    <QuoteWorkspaceDetailPage />
                   </RequirePermission>
                 ),
               },

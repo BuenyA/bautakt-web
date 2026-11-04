@@ -155,6 +155,7 @@ export function useExemptionCertificates(contactId: string | undefined, enabled 
 
 export type ContactUsage = {
   orders: { id: string; name: string; status: string }[];
+  quotes: number;
   salesDocuments: number;
   incomingInvoices: number;
   expenses: number;
@@ -177,7 +178,7 @@ export function useContactUsage(contactId: string | undefined) {
     enabled: Boolean(companyId && contactId),
     queryFn: async (): Promise<ContactUsage> => {
       const count = (
-        table: 'sales_documents' | 'incoming_invoices' | 'expenses' | 'articles',
+        table: 'quotes' | 'sales_documents' | 'incoming_invoices' | 'expenses' | 'articles',
         column: string,
       ) =>
         supabase
@@ -186,23 +187,26 @@ export function useContactUsage(contactId: string | undefined) {
           .eq('company_id', companyId!)
           .eq(column, contactId!);
 
-      const [orders, sales, incoming, expenses, articles, involvements] = await Promise.all([
-        supabase
-          .from('orders')
-          .select('id, name, status')
-          .eq('company_id', companyId!)
-          .eq('customer_id', contactId!)
-          .order('created_at', { ascending: false }),
-        count('sales_documents', 'customer_id'),
-        count('incoming_invoices', 'supplier_id'),
-        count('expenses', 'supplier_id'),
-        count('articles', 'supplier_id'),
-        supabase
-          .from('order_contacts')
-          .select('order_id, role, order:orders(name)')
-          .eq('company_id', companyId!)
-          .eq('contact_id', contactId!),
-      ]);
+      const [orders, quotes, sales, incoming, expenses, articles, involvements] = await Promise.all(
+        [
+          supabase
+            .from('orders')
+            .select('id, name, status')
+            .eq('company_id', companyId!)
+            .eq('customer_id', contactId!)
+            .order('created_at', { ascending: false }),
+          count('quotes', 'customer_id'),
+          count('sales_documents', 'customer_id'),
+          count('incoming_invoices', 'supplier_id'),
+          count('expenses', 'supplier_id'),
+          count('articles', 'supplier_id'),
+          supabase
+            .from('order_contacts')
+            .select('order_id, role, order:orders(name)')
+            .eq('company_id', companyId!)
+            .eq('contact_id', contactId!),
+        ],
+      );
       // Ohne Finanzrecht zählen die Belege 0 (RLS) — das ist dann auch die
       // ehrliche Antwort aus Sicht dieses Nutzers.
       if (orders.error) throw orders.error;
@@ -210,6 +214,7 @@ export function useContactUsage(contactId: string | undefined) {
 
       return {
         orders: orders.data ?? [],
+        quotes: quotes.count ?? 0,
         salesDocuments: sales.count ?? 0,
         incomingInvoices: incoming.count ?? 0,
         expenses: expenses.count ?? 0,

@@ -86,6 +86,9 @@ export const routes = {
   quotes: '/angebote',
   quote: (id: string) => `/angebote/${id}`,
   quoteNew: '/angebote/neu',
+  // Neuer Angebotsbereich, bis 1c nicht verlinkt und nicht in Leiste oder Menü (app#190).
+  quoteWorkspace: '/angebote/vorgaenge',
+  quoteWorkspaceDetail: (id: string) => `/angebote/vorgaenge/${id}`,
   invoices: '/rechnungen/ausgang',
   invoice: (id: string) => `/rechnungen/${id}`,
   invoiceSend: (id: string) => `/rechnungen/${id}?${sendParam}=1`,
