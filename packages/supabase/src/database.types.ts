@@ -2,7 +2,7 @@
  * GENERIERT — nicht von Hand bearbeiten.
  *
  * Quelle:  Supabase-Projekt "Bautakt" (bxivzvmlcnaxqlytumvz, eu-central-1)
- * Stand:   2026-11-02
+ * Stand:   2026-11-03
  *
  * Neu erzeugen:
  *   npx supabase gen types typescript --project-id bxivzvmlcnaxqlytumvz \
@@ -5151,15 +5151,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      checklist_company_id: {
-        Args: { p_checklist_id: string }
-        Returns: string
-      }
-      checklist_is_own_personal: {
-        Args: { p_checklist_id: string }
-        Returns: boolean
-      }
-      checklist_order_id: { Args: { p_checklist_id: string }; Returns: string }
       checklist_user_id: { Args: { p_checklist_id: string }; Returns: string }
       company_legal_footer_missing: {
         Args: { p_company_id: string }
@@ -5429,7 +5420,6 @@ export type Database = {
         Args: { p_invoice_id: string }
         Returns: undefined
       }
-      is_company_chef: { Args: { p_company_id: string }; Returns: boolean }
       is_company_member: { Args: { p_company_id: string }; Returns: boolean }
       is_company_owner: { Args: { p_company_id: string }; Returns: boolean }
       is_owner_role_name: {
@@ -5844,10 +5834,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      shares_company_with: {
-        Args: { p_other_user_id: string }
-        Returns: boolean
-      }
       switch_primary_company: {
         Args: { p_company_id: string }
         Returns: undefined
@@ -5855,14 +5841,6 @@ export type Database = {
       update_document_payment_status: {
         Args: { p_document_id: string }
         Returns: undefined
-      }
-      user_is_assigned_to_work_assignment: {
-        Args: { p_assignment_id: string }
-        Returns: boolean
-      }
-      work_assignment_company_id: {
-        Args: { p_assignment_id: string }
-        Returns: string
       }
     }
     Enums: {
