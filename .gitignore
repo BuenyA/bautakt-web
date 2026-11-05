@@ -39,13 +39,9 @@ blob-report/
 # Dieses Repo besitzt das Schema nicht. Scratch-State bleibt ignoriert.
 # Ausnahme: supabase/migrations/ darf eine noch nicht angewendete Storage-Migration
 # enthalten, die vor dem Deploy am Projekt angewendet werden muss.
-# Ausnahme: supabase/templates/ hält die Auth-Mailvorlage, die der Owner ins
-# Dashboard überträgt. Es gibt hier kein config.toml. Siehe
-# supabase/templates/README.md.
 # Siehe CLAUDE.md, Abschnitt "Repository relationship".
 /supabase/*
 !/supabase/migrations/
-!/supabase/templates/
 
 # Logs
 *.log

@@ -105,19 +105,7 @@ ersten Anmeldung nach `profiles`. Eine leere `identities`-Liste in der Antwort
 heißt „Adresse schon registriert“ und wird als `errors:auth.userAlreadyExists`
 gemeldet. Supabase liefert dafür bei aktiver Bestätigung keinen Fehler.
 
-Die Bestätigungsmail ist die Supabase-Vorlage „Confirm signup“. Die Web-App hat
-keine eigene Confirm-Route. `emailRedirectTo` ist `${origin}/login`, der Client
-liest die Sitzung über `detectSessionInUrl` (PKCE). Die Vorlage muss deshalb
-`{{ .ConfirmationURL }}` verwenden, nicht einen selbst gebauten
-`token_hash`-Link. Dieses Repo hat kein `supabase/config.toml`. Die deutschen
-Dateien liegen in `supabase/templates/` und werden vom Owner ins Dashboard
-kopiert (Authentication > Email Templates). Der englische Standardtext ist
-Stand 05.11.2026 noch live. `bautakt-app` hält laut
-[Issue #141](https://github.com/BuenyA/bautakt-web/issues/141) (03.11.2026) den
-Code der Auth-Mails; die Übertragung ist dort offen. Ein späterer Upload von
-dort überschreibt die Dashboard-Vorlage. Die Anmeldekarte bleibt dunkel
-(Vorgabe 12.10.2026). Der Hinweis nutzt Fluent-Tokens und bleibt in Hell und
-Dunkel lesbar.
+Die Bestätigungsmail kommt aus `bautakt-app`.
 
 Mitarbeiter-Einladungen erzeugen keinen Auth-Benutzer:
 `accept_employment_invitation(p_token)` verlangt `auth.uid()` und legt nur die

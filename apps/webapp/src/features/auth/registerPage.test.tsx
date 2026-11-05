@@ -1,9 +1,5 @@
 import '@/lib/i18n';
 
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 import { lightTheme } from '@bautakt/ui';
 import { FluentProvider } from '@fluentui/react-components';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -24,11 +20,6 @@ const signedOut: AuthContextValue = {
   requestPasswordReset: async () => ({ error: null }),
   updatePassword: async () => ({ error: null }),
 };
-
-const templatesDir = join(
-  dirname(fileURLToPath(import.meta.url)),
-  '../../../../../supabase/templates',
-);
 
 function renderAt(path: string): string {
   const router = createMemoryRouter(appRoutes, { initialEntries: [path] });
@@ -59,20 +50,5 @@ describe('Registrierung', () => {
     expect(html).toContain('>E-Mail<');
     expect(html).not.toContain('Persönliche E-Mail-Adresse');
     expect(html).not.toContain('Firmen-E-Mail');
-  });
-});
-
-describe('Confirm-signup-Vorlage', () => {
-  it('ist deutsch, nutzt ConfirmationURL und die Markenfarbe', () => {
-    const subject = readFileSync(join(templatesDir, 'confirm-signup.subject.txt'), 'utf8').trim();
-    const html = readFileSync(join(templatesDir, 'confirm-signup.html'), 'utf8');
-
-    expect(subject).toBe('Bitte bestätigen Sie Ihre E-Mail-Adresse für Bautakt');
-    expect(html).toContain('{{ .ConfirmationURL }}');
-    expect(html).toContain('#0f6cbd');
-    expect(html).toContain('E-Mail-Adresse bestätigen');
-    expect(html).not.toContain('Follow this link to confirm your user');
-    expect(html).not.toContain('.TokenHash');
-    expect(html).not.toContain('.SiteURL');
   });
 });
