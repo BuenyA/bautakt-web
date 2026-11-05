@@ -121,6 +121,7 @@ export function ContactDetailPage() {
   const mayEditBank = isCreditor ? canSuppliers && canFinance : canCustomers && canBilling;
   const used = usage.data
     ? usage.data.orders.length +
+        usage.data.quotes +
         usage.data.salesDocuments +
         usage.data.incomingInvoices +
         usage.data.expenses +
@@ -571,6 +572,7 @@ function UsageCard({ contactId }: { contactId: string }) {
   const hasAny =
     data.orders.length +
       data.orderInvolvements.length +
+      data.quotes +
       data.salesDocuments +
       data.incomingInvoices +
       data.expenses +
@@ -622,6 +624,10 @@ function UsageCard({ contactId }: { contactId: string }) {
                 ''
               )
             }
+          />
+          <DetailRow
+            label={t('domain:contacts.usageQuotes')}
+            value={data.quotes > 0 ? String(data.quotes) : ''}
           />
           <DetailRow
             label={t('domain:contacts.usageSales')}

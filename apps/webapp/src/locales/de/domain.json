@@ -326,6 +326,7 @@
     "unused": "Noch an keinem Auftrag oder Beleg.",
     "usageOrders": "Aufträge als Kunde",
     "usageInvolved": "Beteiligt an",
+    "usageQuotes": "Angebote",
     "usageSales": "Ausgangsbelege",
     "usageIncoming": "Eingangsrechnungen",
     "usageExpenses": "Ausgaben",
@@ -763,7 +764,71 @@
     "issueDate": "Angebotsdatum",
     "emptyTitle": "Noch keine Angebote",
     "emptyDescription": "Sobald Angebote geschrieben sind, erscheinen sie hier.",
-    "new": "Neues Angebot"
+    "new": "Neues Angebot",
+    "workspace": {
+      "noNumber": "Ohne Nummer",
+      "noDate": "Kein Datum",
+      "kindLabel": "Art",
+      "kind": {
+        "main": "Hauptangebot",
+        "addendum": "Nachtrag"
+      },
+      "status": {
+        "draft": "Entwurf",
+        "open": "Offen",
+        "expired": "Abgelaufen",
+        "accepted": "Angenommen",
+        "declined": "Abgelehnt",
+        "withdrawn": "Zurückgezogen"
+      },
+      "subject": "Betreff",
+      "validUntil": "Gültig bis",
+      "net": "Netto",
+      "filterAll": "Alle",
+      "figures": {
+        "open_one": "{{count}} offenes Angebot",
+        "open_other": "{{count}} offene Angebote",
+        "accepted_one": "{{count}} angenommenes Angebot",
+        "accepted_other": "{{count}} angenommene Angebote",
+        "expired": "Abgelaufen",
+        "followUp": "Wiedervorlage fällig",
+        "netNote": "Netto, nur Euro",
+        "otherCurrency": "Angebote in Franken zählen bei der Anzahl mit, aber nicht in der Euro-Summe."
+      },
+      "noResults": "Keine Treffer",
+      "noResultsDescription": "Zu diesen Filtern gibt es kein Angebot.",
+      "loadErrorTitle": "Angebote konnten nicht geladen werden",
+      "loadErrorDescription": "Bitte versuch es noch einmal.",
+      "notFoundTitle": "Angebot nicht gefunden",
+      "notFoundDescription": "Es existiert nicht oder du hast keinen Zugriff darauf.",
+      "back": "Zur Angebotsliste",
+      "summary": "Überblick",
+      "order": "Auftrag",
+      "site": "Objektadresse",
+      "followUp": "Wiedervorlage",
+      "versions": "Versionen",
+      "noVersions": "Noch keine Version.",
+      "versionLabel": "Version {{number}}",
+      "issuedOn": "festgeschrieben am {{date}}",
+      "history": "Verlauf",
+      "noHistory": "Noch keine Einträge.",
+      "event": {
+        "created": "Angebot angelegt",
+        "version_created": "Neue Version angelegt",
+        "issued": "Version festgeschrieben",
+        "other": "Änderung"
+      },
+      "attachments": "Anhänge",
+      "noAttachments": "Noch keine Anhänge.",
+      "attachmentError": "Der Anhang konnte nicht geöffnet werden.",
+      "attachmentKind": {
+        "plan": "Plan",
+        "photo": "Foto",
+        "aufmass": "Aufmaß",
+        "other": "Sonstiges"
+      },
+      "notCalculated": "Noch nicht berechnet"
+    }
   },
   "receivables": {
     "title": "Offene Posten",
