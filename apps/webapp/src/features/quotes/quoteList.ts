@@ -140,3 +140,10 @@ export function quoteCustomerLabel(row: QuoteCustomerFields | undefined): string
   const contact = row?.customer?.contact;
   return contact ? contactDisplayName(contact) : '';
 }
+
+/** ISO-Datum plus Tage, ohne Zeitzonenfalle (gerechnet um 12 Uhr UTC). */
+export function addDaysIso(iso: string, days: number): string {
+  const date = new Date(`${iso}T12:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}

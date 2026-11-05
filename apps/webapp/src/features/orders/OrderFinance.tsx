@@ -1,4 +1,9 @@
-import { formatMoney, type OrderCostLevel, type OrderFinance } from '@bautakt/finance';
+import {
+  eurosToMinor,
+  formatMoney,
+  type OrderCostLevel,
+  type OrderFinance,
+} from '@bautakt/finance';
 import { cn, SkeletonBlock } from '@bautakt/ui';
 import {
   Card,
@@ -13,7 +18,10 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { RouterLink } from '@/components/common/RouterLink';
+import { usePermission } from '@/features/company/usePermission';
 import { DocumentStatusBadge } from '@/features/finance/DocumentStatusBadge';
+import { QuoteStatusBadge } from '@/features/quotes/QuoteStatusBadge';
+import { useOrderQuotes } from '@/features/quotes/useQuotes';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
@@ -303,6 +311,7 @@ export function OrderFinancePage({ order }: { order: OrderDetail }) {
   const { t } = useTranslation();
   const { access, finance, documents, expenses, incoming, isPending, isError, refetch } =
     useOrderFinance(order.id, order.contract_sum);
+  const canViewQuotes = usePermission('canViewQuotes');
   if (!access) return null;
 
   if (isError) {
@@ -484,9 +493,10 @@ export function OrderFinancePage({ order }: { order: OrderDetail }) {
                         key={doc.id}
                         primary={
                           <RouterLink
-                            to={
-                              doc.type === 'quote' ? routes.quote(doc.id) : routes.invoice(doc.id)
-                            }
+                            // Auch ein altes Angebot aus `sales_documents` hat
+                            // seine Seite unter den Belegen; `/angebote/:id`
+                            // gehört dem neuen Angebotsbereich (bautakt-web#292).
+                            to={routes.invoice(doc.id)}
                           >
                             {[t(`domain:documentType.${doc.type}`), doc.document_number]
                               .filter(Boolean)
@@ -508,7 +518,49 @@ export function OrderFinancePage({ order }: { order: OrderDetail }) {
             )}
           </SectionCard>
         ) : null}
+
+        {canViewQuotes ? <OrderQuotesCard orderId={order.id} /> : null}
       </div>
     </div>
+  );
+}
+
+/** Angebote und Nachträge, die an diesem Auftrag hängen (eigenes Recht `canViewQuotes`). */
+function OrderQuotesCard({ orderId }: { orderId: string }) {
+  const { t } = useTranslation();
+  const quotes = useOrderQuotes(orderId);
+  return (
+    <SectionCard title={t('domain:orders.finance.quotes')}>
+      {quotes.isPending ? (
+        <PreviewSkeleton />
+      ) : quotes.isError ? (
+        <PreviewError onRetry={() => void quotes.refetch()} />
+      ) : quotes.data.length === 0 ? (
+        <p className="text-muted-foreground text-sm">{t('domain:orders.finance.noQuotes')}</p>
+      ) : (
+        <ul className="divide-border flex flex-col divide-y">
+          {quotes.data.map((quote) => (
+            <AmountRow
+              key={quote.id}
+              primary={
+                <RouterLink to={routes.quote(quote.id!)}>
+                  {[
+                    t(`domain:quotes.workspace.kind.${quote.kind ?? 'main'}`),
+                    quote.document_number ?? t('domain:quotes.workspace.noNumber'),
+                  ].join(' ')}
+                </RouterLink>
+              }
+              secondary={
+                <>
+                  <QuoteStatusBadge status={quote.status} />
+                  {quote.subject ? <span>{quote.subject}</span> : null}
+                </>
+              }
+              amount={formatMoney(eurosToMinor(quote.net_total))}
+            />
+          ))}
+        </ul>
+      )}
+    </SectionCard>
   );
 }

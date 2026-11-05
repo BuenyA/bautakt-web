@@ -44,7 +44,6 @@ import { IncomingInvoicePage } from '@/features/finance/pages/IncomingInvoicePag
 import { InvoiceDetailPage } from '@/features/finance/pages/InvoiceDetailPage';
 import { InvoicePrintPage } from '@/features/finance/pages/InvoicePrintPage';
 import { InvoicesListPage } from '@/features/finance/pages/InvoicesListPage';
-import { QuotesListPage } from '@/features/finance/pages/QuotesListPage';
 import { ReceivablesPage } from '@/features/finance/pages/ReceivablesPage';
 import { ReportsPage } from '@/features/finance/pages/ReportsPage';
 import { MaterialHubPage, PersonalHubPage } from '@/features/hubs/HubPage';
@@ -62,8 +61,9 @@ import { LanguagePage } from '@/features/profile/pages/LanguagePage';
 import { PersonalDataPage } from '@/features/profile/pages/PersonalDataPage';
 import { ProfileLegalPage } from '@/features/profile/pages/ProfileLegalPage';
 import { ProfileLayout } from '@/features/profile/ProfileLayout';
-import { QuoteWorkspaceDetailPage } from '@/features/quotes/pages/QuoteWorkspaceDetailPage';
-import { QuoteWorkspaceListPage } from '@/features/quotes/pages/QuoteWorkspaceListPage';
+import { QuoteDetailPage } from '@/features/quotes/pages/QuoteDetailPage';
+import { QuoteEditorPage } from '@/features/quotes/pages/QuoteEditorPage';
+import { QuoteListPage } from '@/features/quotes/pages/QuoteListPage';
 import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 import { AbsenceDetailPage } from '@/features/team/pages/AbsenceDetailPage';
 import { AbsencesPage } from '@/features/team/pages/AbsencesPage';
@@ -146,33 +146,43 @@ export const appRoutes: RouteObject[] = [
               { path: `${routes.assignments}/:id`, element: <AssignmentDetailPage /> },
               { path: routes.calendar, element: <CalendarPage /> },
 
-              // --- Rechnungen: Übersicht und Listen. Die Reiter stehen im Kopf
-              // jeder Seite (`FinanceHeader`), unter der Überschrift. ---
-              { path: routes.financeHub, element: <FinanceOverviewPage /> },
+              // --- Angebote (bautakt-web#292): eigener Bereich, nicht mehr unter Rechnungen. ---
               {
                 path: routes.quotes,
                 element: (
-                  <RequirePermission anyOf={['canUseBillingModule', 'canViewManagementInvoices']}>
-                    <QuotesListPage />
+                  <RequirePermission anyOf={['canViewQuotes']}>
+                    <QuoteListPage />
                   </RequirePermission>
                 ),
               },
               {
-                path: routes.quoteWorkspace,
+                path: routes.quoteNew,
                 element: (
-                  <RequirePermission anyOf={['canViewQuotes']}>
-                    <QuoteWorkspaceListPage />
+                  <RequirePermission anyOf={['canCreateQuotes']}>
+                    <QuoteEditorPage />
                   </RequirePermission>
                 ),
               },
               {
-                path: `${routes.quoteWorkspace}/:id`,
+                path: routes.quote(':id'),
                 element: (
                   <RequirePermission anyOf={['canViewQuotes']}>
-                    <QuoteWorkspaceDetailPage />
+                    <QuoteDetailPage />
                   </RequirePermission>
                 ),
               },
+              {
+                path: routes.quoteEdit(':id'),
+                element: (
+                  <RequirePermission anyOf={['canEditQuotes']}>
+                    <QuoteEditorPage />
+                  </RequirePermission>
+                ),
+              },
+
+              // --- Rechnungen: Übersicht und Listen. Die Reiter stehen im Kopf
+              // jeder Seite (`FinanceHeader`), unter der Überschrift. ---
+              { path: routes.financeHub, element: <FinanceOverviewPage /> },
               {
                 path: routes.invoices,
                 element: (
@@ -248,14 +258,6 @@ export const appRoutes: RouteObject[] = [
                 element: (
                   <RequirePermission anyOf={['canUseBillingModule']}>
                     <DocumentEditorPage type="invoice" />
-                  </RequirePermission>
-                ),
-              },
-              {
-                path: routes.quoteNew,
-                element: (
-                  <RequirePermission anyOf={['canUseBillingModule']}>
-                    <DocumentEditorPage type="quote" />
                   </RequirePermission>
                 ),
               },

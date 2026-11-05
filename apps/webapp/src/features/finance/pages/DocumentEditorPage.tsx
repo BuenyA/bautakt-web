@@ -243,7 +243,12 @@ const useStyles = makeStyles({
   },
 });
 
-export function DocumentEditorPage({ type }: { type: EditableDocumentType }) {
+export function DocumentEditorPage({
+  type,
+}: {
+  // Angebote haben seit bautakt-web#292 einen eigenen Editor (`QuoteEditorPage`).
+  type: Exclude<EditableDocumentType, 'quote'>;
+}) {
   const customerFieldId = useId();
   const { t } = useTranslation();
   const navigate = useNavigate();
