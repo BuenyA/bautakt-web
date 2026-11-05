@@ -126,9 +126,18 @@ export function QuoteWorkspaceDetailPage() {
                         : t('domain:quotes.workspace.status.draft')}
                     </span>
                   </span>
-                  <span className="text-foreground font-medium tabular-nums">
-                    {formatMoney(eurosToMinor(version.net_total), version.currency as CurrencyCode)}
-                  </span>
+                  {version.issued_at ? (
+                    <span className="text-foreground font-medium tabular-nums">
+                      {formatMoney(
+                        eurosToMinor(version.net_total),
+                        version.currency as CurrencyCode,
+                      )}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground text-sm">
+                      {t('domain:quotes.workspace.notCalculated')}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

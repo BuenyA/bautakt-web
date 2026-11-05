@@ -826,7 +826,8 @@
         "photo": "Foto",
         "aufmass": "Aufmaß",
         "other": "Sonstiges"
-      }
+      },
+      "notCalculated": "Noch nicht berechnet"
     }
   },
   "receivables": {

@@ -128,14 +128,20 @@ export function QuoteWorkspaceListPage() {
       {
         accessorKey: 'net_total',
         header: t('domain:quotes.workspace.net'),
-        cell: ({ row }) => (
-          <span className="text-foreground block text-right font-medium tabular-nums">
-            {formatMoney(
-              eurosToMinor(row.original.net_total),
-              (row.original.currency ?? 'EUR') as CurrencyCode,
-            )}
-          </span>
-        ),
+        // Ein Entwurf hat noch keine Summe: Der Server rechnet erst beim Festschreiben.
+        cell: ({ row }) =>
+          row.original.status === 'draft' ? (
+            <span className="text-muted-foreground block text-right">
+              {t('domain:quotes.workspace.notCalculated')}
+            </span>
+          ) : (
+            <span className="text-foreground block text-right font-medium tabular-nums">
+              {formatMoney(
+                eurosToMinor(row.original.net_total),
+                (row.original.currency ?? 'EUR') as CurrencyCode,
+              )}
+            </span>
+          ),
       },
     ],
     [t],
