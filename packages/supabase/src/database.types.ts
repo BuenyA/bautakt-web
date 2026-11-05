@@ -2,7 +2,7 @@
  * GENERIERT — nicht von Hand bearbeiten.
  *
  * Quelle:  Supabase-Projekt "Bautakt" (bxivzvmlcnaxqlytumvz, eu-central-1)
- * Stand:   2026-11-03
+ * Stand:   2026-11-05
  *
  * Neu erzeugen:
  *   npx supabase gen types typescript --project-id bxivzvmlcnaxqlytumvz \
@@ -4099,6 +4099,588 @@ export type Database = {
           },
         ]
       }
+      quote_attachments: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          file_name: string
+          file_size: number
+          id: string
+          kind: string
+          mime_type: string
+          quote_id: string
+          storage_path: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          file_name?: string
+          file_size?: number
+          id?: string
+          kind?: string
+          mime_type?: string
+          quote_id: string
+          storage_path: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          file_name?: string
+          file_size?: number
+          id?: string
+          kind?: string
+          mime_type?: string
+          quote_id?: string
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_attachments_quote_fkey"
+            columns: ["quote_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "quote_overview"
+            referencedColumns: ["id", "company_id"]
+          },
+          {
+            foreignKeyName: "quote_attachments_quote_fkey"
+            columns: ["quote_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id", "company_id"]
+          },
+        ]
+      }
+      quote_events: {
+        Row: {
+          company_id: string
+          created_by: string | null
+          event_type: string
+          id: string
+          occurred_at: string
+          payload: Json
+          quote_id: string
+          version_id: string | null
+        }
+        Insert: {
+          company_id: string
+          created_by?: string | null
+          event_type: string
+          id?: string
+          occurred_at?: string
+          payload?: Json
+          quote_id: string
+          version_id?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_by?: string | null
+          event_type?: string
+          id?: string
+          occurred_at?: string
+          payload?: Json
+          quote_id?: string
+          version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_events_quote_fkey"
+            columns: ["quote_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "quote_overview"
+            referencedColumns: ["id", "company_id"]
+          },
+          {
+            foreignKeyName: "quote_events_quote_fkey"
+            columns: ["quote_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id", "company_id"]
+          },
+        ]
+      }
+      quote_items: {
+        Row: {
+          alternative_to_id: string | null
+          company_id: string
+          contingency_mode: string | null
+          copied_from_item_id: string | null
+          id: string
+          labor_share: number
+          long_text: string
+          node_type: string
+          origin: string
+          origin_ref_id: string | null
+          oz: string
+          parent_id: string | null
+          position_type: string | null
+          price_is_manual: boolean
+          quantity: number
+          short_text: string
+          sort_order: number
+          tax_category: string
+          tax_rate_percent: number
+          unit: string
+          unit_price: number
+          version_id: string
+        }
+        Insert: {
+          alternative_to_id?: string | null
+          company_id: string
+          contingency_mode?: string | null
+          copied_from_item_id?: string | null
+          id?: string
+          labor_share?: number
+          long_text?: string
+          node_type: string
+          origin?: string
+          origin_ref_id?: string | null
+          oz?: string
+          parent_id?: string | null
+          position_type?: string | null
+          price_is_manual?: boolean
+          quantity?: number
+          short_text?: string
+          sort_order?: number
+          tax_category?: string
+          tax_rate_percent?: number
+          unit?: string
+          unit_price?: number
+          version_id: string
+        }
+        Update: {
+          alternative_to_id?: string | null
+          company_id?: string
+          contingency_mode?: string | null
+          copied_from_item_id?: string | null
+          id?: string
+          labor_share?: number
+          long_text?: string
+          node_type?: string
+          origin?: string
+          origin_ref_id?: string | null
+          oz?: string
+          parent_id?: string | null
+          position_type?: string | null
+          price_is_manual?: boolean
+          quantity?: number
+          short_text?: string
+          sort_order?: number
+          tax_category?: string
+          tax_rate_percent?: number
+          unit?: string
+          unit_price?: number
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_items_alternative_fkey"
+            columns: ["alternative_to_id", "version_id"]
+            isOneToOne: false
+            referencedRelation: "quote_items"
+            referencedColumns: ["id", "version_id"]
+          },
+          {
+            foreignKeyName: "quote_items_parent_fkey"
+            columns: ["parent_id", "version_id"]
+            isOneToOne: false
+            referencedRelation: "quote_items"
+            referencedColumns: ["id", "version_id"]
+          },
+          {
+            foreignKeyName: "quote_items_version_fkey"
+            columns: ["version_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "quote_versions"
+            referencedColumns: ["id", "company_id"]
+          },
+        ]
+      }
+      quote_outputs: {
+        Row: {
+          company_id: string
+          content_hash: string
+          created_at: string
+          created_by: string | null
+          document_number: string
+          id: string
+          kind: string
+          quote_id: string
+          storage_path: string
+          version_id: string
+        }
+        Insert: {
+          company_id: string
+          content_hash: string
+          created_at?: string
+          created_by?: string | null
+          document_number?: string
+          id?: string
+          kind: string
+          quote_id: string
+          storage_path: string
+          version_id: string
+        }
+        Update: {
+          company_id?: string
+          content_hash?: string
+          created_at?: string
+          created_by?: string | null
+          document_number?: string
+          id?: string
+          kind?: string
+          quote_id?: string
+          storage_path?: string
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_outputs_quote_fkey"
+            columns: ["quote_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "quote_overview"
+            referencedColumns: ["id", "company_id"]
+          },
+          {
+            foreignKeyName: "quote_outputs_quote_fkey"
+            columns: ["quote_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id", "company_id"]
+          },
+          {
+            foreignKeyName: "quote_outputs_version_fkey"
+            columns: ["version_id", "quote_id"]
+            isOneToOne: false
+            referencedRelation: "quote_versions"
+            referencedColumns: ["id", "quote_id"]
+          },
+        ]
+      }
+      quote_versions: {
+        Row: {
+          billing_mode: string
+          buyer_city: string
+          buyer_contact_name: string
+          buyer_country: string
+          buyer_customer_number: string
+          buyer_email: string
+          buyer_name: string
+          buyer_postal_code: string
+          buyer_street: string
+          buyer_vat_id: string
+          calc_mode: string
+          closing_text: string
+          company_id: string
+          content_hash: string | null
+          contract_basis: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          discount_percent: number
+          exec_from: string | null
+          exec_to: string | null
+          gross_total: number
+          id: string
+          intro_text: string
+          invoice_template_id: string | null
+          issued_at: string | null
+          issued_by: string | null
+          labor_share_total: number
+          modified_at: string
+          net_total: number
+          prelim_text: string
+          quote_date: string | null
+          quote_id: string
+          seller_bank_name: string
+          seller_bic: string
+          seller_city: string
+          seller_country: string
+          seller_email: string
+          seller_iban: string
+          seller_name: string
+          seller_phone: string
+          seller_postal_code: string
+          seller_street: string
+          seller_tax_number: string
+          seller_trade_register: string
+          seller_vat_id: string
+          site_city: string
+          site_country: string
+          site_postal_code: string
+          site_street: string
+          storage_path: string | null
+          subject: string
+          tax_mode: string
+          valid_until: string | null
+          vat_total: number
+          version_no: number
+        }
+        Insert: {
+          billing_mode?: string
+          buyer_city?: string
+          buyer_contact_name?: string
+          buyer_country?: string
+          buyer_customer_number?: string
+          buyer_email?: string
+          buyer_name?: string
+          buyer_postal_code?: string
+          buyer_street?: string
+          buyer_vat_id?: string
+          calc_mode?: string
+          closing_text?: string
+          company_id: string
+          content_hash?: string | null
+          contract_basis?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          discount_percent?: number
+          exec_from?: string | null
+          exec_to?: string | null
+          gross_total?: number
+          id?: string
+          intro_text?: string
+          invoice_template_id?: string | null
+          issued_at?: string | null
+          issued_by?: string | null
+          labor_share_total?: number
+          modified_at?: string
+          net_total?: number
+          prelim_text?: string
+          quote_date?: string | null
+          quote_id: string
+          seller_bank_name?: string
+          seller_bic?: string
+          seller_city?: string
+          seller_country?: string
+          seller_email?: string
+          seller_iban?: string
+          seller_name?: string
+          seller_phone?: string
+          seller_postal_code?: string
+          seller_street?: string
+          seller_tax_number?: string
+          seller_trade_register?: string
+          seller_vat_id?: string
+          site_city?: string
+          site_country?: string
+          site_postal_code?: string
+          site_street?: string
+          storage_path?: string | null
+          subject?: string
+          tax_mode?: string
+          valid_until?: string | null
+          vat_total?: number
+          version_no: number
+        }
+        Update: {
+          billing_mode?: string
+          buyer_city?: string
+          buyer_contact_name?: string
+          buyer_country?: string
+          buyer_customer_number?: string
+          buyer_email?: string
+          buyer_name?: string
+          buyer_postal_code?: string
+          buyer_street?: string
+          buyer_vat_id?: string
+          calc_mode?: string
+          closing_text?: string
+          company_id?: string
+          content_hash?: string | null
+          contract_basis?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          discount_percent?: number
+          exec_from?: string | null
+          exec_to?: string | null
+          gross_total?: number
+          id?: string
+          intro_text?: string
+          invoice_template_id?: string | null
+          issued_at?: string | null
+          issued_by?: string | null
+          labor_share_total?: number
+          modified_at?: string
+          net_total?: number
+          prelim_text?: string
+          quote_date?: string | null
+          quote_id?: string
+          seller_bank_name?: string
+          seller_bic?: string
+          seller_city?: string
+          seller_country?: string
+          seller_email?: string
+          seller_iban?: string
+          seller_name?: string
+          seller_phone?: string
+          seller_postal_code?: string
+          seller_street?: string
+          seller_tax_number?: string
+          seller_trade_register?: string
+          seller_vat_id?: string
+          site_city?: string
+          site_country?: string
+          site_postal_code?: string
+          site_street?: string
+          storage_path?: string | null
+          subject?: string
+          tax_mode?: string
+          valid_until?: string | null
+          vat_total?: number
+          version_no?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_versions_quote_fkey"
+            columns: ["quote_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "quote_overview"
+            referencedColumns: ["id", "company_id"]
+          },
+          {
+            foreignKeyName: "quote_versions_quote_fkey"
+            columns: ["quote_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id", "company_id"]
+          },
+          {
+            foreignKeyName: "quote_versions_template_fkey"
+            columns: ["invoice_template_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "invoice_templates"
+            referencedColumns: ["id", "company_id"]
+          },
+        ]
+      }
+      quotes: {
+        Row: {
+          accepted_version_id: string | null
+          company_id: string
+          contact_person_id: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          decided_at: string | null
+          decided_by: string | null
+          decision: string | null
+          decision_kind: string | null
+          decision_note: string
+          decision_recorded_at: string | null
+          decline_reason: string
+          document_number: string | null
+          follow_up_on: string | null
+          id: string
+          kind: string
+          modified_at: string
+          order_id: string | null
+          origin: string
+          responsible_user_id: string | null
+          site_city: string
+          site_country: string
+          site_postal_code: string
+          site_street: string
+          subject: string
+        }
+        Insert: {
+          accepted_version_id?: string | null
+          company_id: string
+          contact_person_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          decided_at?: string | null
+          decided_by?: string | null
+          decision?: string | null
+          decision_kind?: string | null
+          decision_note?: string
+          decision_recorded_at?: string | null
+          decline_reason?: string
+          document_number?: string | null
+          follow_up_on?: string | null
+          id?: string
+          kind?: string
+          modified_at?: string
+          order_id?: string | null
+          origin?: string
+          responsible_user_id?: string | null
+          site_city?: string
+          site_country?: string
+          site_postal_code?: string
+          site_street?: string
+          subject?: string
+        }
+        Update: {
+          accepted_version_id?: string | null
+          company_id?: string
+          contact_person_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          decided_at?: string | null
+          decided_by?: string | null
+          decision?: string | null
+          decision_kind?: string | null
+          decision_note?: string
+          decision_recorded_at?: string | null
+          decline_reason?: string
+          document_number?: string | null
+          follow_up_on?: string | null
+          id?: string
+          kind?: string
+          modified_at?: string
+          order_id?: string | null
+          origin?: string
+          responsible_user_id?: string | null
+          site_city?: string
+          site_country?: string
+          site_postal_code?: string
+          site_street?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_accepted_version_fkey"
+            columns: ["accepted_version_id", "id"]
+            isOneToOne: false
+            referencedRelation: "quote_versions"
+            referencedColumns: ["id", "quote_id"]
+          },
+          {
+            foreignKeyName: "quotes_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_contact_person_id_fkey"
+            columns: ["contact_person_id"]
+            isOneToOne: false
+            referencedRelation: "contact_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_customer_fkey"
+            columns: ["customer_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "customer_profiles"
+            referencedColumns: ["contact_id", "company_id"]
+          },
+          {
+            foreignKeyName: "quotes_order_fkey"
+            columns: ["order_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id", "company_id"]
+          },
+        ]
+      }
       recurring_document_templates: {
         Row: {
           anchor_day: number | null
@@ -5009,6 +5591,58 @@ export type Database = {
           },
         ]
       }
+      quote_overview: {
+        Row: {
+          company_id: string | null
+          created_at: string | null
+          currency: string | null
+          customer_id: string | null
+          decided_at: string | null
+          decision: string | null
+          document_number: string | null
+          draft_version_id: string | null
+          follow_up_on: string | null
+          gross_total: number | null
+          has_open_draft: boolean | null
+          id: string | null
+          issued_at: string | null
+          kind: string | null
+          modified_at: string | null
+          net_total: number | null
+          order_id: string | null
+          quote_date: string | null
+          responsible_user_id: string | null
+          status: string | null
+          subject: string | null
+          valid_until: string | null
+          vat_total: number | null
+          version_id: string | null
+          version_no: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_customer_fkey"
+            columns: ["customer_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "customer_profiles"
+            referencedColumns: ["contact_id", "company_id"]
+          },
+          {
+            foreignKeyName: "quotes_order_fkey"
+            columns: ["order_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id", "company_id"]
+          },
+        ]
+      }
     }
     Functions: {
       accept_employment_invitation: {
@@ -5028,6 +5662,10 @@ export type Database = {
       actor_is_company_owner: {
         Args: { p_company_id: string }
         Returns: boolean
+      }
+      allocate_document_number: {
+        Args: { p_company_id: string; p_doc_type: string }
+        Returns: string
       }
       approve_absence: {
         Args: { p_absence_id: string }
@@ -5212,6 +5850,7 @@ export type Database = {
         }
         Returns: string
       }
+      create_quote_version: { Args: { p_quote_id: string }; Returns: string }
       datev_account_fits: {
         Args: { p_account: string; p_account_length: number; p_purpose: string }
         Returns: boolean
@@ -5288,6 +5927,7 @@ export type Database = {
         Args: { p_company_id: string }
         Returns: undefined
       }
+      delete_quote_draft: { Args: { p_quote_id: string }; Returns: undefined }
       derive_incoming_invoice_tax_line: {
         Args: { p_invoice_id: string }
         Returns: boolean
@@ -5425,6 +6065,77 @@ export type Database = {
       is_owner_role_name: {
         Args: { p_company_id: string; p_role: string }
         Returns: boolean
+      }
+      issue_quote_version: {
+        Args: {
+          p_expected_gross?: number
+          p_expected_net?: number
+          p_version_id: string
+        }
+        Returns: {
+          billing_mode: string
+          buyer_city: string
+          buyer_contact_name: string
+          buyer_country: string
+          buyer_customer_number: string
+          buyer_email: string
+          buyer_name: string
+          buyer_postal_code: string
+          buyer_street: string
+          buyer_vat_id: string
+          calc_mode: string
+          closing_text: string
+          company_id: string
+          content_hash: string | null
+          contract_basis: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          discount_percent: number
+          exec_from: string | null
+          exec_to: string | null
+          gross_total: number
+          id: string
+          intro_text: string
+          invoice_template_id: string | null
+          issued_at: string | null
+          issued_by: string | null
+          labor_share_total: number
+          modified_at: string
+          net_total: number
+          prelim_text: string
+          quote_date: string | null
+          quote_id: string
+          seller_bank_name: string
+          seller_bic: string
+          seller_city: string
+          seller_country: string
+          seller_email: string
+          seller_iban: string
+          seller_name: string
+          seller_phone: string
+          seller_postal_code: string
+          seller_street: string
+          seller_tax_number: string
+          seller_trade_register: string
+          seller_vat_id: string
+          site_city: string
+          site_country: string
+          site_postal_code: string
+          site_street: string
+          storage_path: string | null
+          subject: string
+          tax_mode: string
+          valid_until: string | null
+          vat_total: number
+          version_no: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "quote_versions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       leave_company: { Args: { p_company_id: string }; Returns: undefined }
       log_finance_audit: {
@@ -5732,6 +6443,15 @@ export type Database = {
           buyer_street: string
           buyer_vat_id: string
         }[]
+      }
+      save_quote_draft: {
+        Args: {
+          p_header: Json
+          p_items?: Json
+          p_quote_id: string
+          p_version?: Json
+        }
+        Returns: Json
       }
       save_sales_document_draft: {
         Args: { p_document_id: string | null; p_header: Json; p_lines?: Json }
