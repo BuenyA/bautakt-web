@@ -42,6 +42,18 @@ export const PERMISSION_GROUPS: { key: string; items: PermissionKey[] }[] = [
     ],
   },
   {
+    key: 'quotes',
+    items: [
+      'canViewQuotes',
+      'canCreateQuotes',
+      'canEditQuotes',
+      'canIssueQuotes',
+      'canDecideQuotes',
+      'canViewQuoteCalculation',
+      'canManageQuoteCatalog',
+    ],
+  },
+  {
     key: 'finance',
     items: [
       'canUseBillingModule',

@@ -1138,6 +1138,7 @@
         "site": "Baustelle & Dokumentation",
         "documents": "Dokumente",
         "orders": "Aufträge & Kalender",
+        "quotes": "Angebote",
         "finance": "Finanzen",
         "company": "Unternehmen"
       },
@@ -1213,6 +1214,34 @@
         "canViewManagementInvoices": {
           "title": "Rechnungen einsehen",
           "description": "Finanzübersicht im Management"
+        },
+        "canViewQuotes": {
+          "title": "Angebote ansehen",
+          "description": "Angebote meines Betriebs sehen"
+        },
+        "canCreateQuotes": {
+          "title": "Angebote anlegen",
+          "description": "Neue Angebote und Nachträge anlegen"
+        },
+        "canEditQuotes": {
+          "title": "Angebote bearbeiten",
+          "description": "Entwürfe ändern und neue Versionen anlegen"
+        },
+        "canIssueQuotes": {
+          "title": "Angebote festschreiben",
+          "description": "Angebote mit Nummer festschreiben und versenden"
+        },
+        "canDecideQuotes": {
+          "title": "Über Angebote entscheiden",
+          "description": "Annahme und Ablehnung erfassen"
+        },
+        "canViewQuoteCalculation": {
+          "title": "Kalkulation einsehen",
+          "description": "Einkaufspreise, Zuschläge und Marge eines Angebots sehen"
+        },
+        "canManageQuoteCatalog": {
+          "title": "Kalkulation pflegen",
+          "description": "Zuschläge und Leistungskatalog verwalten"
         },
         "canViewOrderFinance": {
           "title": "Auftragsfinanzen",
