@@ -92,13 +92,32 @@ Owner-Wunsch). Das Formular wird nicht vorab gesperrt; ist die Registrierung aus
 
 `signUp` in `AuthProvider` wird nur von `RegisterPage` benutzt. Die Seite fragt
 wie `sign-up.tsx` der App Vorname, Nachname, Geburtsdatum, E-Mail und Passwort ab
-(seit 30.10.2026). Name und Geburtsdatum gehen als `options.data` in die
-`user_metadata`: Mit E-Mail-Bestätigung gibt es nach `signUp` keine Sitzung, und
-`handle_new_user` legt `profiles` nur mit `NULL`-Namen an (gemessen am 30.10.2026
-am Trigger `on_auth_user_created`). `/betrieb-einrichten` schreibt die Werte nach
-der ersten Anmeldung nach `profiles`. Eine leere `identities`-Liste in der Antwort
+(seit 30.10.2026). Das E-Mail-Feld heißt seit 05.11.2026 nur hier
+„Persönliche E-Mail-Adresse“ (`auth:signUp.email`). Daneben steht das bestehende
+`HelpButton` („?“, `aria-label` „Hilfe zu …“): die Adresse soll die persönliche
+sein, nicht das Firmenpostfach, weil die Anmeldung später darüber läuft. Login
+und Passwort vergessen bleiben bei „E-Mail“ (`auth:field.email`). Name und
+Geburtsdatum gehen als `options.data` in die `user_metadata`: Mit
+E-Mail-Bestätigung gibt es nach `signUp` keine Sitzung, und `handle_new_user`
+legt `profiles` nur mit `NULL`-Namen an (gemessen am 30.10.2026 am Trigger
+`on_auth_user_created`). `/betrieb-einrichten` schreibt die Werte nach der
+ersten Anmeldung nach `profiles`. Eine leere `identities`-Liste in der Antwort
 heißt „Adresse schon registriert“ und wird als `errors:auth.userAlreadyExists`
-gemeldet — Supabase liefert dafür bei aktiver Bestätigung keinen Fehler.
+gemeldet. Supabase liefert dafür bei aktiver Bestätigung keinen Fehler.
+
+Die Bestätigungsmail ist die Supabase-Vorlage „Confirm signup“. Die Web-App hat
+keine eigene Confirm-Route. `emailRedirectTo` ist `${origin}/login`, der Client
+liest die Sitzung über `detectSessionInUrl` (PKCE). Die Vorlage muss deshalb
+`{{ .ConfirmationURL }}` verwenden, nicht einen selbst gebauten
+`token_hash`-Link. Dieses Repo hat kein `supabase/config.toml`. Die deutschen
+Dateien liegen in `supabase/templates/` und werden vom Owner ins Dashboard
+kopiert (Authentication > Email Templates). Der englische Standardtext ist
+Stand 05.11.2026 noch live. `bautakt-app` hält laut
+[Issue #141](https://github.com/BuenyA/bautakt-web/issues/141) (03.11.2026) den
+Code der Auth-Mails; die Übertragung ist dort offen. Ein späterer Upload von
+dort überschreibt die Dashboard-Vorlage. Die Anmeldekarte bleibt dunkel
+(Vorgabe 12.10.2026). Der Hinweis nutzt Fluent-Tokens und bleibt in Hell und
+Dunkel lesbar.
 
 Mitarbeiter-Einladungen erzeugen keinen Auth-Benutzer:
 `accept_employment_invitation(p_token)` verlangt `auth.uid()` und legt nur die

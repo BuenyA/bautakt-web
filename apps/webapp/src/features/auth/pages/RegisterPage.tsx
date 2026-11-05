@@ -2,6 +2,7 @@ import { Button, Input, Label } from '@fluentui/react-components';
 import { type FormEvent, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
+import { HelpButton } from '@/components/common/HelpButton';
 import { LinkButton } from '@/components/common/LinkButton';
 import { RouterLink } from '@/components/common/RouterLink';
 import { DatePicker } from '@/components/form/dateTime';
@@ -126,7 +127,12 @@ export function RegisterPage() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="email">{t('auth:field.email')}</Label>
+          <div className="flex flex-wrap items-center gap-1">
+            <Label htmlFor="email">{t('auth:signUp.email')}</Label>
+            <HelpButton label={t('auth:signUp.email')}>
+              <p>{t('auth:signUp.emailHint')}</p>
+            </HelpButton>
+          </div>
           <Input
             id="email"
             type="email"
