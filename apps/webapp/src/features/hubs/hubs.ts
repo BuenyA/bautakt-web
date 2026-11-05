@@ -5,7 +5,6 @@ import {
   BoxMultipleRegular,
   BoxRegular,
   DataHistogramRegular,
-  DocumentEditRegular,
   DocumentTextRegular,
   type FluentIcon,
   LayerRegular,
@@ -100,12 +99,6 @@ export const financeHub: Hub = {
       // Offene Posten ist kein eigener Reiter mehr; die Seite bleibt und
       // gehört zu den Ausgangsrechnungen.
       alsoMatches: [routes.receivables],
-    },
-    {
-      titleKey: 'common:hub.finance.tabs.quotes',
-      to: routes.quotes,
-      icon: DocumentEditRegular,
-      anyPermission: ['canUseBillingModule', 'canViewManagementInvoices'],
     },
     {
       titleKey: 'common:hub.finance.tabs.dunning',

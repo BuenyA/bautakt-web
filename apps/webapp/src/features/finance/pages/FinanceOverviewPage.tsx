@@ -54,14 +54,9 @@ export function FinanceOverviewPage() {
               </Button>
             ) : null}
             {access.canWriteSalesDocuments ? (
-              <>
-                <LinkButton to={routes.quoteNew} icon={<AddRegular />}>
-                  {t('domain:invoiceDesk.newQuote')}
-                </LinkButton>
-                <LinkButton appearance="primary" to={routes.invoiceNew} icon={<AddRegular />}>
-                  {t('domain:invoiceDesk.newInvoice')}
-                </LinkButton>
-              </>
+              <LinkButton appearance="primary" to={routes.invoiceNew} icon={<AddRegular />}>
+                {t('domain:invoiceDesk.newInvoice')}
+              </LinkButton>
             ) : null}
           </div>
         }

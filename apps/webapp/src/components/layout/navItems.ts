@@ -6,6 +6,8 @@ import {
   bundleIcon,
   CalendarLtr20Filled,
   CalendarLtr20Regular,
+  DocumentEdit20Filled,
+  DocumentEdit20Regular,
   DocumentText20Filled,
   DocumentText20Regular,
   type FluentIcon,
@@ -34,6 +36,7 @@ const Briefcase = bundleIcon(Briefcase20Filled, Briefcase20Regular);
 const PeopleTeam = bundleIcon(PeopleTeam20Filled, PeopleTeam20Regular);
 const CalendarLtr = bundleIcon(CalendarLtr20Filled, CalendarLtr20Regular);
 const DocumentText = bundleIcon(DocumentText20Filled, DocumentText20Regular);
+const DocumentEdit = bundleIcon(DocumentEdit20Filled, DocumentEdit20Regular);
 const Person = bundleIcon(Person20Filled, Person20Regular);
 const People = bundleIcon(People20Filled, People20Regular);
 const Box = bundleIcon(Box20Filled, Box20Regular);
@@ -69,6 +72,14 @@ export type NavItem = PermissionGate & {
  */
 export const navItems: NavItem[] = [
   { to: routes.overview, labelKey: 'common:nav.overview', icon: Home },
+  // Vor den Aufträgen: Vom Angebot zum Auftrag ist die Lesereihenfolge
+  // (Umsetzungsplan Angebote, A4).
+  {
+    to: routes.quotes,
+    labelKey: 'common:nav.quotes',
+    icon: DocumentEdit,
+    permission: 'canViewQuotes',
+  },
   { to: routes.orders, labelKey: 'common:nav.orders', icon: Briefcase },
   { to: routes.assignments, labelKey: 'common:nav.assignments', icon: PeopleTeam },
   {

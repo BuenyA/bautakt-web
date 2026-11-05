@@ -1,15 +1,18 @@
 import { type CurrencyCode, eurosToMinor, formatMoney } from '@bautakt/finance';
 import { DataTable, type DataTableColumn } from '@bautakt/ui';
 import { Card, Field, Link as FluentLink, MessageBar, Select } from '@fluentui/react-components';
+import { AddRegular } from '@fluentui/react-icons';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
 
 import { EmptyState } from '@/components/common/EmptyState';
+import { LinkButton } from '@/components/common/LinkButton';
 import { PageHeader } from '@/components/common/PageHeader';
 import { RouterLink } from '@/components/common/RouterLink';
 import { useDataTableLabels } from '@/components/common/useDataTableLabels';
 import { useCompanyListLoading } from '@/features/company/useCompanyListLoading';
+import { usePermission } from '@/features/company/usePermission';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
@@ -41,10 +44,11 @@ function Figure({ label, value, note }: { label: string; value: string; note?: s
   );
 }
 
-export function QuoteWorkspaceListPage() {
+export function QuoteListPage() {
   const { t } = useTranslation();
   const labels = useDataTableLabels();
   const navigate = useNavigate();
+  const canCreate = usePermission('canCreateQuotes');
   const [searchParams, setSearchParams] = useSearchParams();
   const statusFilter = quoteStatusFromSearch(searchParams.get('status'));
   const kindFilter = quoteKindFromSearch(searchParams.get('art'));
@@ -77,11 +81,7 @@ export function QuoteWorkspaceListPage() {
         accessorKey: 'document_number',
         header: t('domain:quotes.columns.number'),
         cell: ({ row }) => (
-          <RouterLink
-            appearance="subtle"
-            to={routes.quoteWorkspaceDetail(row.original.id ?? '')}
-            stopPropagation
-          >
+          <RouterLink appearance="subtle" to={routes.quote(row.original.id ?? '')} stopPropagation>
             <span className="font-medium whitespace-nowrap">
               {row.original.document_number || t('domain:quotes.workspace.noNumber')}
             </span>
@@ -169,6 +169,13 @@ export function QuoteWorkspaceListPage() {
       <PageHeader
         title={t('domain:quotes.listTitle')}
         description={t('domain:quotes.listDescription')}
+        actions={
+          canCreate ? (
+            <LinkButton appearance="primary" to={routes.quoteNew} icon={<AddRegular />}>
+              {t('domain:quotes.new')}
+            </LinkButton>
+          ) : undefined
+        }
       />
 
       <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -235,7 +242,7 @@ export function QuoteWorkspaceListPage() {
         labels={labels}
         exportFileName="angebote"
         onRowClick={(row) => {
-          if (row.id) void navigate(routes.quoteWorkspaceDetail(row.id));
+          if (row.id) void navigate(routes.quote(row.id));
         }}
         empty={
           <EmptyState

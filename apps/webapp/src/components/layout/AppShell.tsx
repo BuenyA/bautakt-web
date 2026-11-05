@@ -67,6 +67,7 @@ function writeExpanded(expanded: boolean) {
 const EDITOR_PATHS = [
   routes.invoiceNew,
   routes.quoteNew,
+  routes.quoteEdit(':id'),
   routes.invoiceEdit(':id'),
   routes.incomingInvoiceNew,
   routes.incomingInvoice(':id'),

@@ -198,7 +198,9 @@
       "incoming": "Eingangsrechnung",
       "expense": "Ausgabe",
       "documents": "Angebote und Rechnungen",
-      "noDocuments": "Noch keine Belege zu diesem Auftrag."
+      "noDocuments": "Noch keine Belege zu diesem Auftrag.",
+      "quotes": "Angebote und Nachträge",
+      "noQuotes": "Noch kein Angebot zu diesem Auftrag."
     },
     "documents": {
       "title": "Dokumente",
@@ -828,6 +830,154 @@
         "other": "Sonstiges"
       },
       "notCalculated": "Noch nicht berechnet"
+    },
+    "editor": {
+      "newTitle": "Neues Angebot",
+      "draftTitle": "Angebotsentwurf",
+      "editTitle": "Angebot {{number}} · Version {{version}}",
+      "description": "Gespeichert wird ein Entwurf. Erst beim Festschreiben bekommt das Angebot seine Nummer.",
+      "saving": "Wird gespeichert …",
+      "notSaved": "Nicht gespeichert",
+      "savedState": "Gespeichert",
+      "saveDraft": "Entwurf speichern",
+      "saved": "Entwurf gespeichert",
+      "saveError": "Speichern hat nicht geklappt. Der zuletzt gespeicherte Stand ist unverändert.",
+      "issue": "Festschreiben",
+      "issued": "Angebot festgeschrieben",
+      "issueError": "Festschreiben hat nicht geklappt. Der Entwurf ist gespeichert.",
+      "issueDialog": {
+        "title": "Angebot festschreiben?",
+        "firstVersion": "Das Angebot bekommt jetzt seine Nummer aus dem Nummernkreis.",
+        "nextVersion": "Diese Version wird Teil von Angebot {{number}}, die Nummer bleibt.",
+        "locked": "Danach lässt sich diese Version nicht mehr ändern. Änderungen gehen nur über eine neue Version.",
+        "confirm": "Festschreiben"
+      },
+      "lockedTitle": "Diese Version ist festgeschrieben",
+      "lockedDescription": "Ändern geht nur über eine neue Version. Sie startet als Kopie der letzten.",
+      "lockedDecided": "Über dieses Angebot ist entschieden. Es lässt sich nicht mehr ändern.",
+      "toQuote": "Zum Angebot",
+      "newVersion": "Neue Version",
+      "newVersionError": "Die neue Version konnte nicht angelegt werden.",
+      "noCustomer": "Noch kein Kunde",
+      "noOrder": "Kein Auftrag",
+      "subjectPlaceholder": "Zum Beispiel: Badsanierung Erdgeschoss",
+      "addendumNeedsOrder": "Ein Nachtrag gehört zu einem Auftrag. Bitte wähle den Auftrag.",
+      "validBeforeDate": "„Gültig bis“ liegt vor dem Angebotsdatum.",
+      "execBeforeStart": "Das Ende der Ausführung liegt vor dem Beginn.",
+      "missing": {
+        "customer": "Zum Festschreiben fehlt der Kunde.",
+        "subject": "Zum Festschreiben fehlt der Betreff.",
+        "validUntil": "Zum Festschreiben fehlt „Gültig bis“.",
+        "positions": "Zum Festschreiben braucht das Angebot mindestens eine Position.",
+        "shortText": "Jeder Titel und jede Position braucht einen Kurztext."
+      },
+      "sections": {
+        "quote": "Angebot",
+        "terms": "Termine und Vertrag",
+        "site": "Objektadresse (optional)",
+        "texts": "Texte (optional)",
+        "items": "Leistungsverzeichnis",
+        "taxMode": "Steuerart",
+        "totals": "Summen"
+      },
+      "quoteDate": "Angebotsdatum",
+      "execFrom": "Ausführung ab",
+      "execTo": "Ausführung bis",
+      "contractBasis": "Vertragsgrundlage",
+      "contractBases": {
+        "bgb": "BGB",
+        "vob_b": "VOB/B"
+      },
+      "billingMode": "Abrechnung im Auftrag",
+      "billingModes": {
+        "unit_price": "Nach Einheitspreisen",
+        "fixed": "Pauschal",
+        "regie": "Nach Aufwand (Regie)"
+      },
+      "siteStreet": "Straße und Hausnummer",
+      "sitePostalCode": "PLZ",
+      "siteCity": "Ort",
+      "introText": "Einleitung",
+      "prelimText": "Vorbemerkungen",
+      "closingText": "Schlusstext",
+      "discount": "Nachlass",
+      "subtotal": "Summe der Positionen",
+      "discountAmount": "Nachlass {{percent}} %",
+      "notInTotal": "Nicht in der Summe enthalten:",
+      "alternativeSum": "Alternativpositionen",
+      "contingencySum": "Bedarfspositionen",
+      "nodeType": {
+        "title": "Titel",
+        "position": "Position",
+        "text": "Text"
+      },
+      "positionType": {
+        "normal": "Normal",
+        "lump_sum": "Pauschal",
+        "alternative": "Alternativ",
+        "contingency": "Bedarf"
+      },
+      "contingencyMode": {
+        "with_total": "Mit Gesamtbetrag",
+        "unit_price_only": "Nur Einheitspreis"
+      },
+      "tree": {
+        "label": "Positionen",
+        "add": "Hinzufügen",
+        "addTitle": "Titel",
+        "addPosition": "Position",
+        "addText": "Text",
+        "empty": "Noch keine Position. Titel und Untertitel gliedern das Angebot, sie sind aber kein Muss.",
+        "oz": "OZ",
+        "shortText": "Kurztext",
+        "quantity": "Menge",
+        "unit": "Einheit",
+        "unitPrice": "EP",
+        "total": "GP",
+        "drag": "{{label}} verschieben",
+        "shortTextOf": "Kurztext {{label}}",
+        "quantityOf": "Menge {{label}}",
+        "unitOf": "Einheit {{label}}",
+        "unitPriceOf": "Einheitspreis {{label}}",
+        "unitPriceOnly": "nur EP",
+        "placeholder": {
+          "title": "Titel",
+          "position": "Kurztext der Position",
+          "text": "Hinweis im Angebot"
+        },
+        "longText": "Langtext",
+        "titleHint": "Ein Titel fasst Positionen zusammen. Seine Summe steht rechts, Untertitel gehen eine Ebene tief.",
+        "positionType": "Art",
+        "alternativeTo": "Alternative zu",
+        "alternativeNone": "Keine Zuordnung",
+        "contingencyMode": "Bedarf mit",
+        "taxRate": "Steuersatz in %",
+        "laborShare": "Lohnanteil in €",
+        "laborShareHint": "Anteil der Arbeitskosten am Gesamtbetrag. Er steht auf dem Angebot, damit der Kunde ihn nach § 35a EStG absetzen kann.",
+        "addSubtitle": "Untertitel",
+        "row": "Zeile",
+        "detailsOf": "Details zu {{label}}",
+        "removeOf": "{{label}} entfernen",
+        "removeTitleOf": "Titel {{label}} mit Inhalt entfernen",
+        "removeTitleConfirm": {
+          "title": "Titel mit Inhalt entfernen?",
+          "description_one": "Der Titel und {{count}} Zeile darunter werden entfernt.",
+          "description_other": "Der Titel und {{count}} Zeilen darunter werden entfernt.",
+          "confirm": "Entfernen"
+        }
+      }
+    },
+    "detail": {
+      "editDraft": "Entwurf bearbeiten",
+      "discardDraft": "Entwurf verwerfen",
+      "discardDraftTitle": "Entwurf verwerfen?",
+      "discardDraftDescription": "Die Änderungen seit der letzten festgeschriebenen Version gehen verloren. Diese Version bleibt gültig.",
+      "draftDiscarded": "Entwurf verworfen",
+      "delete": "Angebot löschen",
+      "deleteTitle": "Angebot löschen?",
+      "deleteDescription": "Das Angebot wurde nie festgeschrieben und verschwindet ganz.",
+      "quoteDeleted": "Angebot gelöscht",
+      "deleteError": "Das hat nicht geklappt."
     }
   },
   "receivables": {
@@ -2491,7 +2641,6 @@
     "title": "Rechnungen",
     "description": "Was rausgeht, was reinkommt, und wo mein Betrieb steht.",
     "newInvoice": "Neue Rechnung",
-    "newQuote": "Neues Angebot",
     "showAll": "Alle anzeigen",
     "outgoing": {
       "title": "Offene Ausgangsrechnungen",

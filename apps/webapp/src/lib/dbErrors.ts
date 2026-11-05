@@ -129,6 +129,25 @@ const MESSAGES: Record<string, string> = {
     'Die Angaben passen nicht: Zahlungsart höchstens 100, Notiz und Begründung höchstens 2000 Zeichen. Ein Storno lässt sich nicht stornieren.',
   INCOMING_PAYMENT_NOT_SAVED:
     'Die Zahlung wurde nicht bestätigt. Bitte lade die Seite neu und prüfe, ob sie in der Liste steht.',
+  // Angebote (bautakt-app 20261105212136_ang_quotes_core, bautakt-web#292). Die
+  // längeren Codes stehen vor `QUOTE_INVALID`, weil der Vergleich per Teilstring läuft.
+  QUOTE_INVALID_VALID_UNTIL: '„Gültig bis“ liegt vor dem Angebotsdatum.',
+  QUOTE_INVALID: 'Die Gliederung ist ungültig: Unterpositionen gibt es nur unter Titeln.',
+  QUOTE_MISSING_CUSTOMER: 'Zum Festschreiben fehlt der Kunde.',
+  QUOTE_MISSING_SUBJECT: 'Zum Festschreiben fehlt der Betreff.',
+  QUOTE_MISSING_VALID_UNTIL: 'Zum Festschreiben fehlt „Gültig bis“.',
+  QUOTE_NO_POSITIONS: 'Das Angebot hat noch keine Position.',
+  QUOTE_BLANK_ITEM: 'Mindestens ein Titel oder eine Position hat noch keinen Kurztext.',
+  QUOTE_TOTAL_MISMATCH:
+    'Die Summe hat sich beim Festschreiben anders ergeben als im Editor. Bitte lade die Seite neu und prüfe die Positionen.',
+  QUOTE_ALREADY_ISSUED: 'Diese Version ist schon festgeschrieben. Bitte lade die Seite neu.',
+  QUOTE_DECIDED: 'Über dieses Angebot ist entschieden, es lässt sich nicht mehr ändern.',
+  QUOTE_NO_DRAFT:
+    'Es gibt keinen Entwurf mehr, vielleicht wurde er gerade festgeschrieben. Lege eine neue Version an.',
+  QUOTE_DRAFT_EXISTS: 'Es gibt schon einen Entwurf. Bearbeite zuerst diesen.',
+  QUOTE_IMMUTABLE: 'Diese Version ist festgeschrieben. Ändern geht nur über eine neue Version.',
+  QUOTE_NOT_FOUND: 'Dieses Angebot gibt es nicht mehr. Bitte lade die Seite neu.',
+  'permission denied: can': 'Dafür fehlt dir die Berechtigung.',
   APPEND_ONLY: 'Dieser Eintrag ist Teil des Protokolls und wird nie geändert oder gelöscht.',
   CONTACT_IN_USE:
     'Der Kontakt hängt noch an Aufträgen oder Belegen. Archiviere ihn stattdessen, dann verschwindet er aus Listen und Auswahlfeldern.',

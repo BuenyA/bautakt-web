@@ -84,7 +84,7 @@ function useEntries(): { pages: Entry[]; actions: Entry[] } {
       key: 'domain:expenseForm.title',
     },
     can('canUseBillingModule') && { to: routes.invoiceNew, key: 'domain:invoices.new' },
-    can('canUseBillingModule') && { to: routes.quoteNew, key: 'domain:quotes.new' },
+    can('canCreateQuotes') && { to: routes.quoteNew, key: 'domain:quotes.new' },
   ]
     .filter((entry): entry is { to: string; key: string } => Boolean(entry))
     .map((entry) => ({ to: entry.to, label: t(entry.key), icon: AddCircle20Regular }));

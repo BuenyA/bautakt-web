@@ -42,6 +42,27 @@ export function useQuoteOverview() {
   });
 }
 
+/** Angebote und Nachträge eines Auftrags, neueste zuerst. */
+export function useOrderQuotes(orderId: string) {
+  const { data: membership } = useMembership();
+  const companyId = membership?.companyId;
+
+  return useQuery({
+    queryKey: [companyId, 'quotes', 'order', orderId],
+    enabled: Boolean(companyId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('quote_overview')
+        .select('id, kind, document_number, subject, status, net_total, created_at')
+        .eq('company_id', companyId!)
+        .eq('order_id', orderId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
 /** Ein Vorgang mit Versionen, Verlauf und Anhängen. Ohne Recht oder fremd: `null`. */
 export function useQuoteDetail(quoteId: string | undefined) {
   const { data: membership } = useMembership();
