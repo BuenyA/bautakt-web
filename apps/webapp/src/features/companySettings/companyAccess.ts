@@ -14,7 +14,8 @@ import { useMembership } from '@/features/company/useMembership';
  * - `company_roles`: `canManageRoles` oder Inhaber.
  * - `company_absence_settings`: `canManageAbsences`.
  * - Storage `company-images` (Logo): `canManageCompanySettings`.
- * - `delete_company_as_owner`: nur Inhaber.
+ * - Kündigung (`DeleteCompanyPage`): nur Inhaber. `delete_company_as_owner` ist seit
+ *   Löschkonzept WP0 für Clients gesperrt.
  *
  * ⚠️ Führung, keine Kontrolle. Wer die Adresse kennt, ruft den Abschnitt
  * trotzdem auf — die verbindliche Grenze ist die Datenbank.
