@@ -21,7 +21,7 @@
     "datev": "DATEV & Steuerberatung",
     "roles": "Rollen & Berechtigungen",
     "absences": "Urlaub & Abwesenheit",
-    "delete": "Unternehmen löschen"
+    "delete": "Unternehmen kündigen"
   },
   "setupStatus": {
     "title": "Einrichtung",
@@ -386,22 +386,20 @@
     "weekendsHint": "Ausgeschaltet zählen nur Werktage (Montag bis Freitag) abzüglich Feiertage."
   },
   "delete": {
-    "title": "Unternehmen löschen",
-    "description": "Den Betrieb mit allen Daten endgültig aus Bautakt entfernen.",
-    "cardTitle": "{{name}} löschen",
-    "warningTitle": "Das lässt sich nicht rückgängig machen.",
-    "warning": "Alle Daten des Unternehmens werden sofort und endgültig gelöscht.",
-    "consequences": {
-      "data": "Aufträge, Kontakte, Zeiten, Belege und Dokumente werden gelöscht.",
-      "team": "Alle Mitarbeiter verlieren den Zugriff auf das Unternehmen.",
-      "archive": "Lade vorher herunter, was du aufbewahren musst, etwa den DATEV-Export und die Rechnungs-PDFs."
+    "title": "Unternehmen kündigen",
+    "description": "Vertrag beenden, Daten exportieren, danach wird der Betrieb gelöscht.",
+    "cardTitle": "{{name}} kündigen",
+    "noticeTitle": "Ein Unternehmen wird nicht sofort gelöscht.",
+    "notice": "Nach der Kündigung hast du Zeit, alle Daten kostenlos herunterzuladen. Erst danach löschen wir sie endgültig.",
+    "steps": {
+      "export": "Bis 30 Tage nach Vertragsende kannst du alle Daten exportieren, auch Belege, Fotos und den DATEV-Export.",
+      "access": "Ab Vertragsende kommt nur noch der Inhaber rein und kann nur lesen und exportieren. Mitarbeiter und die App sind gesperrt.",
+      "lock": "Ab dem 31. Tag nach Vertragsende ist keine Anmeldung mehr möglich.",
+      "delete": "Am 60. Tag löschen wir alle Daten endgültig. Sicherungskopien laufen bis zum 67. Tag aus."
     },
-    "action": "Unternehmen löschen …",
-    "confirmTitle": "Wirklich endgültig löschen?",
-    "confirmText": "Tippe zur Bestätigung den Namen des Unternehmens ein: {{name}}",
-    "confirmLabel": "Name des Unternehmens",
-    "confirmAction": "Endgültig löschen",
-    "done": "{{name}} wurde gelöscht.",
-    "error": "Das Unternehmen konnte nicht gelöscht werden."
+    "request": "Kündigung beantragen",
+    "direct": "Oder schreib uns an",
+    "mailSubject": "Kündigung: {{name}}",
+    "mailBody": "Hallo Bautakt-Team,\n\nich möchte den Vertrag für {{name}} (ID {{id}}) kündigen.\n\nViele Grüße"
   }
 }
