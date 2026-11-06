@@ -29,23 +29,21 @@ import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import { isConsumer, quoteEventDetail, quoteEventKey } from '../quoteDecision';
+import { QuoteDecisionActions } from '../QuoteDecisionActions';
 import { ensureQuoteOriginal, openQuotePdf, quoteMailChannel } from '../quoteOutput';
 import { QuoteStatusBadge } from '../QuoteStatusBadge';
+import { evidenceUrl, useQuoteDecisionDetail } from '../useQuoteDecision';
 import { useCreateQuoteVersion, useDeleteQuoteDraft } from '../useQuoteEditor';
 import { quoteAttachmentUrl, useQuoteDetail } from '../useQuotes';
 
 const dateTime = new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium', timeStyle: 'short' });
 
-/** Versand im Probelauf heißt im Verlauf anders als echter Versand. */
-function eventKey(event: { event_type: string; payload: unknown }): string {
-  const mode = (event.payload as { mode?: unknown } | null)?.mode;
-  return event.event_type === 'sent' && mode === 'dry_run' ? 'sentDryRun' : event.event_type;
-}
-
 export function QuoteDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, isError, refetch } = useQuoteDetail(id);
+  const { data: decision } = useQuoteDecisionDetail(id);
 
   if (isLoading) return <PageSpinner />;
 
@@ -115,6 +113,13 @@ export function QuoteDetailPage() {
               draft={versions.find((version) => !version.issued_at) ?? null}
               decided={Boolean(overview.decision)}
             />
+            <QuoteDecisionActions
+              quoteId={overview.id!}
+              decided={Boolean(overview.decision)}
+              issuedVersions={versions.filter((version) => version.issued_at)}
+              consumer={isConsumer(decision?.contact)}
+              consumerAcceptanceEnabled={decision?.consumerAcceptanceEnabled ?? false}
+            />
             <QuoteActions
               quoteId={overview.id!}
               hasDraft={Boolean(overview.draft_version_id)}
@@ -160,6 +165,16 @@ export function QuoteDetailPage() {
             />
           </dl>
         </SectionCard>
+
+        {decision?.quote.decision ? (
+          <DecisionCard
+            detail={decision}
+            versionNo={
+              versions.find((version) => version.id === decision.quote.accepted_version_id)
+                ?.version_no ?? null
+            }
+          />
+        ) : null}
 
         <SectionCard title={t('domain:quotes.workspace.versions')}>
           {versions.length === 0 ? (
@@ -213,9 +228,14 @@ export function QuoteDetailPage() {
               {events.map((event) => (
                 <li key={event.id} className="flex items-baseline justify-between gap-4">
                   <span className="text-foreground">
-                    {t(`domain:quotes.workspace.event.${eventKey(event)}`, {
+                    {t(`domain:quotes.workspace.event.${quoteEventKey(event)}`, {
                       defaultValue: t('domain:quotes.workspace.event.other'),
                     })}
+                    {quoteEventDetail(event) ? (
+                      <span className="text-muted-foreground block text-sm">
+                        {quoteEventDetail(event)}
+                      </span>
+                    ) : null}
                   </span>
                   <span className="text-muted-foreground text-sm whitespace-nowrap">
                     {dateTime.format(new Date(event.occurred_at))}
@@ -470,5 +490,86 @@ function QuoteOutputActions({
         />
       ) : null}
     </>
+  );
+}
+
+type DecisionDetail = NonNullable<ReturnType<typeof useQuoteDecisionDetail>['data']>;
+
+/** Wer wann wie entschieden hat. Gerätezeit und Erfassung stehen beide da (A8). */
+function DecisionCard({ detail, versionNo }: { detail: DecisionDetail; versionNo: number | null }) {
+  const { t } = useTranslation();
+  const { quote, selected, evidence } = detail;
+
+  async function openEvidence(path: string) {
+    try {
+      window.open(await evidenceUrl(path), '_blank', 'noopener,noreferrer');
+    } catch {
+      toast.error(t('domain:quotes.workspace.attachmentError'));
+    }
+  }
+
+  return (
+    <SectionCard title={t('domain:quotes.decision.cardTitle')}>
+      <dl className="flex flex-col gap-2">
+        <DetailRow
+          label={t('domain:quotes.decision.result')}
+          value={t(`domain:quotes.workspace.status.${quote.decision}`)}
+        />
+        {versionNo ? (
+          <DetailRow
+            label={t('domain:quotes.decision.version')}
+            value={t('domain:quotes.workspace.versionLabel', { number: versionNo })}
+          />
+        ) : null}
+        <DetailRow
+          label={t('domain:quotes.decision.decidedAt')}
+          value={quote.decided_at ? dateTime.format(new Date(quote.decided_at)) : ''}
+        />
+        <DetailRow
+          label={t('domain:quotes.decision.recordedAt')}
+          value={
+            quote.decision_recorded_at ? dateTime.format(new Date(quote.decision_recorded_at)) : ''
+          }
+        />
+        <DetailRow
+          label={t('domain:quotes.decision.kindLabel')}
+          value={quote.decision_kind ? t(`domain:quotes.decision.kind.${quote.decision_kind}`) : ''}
+        />
+        {quote.decline_reason ? (
+          <DetailRow label={t('domain:quotes.decision.reason')} value={quote.decline_reason} />
+        ) : null}
+        {quote.decision_note ? (
+          <DetailRow label={t('domain:quotes.decision.note')} value={quote.decision_note} />
+        ) : null}
+        {selected.length > 0 ? (
+          <DetailRow
+            label={t('domain:quotes.decision.selection')}
+            value={selected
+              .map((item) => [item.oz, item.short_text].filter(Boolean).join(' '))
+              .join(', ')}
+          />
+        ) : null}
+        {evidence.length > 0 ? (
+          <DetailRow
+            label={t('domain:quotes.decision.evidence')}
+            value={
+              <span className="flex flex-col items-start gap-1">
+                {evidence.map((file) => (
+                  <FluentLink
+                    key={file.id}
+                    as="button"
+                    onClick={() => void openEvidence(file.storage_path)}
+                  >
+                    {t('domain:quotes.decision.evidenceOpen', {
+                      date: dateTime.format(new Date(file.created_at)),
+                    })}
+                  </FluentLink>
+                ))}
+              </span>
+            }
+          />
+        ) : null}
+      </dl>
+    </SectionCard>
   );
 }

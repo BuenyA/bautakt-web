@@ -141,6 +141,24 @@ const MESSAGES: Record<string, string> = {
   QUOTE_TOTAL_MISMATCH:
     'Die Summe hat sich beim Festschreiben anders ergeben als im Editor. Bitte lade die Seite neu und prüfe die Positionen.',
   QUOTE_ALREADY_ISSUED: 'Diese Version ist schon festgeschrieben. Bitte lade die Seite neu.',
+  // Länger als QUOTE_DECIDED, deshalb davor (Vergleich per Teilstring).
+  QUOTE_DECIDED_AT_FUTURE: 'Der Zeitpunkt der Entscheidung liegt in der Zukunft.',
+  QUOTE_DECIDED_AT_BEFORE_ISSUE: 'Der Zeitpunkt liegt vor dem Festschreiben des Angebots.',
+  QUOTE_DECIDED_AT_REQUIRED: 'Bitte gib an, wann entschieden wurde.',
+  QUOTE_ALREADY_DECIDED: 'Über dieses Angebot ist schon entschieden. Bitte lade die Seite neu.',
+  QUOTE_NOT_DECIDED: 'Es gibt keine Entscheidung zum Zurücknehmen. Bitte lade die Seite neu.',
+  QUOTE_NOT_ISSUED: 'Nur ein festgeschriebenes Angebot lässt sich entscheiden.',
+  QUOTE_DECISION_KIND: 'Bitte wähle, wie entschieden wurde.',
+  QUOTE_CONSUMER_ACCEPTANCE_DISABLED:
+    'Die Annahme durch Privatkunden ist noch nicht freigeschaltet.',
+  QUOTE_EVIDENCE_REQUIRED: 'Bei Unterschrift und Papier fehlt der Nachweis.',
+  QUOTE_EVIDENCE_PATH: 'Der Nachweis gehört nicht zu diesem Angebot.',
+  QUOTE_EVIDENCE_MISSING: 'Der Nachweis wurde nicht hochgeladen. Bitte versuche es erneut.',
+  QUOTE_EVIDENCE_HASH: 'Die Prüfsumme des Nachweises fehlt. Bitte versuche es erneut.',
+  QUOTE_EVIDENCE_TYPE: 'Der Nachweis muss eine PDF, PNG oder JPG sein.',
+  QUOTE_SELECTION_INVALID: 'Gewählt werden können nur Alternativ- und Bedarfspositionen.',
+  QUOTE_ALTERNATIVE_CONFLICT: 'Je Position gilt höchstens eine Alternative.',
+  QUOTE_REVERT_REASON_REQUIRED: 'Bitte gib eine Begründung an.',
   QUOTE_DECIDED: 'Über dieses Angebot ist entschieden, es lässt sich nicht mehr ändern.',
   QUOTE_NO_DRAFT:
     'Es gibt keinen Entwurf mehr, vielleicht wurde er gerade festgeschrieben. Lege eine neue Version an.',
