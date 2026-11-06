@@ -8,6 +8,8 @@ Neuer Angebotsbereich, Umsetzungsplan in `bautakt-app` unter
 
 - **1b Liste und Detailseite** (web#291).
 - **2a Entscheidung** (bautakt-app#186), siehe unten.
+- **2b Auftrag und Nachtrag** (bautakt-app#187), siehe unten. Auftragsbestätigung als PDF
+  folgt in einem eigenen Schritt auf 1d.
 - **1d PDF und Versand** (bautakt-app#183), siehe unten.
 - **1c Editor und Umschalten** (web#292): Der Bereich steht in der Leiste vor „Aufträge“
   (`canViewQuotes`). Routen: `/angebote` Liste, `/angebote/neu` (`canCreateQuotes`),
@@ -35,6 +37,26 @@ Sperren stehen im App-Wiki (`wiki/pages/angebote.md`).
 - **Privatkunden.** Person ohne USt-IdNr. Solange `quote_platform_settings` die Annahme
   sperrt, zeigt der Drawer den Hinweis und der Speichern-Knopf bleibt aus. Der Hinweis zum
   Widerrufsrecht trägt „vor Livegang anwaltlich prüfen“.
+
+## Auftrag und Nachtrag (2b)
+
+bautakt-app#187. Der Annahme-Drawer fragt nach dem Auftrag: neu anlegen, bestehenden
+wählen oder ohne Auftrag annehmen. `accept_quote` legt den Auftrag in derselben Transaktion
+an wie die Entscheidung; Regeln im App-Wiki.
+
+- **Vorgabe.** Neuer Auftrag, wenn `canCreateOrders` da ist, sonst „ohne Auftrag“
+  (`defaultOrderMode`). Ohne das Recht fehlt die Option ganz; die RPC prüft es trotzdem.
+- **Auswahl bestehender Aufträge.** Nur offene desselben Kunden oder ohne Kunden
+  (`linkableOrders`, dieselbe Regel wie in der RPC). Ob der Auftrag schon ein angenommenes
+  Hauptangebot hat, weiß nur die Datenbank: Sie meldet `QUOTE_ORDER_HAS_MAIN`, der Drawer
+  zeigt den Text aus `dbErrors.ts`.
+- **Schon verknüpft.** Hängt das Angebot an einem Auftrag (Nachtrag, Angebot vom Auftrag aus
+  oder frühere, zurückgenommene Annahme), nennt der Drawer ihn nur und schickt `none`; die RPC
+  nimmt den verknüpften Auftrag.
+- **Nachtrag nur am Auftrag.** Die Karte „Angebote und Nachträge“ unter Auftrag, Finanzen hat
+  einen Knopf: „Angebot“, solange kein Hauptangebot angenommen ist, danach „Nachtrag“. Er
+  öffnet `/angebote/neu?auftrag=<id>` (mit `&art=nachtrag`), der Editor belegt Auftrag, Art
+  und Kunden vor (`routes.quoteNewForOrder`). Abgeschlossene Aufträge bekommen keinen Knopf.
 
 ## Editor
 
