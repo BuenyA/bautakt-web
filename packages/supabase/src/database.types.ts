@@ -2,7 +2,7 @@
  * GENERIERT — nicht von Hand bearbeiten.
  *
  * Quelle:  Supabase-Projekt "Bautakt" (bxivzvmlcnaxqlytumvz, eu-central-1)
- * Stand:   2026-11-06
+ * Stand:   2026-11-07
  *
  * Neu erzeugen:
  *   npx supabase gen types typescript --project-id bxivzvmlcnaxqlytumvz \
@@ -369,6 +369,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checklists_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id"]
           },
           {
             foreignKeyName: "checklists_order_id_fkey"
@@ -1552,6 +1559,13 @@ export type Database = {
             foreignKeyName: "daily_reports_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "daily_reports_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -2086,6 +2100,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id"]
           },
           {
             foreignKeyName: "expenses_order_id_fkey"
@@ -2961,6 +2982,13 @@ export type Database = {
             foreignKeyName: "incoming_invoices_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "incoming_invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -3091,6 +3119,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "employments"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "labor_rates_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id"]
           },
           {
             foreignKeyName: "labor_rates_order_id_fkey"
@@ -3351,6 +3386,13 @@ export type Database = {
             foreignKeyName: "notes_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "notes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -3527,6 +3569,13 @@ export type Database = {
             foreignKeyName: "order_contacts_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_contacts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -3647,6 +3696,13 @@ export type Database = {
             foreignKeyName: "order_documents_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_documents_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -3713,6 +3769,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "daily_reports"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_images_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id"]
           },
           {
             foreignKeyName: "order_images_order_id_fkey"
@@ -3837,6 +3900,13 @@ export type Database = {
             foreignKeyName: "order_issues_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_issues_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -3943,6 +4013,13 @@ export type Database = {
             foreignKeyName: "order_materials_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "order_materials_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -3993,6 +4070,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "companies"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_notes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id"]
           },
           {
             foreignKeyName: "order_notes_order_id_fkey"
@@ -4998,6 +5082,13 @@ export type Database = {
             foreignKeyName: "quotes_order_fkey"
             columns: ["order_id", "company_id"]
             isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id", "company_id"]
+          },
+          {
+            foreignKeyName: "quotes_order_fkey"
+            columns: ["order_id", "company_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id", "company_id"]
           },
@@ -5225,6 +5316,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "sales_documents"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_document_lines_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id"]
           },
           {
             foreignKeyName: "sales_document_lines_order_id_fkey"
@@ -5696,6 +5794,13 @@ export type Database = {
             foreignKeyName: "time_entries_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "time_entries_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
@@ -5793,6 +5898,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_assignments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id"]
           },
           {
             foreignKeyName: "work_assignments_order_id_fkey"
@@ -5980,6 +6092,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "customer_profiles"
             referencedColumns: ["contact_id", "company_id"]
+          },
+          {
+            foreignKeyName: "quotes_order_fkey"
+            columns: ["order_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id", "company_id"]
           },
           {
             foreignKeyName: "quotes_order_fkey"
@@ -6217,6 +6336,77 @@ export type Database = {
         Args: { p_company_id: string }
         Returns: string[]
       }
+      company_lifecycle_job_secret_ok: {
+        Args: { p_secret: string }
+        Returns: boolean
+      }
+      company_lifecycle_mail_claim: {
+        Args: { p_limit?: number }
+        Returns: {
+          attempts: number
+          company_id: string
+          company_name: string
+          contract_end_date: string
+          delete_after: string
+          export_deadline: string
+          kind: string
+          mail_id: string
+          recipients: string[]
+        }[]
+      }
+      company_lifecycle_mail_finish: {
+        Args: {
+          p_error?: string
+          p_mail_id: string
+          p_provider_message_id?: string
+          p_recipient_count?: number
+          p_release?: boolean
+          p_retry?: boolean
+          p_sent: boolean
+        }
+        Returns: string
+      }
+      company_lifecycle_tick: { Args: { p_today?: string }; Returns: Json }
+      company_purge_begin: {
+        Args: { p_company_id: string; p_today?: string }
+        Returns: string
+      }
+      company_purge_due: { Args: { p_today?: string }; Returns: string[] }
+      company_purge_execute: {
+        Args: { p_company_id: string; p_today?: string }
+        Returns: Json
+      }
+      company_purge_fail: {
+        Args: { p_company_id: string; p_error: string }
+        Returns: undefined
+      }
+      company_purge_files: {
+        Args: { p_company_id: string; p_limit?: number }
+        Returns: {
+          bucket: string
+          name: string
+        }[]
+      }
+      company_purge_files_done: {
+        Args: { p_company_id: string; p_deleted: number }
+        Returns: undefined
+      }
+      company_purge_finish: {
+        Args: {
+          p_company_id: string
+          p_error?: string
+          p_users_deleted: number
+          p_users_failed: number
+        }
+        Returns: string
+      }
+      company_purge_pending_users: {
+        Args: { p_company_id: string }
+        Returns: {
+          profile_files: string[]
+          user_id: string
+        }[]
+      }
       count_active_chefs: {
         Args: { p_company_id: string; p_exclude_employment_id?: string }
         Returns: number
@@ -6384,14 +6574,6 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
-      }
-      delete_company_as_chef: {
-        Args: { p_company_id: string }
-        Returns: undefined
-      }
-      delete_company_as_owner: {
-        Args: { p_company_id: string }
-        Returns: undefined
       }
       delete_quote_draft: { Args: { p_quote_id: string }; Returns: undefined }
       derive_incoming_invoice_tax_line: {
@@ -6858,6 +7040,10 @@ export type Database = {
         Args: { p_date: string; p_rule: string; p_series_start: string }
         Returns: boolean
       }
+      request_company_termination: {
+        Args: { p_company_id: string; p_export_notice_confirmed: boolean }
+        Returns: Json
+      }
       resolve_inbound_mail_file: {
         Args: { p_decision: string; p_file_id: string }
         Returns: Json
@@ -6984,10 +7170,15 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      revoke_company_termination: {
+        Args: { p_company_id: string }
+        Returns: Json
+      }
       revoke_employment_invitation: {
         Args: { p_invitation_id: string }
         Returns: undefined
       }
+      run_company_lifecycle_job: { Args: never; Returns: Json }
       sales_document_buyer_snapshot: {
         Args: { p_customer_id: string }
         Returns: {

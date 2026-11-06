@@ -20,10 +20,24 @@ describe('lifecycleView', () => {
   it('aktiv, Karenz und unbekannt: normal', () => {
     assert.deepEqual(lifecycleView(undefined, 'a'), { kind: 'normal' });
     assert.deepEqual(lifecycleView([row({})], 'a'), { kind: 'normal' });
-    assert.deepEqual(lifecycleView([row({ lifecycle_status: 'terminating' })], 'a'), {
-      kind: 'normal',
-    });
+    assert.deepEqual(
+      lifecycleView(
+        [row({ lifecycle_status: 'terminating', contract_end_date: '2026-11-14' })],
+        'a',
+      ),
+      { kind: 'normal' },
+    );
     assert.deepEqual(lifecycleView([row({})], 'x'), { kind: 'normal' });
+  });
+
+  it('Inhaber in der Bedenkzeit: Hinweis mit Vertragsende', () => {
+    assert.deepEqual(
+      lifecycleView(
+        [row({ lifecycle_status: 'terminating', contract_end_date: '2026-11-14', is_owner: true })],
+        'a',
+      ),
+      { kind: 'terminating', contractEnd: '2026-11-14' },
+    );
   });
 
   it('Inhaber in export_only: nur lesen, mit Frist', () => {

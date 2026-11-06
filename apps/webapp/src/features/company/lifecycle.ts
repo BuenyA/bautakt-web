@@ -1,5 +1,6 @@
 /**
- * Löschkonzept WP3: Was der Angemeldete im aktiven Betrieb nach Vertragsende noch darf.
+ * Löschkonzept WP3: Was der Angemeldete im aktiven Betrieb nach Vertragsende noch darf, und
+ * ab WP6 der Hinweis für Inhaber während der Bedenkzeit nach der Kündigung.
  * Quelle ist `my_company_lifecycle()` (bautakt-app, Migration 20261106134437). Die Datenbank
  * sperrt selbst; das hier entscheidet nur, welche Seite und welcher Hinweis erscheint.
  */
@@ -17,6 +18,8 @@ export type LifecycleRow = {
 
 export type LifecycleView =
   | { kind: 'normal' }
+  /** Kündigung beantragt, Bedenkzeit läuft (WP6). Nur für Inhaber, alle arbeiten normal weiter. */
+  | { kind: 'terminating'; contractEnd: string }
   | { kind: 'readOnly'; contractEnd: string; exportDeadline: string }
   | {
       kind: 'locked';
@@ -37,6 +40,14 @@ export function lifecycleView(
   const row = rows?.find((r) => r.company_id === companyId);
   // Unbekannt heißt hier: noch nicht geladen oder kein Betrieb. Gesperrt wird dann nicht,
   // die Datenbank liefert ohnehin nichts.
+  if (
+    row?.access === 'write' &&
+    row.is_owner &&
+    row.lifecycle_status === 'terminating' &&
+    row.contract_end_date
+  ) {
+    return { kind: 'terminating', contractEnd: row.contract_end_date };
+  }
   if (!row || row.access === 'write') return { kind: 'normal' };
   if (row.access === 'read' && row.contract_end_date && row.export_deadline) {
     return {
@@ -63,4 +74,11 @@ export function dayAfter(date: string): string {
   const [y, m, d] = date.split('-').map(Number);
   const next = new Date(Date.UTC(y!, m! - 1, d! + 1));
   return next.toISOString().slice(0, 10);
+}
+
+/** Ein Tag vor dem Datum, für „bis zum …“ (Widerruf bis zum Vortag von E). */
+export function dayBefore(date: string): string {
+  const [y, m, d] = date.split('-').map(Number);
+  const prev = new Date(Date.UTC(y!, m! - 1, d! - 1));
+  return prev.toISOString().slice(0, 10);
 }
