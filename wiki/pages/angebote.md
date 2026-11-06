@@ -7,6 +7,7 @@ Neuer Angebotsbereich, Umsetzungsplan in `bautakt-app` unter
 ## Stand
 
 - **1b Liste und Detailseite** (web#291).
+- **2a Entscheidung** (bautakt-app#186), siehe unten.
 - **1d PDF und Versand** (bautakt-app#183), siehe unten.
 - **1c Editor und Umschalten** (web#292): Der Bereich steht in der Leiste vor „Aufträge“
   (`canViewQuotes`). Routen: `/angebote` Liste, `/angebote/neu` (`canCreateQuotes`),
@@ -14,6 +15,26 @@ Neuer Angebotsbereich, Umsetzungsplan in `bautakt-app` unter
   „Angebote“ unter Rechnungen, die alte Liste aus `sales_documents` und `type="quote"`
   im Belegeditor sind entfernt. Alte Angebotsbelege (Production: 0) öffnet die Auftragsseite
   über die Belegseite, neue Angebote eines Auftrags stehen dort in eigener Karte.
+
+## Entscheidung (2a)
+
+bautakt-app#186. Auf der Detailseite eines festgeschriebenen Angebots: „Annahme erfassen“
+als Hauptknopf, Ablehnen und Zurückziehen im Menü daneben, bei entschiedenen Angeboten
+„Entscheidung zurücknehmen“ mit Pflichtbegründung. Alles nur mit `canDecideQuotes`, die
+Karte „Entscheidung“ sieht jeder mit `canViewQuotes`. Geschrieben wird nur über
+`accept_quote`, `decline_quote`, `withdraw_quote` und `revert_quote_decision`; Regeln und
+Sperren stehen im App-Wiki (`wiki/pages/angebote.md`).
+
+- **Zwei Zeitpunkte.** „Entschieden am“ gibt der Nutzer ein (Ortszeit des Browsers, höchstens
+  zehn Minuten in der Zukunft wie in der Datenbank), „Erfasst am“ setzt der Server.
+- **Nachweis.** Unterschrift am Gerät (`SignaturePad`, PNG schwarz auf weiß, auch im dunklen
+  Schema) oder Scan. Erst Upload nach `{company}/{quote}/acceptance/{uuid}.{ext}`, dann die
+  RPC mit Pfad und SHA-256; sie prüft beides.
+- **Auswahl.** Nur Alternativ- und Bedarfspositionen der angenommenen Version, je
+  Grundposition höchstens eine Alternative (`toggleSelection`).
+- **Privatkunden.** Person ohne USt-IdNr. Solange `quote_platform_settings` die Annahme
+  sperrt, zeigt der Drawer den Hinweis und der Speichern-Knopf bleibt aus. Der Hinweis zum
+  Widerrufsrecht trägt „vor Livegang anwaltlich prüfen“.
 
 ## Editor
 
@@ -109,6 +130,12 @@ Stand 2026-11-07, bautakt-app#183, Server-Teil im Wiki der App.
   Zeile in `quote_outputs`, Verknüpfung am Auftrag) und lokal im Browser bis zum Probelauf.
 
 ## Fallstricke
+
+- **Nachweise einer zurückgenommenen Annahme bleiben in `quote_outputs`.** Die Karte zeigt
+  nur den Nachweis mit `created_at` gleich `decision_recorded_at` (`currentEvidence`); beide
+  setzt `accept_quote` in derselben Transaktion. Ohne den Filter stand nach Zurücknehmen und
+  erneuter Annahme auch die alte Unterschrift da (im Browser gefunden).
+- `readableDbError` sucht Teilstrings: `QUOTE_DECIDED_AT_*` muss vor `QUOTE_DECIDED` stehen.
 
 - `quote_overview` liefert alle Spalten als nullable, weil es eine Sicht ist. `id` vor
   `routes.quote` prüfen.

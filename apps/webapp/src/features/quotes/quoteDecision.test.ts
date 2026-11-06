@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
+  currentEvidence,
   decidedAtIso,
   evidencePath,
   isConsumer,
@@ -90,6 +91,18 @@ describe('Nachweis', () => {
     assert.equal(evidencePath('c', 'q', 'f', 'image/png'), 'c/q/acceptance/f.png');
     assert.equal(evidencePath('c', 'q', 'f', 'application/pdf'), 'c/q/acceptance/f.pdf');
     assert.equal(evidencePath('c', 'q', 'f', 'text/html'), null);
+  });
+
+  it('nur der Nachweis der geltenden Entscheidung zählt', () => {
+    const rows = [
+      { id: 'neu', created_at: '2026-11-06T13:30:00.123456+00:00' },
+      { id: 'alt', created_at: '2026-11-06T13:26:00.5+00:00' },
+    ];
+    assert.deepEqual(
+      currentEvidence(rows, '2026-11-06T13:30:00.123456+00:00').map((row) => row.id),
+      ['neu'],
+    );
+    assert.deepEqual(currentEvidence(rows, null), []);
   });
 });
 

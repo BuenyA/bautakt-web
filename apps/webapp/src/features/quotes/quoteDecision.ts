@@ -111,6 +111,21 @@ export function evidencePath(
   return extension ? `${companyId}/${quoteId}/acceptance/${fileId}.${extension}` : null;
 }
 
+/**
+ * Nachweise der geltenden Entscheidung. `accept_quote` legt den Nachweis in
+ * derselben Transaktion an, in der es `decision_recorded_at` setzt; beide
+ * tragen daher denselben Zeitpunkt. Nachweise einer zurückgenommenen Annahme
+ * bleiben gespeichert, gehören aber nicht zur geltenden Entscheidung.
+ */
+export function currentEvidence<T extends { created_at: string }>(
+  rows: readonly T[],
+  recordedAt: string | null,
+): T[] {
+  if (!recordedAt) return [];
+  const at = new Date(recordedAt).getTime();
+  return rows.filter((row) => new Date(row.created_at).getTime() === at);
+}
+
 /** Schlüssel des Verlaufs je Ereignis; Probelauf heißt anders als echter Versand. */
 export function quoteEventKey(event: { event_type: string; payload: unknown }): string {
   const mode = (event.payload as { mode?: unknown } | null)?.mode;

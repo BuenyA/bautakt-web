@@ -12,7 +12,7 @@ import { useMembership } from '@/features/company/useMembership';
 import { sha256Hex } from '@/features/finance/originalIntegrity';
 import { supabase } from '@/lib/supabase';
 
-import { type DecisionKind, evidencePath, selectableItems } from './quoteDecision';
+import { currentEvidence, type DecisionKind, evidencePath, selectableItems } from './quoteDecision';
 import { QUOTE_ATTACHMENT_BUCKET } from './useQuotes';
 
 /** Entscheidung, Kunde (für die Verbraucher-Sperre), Auswahl und Nachweise. */
@@ -59,7 +59,7 @@ export function useQuoteDecisionDetail(quoteId: string | undefined) {
         contact: quote.data.customer?.contact ?? null,
         consumerAcceptanceEnabled: platform.data?.consumer_acceptance_enabled ?? false,
         selected: (selection.data ?? []).flatMap((row) => (row.item ? [row.item] : [])),
-        evidence: evidence.data ?? [],
+        evidence: currentEvidence(evidence.data ?? [], quote.data.decision_recorded_at),
       };
     },
   });
