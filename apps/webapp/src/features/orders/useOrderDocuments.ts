@@ -24,7 +24,8 @@ export type OrderDocumentCategory = {
 export type OrderDocument = {
   id: string;
   categoryId: string;
-  userId: string;
+  /** NULL, wenn das Konto gelöscht wurde (Löschkonzept WP1). */
+  userId: string | null;
   name: string;
   fileName: string;
   mimeType: string;

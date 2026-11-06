@@ -133,5 +133,20 @@
     "description": "Du hast Eingaben, die noch nicht gespeichert sind. Wenn du die Seite verlässt, gehen sie verloren.",
     "stay": "Weiter bearbeiten",
     "leave": "Verwerfen und verlassen"
+  },
+  "lifecycle": {
+    "readOnly": {
+      "title": "Mein Betrieb ist gekündigt",
+      "body": "Seit dem {{end}} kannst du nur noch lesen und deine Daten exportieren. Ab dem {{locked}} ist kein Login mehr möglich, danach werden alle Daten gelöscht.",
+      "export": "Zum Datenexport"
+    },
+    "locked": {
+      "title": "Mein Betrieb ist gesperrt",
+      "ownerBody": "Der Vertrag für {{name}} ist beendet und die Exportfrist ist abgelaufen. Am {{date}} werden alle Daten gelöscht.",
+      "memberBody": "Der Vertrag für {{name}} ist beendet. Mitarbeitende haben keinen Zugang mehr. Bei Fragen wende dich an die Leitung deines Betriebs.",
+      "otherCompanies": "Du gehörst noch zu einem anderen Betrieb:",
+      "switchTo": "Zu {{name}} wechseln",
+      "newCompany": "Neuen Betrieb anlegen"
+    }
   }
 }

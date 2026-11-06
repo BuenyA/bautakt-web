@@ -104,6 +104,14 @@ export async function createOwnerCompany(userId: string, input: OwnerCompanyInpu
 
   if (employmentError) throw employmentError;
 
+  // Die Rücksetzung oben trifft Beschäftigungen in einem gekündigten Betrieb nicht: Dort
+  // lässt RLS kein UPDATE mehr zu, die Zeile bliebe `is_primary`. Die RPC setzt beides,
+  // der Schreib-Trigger erlaubt genau diesen Wechsel (Löschkonzept WP3).
+  const { error: switchError } = await supabase.rpc('switch_primary_company', {
+    p_company_id: data.id,
+  });
+  if (switchError) throw switchError;
+
   return data;
 }
 

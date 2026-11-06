@@ -24,7 +24,7 @@ export function canCreateDailyReport(
 export function canEditDailyReport(
   permissions: Partial<EmployeePermissions> | null | undefined,
   userId: string | null | undefined,
-  report: { userId: string },
+  report: { userId: string | null },
 ): boolean {
   if (hasPermission(permissions, 'canManageOrders')) return true;
   return (
@@ -45,7 +45,7 @@ export function canEditDailyReport(
 export function canDeleteDailyReport(
   permissions: Partial<EmployeePermissions> | null | undefined,
   userId: string | null | undefined,
-  report: { userId: string },
+  report: { userId: string | null },
 ): boolean {
   return (
     hasPermission(permissions, 'canTrackTimeForTeam') &&

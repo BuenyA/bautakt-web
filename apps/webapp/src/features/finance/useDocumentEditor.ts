@@ -540,7 +540,9 @@ export function useSaveDraft() {
       // Eine Transaktion (bautakt-web#158): bricht das Speichern ab, bleibt
       // der vorherige Stand vollständig erhalten.
       const { data, error } = await supabase.rpc('save_sales_document_draft', {
-        p_document_id: documentId,
+        // NULL legt einen neuen Entwurf an. Der Typgenerator schreibt RPC-Argumente seit
+        // 06.11.2026 ohne `| null`, die Funktion nimmt NULL aber an.
+        p_document_id: documentId as string,
         p_header: header,
         p_lines: lines,
       });

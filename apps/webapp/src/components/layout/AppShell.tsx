@@ -19,6 +19,7 @@ import { matchPath, Outlet, useLocation } from 'react-router';
 
 import { BautaktSignet } from '@/components/brand/BautaktSignet';
 import { useRouterLink } from '@/components/common/useRouterLink';
+import { CompanyReadOnlyBanner } from '@/features/company/CompanyReadOnlyBanner';
 import { useMembership } from '@/features/company/useMembership';
 import { HOME_ROUTE, routes } from '@/lib/routes';
 
@@ -366,6 +367,7 @@ export function AppShell() {
         </header>
 
         <main className="min-w-0 flex-1 p-4 sm:p-6">
+          <CompanyReadOnlyBanner />
           <Outlet />
         </main>
       </div>
