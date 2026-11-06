@@ -16,10 +16,8 @@
     "other": "Betriebe"
   },
   "orderStatus": {
-    "quote": "Angebot",
     "active": "Aktiv",
-    "finished": "Abgeschlossen",
-    "declined": "Abgelehnt"
+    "finished": "Abgeschlossen"
   },
   "orders": {
     "listTitle": "Aufträge",
