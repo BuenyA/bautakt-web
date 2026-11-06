@@ -87,6 +87,9 @@ export const routes = {
   quotes: '/angebote',
   quote: (id: string) => `/angebote/${id}`,
   quoteNew: '/angebote/neu',
+  /** Neues Angebot oder Nachtrag zu einem Auftrag, vorbelegt (bautakt-app#187). */
+  quoteNewForOrder: (orderId: string, kind: 'main' | 'addendum') =>
+    `/angebote/neu?auftrag=${encodeURIComponent(orderId)}${kind === 'addendum' ? '&art=nachtrag' : ''}`,
   quoteEdit: (id: string) => `/angebote/${id}/bearbeiten`,
   invoices: '/rechnungen/ausgang',
   invoice: (id: string) => `/rechnungen/${id}`,

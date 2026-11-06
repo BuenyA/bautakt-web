@@ -12,7 +12,13 @@ import { useMembership } from '@/features/company/useMembership';
 import { sha256Hex } from '@/features/finance/originalIntegrity';
 import { supabase } from '@/lib/supabase';
 
-import { currentEvidence, type DecisionKind, evidencePath, selectableItems } from './quoteDecision';
+import {
+  currentEvidence,
+  type DecisionKind,
+  evidencePath,
+  type OrderMode,
+  selectableItems,
+} from './quoteDecision';
 import { QUOTE_ATTACHMENT_BUCKET } from './useQuotes';
 
 /** Entscheidung, Kunde (für die Verbraucher-Sperre), Auswahl und Nachweise. */
@@ -96,6 +102,9 @@ export type AcceptInput = {
   note: string;
   selectedItemIds: string[];
   evidence: Blob | null;
+  /** Neuer, bestehender oder kein Auftrag (bautakt-app#187). */
+  orderMode: OrderMode;
+  orderId: string | null;
 };
 
 async function uploadEvidence(companyId: string, quoteId: string, file: Blob) {
@@ -120,6 +129,9 @@ function useInvalidateQuotes() {
 export function useAcceptQuote() {
   const { data: membership } = useMembership();
   const invalidate = useInvalidateQuotes();
+  const queryClient = useQueryClient();
+  const invalidateOrders = () =>
+    queryClient.invalidateQueries({ queryKey: ['orders', membership?.companyId] });
   return useMutation({
     mutationFn: async (input: AcceptInput) => {
       const companyId = membership?.companyId;
@@ -134,10 +146,16 @@ export function useAcceptQuote() {
         p_note: input.note,
         p_selected_item_ids: input.selectedItemIds,
         ...(evidence ? { p_evidence_path: evidence.path, p_evidence_hash: evidence.hash } : {}),
+        p_order_mode: input.orderMode,
+        ...(input.orderMode === 'existing' && input.orderId ? { p_order_id: input.orderId } : {}),
       });
       if (error) throw error;
     },
-    onSettled: invalidate,
+    onSettled: async (_data, _error, input) => {
+      await invalidate();
+      // Ein neuer Auftrag soll sofort in der Auftragsliste stehen.
+      if (input.orderMode !== 'none') await invalidateOrders();
+    },
   });
 }
 

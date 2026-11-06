@@ -6007,6 +6007,8 @@ export type Database = {
           p_evidence_path?: string
           p_kind: string
           p_note?: string
+          p_order_id?: string
+          p_order_mode?: string
           p_selected_item_ids?: string[]
           p_version_id: string
         }

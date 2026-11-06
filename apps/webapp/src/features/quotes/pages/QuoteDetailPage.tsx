@@ -119,6 +119,8 @@ export function QuoteDetailPage() {
               issuedVersions={versions.filter((version) => version.issued_at)}
               consumer={isConsumer(decision?.contact)}
               consumerAcceptanceEnabled={decision?.consumerAcceptanceEnabled ?? false}
+              customerId={overview.customer_id ?? null}
+              linkedOrder={order ? { id: order.id, name: order.name } : null}
             />
             <QuoteActions
               quoteId={overview.id!}
