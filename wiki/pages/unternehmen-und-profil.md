@@ -51,6 +51,13 @@ Den Menüpunkt „Unternehmen“ gibt es, sobald irgendein Abschnitt sichtbar is
 
 ## Entscheidungen und Gründe
 
+- **Gewerk** (`companies.type`) ist Freitext, kein Enum. Onboarding
+  (`/betrieb-einrichten`) und die Karte „Betrieb“ unter Stammdaten nutzen
+  dieselbe `TradeCombobox`. Die Vorschläge stehen in `COMPANY_TYPES`
+  (`features/companySettings/companyValidation.ts`), dieselbe Liste wie
+  `bautakt-app` `app/lib/utils/validationUtils.ts`. Seit 2026-11-06 gehört
+  `Rohbau` dazu, alphabetisch zwischen Metallbau und Sanitär. Gespeichert
+  wird der String selbst. Ein eigener Text ab zwei Zeichen bleibt gültig.
 - **Einrichtung** (`/unternehmen/einrichtung`, `useCompanySetup`) zeigt den
   Einrichtungsstand: Anschrift, Steuernummer, Pflichtangaben für Mails, Bank.
   Den Abschnitt gibt es nur, solange davon etwas fehlt; danach verschwindet er
