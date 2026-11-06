@@ -64,8 +64,7 @@ export type OrderEditDraft = {
 /**
  * Spalten, die ein Speichern schreiben darf.
  *
- * Nie dabei: `status`, `billing_mode`, `contract_sum`, `quote_accepted_at`,
- * `icon`, `cover_image_path`, `company_id`, `created_at`, `id`.
+ * Nie dabei: `status`, `billing_mode`, `contract_sum`, `icon`, `cover_image_path`, `company_id`, `created_at`, `id`.
  * `customer_id` und `cost_center_id` sind hier `string`, nie `null`.
  */
 export type OrderUpdatePatch = {

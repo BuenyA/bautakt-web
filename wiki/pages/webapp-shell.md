@@ -254,8 +254,12 @@ der Tab sagt, was zu sehen ist. Sortierung ohne Klick: `created_at`
 absteigend aus der Abfrage.
 
 `finished` ist abgeschlossen. `active` und jeder unbekannte Status läuft.
-Zeilen mit `quote` oder `declined` (Altbestand der Angebote-Ansicht)
-erscheinen nur unter Alle. Die Abfrage lädt alle Aufträge des Betriebs;
+Seit 2026-11-06 (bautakt-app#184) bildet `toOrderStatus` in
+`features/orders/orderList.ts` die Altwerte ab wie die App: `quote` läuft,
+`declined` ist abgeschlossen; das Badge zeigt nur noch Laufend oder
+Abgeschlossen. Vorher erschienen diese Zeilen nur unter Alle, mit eigenem
+Badge „Angebot“ oder „Abgelehnt“. Die Datenbank kennt beide Werte bis zur
+Migration `ang_quote_legacy_drop` (1f), gemessen gibt es keinen. Die Abfrage lädt alle Aufträge des Betriebs;
 gefiltert wird clientseitig aus demselben Cache. `useOrders` hat keinen
 Filter-Parameter.
 

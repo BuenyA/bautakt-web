@@ -311,7 +311,7 @@ export function useOrderEndDates(enabled: boolean, untilIso: string) {
         .from('orders')
         .select('id, name, end_date')
         .eq('company_id', companyId!)
-        .not('status', 'in', '(finished,quote,declined)')
+        .not('status', 'in', '(finished,declined)')
         .gte('end_date', dayIso)
         .lte('end_date', untilIso);
       if (error) throw error;
