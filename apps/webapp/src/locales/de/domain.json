@@ -183,6 +183,11 @@
       "open": "{{amount}} noch offen",
       "overrun": "Auftragssumme um {{amount}} überschritten",
       "noContract": "Keine Auftragssumme hinterlegt. Ohne sie gibt es keine Anteile.",
+      "contractHidden": "Die Auftragssumme siehst du mit dem Recht für Auftragsfinanzen.",
+      "contractSource": {
+        "quotes": "Aus den angenommenen Angeboten",
+        "manualWithAddenda": "Summe von Hand plus angenommene Nachträge"
+      },
       "percentOfContract": "{{percent}} % der Auftragssumme",
       "result": "Ergebnis",
       "resultNote": "Abgerechnet minus Kosten, netto",

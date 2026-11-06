@@ -93,3 +93,20 @@ Was das gekostet hat, damit es keiner zurückbaut:
 - `save_quote_draft` überschreibt alle Kopffelder, auch die, die der Editor nicht zeigt
   (`responsible_user_id`, `follow_up_on`). Der Editor lädt sie deshalb mit und gibt sie
   unverändert zurück.
+
+## Auftragssumme aus Angeboten (2c)
+
+Stand 2026-11-06, bautakt-app#188.
+
+- Die Auftragssumme nie aus `orders.contract_sum` lesen, sondern über
+  `useOrderContract` aus der Sicht `order_contract_totals`. Nach einer Annahme
+  steht in der Spalte weiter die alte Summe von Hand.
+- Die Sicht liefert nur mit `canViewOrderFinance` Zeilen. Ohne das Recht zeigt die
+  Übersicht keine Auftragssumme mehr, die Finanzseite einen Hinweis. Früher sah jedes
+  Mitglied die Summe (Risiko R6 im Umsetzungsplan).
+- Die Summe in der Karte „Angebote und Nachträge“ ist der Angebotsbetrag der Version.
+  Die Auftragssumme kann davon abweichen, weil bei der Annahme gewählte Alternativen
+  und Bedarfspositionen mitzählen.
+- Summe und Abrechnungsart sperrt die Datenbank nach der Annahme
+  (`ORDER_CONTRACT_LOCKED`, `ORDER_BILLING_MODE_LOCKED`). Das Web bearbeitet beide
+  Felder ohnehin nicht.

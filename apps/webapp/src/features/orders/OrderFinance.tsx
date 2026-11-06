@@ -14,6 +14,7 @@ import {
   Text,
 } from '@fluentui/react-components';
 import { MoneyRegular } from '@fluentui/react-icons';
+import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -25,8 +26,10 @@ import { useOrderQuotes } from '@/features/quotes/useQuotes';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import type { OrderContract } from './orderContract';
 import { OrderPreviewCard, PreviewError, PreviewSkeleton } from './OrderPreviewCard';
 import type { OrderDetail } from './useOrder';
+import { useOrderContract } from './useOrderContract';
 import { type OrderFinanceAccess, useOrderFinance } from './useOrderFinance';
 
 /** Ganze Euro für Leisten und Kennzahlen; Cent stehen in den Listen. */
@@ -168,6 +171,22 @@ function BilledMeter({ finance }: { finance: OrderFinance }) {
   );
 }
 
+/** Hinweis unter der Auftragssumme: fehlt, kommt aus Angeboten oder ist verborgen. */
+function contractNote(
+  t: TFunction,
+  canView: boolean,
+  contract: OrderContract | null,
+  contractMinor: number | null,
+): string | undefined {
+  if (!canView) return t('domain:orders.finance.contractHidden');
+  if (contractMinor === null) return t('domain:orders.finance.noContract');
+  if (contract?.source === 'quotes') return t('domain:orders.finance.contractSource.quotes');
+  if (contract?.source === 'manual_with_addenda') {
+    return t('domain:orders.finance.contractSource.manualWithAddenda');
+  }
+  return undefined;
+}
+
 function NoContractHint() {
   const { t } = useTranslation();
   return <p className="text-muted-foreground text-xs">{t('domain:orders.finance.noContract')}</p>;
@@ -180,9 +199,10 @@ function NoContractHint() {
  */
 export function FinancePreview({ order }: { order: OrderDetail }) {
   const { t } = useTranslation();
+  const contract = useOrderContract(order.id);
   const { access, finance, isPending, isError, refetch } = useOrderFinance(
     order.id,
-    order.contract_sum,
+    contract.contract?.contractNet ?? null,
   );
   if (!access || !(access.billing || access.costs)) return null;
 
@@ -192,9 +212,9 @@ export function FinancePreview({ order }: { order: OrderDetail }) {
       title={t('domain:orders.finance.title')}
       to={routes.orderSection(order.id, 'finance')}
     >
-      {isPending ? (
+      {isPending || contract.isPending ? (
         <PreviewSkeleton />
-      ) : isError ? (
+      ) : isError || contract.isError ? (
         <PreviewError onRetry={refetch} />
       ) : (
         <>
@@ -202,7 +222,7 @@ export function FinancePreview({ order }: { order: OrderDetail }) {
             {access.costs ? <CostMeter finance={finance} access={access} /> : null}
             {access.billing ? <BilledMeter finance={finance} /> : null}
           </div>
-          {finance.contractMinor === null ? <NoContractHint /> : null}
+          {finance.contractMinor === null && contract.canView ? <NoContractHint /> : null}
         </>
       )}
     </OrderPreviewCard>
@@ -309,8 +329,9 @@ function share(part: number, whole: number): string {
  */
 export function OrderFinancePage({ order }: { order: OrderDetail }) {
   const { t } = useTranslation();
+  const contract = useOrderContract(order.id);
   const { access, finance, documents, expenses, incoming, isPending, isError, refetch } =
-    useOrderFinance(order.id, order.contract_sum);
+    useOrderFinance(order.id, contract.contract?.contractNet ?? null);
   const canViewQuotes = usePermission('canViewQuotes');
   if (!access) return null;
 
@@ -336,8 +357,8 @@ export function OrderFinancePage({ order }: { order: OrderDetail }) {
         <Figure
           label={t('domain:orders.fields.contractSum')}
           value={finance.contractMinor === null ? '–' : euro(finance.contractMinor)}
-          note={finance.contractMinor === null ? t('domain:orders.finance.noContract') : undefined}
-          isLoading={false}
+          note={contractNote(t, contract.canView, contract.contract, finance.contractMinor)}
+          isLoading={contract.isPending}
         />
         {access.costs ? (
           <Figure

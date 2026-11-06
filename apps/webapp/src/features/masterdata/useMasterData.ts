@@ -81,7 +81,9 @@ export function useCostCenters() {
     queryKey: ['cost-centers', companyId],
     enabled: Boolean(companyId),
     queryFn: async (): Promise<CostCenterRow[]> => {
-      const [centers, orders] = await Promise.all([
+      // Summen aus der Sicht order_contract_totals (bautakt-app#188): Sie liefert nur
+      // mit canViewOrderFinance Zeilen. Gezählt wird weiter jeder Auftrag.
+      const [centers, orders, contracts] = await Promise.all([
         supabase
           .from('cost_centers')
           .select('id, code, name')
@@ -89,15 +91,28 @@ export function useCostCenters() {
           .order('code', { ascending: true }),
         supabase
           .from('orders')
-          .select('cost_center_id, contract_sum')
+          .select('id, cost_center_id')
           .eq('company_id', companyId!)
           .not('cost_center_id', 'is', null),
+        supabase
+          .from('order_contract_totals')
+          .select('order_id, contract_net')
+          .eq('company_id', companyId!),
       ]);
 
       if (centers.error) throw centers.error;
       if (orders.error) throw orders.error;
+      if (contracts.error) throw contracts.error;
 
-      const stats = aggregateCostCenterStats(orders.data ?? []);
+      const netByOrder = new Map(
+        (contracts.data ?? []).map((row) => [row.order_id, row.contract_net] as const),
+      );
+      const stats = aggregateCostCenterStats(
+        (orders.data ?? []).map((order) => ({
+          cost_center_id: order.cost_center_id,
+          contract_net: netByOrder.get(order.id) ?? null,
+        })),
+      );
       return (centers.data ?? []).map((center) => {
         const stat = stats.get(center.id);
         return {
