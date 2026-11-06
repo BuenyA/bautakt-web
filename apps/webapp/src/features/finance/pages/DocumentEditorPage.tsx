@@ -34,6 +34,7 @@ import {
   ArrowSyncRegular,
   CheckmarkCircleRegular,
   DeleteRegular,
+  PrintRegular,
   ReceiptMoneyRegular,
   SaveRegular,
 } from '@fluentui/react-icons';
@@ -59,6 +60,7 @@ import { creditNoteFromParam, invoiceFromOrderParam, routes } from '@/lib/routes
 
 import { invalidTermFields, prefillCustomerTerms } from '../customerTerms';
 import { PdfViewer } from '../PdfViewer';
+import { printPdfBytes } from '../printPdf';
 import { ReleaseDialog } from '../ReleaseDialog';
 import {
   buildDraftRows,
@@ -1315,15 +1317,32 @@ export function DocumentEditorPage({
             error={previewError}
             emptyText={t('domain:editor.preview.empty')}
             toolbarEnd={
-              <Button
-                size="small"
-                appearance="subtle"
-                icon={<ArrowSyncRegular />}
-                disabled={live.phase !== 'idle'}
-                onClick={() => live.refresh()}
-              >
-                {t('domain:editor.preview.refresh')}
-              </Button>
+              <>
+                <Button
+                  size="small"
+                  appearance="subtle"
+                  icon={<PrintRegular />}
+                  disabled={!live.pdf || live.pdf.byteLength === 0}
+                  onClick={() => {
+                    if (!live.pdf || live.pdf.byteLength === 0) return;
+                    printPdfBytes(live.pdf, {
+                      title: t('domain:invoices.printPdf'),
+                      onError: () => toast.error(t('domain:invoices.printError')),
+                    });
+                  }}
+                >
+                  {t('domain:invoices.printPdf')}
+                </Button>
+                <Button
+                  size="small"
+                  appearance="subtle"
+                  icon={<ArrowSyncRegular />}
+                  disabled={live.phase !== 'idle'}
+                  onClick={() => live.refresh()}
+                >
+                  {t('domain:editor.preview.refresh')}
+                </Button>
+              </>
             }
           />
           {live.warnings.length > 0 ? (

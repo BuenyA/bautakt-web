@@ -151,6 +151,7 @@ verlinkt, nie kopiert.
 | 2026-11-06 | [Gewerk „Rohbau“ in der Vorschlagsliste](logs/2026-11-06-gewerk-rohbau.md)                                     |
 | 2026-11-07 | [Angebote: PDF und Versand im Web](logs/2026-11-07-angebote-pdf-versand.md)                                    |
 | 2026-11-06 | [Angebote: Auftragssumme aus Angeboten](logs/2026-11-06-angebote-auftragssumme.md)                             |
+| 2026-11-06 | [Drucken öffnet das angezeigte Beleg-PDF](logs/2026-11-06-beleg-drucken.md)                                    |
 
 ## Die drei wichtigsten Sätze
 
