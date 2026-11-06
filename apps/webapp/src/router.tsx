@@ -26,6 +26,7 @@ import {
 } from '@/features/companySettings/pages/CompanyDataPages';
 import { DeleteCompanyPage } from '@/features/companySettings/pages/DeleteCompanyPage';
 import { DunningSettingsPage } from '@/features/companySettings/pages/DunningSettingsPage';
+import { FullExportPage } from '@/features/companySettings/pages/FullExportPage';
 import { InvoiceTemplatePage } from '@/features/companySettings/pages/InvoiceTemplatePage';
 import { NumbersPage } from '@/features/companySettings/pages/NumbersPage';
 import { RatesPage } from '@/features/companySettings/pages/RatesPage';
@@ -376,6 +377,7 @@ export const appRoutes: RouteObject[] = [
                   { path: routes.companyDatev, element: <DatevPage /> },
                   { path: routes.companyRoles, element: <RolesPage /> },
                   { path: routes.companyAbsences, element: <AbsenceSettingsPage /> },
+                  { path: routes.companyExport, element: <FullExportPage /> },
                   { path: routes.companyDelete, element: <DeleteCompanyPage /> },
                 ],
               },

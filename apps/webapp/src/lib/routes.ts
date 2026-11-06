@@ -152,6 +152,7 @@ export const routes = {
   companyDatev: '/unternehmen/datev',
   companyRoles: '/unternehmen/rollen',
   companyAbsences: '/unternehmen/urlaub',
+  companyExport: '/unternehmen/datenexport',
   companyDelete: '/unternehmen/loeschen',
 
   /** Nur noch Bedienung: Darstellung, Benachrichtigungen, Seitenleiste. */

@@ -1,4 +1,5 @@
 import {
+  ArrowDownload20Regular,
   BookTemplate20Regular,
   Box20Regular,
   Building20Regular,
@@ -139,6 +140,12 @@ export function useCompanyNavGroups(): { groups: SubNavGroup[]; ready: boolean }
     {
       titleKey: 'companySettings:nav.groupDanger',
       items: [
+        {
+          to: routes.companyExport,
+          labelKey: 'companySettings:nav.export',
+          icon: ArrowDownload20Regular,
+          visible: access.danger.view,
+        },
         {
           to: routes.companyDelete,
           labelKey: 'companySettings:nav.delete',

@@ -1,4 +1,11 @@
-import { Button, Link, MessageBar, MessageBarBody, MessageBarTitle, Text } from '@fluentui/react-components';
+import {
+  Button,
+  Link,
+  MessageBar,
+  MessageBarBody,
+  MessageBarTitle,
+  Text,
+} from '@fluentui/react-components';
 import { Mail20Regular } from '@fluentui/react-icons';
 import { useTranslation } from 'react-i18next';
 
