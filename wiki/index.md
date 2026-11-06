@@ -149,6 +149,7 @@ verlinkt, nie kopiert.
 | 2026-11-02 | [Preisseite /preise](logs/2026-11-02-preisseite.md)                                                            |
 | 2026-11-06 | [Sperrseite und Lesehinweis nach Vertragsende](logs/2026-11-06-login-sperre.md)                                |
 | 2026-11-06 | [Angebote: Auftragssumme aus Angeboten](logs/2026-11-06-angebote-auftragssumme.md)                             |
+| 2026-11-06 | [Drucken öffnet das angezeigte Beleg-PDF](logs/2026-11-06-beleg-drucken.md)                                    |
 
 ## Die drei wichtigsten Sätze
 

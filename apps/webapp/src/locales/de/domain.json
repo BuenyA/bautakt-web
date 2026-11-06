@@ -688,7 +688,9 @@
     "taxNumber": "Steuernummer",
     "vatId": "USt-IdNr.",
     "smallBusinessNote": "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
-    "print": "Druckansicht (ohne E-Rechnung)",
+    "printPdf": "Drucken",
+    "printError": "Das PDF konnte nicht zum Drucken geöffnet werden.",
+    "print": "Druckansicht (ohne PDF)",
     "download": {
       "action": "Herunterladen",
       "pdf": "PDF (Original)",

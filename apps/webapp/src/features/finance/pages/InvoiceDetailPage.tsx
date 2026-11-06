@@ -6,7 +6,6 @@ import {
   CardHeader,
   Link as FluentLink,
   Menu,
-  MenuDivider,
   MenuItem,
   MenuList,
   MenuPopover,
@@ -65,6 +64,7 @@ import { EInvoiceBadge } from '../EInvoiceBadge';
 import { MailDeliveryStatus } from '../MailDeliveryStatus';
 import { PaymentSheet } from '../PaymentSheet';
 import { PdfViewer } from '../PdfViewer';
+import { invoicePrintBytes, printPdfBytes } from '../printPdf';
 import { ReleaseDialog } from '../ReleaseDialog';
 import { SendDialog } from '../SendDialog';
 import { useFinalizeBlockers } from '../useFinalizeBlockers';
@@ -249,6 +249,15 @@ export function InvoiceDetailPage() {
 
   const fileBaseName = documentFileBaseName(data.document_number, data.customer_label);
   const archivedBytes = archivedPdf.data ?? null;
+  // Dieselben Bytes wie im Viewer: Archiv nach dem Festschreiben, sonst die
+  // Entwurfsvorschau. Solange nichts da ist, bleibt die HTML-Druckansicht.
+  const printBytes = invoicePrintBytes({
+    isDraft,
+    archivedPdf: archivedBytes,
+    draftPdf: draftPreview.data?.pdf ?? null,
+  });
+  const printPending =
+    !printBytes && (isDraft ? draftPreview.isLoading : isArchived && archivedPdf.isLoading);
   // Per Mail geht nur das Archiv-Original hinaus (#186), also nur mit Original.
   const canSendMail = access.canWriteSalesDocuments && isArchived && data.status !== 'cancelled';
   const canMarkSent =
@@ -275,6 +284,13 @@ export function InvoiceDetailPage() {
 
   function onDownloadPdf() {
     if (archivedBytes) downloadBytes(archivedBytes, `${fileBaseName}.pdf`, 'application/pdf');
+  }
+
+  function onPrintPdf(bytes: Uint8Array) {
+    printPdfBytes(bytes, {
+      title: t('domain:invoices.printPdf'),
+      onError: () => toast.error(t('domain:invoices.printError')),
+    });
   }
 
   async function onDownloadXml() {
@@ -328,6 +344,23 @@ export function InvoiceDetailPage() {
               </Button>
             ) : null}
 
+            {printBytes ? (
+              <Button icon={<PrintRegular />} onClick={() => onPrintPdf(printBytes)}>
+                {t('domain:invoices.printPdf')}
+              </Button>
+            ) : printPending ? (
+              <Button icon={<PrintRegular />} disabled>
+                {t('domain:invoices.printPdf')}
+              </Button>
+            ) : (
+              <Button
+                icon={<PrintRegular />}
+                onClick={() => window.open(routes.invoicePrint(data.id), '_blank', 'noopener')}
+              >
+                {t('domain:invoices.print')}
+              </Button>
+            )}
+
             {!isDraft ? (
               <Menu positioning="below-end">
                 <MenuTrigger disableButtonEnhancement>
@@ -365,16 +398,6 @@ export function InvoiceDetailPage() {
                         {t('domain:invoices.download.xml')}
                       </MenuItem>
                     ) : null}
-                    <MenuDivider />
-                    {/* Nur Fallback: kein Original, keine E-Rechnung. */}
-                    <MenuItem
-                      icon={<PrintRegular />}
-                      onClick={() =>
-                        window.open(routes.invoicePrint(data.id), '_blank', 'noopener')
-                      }
-                    >
-                      {t('domain:invoices.print')}
-                    </MenuItem>
                   </MenuList>
                 </MenuPopover>
               </Menu>

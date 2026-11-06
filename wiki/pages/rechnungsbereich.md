@@ -101,6 +101,26 @@ Edge Function `datev-export` (bautakt-app, Wiki `finanzmodul.md`).
   Die Regeln stehen in bautakt-app, Wiki `finanzmodul.md`, Abschnitt
   „Skonto im Eingang“.
 
+## Drucken auf der Belegseite
+
+`InvoiceDetailPage` zeigt **Drucken** in der Kopfzeile, neben „Herunterladen“, nicht
+im Download-Menü (bautakt-web#307). Gedruckt wird das PDF, das der Viewer schon
+zeigt, aus den Bytes im Speicher. Kein zweiter Download, kein neuer Storage-Pfad,
+kein `company_export_*`.
+
+- **Festgeschrieben mit Archiv:** `invoicePrintBytes` nimmt `useArchivedPdf`,
+  dieselben Bytes wie `PdfViewer`. Der Druckdialog öffnet dieses Original.
+- **Entwurf:** dieselbe Schaltfläche druckt die geladene Vorschau
+  (`useDraftPreview`), sobald sie da ist. Im Editor steht **Drucken** an der
+  Live-Vorschau (`DocumentEditorPage`, neben „Aktualisieren“) und druckt das
+  angezeigte PDF, auch ungespeichert.
+- **Noch kein PDF** (Archiv fehlt, Ladefehler, Vorschau leer): die Schaltfläche
+  heißt „Druckansicht (ohne PDF)“ und öffnet die HTML-Seite `InvoicePrintPage`.
+  Solange die Abfrage läuft, bleibt „Drucken“ sichtbar und gesperrt.
+- Umsetzung in `printPdf.ts`: Blob-URL in einem iframe außerhalb des Sichtfelds,
+  mit A4-Maß, dann `print()`. `display: none` oder 0×0 druckt in Chromium oft
+  eine leere Seite. Die Blob-URL bleibt bis nach `afterprint` bestehen.
+
 ## Regeln
 
 - **Rechte je Karte**, wie auf der Startseite. Ohne Recht fehlt die Karte, keine Nullen.
