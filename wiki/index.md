@@ -147,6 +147,7 @@ verlinkt, nie kopiert.
 | 2026-11-02 | [Absender-Freigabeliste und abgewiesene Mails](logs/2026-11-02-absender-freigabeliste.md)                      |
 | 2026-11-02 | [Mail-Anhänge „Zu prüfen“](logs/2026-11-02-zu-pruefen.md)                                                      |
 | 2026-11-02 | [Preisseite /preise](logs/2026-11-02-preisseite.md)                                                            |
+| 2026-11-05 | [Persönliche E-Mail bei der Registrierung](logs/2026-11-05-bestaetigungsmail-persoenliche-email.md)            |
 
 ## Die drei wichtigsten Sätze
 

@@ -92,13 +92,20 @@ Owner-Wunsch). Das Formular wird nicht vorab gesperrt; ist die Registrierung aus
 
 `signUp` in `AuthProvider` wird nur von `RegisterPage` benutzt. Die Seite fragt
 wie `sign-up.tsx` der App Vorname, Nachname, Geburtsdatum, E-Mail und Passwort ab
-(seit 30.10.2026). Name und Geburtsdatum gehen als `options.data` in die
-`user_metadata`: Mit E-Mail-Bestätigung gibt es nach `signUp` keine Sitzung, und
-`handle_new_user` legt `profiles` nur mit `NULL`-Namen an (gemessen am 30.10.2026
-am Trigger `on_auth_user_created`). `/betrieb-einrichten` schreibt die Werte nach
-der ersten Anmeldung nach `profiles`. Eine leere `identities`-Liste in der Antwort
+(seit 30.10.2026). Das E-Mail-Feld heißt seit 05.11.2026 nur hier
+„Persönliche E-Mail-Adresse“ (`auth:signUp.email`). Daneben steht das bestehende
+`HelpButton` („?“, `aria-label` „Hilfe zu …“): die Adresse soll die persönliche
+sein, nicht das Firmenpostfach, weil die Anmeldung später darüber läuft. Login
+und Passwort vergessen bleiben bei „E-Mail“ (`auth:field.email`). Name und
+Geburtsdatum gehen als `options.data` in die `user_metadata`: Mit
+E-Mail-Bestätigung gibt es nach `signUp` keine Sitzung, und `handle_new_user`
+legt `profiles` nur mit `NULL`-Namen an (gemessen am 30.10.2026 am Trigger
+`on_auth_user_created`). `/betrieb-einrichten` schreibt die Werte nach der
+ersten Anmeldung nach `profiles`. Eine leere `identities`-Liste in der Antwort
 heißt „Adresse schon registriert“ und wird als `errors:auth.userAlreadyExists`
-gemeldet — Supabase liefert dafür bei aktiver Bestätigung keinen Fehler.
+gemeldet. Supabase liefert dafür bei aktiver Bestätigung keinen Fehler.
+
+Die Bestätigungsmail kommt aus `bautakt-app`.
 
 Mitarbeiter-Einladungen erzeugen keinen Auth-Benutzer:
 `accept_employment_invitation(p_token)` verlangt `auth.uid()` und legt nur die
