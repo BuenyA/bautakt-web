@@ -32,6 +32,7 @@ import {
   vatRateText,
   wrapText,
 } from "./pdf.ts";
+import { drawQuoteBody, quoteMetaRows } from "./quotePdf.ts";
 import type { LetterheadLayout } from "./template.ts";
 import type { InvoiceData, RenderLine } from "./types.ts";
 
@@ -183,6 +184,7 @@ function drawMeta(ctx: Ctx, layout: LetterheadLayout, top: number): number {
   const rows: [string, string][] = [];
   if (data.serviceDate) rows.push(["Leistungsdatum", formatGermanDate(data.serviceDate)]);
   if (data.buyer.customerNumber) rows.push(["Kundennummer", data.buyer.customerNumber]);
+  if (data.quote) rows.push(...quoteMetaRows(data.quote));
   if (data.payment.dueDate) rows.push(["Fällig am", formatGermanDate(data.payment.dueDate)]);
   if (data.buyerReference) rows.push(["Ihr Zeichen / Leitweg-ID", data.buyerReference]);
   for (const [label, value] of rows) {
@@ -481,6 +483,20 @@ export function drawLetterheadDocument(
 
   if (data.introText) paragraph(ctx, data.introText, { gap: 4 });
   ctx.y -= 10;
+
+  // Angebot: eigenes Leistungsverzeichnis, keine Zahlungsbedingungen (bautakt-app#183).
+  if (data.quote) {
+    drawQuoteBody(ctx, {
+      left: L,
+      right: R,
+      size: SIZE,
+      sizeSmall: SIZE_SMALL,
+      boldNames: false,
+      rule: LIGHT_RULE,
+    });
+    drawClosing(ctx, layout);
+    return;
+  }
 
   drawLines(ctx);
   drawSums(ctx);

@@ -5,7 +5,11 @@ import { supabase } from '@/lib/supabase';
 
 import { type MailDeliveryRow, shouldPollDelivery, toDeliveryRows } from './mailDelivery';
 
-export type MailDeliveryTarget = { salesDocumentId: string } | { incomingInvoiceId: string };
+export type MailDeliveryTarget =
+  | { salesDocumentId: string }
+  | { incomingInvoiceId: string }
+  /** Angebote (bautakt-app#183): alle Versionen eines Vorgangs. */
+  | { quoteVersionIds: string[] };
 
 const POLL_INTERVAL_MS = 30_000;
 
@@ -43,9 +47,24 @@ export function useMailDeliveryStatus(target: MailDeliveryTarget) {
           'mail_id, sent_at, status, recipients_total, recipients_delivered, status_at, problem_recipient, problem_code, problem_message',
         )
         .eq('company_id', companyId!);
+      // Die Sicht kennt keinen Angebotsbezug, deshalb erst die Mails der Versionen.
+      let quoteMailIds: string[] = [];
+      if ('quoteVersionIds' in target) {
+        if (target.quoteVersionIds.length === 0) return { rows: [], recipients: {} };
+        const { data: quoteMails, error: quoteMailsError } = await supabase
+          .from('mail_messages')
+          .select('id')
+          .eq('company_id', companyId!)
+          .in('quote_version_id', target.quoteVersionIds);
+        if (quoteMailsError) throw quoteMailsError;
+        quoteMailIds = quoteMails.map((mail) => mail.id);
+        if (quoteMailIds.length === 0) return { rows: [], recipients: {} };
+      }
       const { data, error } = await ('salesDocumentId' in target
         ? base.eq('sales_document_id', target.salesDocumentId)
-        : base.eq('incoming_invoice_id', target.incomingInvoiceId));
+        : 'incomingInvoiceId' in target
+          ? base.eq('incoming_invoice_id', target.incomingInvoiceId)
+          : base.in('mail_id', quoteMailIds));
       if (error) throw error;
       const rows = toDeliveryRows(data);
       if (rows.length === 0) return { rows, recipients: {} };

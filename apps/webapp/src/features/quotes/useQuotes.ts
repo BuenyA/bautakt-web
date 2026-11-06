@@ -90,7 +90,7 @@ export function useQuoteDetail(quoteId: string | undefined) {
         supabase
           .from('quote_versions')
           .select(
-            'id, version_no, quote_date, valid_until, net_total, gross_total, currency, issued_at',
+            'id, version_no, quote_date, valid_until, net_total, gross_total, currency, issued_at, storage_path, buyer_email',
           )
           .eq('company_id', companyId!)
           .eq('quote_id', quoteId!)

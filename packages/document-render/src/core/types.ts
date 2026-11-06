@@ -94,6 +94,46 @@ export type RenderLine = {
   taxRatePercent: number;
   /** BT-151 */
   taxCategory: TaxCategoryCode;
+  /**
+   * Nur Angebote (bautakt-app#183): Ordnungszahl, Rolle in der Gliederung und
+   * ein Hinweis unter der Position. Fehlen bei Rechnungen, so bleiben deren
+   * Fingerabdruck und PDF unverändert.
+   */
+  oz?: string;
+  quoteRole?: QuoteLineRole;
+  note?: string;
+};
+
+/**
+ * Rolle einer Angebotszeile im PDF. `position` zählt zur Summe, `alternative`
+ * und `contingency` nicht, `unit_price_only` zeigt nur den Einheitspreis.
+ */
+export type QuoteLineRole =
+  | "title"
+  | "title_sum"
+  | "position"
+  | "alternative"
+  | "contingency"
+  | "unit_price_only";
+
+/** Angebotsangaben (bautakt-app#183). Fehlt bei Rechnungen. */
+export type QuoteInfo = {
+  versionNo: number;
+  validUntil: string | null;
+  execFrom: string | null;
+  execTo: string | null;
+  contractBasis: "bgb" | "vob_b";
+  /** Objektadresse in einer Zeile, leer wenn keine. */
+  siteLine: string;
+  /** Vorbemerkungen vor dem Leistungsverzeichnis. */
+  prelimText: string;
+  discountPercent: number;
+  /** Summe der zählenden Positionen vor dem Nachlass. */
+  positionsNetCents: number;
+  /** Nachlass in Cent (positiv), Summe über die Steuersatzgruppen. */
+  discountCents: number;
+  /** Lohnanteil nach Nachlass (§ 35a EStG), wie `labor_share_total`. */
+  laborShareCents: number;
 };
 
 /** BG-23 — USt-Aufschlüsselung je Kategorie/Satz. */
@@ -233,6 +273,8 @@ export type InvoiceData = {
    * Fehlt, wenn leer — so bleibt der Fingerabdruck alter Belege gleich.
    */
   subject?: string;
+  /** Angebot (bautakt-app#183). Fehlt bei allen anderen Belegarten. */
+  quote?: QuoteInfo;
   /**
    * Briefbogen aus der Rechnungsvorlage (`invoice_templates`, Layout
    * `letterhead`). Fehlt beim Standardlayout.

@@ -821,6 +821,8 @@
         "created": "Angebot angelegt",
         "version_created": "Neue Version angelegt",
         "issued": "Version festgeschrieben",
+        "sent": "Per E-Mail versendet",
+        "sentDryRun": "Probelauf: nicht wirklich versendet",
         "other": "Änderung"
       },
       "attachments": "Anhänge",
@@ -981,6 +983,13 @@
       "deleteDescription": "Das Angebot wurde nie festgeschrieben und verschwindet ganz.",
       "quoteDeleted": "Angebot gelöscht",
       "deleteError": "Das hat nicht geklappt."
+    },
+    "output": {
+      "pdf": "PDF",
+      "draftPreview": "Vorschau des Entwurfs",
+      "send": "Per E-Mail versenden",
+      "pdfError": "Das PDF konnte nicht erstellt werden. Bitte versuche es erneut.",
+      "originalPending": "Das PDF wird beim ersten Öffnen erstellt."
     }
   },
   "receivables": {

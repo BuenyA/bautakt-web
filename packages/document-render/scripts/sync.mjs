@@ -33,6 +33,8 @@ export const CORE_FILES = [
   'fingerprint.ts',
   'template.ts',
   'letterhead.ts',
+  'quote.ts',
+  'quotePdf.ts',
 ];
 
 const args = process.argv.slice(2);
@@ -40,6 +42,7 @@ const check = args.includes('--check');
 const app = resolve(args.find((arg) => !arg.startsWith('--')) ?? join(pkg, '../../../bautakt-app'));
 const renderer = join(app, 'supabase/functions/finance-document-render');
 const goldenSource = join(app, 'tools/einvoice-validation/golden/render-golden.json');
+const quoteGoldenSource = join(app, 'tools/einvoice-validation/golden/quote-golden.json');
 
 if (!existsSync(renderer) || !existsSync(goldenSource)) {
   console.error(`Kein bautakt-app unter ${app} (Renderer oder Golden-File fehlt).`);
@@ -50,6 +53,7 @@ const lf = (text) => text.replace(/\r\n/g, '\n');
 const pairs = [
   ...CORE_FILES.map((file) => [join(renderer, file), join(pkg, 'src/core', file)]),
   [goldenSource, join(pkg, 'golden/render-golden.json')],
+  [quoteGoldenSource, join(pkg, 'golden/quote-golden.json')],
 ];
 
 const drift = [];

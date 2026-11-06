@@ -35,7 +35,7 @@ import { attachmentFileName, parseRecipients } from './sendMail';
 import { mailDeliveryKey } from './useMailDeliveryStatus';
 import { chargeableMinorOf, type SalesDocumentDetail } from './useSalesDocument';
 
-type SendableDocument = Pick<
+export type SendableDocument = Pick<
   SalesDocumentDetail,
   | 'id'
   | 'type'
@@ -71,7 +71,7 @@ class SendError extends Error {
   }
 }
 
-type SendBody = { to: string[]; subject: string; text: string };
+export type SendBody = { to: string[]; subject: string; text: string };
 
 /** Antwort von `mail-send` auf `preview: true`, durchgereicht von `finance-document-send`. */
 type MailPreviewResult = {
@@ -85,9 +85,24 @@ type MailPreviewResult = {
 /** Antwort beim Versand; `bookkeeping`: Protokoll und Status danach. */
 type SendResult = { mailId: string; mode: string; bookkeeping?: 'done' | 'failed' };
 
-/** `finance-document-send` aufrufen; Fehler als `SendError` mit Code. */
-async function invokeSend<T>(body: Record<string, unknown>): Promise<T> {
-  const { data, error } = await supabase.functions.invoke('finance-document-send', { body });
+/**
+ * Weg zum Mail-Adapter. Standard ist `finance-document-send` für Belege;
+ * Angebote schicken direkt an `mail-send` (bautakt-app#183). Die Antworten
+ * haben dieselbe Form, Fehler kommen als `{ error: code }`.
+ */
+export type SendChannel = {
+  functionName: string;
+  /** Baut aus Empfänger, Betreff, Text (und Vorschau bzw. Key) den Aufruf. */
+  toBody: (
+    body: SendBody & { preview?: boolean; idempotencyKey?: string },
+  ) => Record<string, unknown>;
+  /** Abfragen, die nach dem Versand neu laden. */
+  invalidateKeys: readonly (readonly unknown[])[];
+};
+
+/** Function aufrufen; Fehler als `SendError` mit Code. */
+async function invokeFunction<T>(functionName: string, body: Record<string, unknown>): Promise<T> {
+  const { data, error } = await supabase.functions.invoke(functionName, { body });
   if (!error) return data as T;
   // FunctionsHttpError trägt die Antwort der Function in `context`.
   const response: unknown = (error as { context?: unknown }).context;
@@ -103,14 +118,29 @@ async function invokeSend<T>(body: Record<string, unknown>): Promise<T> {
  * würde, mit Absender, Reply-To, Fußzeile und fehlenden Pflichtangaben.
  * Nichts wird archiviert oder versendet.
  */
-function useMailPreview(documentId: string, body: SendBody, enabled: boolean) {
+function useMailPreview(
+  documentId: string,
+  body: SendBody,
+  enabled: boolean,
+  channel: SendChannel | undefined,
+) {
   return useQuery({
-    queryKey: ['mail-preview', documentId, body],
+    queryKey: ['mail-preview', channel?.functionName ?? 'finance-document-send', documentId, body],
     enabled,
     staleTime: 0,
     gcTime: 0,
     retry: false,
-    queryFn: () => invokeSend<MailPreviewResult>({ documentId, ...body, preview: true }),
+    queryFn: () =>
+      channel
+        ? invokeFunction<MailPreviewResult>(
+            channel.functionName,
+            channel.toBody({ ...body, preview: true }),
+          )
+        : invokeFunction<MailPreviewResult>('finance-document-send', {
+            documentId,
+            ...body,
+            preview: true,
+          }),
   });
 }
 
@@ -120,16 +150,26 @@ function useMailPreview(documentId: string, body: SendBody, enabled: boolean) {
  * (Archiv-Original) bestimmt der Server (Owner-Entscheidung 26.10.2026).
  * `idempotencyKey` je Bestätigung: Ein Retry versendet nicht doppelt.
  */
-function useSendDocument(documentId: string) {
+function useSendDocument(documentId: string, channel: SendChannel | undefined) {
   const queryClient = useQueryClient();
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
   return useMutation({
     mutationFn: (body: SendBody & { idempotencyKey: string }) =>
-      invokeSend<SendResult>({ documentId, ...body }),
+      channel
+        ? invokeFunction<SendResult>(channel.functionName, channel.toBody(body))
+        : invokeFunction<SendResult>('finance-document-send', { documentId, ...body }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['sales-document', companyId, documentId] });
-      await queryClient.invalidateQueries({ queryKey: ['sales-documents', companyId] });
+      if (channel) {
+        for (const queryKey of channel.invalidateKeys) {
+          await queryClient.invalidateQueries({ queryKey: [...queryKey] });
+        }
+      } else {
+        await queryClient.invalidateQueries({
+          queryKey: ['sales-document', companyId, documentId],
+        });
+        await queryClient.invalidateQueries({ queryKey: ['sales-documents', companyId] });
+      }
       await queryClient.invalidateQueries({ queryKey: mailDeliveryKey(companyId) });
     },
   });
@@ -151,10 +191,13 @@ export function SendDialog({
   open,
   document,
   onClose,
+  channel,
 }: {
   open: boolean;
   document: SendableDocument;
   onClose: () => void;
+  /** Ohne Angabe: Beleg über `finance-document-send`. */
+  channel?: SendChannel;
 }) {
   const { t } = useTranslation();
   const { data: membership } = useMembership();
@@ -162,7 +205,7 @@ export function SendDialog({
   const missing = useLegalFooterMissing();
   const mail = useMailSettings();
   const mailMode = mail.data?.mail_mode;
-  const send = useSendDocument(document.id);
+  const send = useSendDocument(document.id, channel);
 
   const initialDraft = (): Draft => {
     const values = {
@@ -203,7 +246,7 @@ export function SendDialog({
     subject: draft.subject.trim(),
     text: draft.text.trim(),
   };
-  const preview = useMailPreview(document.id, body, open && step === 'preview');
+  const preview = useMailPreview(document.id, body, open && step === 'preview', channel);
   // Verbindlich ist, was der Server meldet; bis dahin die Prüfung der Firmendaten.
   const missingFields = preview.data?.missingLegalFields ?? missing.data ?? [];
   const previewErrorCode = preview.error instanceof SendError ? preview.error.code : null;
