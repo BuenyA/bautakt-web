@@ -21,6 +21,7 @@
     "datev": "DATEV & Steuerberatung",
     "roles": "Rollen & Berechtigungen",
     "absences": "Urlaub & Abwesenheit",
+    "export": "Datenexport",
     "delete": "Unternehmen kündigen"
   },
   "setupStatus": {
@@ -401,5 +402,39 @@
     "direct": "Oder schreib uns an",
     "mailSubject": "Kündigung: {{name}}",
     "mailBody": "Hallo Bautakt-Team,\n\nich möchte den Vertrag für {{name}} (ID {{id}}) kündigen.\n\nViele Grüße"
+  },
+  "export": {
+    "title": "Datenexport",
+    "description": "Alle Daten und Dateien meines Betriebs als ZIP.",
+    "cardTitle": "Alles herunterladen",
+    "intro": "Der Export enthält alles, was dein Betrieb in Bautakt gespeichert hat. Er ist kostenlos und du kannst ihn jederzeit neu starten.",
+    "contents": {
+      "tables": "Alle Tabellen als CSV für Excel und als JSON, dazu ein Datenwörterbuch mit der Bedeutung jeder Spalte.",
+      "files": "Alle Fotos, Dokumente und Belege in ihrer Originalform, aufgeteilt auf ZIP-Dateien bis 40 MB.",
+      "datev": "Die DATEV-Buchungsstapel je Monat, wenn deine DATEV-Einstellungen vollständig sind.",
+      "manifest": "Eine Prüfliste (manifest.json) mit einer SHA-256-Prüfsumme für jede Datei."
+    },
+    "notIncluded": "Nicht enthalten sind Zugangsdaten, persönliche Notizen deiner Mitarbeiter und Gerätekennungen für Push-Nachrichten.",
+    "start": "Export starten",
+    "restart": "Neuen Export starten",
+    "running": "Der Export läuft. Du kannst die Seite verlassen, er läuft weiter.",
+    "preparing": "Daten werden zusammengestellt …",
+    "progress": "Teil {{done}} von {{total}} fertig",
+    "readyTitle": "Dein Export ist fertig.",
+    "ready": "Erstellt am {{date}} mit {{rows}} Datensätzen und {{files}} Dateien. Die Downloads stehen bis {{until}} bereit.",
+    "dataFile": "Daten (Tabellen, Datenwörterbuch, DATEV)",
+    "filesFile": "Dateien: {{file}}",
+    "manifestFile": "Prüfliste (manifest.json)",
+    "checksumHint": "Lade alle Teile herunter. Mit der Prüfliste kannst du kontrollieren, dass jede Datei vollständig und unverändert ist.",
+    "expired": "Der letzte Export vom {{date}} ist abgelaufen. Starte bei Bedarf einen neuen.",
+    "failedTitle": "Der Export hat nicht geklappt.",
+    "failed": "Der Export vom {{date}} ist fehlgeschlagen. Bitte starte ihn neu. Klappt es wieder nicht, schreib uns.",
+    "errors": {
+      "lifecycle": "Für deinen Betrieb ist kein Export mehr möglich, die Exportfrist ist vorbei.",
+      "running": "Es läuft schon ein Export.",
+      "owner": "Nur der Inhaber kann alle Daten exportieren.",
+      "unknown": "Der Export konnte nicht gestartet werden. Bitte versuche es erneut.",
+      "status": "Der Stand des Exports konnte nicht geladen werden. Bitte lade die Seite neu."
+    }
   }
 }
