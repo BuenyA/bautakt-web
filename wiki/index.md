@@ -30,7 +30,7 @@ verlinkt, nie kopiert.
 | [uebersicht.md](pages/uebersicht.md)                           | Startseite: Tagesplan, Zu erledigen, Jahresergebnis.                           |
 | [rechnungsbereich.md](pages/rechnungsbereich.md)               | Bereich „Rechnungen“: Reiter, Übersicht mit Ausgang, Eingang, Zahlen.          |
 | [rechnungsvorlagen.md](pages/rechnungsvorlagen.md)             | Vorlagenmodul für Ausgangsbelege, Briefbogen „Spahrbau“, Konzept und Ausbau.   |
-| [angebote.md](pages/angebote.md)                               | Angebotsbereich: Liste, Detail, Editor, PDF und Versand, 500 Positionen.       |
+| [angebote.md](pages/angebote.md)                               | Angebotsbereich: Liste, Detail, Editor, PDF, Versand, Entscheidung.            |
 | [kontakte.md](pages/kontakte.md)                               | Kontakte: ein Geschäftspartner mit Rollen, Auswahl in Belegen.                 |
 | [auftragsseite.md](pages/auftragsseite.md)                     | Auftrag: Übersicht, Reiter, Unterseiten, Finanzen und Dokumente.               |
 | [auftragsfotos.md](pages/auftragsfotos.md)                     | Fotos am Auftrag anzeigen, hochladen und löschen.                              |
