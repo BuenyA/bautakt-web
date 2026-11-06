@@ -18,7 +18,12 @@ export function toCompanyCountry(country: string | null | undefined): CompanyCou
   return 'DE';
 }
 
-/** Gewerke zur Auswahl; ein eigener Wert ab zwei Zeichen geht auch. */
+/**
+ * Gewerke zur Auswahl; ein eigener Wert ab zwei Zeichen geht auch.
+ * Dieselbe Liste wie `bautakt-app: app/lib/utils/validationUtils.ts`
+ * (`COMPANY_TYPES`). Der gespeicherte Wert ist der String selbst
+ * (`companies.type`), kein Schlüssel.
+ */
 export const COMPANY_TYPES = [
   'Dachdecker',
   'Elektriker',
@@ -31,6 +36,7 @@ export const COMPANY_TYPES = [
   'Maler und Lackierer',
   'Maurer',
   'Metallbau',
+  'Rohbau',
   'Sanitär, Heizung & Klima',
   'Stuckateur',
   'Tiefbau',

@@ -124,8 +124,9 @@ Die Seite ist ein Assistent nach dem Weg der App (`app/index.tsx`,
    dem 30.10.2026 oder aus der App). Regeln wie `validateBirthDate` der App.
 2. **Gründen oder beitreten** (`RoleChoice`). Die Wahl steuert nur den Weg; die
    Rolle entsteht über `employments`.
-3. **Chef:** Betriebsname (≥ 2 Zeichen), Gewerk (Liste oder eigener Text
-   ≥ 2 Zeichen), Teamgröße `solo` / `small` / `medium` / `large` — dann die
+3. **Chef:** Betriebsname (≥ 2 Zeichen), Gewerk (Liste `COMPANY_TYPES` oder
+   eigener Text ≥ 2 Zeichen; gespeichert wird der String, seit 2026-11-06
+   auch `Rohbau`), Teamgröße `solo` / `small` / `medium` / `large` — dann die
    **Anschrift** (Straße ≥ 5, PLZ 5 bzw. 4 Ziffern je Land, Ort ≥ 2, Land
    `DE`/`AT`/`CH`) mit denselben Regeln wie die Karte „Betrieb“ unter
    Einrichtung. Telefon und E-Mail liegen unter „Weitere Angaben (optional)“
