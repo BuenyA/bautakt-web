@@ -135,6 +135,11 @@
     "leave": "Verwerfen und verlassen"
   },
   "lifecycle": {
+    "terminating": {
+      "title": "Mein Betrieb ist gekündigt",
+      "body": "Der Vertrag endet am {{end}}. Bis zum {{until}} kannst du die Kündigung widerrufen, danach geht es mit dem Datenexport weiter.",
+      "link": "Kündigung ansehen"
+    },
     "readOnly": {
       "title": "Mein Betrieb ist gekündigt",
       "body": "Seit dem {{end}} kannst du nur noch lesen und deine Daten exportieren. Ab dem {{locked}} ist kein Login mehr möglich, danach werden alle Daten gelöscht.",

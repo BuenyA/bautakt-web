@@ -393,15 +393,39 @@
     "noticeTitle": "Ein Unternehmen wird nicht sofort gelöscht.",
     "notice": "Nach der Kündigung hast du Zeit, alle Daten kostenlos herunterzuladen. Erst danach löschen wir sie endgültig.",
     "steps": {
+      "grace": "Nach dem Antrag hast du 7 Tage Bedenkzeit. Bis dahin arbeitet ihr ganz normal weiter, und du kannst die Kündigung widerrufen.",
       "export": "Bis 30 Tage nach Vertragsende kannst du alle Daten exportieren, auch Belege, Fotos und den DATEV-Export.",
       "access": "Ab Vertragsende kommt nur noch der Inhaber rein und kann nur lesen und exportieren. Mitarbeiter und die App sind gesperrt.",
       "lock": "Ab dem 31. Tag nach Vertragsende ist keine Anmeldung mehr möglich.",
       "delete": "Am 60. Tag löschen wir alle Daten endgültig. Sicherungskopien laufen bis zum 67. Tag aus."
     },
+    "requestTitle": "Kündigung beantragen",
+    "exportTitle": "Sichere zuerst deine Daten",
+    "exportBody": "Der Vollexport ist kostenlos und enthält alle Daten, Belege, Fotos und den DATEV-Export.",
+    "exportLink": "Zum Datenexport",
+    "exportConfirm": "Ich habe den Hinweis zum Datenexport gelesen.",
+    "password": "Mein Passwort",
+    "passwordHint": "Zur Sicherheit bestätigst du die Kündigung mit deinem Passwort.",
     "request": "Kündigung beantragen",
-    "direct": "Oder schreib uns an",
-    "mailSubject": "Kündigung: {{name}}",
-    "mailBody": "Hallo Bautakt-Team,\n\nich möchte den Vertrag für {{name}} (ID {{id}}) kündigen.\n\nViele Grüße"
+    "requestHint": "Der Vertrag endet dann am {{end}}.",
+    "requested": "Die Kündigung ist beantragt. Du bekommst eine Bestätigung per Mail.",
+    "pendingTitle": "Kündigung beantragt",
+    "pendingBody": "Der Vertrag endet am {{end}}. Bis zum {{until}} kannst du die Kündigung widerrufen, dann läuft alles weiter wie bisher.",
+    "pendingLate": "Der Vertrag endet am {{end}}. Ein Widerruf ist nicht mehr möglich.",
+    "revoke": "Kündigung widerrufen",
+    "revoked": "Die Kündigung ist widerrufen. Dein Betrieb läuft weiter wie bisher.",
+    "endedTitle": "Der Vertrag ist beendet",
+    "endedBody": "Du kannst deine Daten bis zum Ende der Exportfrist herunterladen.",
+    "direct": "Fragen zur Kündigung? Schreib uns an",
+    "errors": {
+      "password": "Das Passwort stimmt nicht. Bitte versuche es erneut.",
+      "reauth": "Bitte gib dein Passwort erneut ein.",
+      "notOwner": "Nur der Inhaber kann den Betrieb kündigen.",
+      "exportNotice": "Bitte bestätige den Hinweis zum Datenexport.",
+      "notActive": "Für deinen Betrieb ist schon eine Kündigung beantragt.",
+      "notRevocable": "Die Kündigung lässt sich nicht mehr widerrufen.",
+      "unknown": "Das hat nicht geklappt. Bitte versuche es erneut."
+    }
   },
   "export": {
     "title": "Datenexport",

@@ -148,6 +148,7 @@ verlinkt, nie kopiert.
 | 2026-11-02 | [Mail-Anhänge „Zu prüfen“](logs/2026-11-02-zu-pruefen.md)                                                      |
 | 2026-11-02 | [Preisseite /preise](logs/2026-11-02-preisseite.md)                                                            |
 | 2026-11-06 | [Sperrseite und Lesehinweis nach Vertragsende](logs/2026-11-06-login-sperre.md)                                |
+| 2026-11-07 | [Kündigung mit 7 Tagen Bedenkzeit](logs/2026-11-07-kuendigung-bedenkzeit.md)                                   |
 | 2026-11-06 | [Gewerk „Rohbau“ in der Vorschlagsliste](logs/2026-11-06-gewerk-rohbau.md)                                     |
 | 2026-11-07 | [Angebote: PDF und Versand im Web](logs/2026-11-07-angebote-pdf-versand.md)                                    |
 | 2026-11-06 | [Angebote: Auftragssumme aus Angeboten](logs/2026-11-06-angebote-auftragssumme.md)                             |

@@ -28,5 +28,7 @@ export function useCompanyLifecycle() {
   return {
     isPending: query.isPending && query.fetchStatus !== 'idle',
     view: lifecycleView(query.data, membership?.companyId),
+    /** Zeile des aktiven Betriebs, für die Kündigungsseite (WP6). */
+    row: query.data?.find((r) => r.company_id === membership?.companyId),
   };
 }
