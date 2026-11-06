@@ -9,8 +9,10 @@
 
 export { type DraftInput, InvalidDraftError, parseDraftInput } from './core/draft.ts';
 export type { SalesDocRow, SalesLineRow } from './core/mapping.ts';
+export type { QuoteItemRow, QuoteRenderInput, QuoteRow, QuoteVersionRow } from './core/quote.ts';
 export {
   type PreparedRender,
+  prepareQuoteRender,
   prepareRender,
   type RenderBundle,
   type RenderedDocument,

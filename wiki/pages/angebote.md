@@ -7,6 +7,7 @@ Neuer Angebotsbereich, Umsetzungsplan in `bautakt-app` unter
 ## Stand
 
 - **1b Liste und Detailseite** (web#291).
+- **1d PDF und Versand** (bautakt-app#183), siehe unten.
 - **1c Editor und Umschalten** (web#292): Der Bereich steht in der Leiste vor „Aufträge“
   (`canViewQuotes`). Routen: `/angebote` Liste, `/angebote/neu` (`canCreateQuotes`),
   `/angebote/:id` Detail, `/angebote/:id/bearbeiten` (`canEditQuotes`). Der Reiter
@@ -83,6 +84,29 @@ Was das gekostet hat, damit es keiner zurückbaut:
   dem Cache zeigt.
 - **Kontakt-Löschprüfung zählt Angebote.** Sonst bietet die Kontaktseite „Löschen“ an,
   und erst der Fremdschlüssel lehnt ab.
+
+## PDF und Versand (1d)
+
+Stand 2026-11-07, bautakt-app#183, Server-Teil im Wiki der App.
+
+- **Original statt Kopie.** Eine festgeschriebene Version hat genau ein PDF unter
+  `finance-documents/{company}/sales/quotes/{quote}/{version}.pdf`. Der Knopf „PDF“
+  (`openQuotePdf` in `quoteOutput.ts`) lädt es; fehlt es noch, stößt er
+  `quote-document-render` mit `mode: 'archive'` an. Der Editor ruft das nach dem
+  Festschreiben schon einmal auf. Ein Entwurf bekommt nur eine Vorschau
+  (`mode: 'preview'`), die nirgends gespeichert wird.
+- **Der Tab öffnet sofort.** `window.open` muss im Klick passieren, sonst blockiert der
+  Browser das Popup nach dem Warten auf die Function. Die Datei kommt danach als
+  `blob:`-URL in den Tab.
+- **Versand über `mail-send` mit Zweck `quote`.** Der Versanddialog ist derselbe wie bei
+  Rechnungen, mit einem Kanal (`quoteMailChannel`) statt einer Kopie des Dialogs. Anhang
+  ist immer das Original, Absender und Modus bestimmt der Server. Verlauf und Zustellstatus
+  lesen `mail_messages.quote_version_id`.
+- **Render-Kern kommt per sync aus der App** (`packages/document-render/scripts/sync.mjs`),
+  mit eigenen Golden-Files für Angebote. Erst den App-PR mergen, dann den Web-PR, sonst
+  meldet `check:sync` Abweichungen.
+- Geprüft am 07.11.2026 auf Production im Testbetrieb (genau ein Original, Hash stimmt, eine
+  Zeile in `quote_outputs`, Verknüpfung am Auftrag) und lokal im Browser bis zum Probelauf.
 
 ## Fallstricke
 

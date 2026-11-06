@@ -30,7 +30,7 @@ verlinkt, nie kopiert.
 | [uebersicht.md](pages/uebersicht.md)                           | Startseite: Tagesplan, Zu erledigen, Jahresergebnis.                           |
 | [rechnungsbereich.md](pages/rechnungsbereich.md)               | Bereich „Rechnungen“: Reiter, Übersicht mit Ausgang, Eingang, Zahlen.          |
 | [rechnungsvorlagen.md](pages/rechnungsvorlagen.md)             | Vorlagenmodul für Ausgangsbelege, Briefbogen „Spahrbau“, Konzept und Ausbau.   |
-| [angebote.md](pages/angebote.md)                               | Angebotsbereich: Liste, Detail, Editor, 500-Positionen-Messung.                |
+| [angebote.md](pages/angebote.md)                               | Angebotsbereich: Liste, Detail, Editor, PDF und Versand, 500 Positionen.       |
 | [kontakte.md](pages/kontakte.md)                               | Kontakte: ein Geschäftspartner mit Rollen, Auswahl in Belegen.                 |
 | [auftragsseite.md](pages/auftragsseite.md)                     | Auftrag: Übersicht, Reiter, Unterseiten, Finanzen und Dokumente.               |
 | [auftragsfotos.md](pages/auftragsfotos.md)                     | Fotos am Auftrag anzeigen, hochladen und löschen.                              |
@@ -149,6 +149,7 @@ verlinkt, nie kopiert.
 | 2026-11-02 | [Preisseite /preise](logs/2026-11-02-preisseite.md)                                                            |
 | 2026-11-06 | [Sperrseite und Lesehinweis nach Vertragsende](logs/2026-11-06-login-sperre.md)                                |
 | 2026-11-06 | [Gewerk „Rohbau“ in der Vorschlagsliste](logs/2026-11-06-gewerk-rohbau.md)                                     |
+| 2026-11-07 | [Angebote: PDF und Versand im Web](logs/2026-11-07-angebote-pdf-versand.md)                                    |
 | 2026-11-06 | [Angebote: Auftragssumme aus Angeboten](logs/2026-11-06-angebote-auftragssumme.md)                             |
 
 ## Die drei wichtigsten Sätze

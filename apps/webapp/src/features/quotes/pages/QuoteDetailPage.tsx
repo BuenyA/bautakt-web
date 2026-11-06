@@ -1,7 +1,13 @@
 import { type CurrencyCode, eurosToMinor, formatMoney } from '@bautakt/finance';
 import { toast } from '@bautakt/ui';
 import { Button, Link as FluentLink } from '@fluentui/react-components';
-import { DeleteRegular, DocumentCopyRegular, EditRegular } from '@fluentui/react-icons';
+import {
+  DeleteRegular,
+  DocumentCopyRegular,
+  DocumentPdfRegular,
+  EditRegular,
+  MailRegular,
+} from '@fluentui/react-icons';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
@@ -13,17 +19,28 @@ import { LinkButton } from '@/components/common/LinkButton';
 import { PageHeader } from '@/components/common/PageHeader';
 import { PageSpinner } from '@/components/common/PageSpinner';
 import { RouterLink } from '@/components/common/RouterLink';
+import { useMembership } from '@/features/company/useMembership';
 import { usePermission } from '@/features/company/usePermission';
 import { SectionCard } from '@/features/contacts/SectionCard';
+import { documentFileBaseName } from '@/features/finance/archiveFiles';
+import { MailDeliveryStatus } from '@/features/finance/MailDeliveryStatus';
+import { type SendableDocument, SendDialog } from '@/features/finance/SendDialog';
 import { readableDbError } from '@/lib/dbErrors';
 import { formatDate } from '@/lib/format';
 import { routes } from '@/lib/routes';
 
+import { ensureQuoteOriginal, openQuotePdf, quoteMailChannel } from '../quoteOutput';
 import { QuoteStatusBadge } from '../QuoteStatusBadge';
 import { useCreateQuoteVersion, useDeleteQuoteDraft } from '../useQuoteEditor';
 import { quoteAttachmentUrl, useQuoteDetail } from '../useQuotes';
 
 const dateTime = new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium', timeStyle: 'short' });
+
+/** Versand im Probelauf heißt im Verlauf anders als echter Versand. */
+function eventKey(event: { event_type: string; payload: unknown }): string {
+  const mode = (event.payload as { mode?: unknown } | null)?.mode;
+  return event.event_type === 'sent' && mode === 'dry_run' ? 'sentDryRun' : event.event_type;
+}
 
 export function QuoteDetailPage() {
   const { t } = useTranslation();
@@ -67,6 +84,14 @@ export function QuoteDetailPage() {
     .filter(Boolean)
     .join(', ');
 
+  async function openPdf(version: (typeof versions)[number]) {
+    try {
+      await openQuotePdf(version);
+    } catch {
+      toast.error(t('domain:quotes.output.pdfError'));
+    }
+  }
+
   async function openAttachment(storagePath: string) {
     try {
       window.open(await quoteAttachmentUrl(storagePath), '_blank', 'noopener,noreferrer');
@@ -83,6 +108,13 @@ export function QuoteDetailPage() {
         actions={
           <div className="flex flex-wrap items-center justify-end gap-2">
             <LinkButton to={routes.quotes}>{t('domain:quotes.workspace.back')}</LinkButton>
+            <QuoteOutputActions
+              documentNumber={overview.document_number}
+              customerLabel={customerLabel}
+              latestIssued={versions.find((version) => version.issued_at) ?? null}
+              draft={versions.find((version) => !version.issued_at) ?? null}
+              decided={Boolean(overview.decision)}
+            />
             <QuoteActions
               quoteId={overview.id!}
               hasDraft={Boolean(overview.draft_version_id)}
@@ -91,6 +123,14 @@ export function QuoteDetailPage() {
             />
           </div>
         }
+      />
+
+      <MailDeliveryStatus
+        target={{
+          quoteVersionIds: versions
+            .filter((version) => version.issued_at)
+            .map((version) => version.id),
+        }}
       />
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -141,11 +181,16 @@ export function QuoteDetailPage() {
                     </span>
                   </span>
                   {version.issued_at ? (
-                    <span className="text-foreground font-medium tabular-nums">
-                      {formatMoney(
-                        eurosToMinor(version.net_total),
-                        version.currency as CurrencyCode,
-                      )}
+                    <span className="flex items-baseline gap-3">
+                      <span className="text-foreground font-medium tabular-nums">
+                        {formatMoney(
+                          eurosToMinor(version.net_total),
+                          version.currency as CurrencyCode,
+                        )}
+                      </span>
+                      <FluentLink as="button" onClick={() => void openPdf(version)}>
+                        {t('domain:quotes.output.pdf')}
+                      </FluentLink>
                     </span>
                   ) : (
                     <span className="text-muted-foreground text-sm">
@@ -168,7 +213,7 @@ export function QuoteDetailPage() {
               {events.map((event) => (
                 <li key={event.id} className="flex items-baseline justify-between gap-4">
                   <span className="text-foreground">
-                    {t(`domain:quotes.workspace.event.${event.event_type}`, {
+                    {t(`domain:quotes.workspace.event.${eventKey(event)}`, {
                       defaultValue: t('domain:quotes.workspace.event.other'),
                     })}
                   </span>
@@ -304,6 +349,126 @@ function QuoteActions({
         onKeep={() => setConfirmDelete(false)}
         onDiscard={onDelete}
       />
+    </>
+  );
+}
+
+type OutputVersion = {
+  id: string;
+  version_no: number;
+  issued_at: string | null;
+  storage_path: string | null;
+  buyer_email: string;
+  gross_total: number;
+};
+
+/**
+ * PDF und Versand (bautakt-app#183). Festgeschrieben: das Original öffnen und
+ * per E-Mail versenden. Mit offenem Entwurf zusätzlich dessen Vorschau. Fehlt
+ * das Original noch (Archiv nach dem Festschreiben gescheitert), entsteht es
+ * beim ersten Öffnen oder Versenden.
+ */
+function QuoteOutputActions({
+  documentNumber,
+  customerLabel,
+  latestIssued,
+  draft,
+  decided,
+}: {
+  documentNumber: string | null;
+  customerLabel: string;
+  latestIssued: OutputVersion | null;
+  draft: OutputVersion | null;
+  decided: boolean;
+}) {
+  const { t } = useTranslation();
+  const { data: membership } = useMembership();
+  const companyId = membership?.companyId;
+  const canIssue = usePermission('canIssueQuotes');
+  const [busy, setBusy] = useState<'pdf' | 'preview' | 'send' | null>(null);
+  const [sendPath, setSendPath] = useState<string | null>(null);
+
+  async function open(version: OutputVersion, kind: 'pdf' | 'preview') {
+    setBusy(kind);
+    try {
+      await openQuotePdf(version);
+    } catch {
+      toast.error(t('domain:quotes.output.pdfError'));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function startSend(version: OutputVersion) {
+    setBusy('send');
+    try {
+      setSendPath(version.storage_path ?? (await ensureQuoteOriginal(version.id)));
+    } catch {
+      toast.error(t('domain:quotes.output.pdfError'));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  const fileName = `${documentFileBaseName(documentNumber, customerLabel)}.pdf`;
+  const sendable: SendableDocument | null = latestIssued
+    ? {
+        id: latestIssued.id,
+        type: 'quote',
+        document_number: documentNumber,
+        customer_label: customerLabel,
+        buyer_email: latestIssued.buyer_email || null,
+        due_date: null,
+        gross_total: latestIssued.gross_total,
+        credited_total: 0,
+        e_invoice: false,
+        einvoice_format: 'zugferd',
+      }
+    : null;
+
+  return (
+    <>
+      {draft ? (
+        <Button
+          icon={<DocumentPdfRegular />}
+          disabled={busy !== null}
+          onClick={() => void open(draft, 'preview')}
+        >
+          {t('domain:quotes.output.draftPreview')}
+        </Button>
+      ) : null}
+      {latestIssued ? (
+        <Button
+          icon={<DocumentPdfRegular />}
+          disabled={busy !== null}
+          onClick={() => void open(latestIssued, 'pdf')}
+        >
+          {t('domain:quotes.output.pdf')}
+        </Button>
+      ) : null}
+      {latestIssued && canIssue && !decided ? (
+        <Button
+          icon={<MailRegular />}
+          disabled={busy !== null}
+          onClick={() => void startSend(latestIssued)}
+        >
+          {t('domain:quotes.output.send')}
+        </Button>
+      ) : null}
+      {sendable && sendPath && companyId ? (
+        <SendDialog
+          open
+          document={sendable}
+          onClose={() => setSendPath(null)}
+          channel={quoteMailChannel({
+            companyId,
+            versionId: sendable.id,
+            storagePath: sendPath,
+            fileName,
+            invalidateKeys: [[companyId, 'quotes']],
+          })}
+        />
+      ) : null}
     </>
   );
 }

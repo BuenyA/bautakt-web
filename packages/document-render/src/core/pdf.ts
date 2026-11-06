@@ -37,6 +37,7 @@ import {
   drawLetterheadDocument,
   LETTERHEAD_BODY_BOTTOM,
 } from "./letterhead.ts";
+import { drawQuoteBody, quoteMetaRows } from "./quotePdf.ts";
 
 // ---------------------------------------------------------------------------
 // Layout-Konstanten (A4)
@@ -561,6 +562,7 @@ function drawAddressAndMeta(ctx: Ctx, top: number): number {
     : undefined;
   if (original) metaRows.push(["Zu Rechnung", original.number]);
   if (buyer.customerNumber) metaRows.push(["Kundennummer", buyer.customerNumber]);
+  if (data.quote) metaRows.push(...quoteMetaRows(data.quote));
   if (data.payment.dueDate) metaRows.push(["Fällig am", formatGermanDate(data.payment.dueDate)]);
   if (seller.vatId) metaRows.push(["USt-IdNr.", seller.vatId]);
   else if (seller.taxNumber) metaRows.push(["Steuernummer", seller.taxNumber]);
@@ -910,6 +912,22 @@ function drawStandardDocument(ctx: Ctx, logo: PDFImage | null): void {
       ctx.y -= 11;
     }
     ctx.y -= 6;
+  }
+
+  // Angebot: Leistungsverzeichnis, Summen und Angebotstexte statt Tabelle und
+  // Zahlungsbedingungen (bautakt-app#183).
+  if (data.quote) {
+    drawQuoteBody(ctx, {
+      left: CONTENT_L,
+      right: CONTENT_R,
+      size: SIZE_BASE,
+      sizeSmall: SIZE_SMALL,
+      boldNames: true,
+      band: { color: ctx.accent.band, onColor: ctx.accent.onBand },
+      rule: ctx.accent.rule,
+    });
+    drawFooters(ctx);
+    return;
   }
 
   // Positionstabelle

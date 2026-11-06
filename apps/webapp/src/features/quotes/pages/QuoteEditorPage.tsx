@@ -52,6 +52,7 @@ import { readableDbError } from '@/lib/dbErrors';
 import { routes } from '@/lib/routes';
 
 import { addDaysIso, berlinToday } from '../quoteList';
+import { ensureQuoteOriginal } from '../quoteOutput';
 import { nodesFromRows, parseDecimal, quoteTotals, suggestBillingMode } from '../quoteTree';
 import { QuoteTreeEditor } from '../QuoteTreeEditor';
 import {
@@ -397,6 +398,11 @@ export function QuoteEditorPage() {
         grossMinor: totals!.grossMinor,
       });
       toast.success(t('domain:quotes.editor.issued'));
+      // Das Original entsteht gleich nach dem Festschreiben. Scheitert das, holt
+      // die Detailseite es beim ersten Öffnen oder Versenden nach.
+      void ensureQuoteOriginal(saved.versionId).catch(() =>
+        toast.warning(t('domain:quotes.output.originalPending')),
+      );
       leaveTo(routes.quote(saved.quoteId));
     } catch (cause) {
       setConfirmIssue(false);

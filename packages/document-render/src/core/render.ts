@@ -25,6 +25,7 @@ import {
   type SalesLineRow,
 } from "./mapping.ts";
 import { buildInvoicePdf } from "./pdf.ts";
+import { buildQuoteData, type QuoteRenderInput } from "./quote.ts";
 import type { InvoiceTemplateRow } from "./template.ts";
 import type { InvoiceData } from "./types.ts";
 
@@ -103,12 +104,23 @@ export async function prepareRender(input: {
   // Nur rechnungsartige Belege tragen ein Factur-X-XML, und nur, wenn der
   // Beleg nicht ausdruecklich als Rechnung ohne E-Rechnung angelegt ist.
   const xml = data.isInvoiceLike && doc.e_invoice !== false ? buildCiiXml(data) : null;
-  if (!data.isInvoiceLike) {
+  if (!data.isInvoiceLike && !data.quote) {
     warnings.push(
       `Belegart "${data.documentType}" ist keine E-Rechnung — PDF/A-3b wurde ohne eingebettetes factur-x.xml erzeugt.`,
     );
   }
   return { data, fingerprint, xml, warnings };
+}
+
+/**
+ * Angebot (bautakt-app#183): dieselben Schritte ohne XML. Ein Angebot ist keine
+ * E-Rechnung, der Fingerabdruck verbindet Vorschau und Original wie bei
+ * Rechnungen (Nummer und Entwurfsstand zählen nicht mit).
+ */
+export async function prepareQuoteRender(input: QuoteRenderInput): Promise<PreparedRender> {
+  const data = buildQuoteData(input);
+  const fingerprint = await invoiceFingerprint(data, input.company?.logo_image_url ?? null);
+  return { data, fingerprint, xml: null, warnings: [...data.warnings] };
 }
 
 export type RenderedDocument = PreparedRender & {
