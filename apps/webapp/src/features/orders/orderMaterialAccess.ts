@@ -22,7 +22,8 @@ export function canCreateOrderMaterial(
 export function canEditOrderMaterial(
   permissions: Partial<EmployeePermissions> | null | undefined,
   userId: string | null | undefined,
-  row: { user_id: string },
+  // NULL seit Löschkonzept WP1: Das Konto wurde gelöscht, die Zeile gehört niemandem mehr.
+  row: { user_id: string | null },
 ): boolean {
   if (hasPermission(permissions, 'canManageOrders')) return true;
   return (

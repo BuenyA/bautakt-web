@@ -26,3 +26,14 @@ describe('readableDbError – GoBD-Sperren', () => {
     assert.ok(text?.includes('Freigeben'));
   });
 });
+
+describe('readableDbError – Löschkonzept WP3', () => {
+  it('erkennt die Schreibsperre trotz 42501 und nennt nicht „fehlende Berechtigung“', () => {
+    const text = readableDbError({
+      code: '42501',
+      message:
+        'COMPANY_READ_ONLY: Betrieb 7f45e1b9-1785-4948-8b7b-c822efcd7584 ist gekündigt, Änderungen sind gesperrt',
+    });
+    assert.ok(text?.startsWith('Dein Betrieb ist gekündigt'), String(text));
+  });
+});

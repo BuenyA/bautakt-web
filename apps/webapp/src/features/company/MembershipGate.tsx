@@ -6,6 +6,8 @@ import { FullPageSpinner } from '@/components/common/FullPageSpinner';
 import { useAuth } from '@/features/auth/useAuth';
 import { additionalCompanyParam, HOME_ROUTE, routes } from '@/lib/routes';
 
+import { CompanyLockedPage } from './CompanyLockedPage';
+import { useCompanyLifecycle } from './useCompanyLifecycle';
 import { useMembership } from './useMembership';
 
 /**
@@ -22,6 +24,7 @@ export function MembershipGate() {
   const { signOut } = useAuth();
   const location = useLocation();
   const membership = useMembership();
+  const lifecycle = useCompanyLifecycle();
   const onSetup = location.pathname === routes.companySetup;
 
   if (membership.isPending) return <FullPageSpinner />;
@@ -56,6 +59,13 @@ export function MembershipGate() {
 
   // `?weiteres=1` aus dem Profilmenü: ein zusätzlicher Betrieb ist erlaubt.
   const additional = new URLSearchParams(location.search).get(additionalCompanyParam) === '1';
+
+  // Löschkonzept WP3: Nach Vertragsende kein Weg mehr in den Betrieb. Einen neuen anlegen
+  // bleibt möglich, deshalb nicht auf der Einrichtungsseite.
+  if (hasCompany && !onSetup) {
+    if (lifecycle.isPending) return <FullPageSpinner />;
+    if (lifecycle.view.kind === 'locked') return <CompanyLockedPage view={lifecycle.view} />;
+  }
   if (hasCompany && onSetup && !additional) {
     return <Navigate to={HOME_ROUTE} replace />;
   }

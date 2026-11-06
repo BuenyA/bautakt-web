@@ -148,6 +148,8 @@ const MESSAGES: Record<string, string> = {
   QUOTE_IMMUTABLE: 'Diese Version ist festgeschrieben. Ändern geht nur über eine neue Version.',
   QUOTE_NOT_FOUND: 'Dieses Angebot gibt es nicht mehr. Bitte lade die Seite neu.',
   'permission denied: can': 'Dafür fehlt dir die Berechtigung.',
+  COMPANY_READ_ONLY:
+    'Dein Betrieb ist gekündigt. Du kannst nur noch lesen und deine Daten exportieren, Änderungen sind nicht mehr möglich.',
   APPEND_ONLY: 'Dieser Eintrag ist Teil des Protokolls und wird nie geändert oder gelöscht.',
   CONTACT_IN_USE:
     'Der Kontakt hängt noch an Aufträgen oder Belegen. Archiviere ihn stattdessen, dann verschwindet er aus Listen und Auswahlfeldern.',
@@ -181,6 +183,9 @@ function codeOf(error: unknown): string {
 export function readableDbError(error: unknown): string | null {
   const raw = messageOf(error);
   if (!raw && !codeOf(error)) return null;
+
+  // Löschkonzept WP3: Der Schreib-Trigger meldet ebenfalls 42501, aber mit eigenem Code.
+  if (raw.includes('COMPANY_READ_ONLY')) return MESSAGES.COMPANY_READ_ONLY;
 
   // PostgREST meldet eine abgelehnte RLS-Policy als 42501, ohne den
   // maschinenlesbaren Code `FORBIDDEN`, den die Trigger werfen.

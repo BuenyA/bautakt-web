@@ -12,7 +12,8 @@
 export type OrderChecklistParent = {
   id: string;
   title: string;
-  userId: string;
+  /** NULL, wenn das Konto gelöscht wurde (Löschkonzept WP1). */
+  userId: string | null;
   createdAt: string;
   modifiedAt: string | null;
 };

@@ -2,7 +2,7 @@
  * GENERIERT — nicht von Hand bearbeiten.
  *
  * Quelle:  Supabase-Projekt "Bautakt" (bxivzvmlcnaxqlytumvz, eu-central-1)
- * Stand:   2026-11-05
+ * Stand:   2026-11-06
  *
  * Neu erzeugen:
  *   npx supabase gen types typescript --project-id bxivzvmlcnaxqlytumvz \
@@ -42,7 +42,7 @@ export type Database = {
           id: string
           modified_at: string | null
           note: string
-          requested_by_user_id: string
+          requested_by_user_id: string | null
           start_date: string
           status: string
           type: string
@@ -58,7 +58,7 @@ export type Database = {
           id: string
           modified_at?: string | null
           note?: string
-          requested_by_user_id: string
+          requested_by_user_id?: string | null
           start_date: string
           status?: string
           type: string
@@ -74,7 +74,7 @@ export type Database = {
           id?: string
           modified_at?: string | null
           note?: string
-          requested_by_user_id?: string
+          requested_by_user_id?: string | null
           start_date?: string
           status?: string
           type?: string
@@ -208,7 +208,7 @@ export type Database = {
           reminder_minutes: number | null
           starts_at: string
           title: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           all_day?: boolean
@@ -226,7 +226,7 @@ export type Database = {
           reminder_minutes?: number | null
           starts_at: string
           title?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           all_day?: boolean
@@ -244,7 +244,7 @@ export type Database = {
           reminder_minutes?: number | null
           starts_at?: string
           title?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -342,7 +342,7 @@ export type Database = {
           modified_at: string | null
           order_id: string | null
           title: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           company_id: string
@@ -351,7 +351,7 @@ export type Database = {
           modified_at?: string | null
           order_id?: string | null
           title?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           company_id?: string
@@ -360,7 +360,7 @@ export type Database = {
           modified_at?: string | null
           order_id?: string | null
           title?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -397,11 +397,14 @@ export type Database = {
           bic: string | null
           city: string | null
           collection_days_after_due: number | null
+          contract_end_date: string | null
           country: string | null
           created_at: string
-          creator_id: string
+          creator_id: string | null
           currency: string
+          delete_after: string | null
           email: string | null
+          export_deadline: string | null
           first_dunning_days_after_due: number | null
           iban: string | null
           id: string
@@ -410,7 +413,10 @@ export type Database = {
           invoice_intro_text: string
           invoice_prefix: string | null
           is_small_business: boolean | null
+          last_full_export_at: string | null
+          last_full_export_hash: string | null
           legal_form: string | null
+          lifecycle_status: string
           logo_image_url: string | null
           logo_url: string | null
           managing_directors: string[]
@@ -441,11 +447,14 @@ export type Database = {
           bic?: string | null
           city?: string | null
           collection_days_after_due?: number | null
+          contract_end_date?: string | null
           country?: string | null
           created_at?: string
-          creator_id: string
+          creator_id?: string | null
           currency?: string
+          delete_after?: string | null
           email?: string | null
+          export_deadline?: string | null
           first_dunning_days_after_due?: number | null
           iban?: string | null
           id?: string
@@ -454,7 +463,10 @@ export type Database = {
           invoice_intro_text?: string
           invoice_prefix?: string | null
           is_small_business?: boolean | null
+          last_full_export_at?: string | null
+          last_full_export_hash?: string | null
           legal_form?: string | null
+          lifecycle_status?: string
           logo_image_url?: string | null
           logo_url?: string | null
           managing_directors?: string[]
@@ -485,11 +497,14 @@ export type Database = {
           bic?: string | null
           city?: string | null
           collection_days_after_due?: number | null
+          contract_end_date?: string | null
           country?: string | null
           created_at?: string
-          creator_id?: string
+          creator_id?: string | null
           currency?: string
+          delete_after?: string | null
           email?: string | null
+          export_deadline?: string | null
           first_dunning_days_after_due?: number | null
           iban?: string | null
           id?: string
@@ -498,7 +513,10 @@ export type Database = {
           invoice_intro_text?: string
           invoice_prefix?: string | null
           is_small_business?: boolean | null
+          last_full_export_at?: string | null
+          last_full_export_hash?: string | null
           legal_form?: string | null
+          lifecycle_status?: string
           logo_image_url?: string | null
           logo_url?: string | null
           managing_directors?: string[]
@@ -611,6 +629,174 @@ export type Database = {
             columns: ["modified_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_deletion_log: {
+        Row: {
+          actor_user_id: string | null
+          company_id: string
+          details: Json
+          event: string
+          from_status: string | null
+          id: number
+          occurred_at: string
+          to_status: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          company_id: string
+          details?: Json
+          event: string
+          from_status?: string | null
+          id?: never
+          occurred_at?: string
+          to_status?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          company_id?: string
+          details?: Json
+          event?: string
+          from_status?: string | null
+          id?: never
+          occurred_at?: string
+          to_status?: string | null
+        }
+        Relationships: []
+      }
+      company_export_log: {
+        Row: {
+          attempts: number
+          company_id: string
+          completed_at: string | null
+          error: string | null
+          failures: number
+          file_count: number | null
+          files_deleted_at: string | null
+          files_valid_until: string | null
+          id: string
+          locked_until: string | null
+          manifest_path: string | null
+          manifest_sha256: string | null
+          requested_at: string
+          requested_by: string | null
+          row_count: number | null
+          scope: string
+          status: string
+          total_bytes: number | null
+        }
+        Insert: {
+          attempts?: number
+          company_id: string
+          completed_at?: string | null
+          error?: string | null
+          failures?: number
+          file_count?: number | null
+          files_deleted_at?: string | null
+          files_valid_until?: string | null
+          id?: string
+          locked_until?: string | null
+          manifest_path?: string | null
+          manifest_sha256?: string | null
+          requested_at?: string
+          requested_by?: string | null
+          row_count?: number | null
+          scope?: string
+          status?: string
+          total_bytes?: number | null
+        }
+        Update: {
+          attempts?: number
+          company_id?: string
+          completed_at?: string | null
+          error?: string | null
+          failures?: number
+          file_count?: number | null
+          files_deleted_at?: string | null
+          files_valid_until?: string | null
+          id?: string
+          locked_until?: string | null
+          manifest_path?: string | null
+          manifest_sha256?: string | null
+          requested_at?: string
+          requested_by?: string | null
+          row_count?: number | null
+          scope?: string
+          status?: string
+          total_bytes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_export_log_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_export_log_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_export_parts: {
+        Row: {
+          bytes: number | null
+          company_id: string
+          done_at: string | null
+          export_id: string
+          id: string
+          items: Json
+          kind: string
+          part_no: number
+          sha256: string | null
+          status: string
+          storage_path: string | null
+        }
+        Insert: {
+          bytes?: number | null
+          company_id: string
+          done_at?: string | null
+          export_id: string
+          id?: string
+          items?: Json
+          kind: string
+          part_no: number
+          sha256?: string | null
+          status?: string
+          storage_path?: string | null
+        }
+        Update: {
+          bytes?: number | null
+          company_id?: string
+          done_at?: string | null
+          export_id?: string
+          id?: string
+          items?: Json
+          kind?: string
+          part_no?: number
+          sha256?: string | null
+          status?: string
+          storage_path?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_export_parts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_export_parts_export_id_fkey"
+            columns: ["export_id"]
+            isOneToOne: false
+            referencedRelation: "company_export_log"
             referencedColumns: ["id"]
           },
         ]
@@ -1315,7 +1501,7 @@ export type Database = {
           special_occurrences: string
           temperature_afternoon: number | null
           temperature_morning: number | null
-          user_id: string
+          user_id: string | null
           weather_afternoon: string
           weather_morning: string
           work_done: string
@@ -1332,7 +1518,7 @@ export type Database = {
           special_occurrences?: string
           temperature_afternoon?: number | null
           temperature_morning?: number | null
-          user_id: string
+          user_id?: string | null
           weather_afternoon?: string
           weather_morning?: string
           work_done?: string
@@ -1349,7 +1535,7 @@ export type Database = {
           special_occurrences?: string
           temperature_afternoon?: number | null
           temperature_morning?: number | null
-          user_id?: string
+          user_id?: string | null
           weather_afternoon?: string
           weather_morning?: string
           work_done?: string
@@ -1617,7 +1803,7 @@ export type Database = {
         Row: {
           company_id: string
           created_at: string
-          created_by: string
+          created_by: string | null
           delivery_method: string
           expires_at: string
           id: string
@@ -1632,7 +1818,7 @@ export type Database = {
         Insert: {
           company_id: string
           created_at?: string
-          created_by: string
+          created_by?: string | null
           delivery_method: string
           expires_at: string
           id?: string
@@ -1647,7 +1833,7 @@ export type Database = {
         Update: {
           company_id?: string
           created_at?: string
-          created_by?: string
+          created_by?: string | null
           delivery_method?: string
           expires_at?: string
           id?: string
@@ -3001,6 +3187,7 @@ export type Database = {
           mode: string
           provider_project_id: string | null
           purpose: string
+          quote_version_id: string | null
           reply_to: string | null
           request_sha256: string
           sales_document_id: string | null
@@ -3022,6 +3209,7 @@ export type Database = {
           mode: string
           provider_project_id?: string | null
           purpose: string
+          quote_version_id?: string | null
           reply_to?: string | null
           request_sha256: string
           sales_document_id?: string | null
@@ -3043,6 +3231,7 @@ export type Database = {
           mode?: string
           provider_project_id?: string | null
           purpose?: string
+          quote_version_id?: string | null
           reply_to?: string | null
           request_sha256?: string
           sales_document_id?: string | null
@@ -3076,6 +3265,20 @@ export type Database = {
             columns: ["incoming_invoice_id"]
             isOneToOne: false
             referencedRelation: "incoming_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mail_messages_quote_version_id_fkey"
+            columns: ["quote_version_id"]
+            isOneToOne: false
+            referencedRelation: "quote_overview"
+            referencedColumns: ["draft_version_id"]
+          },
+          {
+            foreignKeyName: "mail_messages_quote_version_id_fkey"
+            columns: ["quote_version_id"]
+            isOneToOne: false
+            referencedRelation: "quote_versions"
             referencedColumns: ["id"]
           },
           {
@@ -3114,7 +3317,7 @@ export type Database = {
           modified_at: string | null
           order_id: string | null
           title: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           body?: string
@@ -3124,7 +3327,7 @@ export type Database = {
           modified_at?: string | null
           order_id?: string | null
           title?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           body?: string
@@ -3134,7 +3337,7 @@ export type Database = {
           modified_at?: string | null
           order_id?: string | null
           title?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -3391,7 +3594,7 @@ export type Database = {
           source: string
           source_ref_id: string | null
           storage_path: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           category_id: string
@@ -3407,7 +3610,7 @@ export type Database = {
           source?: string
           source_ref_id?: string | null
           storage_path: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           category_id?: string
@@ -3423,7 +3626,7 @@ export type Database = {
           source?: string
           source_ref_id?: string | null
           storage_path?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -3467,7 +3670,7 @@ export type Database = {
           order_id: string
           storage_path: string
           taken_at: string
-          user_id: string
+          user_id: string | null
           width: number
         }
         Insert: {
@@ -3480,7 +3683,7 @@ export type Database = {
           order_id: string
           storage_path: string
           taken_at: string
-          user_id: string
+          user_id?: string | null
           width: number
         }
         Update: {
@@ -3493,7 +3696,7 @@ export type Database = {
           order_id?: string
           storage_path?: string
           taken_at?: string
-          user_id?: string
+          user_id?: string | null
           width?: number
         }
         Relationships: [
@@ -3587,7 +3790,7 @@ export type Database = {
           severity: string
           status: string
           title: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           company_id: string
@@ -3600,7 +3803,7 @@ export type Database = {
           severity?: string
           status?: string
           title: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           company_id?: string
@@ -3613,7 +3816,7 @@ export type Database = {
           severity?: string
           status?: string
           title?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -3665,7 +3868,7 @@ export type Database = {
           unit_cost: number | null
           unit_price: number | null
           used_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           article_id?: string | null
@@ -3685,7 +3888,7 @@ export type Database = {
           unit_cost?: number | null
           unit_price?: number | null
           used_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           article_id?: string | null
@@ -3705,7 +3908,7 @@ export type Database = {
           unit_cost?: number | null
           unit_price?: number | null
           used_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -3761,7 +3964,7 @@ export type Database = {
           modified_at: string | null
           order_id: string
           title: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           body?: string
@@ -3771,7 +3974,7 @@ export type Database = {
           modified_at?: string | null
           order_id: string
           title?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           body?: string
@@ -3781,7 +3984,7 @@ export type Database = {
           modified_at?: string | null
           order_id?: string
           title?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -4099,6 +4302,59 @@ export type Database = {
           },
         ]
       }
+      quote_acceptance_items: {
+        Row: {
+          company_id: string
+          created_at: string
+          item_id: string
+          quote_id: string
+          version_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          item_id: string
+          quote_id: string
+          version_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          item_id?: string
+          quote_id?: string
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_acceptance_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "quote_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_acceptance_items_quote_fkey"
+            columns: ["quote_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "quote_overview"
+            referencedColumns: ["id", "company_id"]
+          },
+          {
+            foreignKeyName: "quote_acceptance_items_quote_fkey"
+            columns: ["quote_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id", "company_id"]
+          },
+          {
+            foreignKeyName: "quote_acceptance_items_version_fkey"
+            columns: ["version_id", "quote_id"]
+            isOneToOne: false
+            referencedRelation: "quote_versions"
+            referencedColumns: ["id", "quote_id"]
+          },
+        ]
+      }
       quote_attachments: {
         Row: {
           company_id: string
@@ -4358,6 +4614,24 @@ export type Database = {
             referencedColumns: ["id", "quote_id"]
           },
         ]
+      }
+      quote_platform_settings: {
+        Row: {
+          consumer_acceptance_enabled: boolean
+          id: boolean
+          modified_at: string
+        }
+        Insert: {
+          consumer_acceptance_enabled?: boolean
+          id?: boolean
+          modified_at?: string
+        }
+        Update: {
+          consumer_acceptance_enabled?: boolean
+          id?: boolean
+          modified_at?: string
+        }
+        Relationships: []
       }
       quote_versions: {
         Row: {
@@ -5427,7 +5701,7 @@ export type Database = {
         Row: {
           company_id: string
           created_at: string
-          created_by_user_id: string
+          created_by_user_id: string | null
           ends_at: string
           id: string
           modified_at: string | null
@@ -5438,7 +5712,7 @@ export type Database = {
         Insert: {
           company_id: string
           created_at?: string
-          created_by_user_id: string
+          created_by_user_id?: string | null
           ends_at: string
           id: string
           modified_at?: string | null
@@ -5449,7 +5723,7 @@ export type Database = {
         Update: {
           company_id?: string
           created_at?: string
-          created_by_user_id?: string
+          created_by_user_id?: string | null
           ends_at?: string
           id?: string
           modified_at?: string | null
@@ -5653,6 +5927,51 @@ export type Database = {
           role: string
         }[]
       }
+      accept_quote: {
+        Args: {
+          p_decided_at: string
+          p_evidence_hash?: string
+          p_evidence_path?: string
+          p_kind: string
+          p_note?: string
+          p_selected_item_ids?: string[]
+          p_version_id: string
+        }
+        Returns: {
+          accepted_version_id: string | null
+          company_id: string
+          contact_person_id: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          decided_at: string | null
+          decided_by: string | null
+          decision: string | null
+          decision_kind: string | null
+          decision_note: string
+          decision_recorded_at: string | null
+          decline_reason: string
+          document_number: string | null
+          follow_up_on: string | null
+          id: string
+          kind: string
+          modified_at: string
+          order_id: string | null
+          origin: string
+          responsible_user_id: string | null
+          site_city: string
+          site_country: string
+          site_postal_code: string
+          site_street: string
+          subject: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "quotes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       actor_employment_rank: { Args: { p_company_id: string }; Returns: number }
       actor_employment_role: { Args: { p_company_id: string }; Returns: string }
       actor_is_company_chef: {
@@ -5790,6 +6109,35 @@ export type Database = {
         }
       }
       checklist_user_id: { Args: { p_checklist_id: string }; Returns: string }
+      company_export_claim: {
+        Args: { p_export_id: string; p_seconds?: number }
+        Returns: {
+          attempts: number
+          company_id: string
+          completed_at: string | null
+          error: string | null
+          failures: number
+          file_count: number | null
+          files_deleted_at: string | null
+          files_valid_until: string | null
+          id: string
+          locked_until: string | null
+          manifest_path: string | null
+          manifest_sha256: string | null
+          requested_at: string
+          requested_by: string | null
+          row_count: number | null
+          scope: string
+          status: string
+          total_bytes: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "company_export_log"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       company_legal_footer_missing: {
         Args: { p_company_id: string }
         Returns: string[]
@@ -5918,6 +6266,49 @@ export type Database = {
       datev_sales_export: {
         Args: { p_company_id: string; p_from: string; p_to: string }
         Returns: Json
+      }
+      decline_quote: {
+        Args: {
+          p_decided_at: string
+          p_kind: string
+          p_note?: string
+          p_quote_id: string
+          p_reason?: string
+        }
+        Returns: {
+          accepted_version_id: string | null
+          company_id: string
+          contact_person_id: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          decided_at: string | null
+          decided_by: string | null
+          decision: string | null
+          decision_kind: string | null
+          decision_note: string
+          decision_recorded_at: string | null
+          decline_reason: string
+          document_number: string | null
+          follow_up_on: string | null
+          id: string
+          kind: string
+          modified_at: string
+          order_id: string | null
+          origin: string
+          responsible_user_id: string | null
+          site_city: string
+          site_country: string
+          site_postal_code: string
+          site_street: string
+          subject: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "quotes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       delete_company_as_chef: {
         Args: { p_company_id: string }
@@ -6173,6 +6564,7 @@ export type Database = {
           p_incoming_invoice_id: string
           p_mode: string
           p_purpose: string
+          p_quote_version_id?: string
           p_reply_to: string
           p_request_sha256: string
           p_sales_document_id: string
@@ -6229,6 +6621,19 @@ export type Database = {
         Args: { p_drop: string; p_keep: string }
         Returns: undefined
       }
+      my_company_lifecycle: {
+        Args: never
+        Returns: {
+          access: string
+          company_id: string
+          company_name: string
+          contract_end_date: string
+          delete_after: string
+          export_deadline: string
+          is_owner: boolean
+          lifecycle_status: string
+        }[]
+      }
       my_morning_briefing: {
         Args: { p_company_id: string; p_date?: string }
         Returns: Json
@@ -6280,6 +6685,47 @@ export type Database = {
       notification_user_has_permission: {
         Args: { p_company_id: string; p_permission: string; p_user_id: string }
         Returns: boolean
+      }
+      quote_decision_check_time: {
+        Args: { p_decided_at: string; p_quote_id: string }
+        Returns: undefined
+      }
+      quote_decision_lock: {
+        Args: { p_quote_id: string }
+        Returns: {
+          accepted_version_id: string | null
+          company_id: string
+          contact_person_id: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          decided_at: string | null
+          decided_by: string | null
+          decision: string | null
+          decision_kind: string | null
+          decision_note: string
+          decision_recorded_at: string | null
+          decline_reason: string
+          document_number: string | null
+          follow_up_on: string | null
+          id: string
+          kind: string
+          modified_at: string
+          order_id: string | null
+          origin: string
+          responsible_user_id: string | null
+          site_city: string
+          site_country: string
+          site_postal_code: string
+          site_street: string
+          subject: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "quotes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       record_incoming_invoice_payment: {
         Args: {
@@ -6403,6 +6849,43 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      revert_quote_decision: {
+        Args: { p_quote_id: string; p_reason: string }
+        Returns: {
+          accepted_version_id: string | null
+          company_id: string
+          contact_person_id: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          decided_at: string | null
+          decided_by: string | null
+          decision: string | null
+          decision_kind: string | null
+          decision_note: string
+          decision_recorded_at: string | null
+          decline_reason: string
+          document_number: string | null
+          follow_up_on: string | null
+          id: string
+          kind: string
+          modified_at: string
+          order_id: string | null
+          origin: string
+          responsible_user_id: string | null
+          site_city: string
+          site_country: string
+          site_postal_code: string
+          site_street: string
+          subject: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "quotes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       review_incoming_invoice: {
         Args: { p_decision: string; p_invoice_id: string; p_reason?: string }
         Returns: {
@@ -6454,7 +6937,7 @@ export type Database = {
         Returns: Json
       }
       save_sales_document_draft: {
-        Args: { p_document_id: string | null; p_header: Json; p_lines?: Json }
+        Args: { p_document_id: string; p_header: Json; p_lines?: Json }
         Returns: string
       }
       seed_company_labor_rate: {
@@ -6561,6 +7044,43 @@ export type Database = {
       update_document_payment_status: {
         Args: { p_document_id: string }
         Returns: undefined
+      }
+      withdraw_quote: {
+        Args: { p_note?: string; p_quote_id: string }
+        Returns: {
+          accepted_version_id: string | null
+          company_id: string
+          contact_person_id: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          decided_at: string | null
+          decided_by: string | null
+          decision: string | null
+          decision_kind: string | null
+          decision_note: string
+          decision_recorded_at: string | null
+          decline_reason: string
+          document_number: string | null
+          follow_up_on: string | null
+          id: string
+          kind: string
+          modified_at: string
+          order_id: string | null
+          origin: string
+          responsible_user_id: string | null
+          site_city: string
+          site_country: string
+          site_postal_code: string
+          site_street: string
+          subject: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "quotes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
     }
     Enums: {
