@@ -18,6 +18,7 @@ import {
 } from '../OrderPreviews';
 import { useOrderOutlet, useVisibleOrderSections } from '../orderSections';
 import { orderAddress, orderPeriod } from '../orderSummary';
+import { useOrderContract } from '../useOrderContract';
 
 /**
  * Startseite eines Auftrags: Stammdaten und Ansprechpartner nebeneinander,
@@ -28,6 +29,8 @@ export function OrderOverviewPage() {
   const { t } = useTranslation();
   const data = useOrderOutlet();
   const visible = useVisibleOrderSections();
+  // Nur mit canViewOrderFinance, und aus den Angeboten statt orders.contract_sum (app#188).
+  const contract = useOrderContract(data.id);
 
   return (
     <div className="flex flex-col gap-4">
@@ -51,10 +54,12 @@ export function OrderOverviewPage() {
             label={t('domain:orders.fields.period')}
             value={orderPeriod(formatDate(data.start_date), formatDate(data.end_date))}
           />
-          <DetailRow
-            label={t('domain:orders.fields.contractSum')}
-            value={formatCurrency(data.contract_sum)}
-          />
+          {contract.canView ? (
+            <DetailRow
+              label={t('domain:orders.fields.contractSum')}
+              value={formatCurrency(contract.contract?.contractNet ?? null)}
+            />
+          ) : null}
           <DetailRow label={t('domain:orders.fields.costCenter')} value={data.cost_center_label} />
           <DetailRow
             label={t('domain:orders.fields.description')}

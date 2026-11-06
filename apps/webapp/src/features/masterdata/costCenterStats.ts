@@ -7,12 +7,13 @@ import { eurosToMinor, minorToEuros } from '@bautakt/finance';
  * Produkt eine Zahlung oder eine nicht-kalkulatorische Ausgabe — beides haengt
  * nicht an der Kostenstelle, und die Lese-Policies verlangen Finanzrechte.
  * Gezaehlt wird deshalb jeder Auftrag mit `cost_center_id`, summiert wird
- * `orders.contract_sum`. Fehlt die Summe, bleibt das Feld leer statt 0.
+ * `contract_net` aus der Sicht `order_contract_totals` (Summe aus Angeboten oder
+ * von Hand, bautakt-app#188). Fehlt die Summe, bleibt das Feld leer statt 0.
  * Siehe wiki/pages/kostenstellen.md.
  */
 export type CostCenterOrderSlice = {
   cost_center_id: string | null;
-  contract_sum: number | string | null;
+  contract_net: number | string | null;
 };
 
 export type CostCenterStats = {
@@ -33,7 +34,7 @@ export function aggregateCostCenterStats(
     const bucket = buckets.get(costCenterId) ?? { orderCount: 0, minor: 0, hasSum: false };
     bucket.orderCount += 1;
 
-    const minor = contractSumMinor(order.contract_sum);
+    const minor = contractSumMinor(order.contract_net);
     if (minor !== null) {
       bucket.minor += minor;
       bucket.hasSum = true;

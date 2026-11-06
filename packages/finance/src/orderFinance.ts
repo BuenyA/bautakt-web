@@ -33,7 +33,7 @@ export type OrderIncomingRow = {
 };
 
 export type OrderFinanceInput = {
-  /** `orders.contract_sum`; `null`, wenn keine hinterlegt ist. */
+  /** `contract_net` aus `order_contract_totals`; `null`, wenn keine Summe da ist. */
   contractSum: number | null;
   /** Belege mit mindestens einer Position am Auftrag. */
   documents: readonly SalesDocumentRow[];

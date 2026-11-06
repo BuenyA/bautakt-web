@@ -4010,6 +4010,54 @@ export type Database = {
           },
         ]
       }
+      order_quote_totals: {
+        Row: {
+          addendum_count: number
+          addendum_net_total: number
+          company_id: string
+          main_billing_mode: string | null
+          main_net_total: number | null
+          main_quote_id: string | null
+          order_id: string
+          updated_at: string
+        }
+        Insert: {
+          addendum_count?: number
+          addendum_net_total?: number
+          company_id: string
+          main_billing_mode?: string | null
+          main_net_total?: number | null
+          main_quote_id?: string | null
+          order_id: string
+          updated_at?: string
+        }
+        Update: {
+          addendum_count?: number
+          addendum_net_total?: number
+          company_id?: string
+          main_billing_mode?: string | null
+          main_net_total?: number | null
+          main_quote_id?: string | null
+          order_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_quote_totals_order_fkey"
+            columns: ["order_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "order_contract_totals"
+            referencedColumns: ["order_id", "company_id"]
+          },
+          {
+            foreignKeyName: "order_quote_totals_order_fkey"
+            columns: ["order_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id", "company_id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           billing_mode: string
@@ -5861,6 +5909,31 @@ export type Database = {
             columns: ["sales_document_id"]
             isOneToOne: false
             referencedRelation: "sales_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_contract_totals: {
+        Row: {
+          addendum_count: number | null
+          addendum_net_total: number | null
+          billing_mode: string | null
+          billing_mode_locked: boolean | null
+          company_id: string | null
+          contract_net: number | null
+          main_net_total: number | null
+          main_quote_id: string | null
+          manual_net: number | null
+          order_id: string | null
+          source: string | null
+          sum_locked: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
