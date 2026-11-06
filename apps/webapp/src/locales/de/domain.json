@@ -1071,7 +1071,7 @@
           "none": "Ohne Auftrag annehmen"
         },
         "newHint": "Der Auftrag übernimmt Betreff, Kunde, Objektadresse und Abrechnungsart des Angebots.",
-        "select": "Auftrag",
+        "select": "Bestehender Auftrag",
         "placeholder": "Auftrag wählen",
         "option": "{{name}}, {{customer}}",
         "noneAvailable": "Es gibt keinen offenen Auftrag für diesen Kunden.",
