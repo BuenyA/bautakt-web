@@ -13,11 +13,12 @@ import {
   ProgressBar,
   Text,
 } from '@fluentui/react-components';
-import { MoneyRegular } from '@fluentui/react-icons';
+import { AddRegular, MoneyRegular } from '@fluentui/react-icons';
 import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { LinkButton } from '@/components/common/LinkButton';
 import { RouterLink } from '@/components/common/RouterLink';
 import { usePermission } from '@/features/company/usePermission';
 import { DocumentStatusBadge } from '@/features/finance/DocumentStatusBadge';
@@ -270,7 +271,15 @@ function Figure({
   );
 }
 
-function SectionCard({ title, children }: { title: string; children: ReactNode }) {
+function SectionCard({
+  title,
+  action,
+  children,
+}: {
+  title: string;
+  action?: ReactNode;
+  children: ReactNode;
+}) {
   return (
     <Card size="large" className="h-full">
       <CardHeader
@@ -279,6 +288,7 @@ function SectionCard({ title, children }: { title: string; children: ReactNode }
             {title}
           </Text>
         }
+        action={action ? <>{action}</> : undefined}
       />
       <div className="flex flex-col gap-4">{children}</div>
     </Card>
@@ -540,18 +550,42 @@ export function OrderFinancePage({ order }: { order: OrderDetail }) {
           </SectionCard>
         ) : null}
 
-        {canViewQuotes ? <OrderQuotesCard orderId={order.id} /> : null}
+        {canViewQuotes ? (
+          <OrderQuotesCard orderId={order.id} finished={order.status === 'finished'} />
+        ) : null}
       </div>
     </div>
   );
 }
 
-/** Angebote und Nachträge, die an diesem Auftrag hängen (eigenes Recht `canViewQuotes`). */
-function OrderQuotesCard({ orderId }: { orderId: string }) {
+/**
+ * Angebote und Nachträge, die an diesem Auftrag hängen (eigenes Recht `canViewQuotes`).
+ * Ein Nachtrag entsteht nur hier, am Auftrag (bautakt-app#187); ein abgeschlossener
+ * Auftrag bekommt keine neuen.
+ */
+function OrderQuotesCard({ orderId, finished }: { orderId: string; finished: boolean }) {
   const { t } = useTranslation();
   const quotes = useOrderQuotes(orderId);
+  const canCreate = usePermission('canCreateQuotes');
+  const hasAccepted = (quotes.data ?? []).some(
+    (quote) => quote.kind === 'main' && quote.status === 'accepted',
+  );
   return (
-    <SectionCard title={t('domain:orders.finance.quotes')}>
+    <SectionCard
+      title={t('domain:orders.finance.quotes')}
+      action={
+        canCreate && !finished && !quotes.isPending ? (
+          <LinkButton
+            to={routes.quoteNewForOrder(orderId, hasAccepted ? 'addendum' : 'main')}
+            icon={<AddRegular />}
+          >
+            {t(
+              hasAccepted ? 'domain:orders.finance.newAddendum' : 'domain:orders.finance.newQuote',
+            )}
+          </LinkButton>
+        ) : null
+      }
+    >
       {quotes.isPending ? (
         <PreviewSkeleton />
       ) : quotes.isError ? (

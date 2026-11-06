@@ -32,6 +32,7 @@ import { useTranslation } from 'react-i18next';
 
 import { DatePicker, TimeInput } from '@/components/form/dateTime';
 import { usePermission } from '@/features/company/usePermission';
+import { useOrders } from '@/features/orders/useOrders';
 import { readableDbError } from '@/lib/dbErrors';
 
 import {
@@ -39,10 +40,13 @@ import {
   decidedAtIso,
   type DecisionKind,
   DECLINE_KINDS,
+  defaultOrderMode,
   EVIDENCE_TYPES,
   isInFuture,
+  linkableOrders,
   localDateTimeParts,
   needsEvidence,
+  type OrderMode,
   toggleSelection,
 } from './quoteDecision';
 import { SignaturePad } from './SignaturePad';
@@ -56,6 +60,7 @@ import {
 
 type IssuedVersion = { id: string; version_no: number; currency: string };
 type Mode = 'accept' | 'decline' | 'withdraw' | 'revert';
+type LinkedOrder = { id: string; name: string };
 
 /**
  * Entscheidung erfassen (bautakt-app#186). Offen: annehmen als Hauptaktion,
@@ -69,10 +74,15 @@ export function QuoteDecisionActions({
   issuedVersions,
   consumer,
   consumerAcceptanceEnabled,
+  customerId,
+  linkedOrder,
 }: {
   quoteId: string;
   decided: boolean;
   issuedVersions: IssuedVersion[];
+  customerId: string | null;
+  /** Auftrag, an dem das Angebot schon hängt (Nachtrag oder frühere Annahme). */
+  linkedOrder: LinkedOrder | null;
   /** Kunde ist Verbraucher (Person ohne USt-IdNr.). */
   consumer: boolean;
   /** Plattform hat die Annahme durch Verbraucher freigeschaltet (Standard aus). */
@@ -128,6 +138,8 @@ export function QuoteDecisionActions({
             versions={issuedVersions}
             consumer={consumer}
             consumerBlocked={consumer && !consumerAcceptanceEnabled}
+            customerId={customerId}
+            linkedOrder={linkedOrder}
             onDone={close}
           />
         ) : null}
@@ -260,18 +272,30 @@ function AcceptForm({
   versions,
   consumer,
   consumerBlocked,
+  customerId,
+  linkedOrder,
   onDone,
 }: {
   quoteId: string;
   versions: IssuedVersion[];
   consumer: boolean;
   consumerBlocked: boolean;
+  customerId: string | null;
+  linkedOrder: LinkedOrder | null;
   onDone: () => void;
 }) {
   const { t } = useTranslation();
   const accept = useAcceptQuote();
+  const canCreateOrders = usePermission('canCreateOrders');
   const versionFieldId = useId();
   const fileId = useId();
+  const orderFieldId = useId();
+  const [orderMode, setOrderMode] = useState<OrderMode>(
+    linkedOrder ? 'none' : defaultOrderMode(canCreateOrders),
+  );
+  const [orderId, setOrderId] = useState('');
+  const orders = useOrders({ enabled: !linkedOrder && orderMode === 'existing' });
+  const orderOptions = linkableOrders(orders.data ?? [], customerId);
   const [versionId, setVersionId] = useState(versions[0]!.id);
   const [kind, setKind] = useState<DecisionKind>('mail');
   const [note, setNote] = useState('');
@@ -298,6 +322,10 @@ function AcceptForm({
       setError(t(`domain:quotes.decision.evidenceMissing.${kind}`));
       return;
     }
+    if (orderMode === 'existing' && !orderId) {
+      setError(t('domain:quotes.decision.order.missing'));
+      return;
+    }
     try {
       await accept.mutateAsync({
         quoteId,
@@ -307,8 +335,16 @@ function AcceptForm({
         note: note.trim(),
         selectedItemIds: [...selected],
         evidence: needsEvidence(kind) ? evidence : null,
+        orderMode,
+        orderId: orderMode === 'existing' ? orderId : null,
       });
-      toast.success(t('domain:quotes.decision.accepted'));
+      toast.success(
+        t(
+          orderMode === 'new'
+            ? 'domain:quotes.decision.acceptedWithNewOrder'
+            : 'domain:quotes.decision.accepted',
+        ),
+      );
       onDone();
     } catch (cause) {
       setError(readableDbError(cause) ?? t('domain:quotes.decision.saveError'));
@@ -379,6 +415,61 @@ function AcceptForm({
       ) : null}
 
       <DecidedAtFields state={decidedAt} />
+
+      {linkedOrder ? (
+        <p className="text-muted-foreground text-sm">
+          {t('domain:quotes.decision.order.linked', { name: linkedOrder.name })}
+        </p>
+      ) : (
+        <div className="grid gap-2">
+          <Label>{t('domain:quotes.decision.order.label')}</Label>
+          <RadioGroup
+            value={orderMode}
+            onChange={(_, data) => setOrderMode(data.value as OrderMode)}
+          >
+            {canCreateOrders ? (
+              <Radio value="new" label={t('domain:quotes.decision.order.mode.new')} />
+            ) : null}
+            <Radio value="existing" label={t('domain:quotes.decision.order.mode.existing')} />
+            <Radio value="none" label={t('domain:quotes.decision.order.mode.none')} />
+          </RadioGroup>
+          {orderMode === 'new' ? (
+            <p className="text-muted-foreground text-sm">
+              {t('domain:quotes.decision.order.newHint')}
+            </p>
+          ) : null}
+          {orderMode === 'existing' ? (
+            <>
+              <Label htmlFor={orderFieldId} required>
+                {t('domain:quotes.decision.order.select')}
+              </Label>
+              <Select
+                id={orderFieldId}
+                value={orderId}
+                disabled={orders.isPending}
+                onChange={(_, data) => setOrderId(data.value)}
+              >
+                <option value="">{t('domain:quotes.decision.order.placeholder')}</option>
+                {orderOptions.map((order) => (
+                  <option key={order.id} value={order.id}>
+                    {order.customer_label
+                      ? t('domain:quotes.decision.order.option', {
+                          name: order.name,
+                          customer: order.customer_label,
+                        })
+                      : order.name}
+                  </option>
+                ))}
+              </Select>
+              {!orders.isPending && orderOptions.length === 0 ? (
+                <p className="text-muted-foreground text-sm">
+                  {t('domain:quotes.decision.order.noneAvailable')}
+                </p>
+              ) : null}
+            </>
+          ) : null}
+        </div>
+      )}
 
       {items.data && items.data.length > 0 ? (
         <div className="grid gap-2">

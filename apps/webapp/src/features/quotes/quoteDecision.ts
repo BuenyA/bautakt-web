@@ -126,6 +126,29 @@ export function currentEvidence<T extends { created_at: string }>(
   return rows.filter((row) => new Date(row.created_at).getTime() === at);
 }
 
+export type OrderMode = 'new' | 'existing' | 'none';
+
+/** Vorgabe bei der Annahme: neuer Auftrag, wenn das Recht dafür da ist. */
+export function defaultOrderMode(canCreateOrders: boolean): OrderMode {
+  return canCreateOrders ? 'new' : 'none';
+}
+
+/**
+ * Aufträge, an die sich ein Angebot hängen lässt: nicht abgeschlossen und vom
+ * selben Kunden, wenn beide einen haben. Wie `accept_quote`; ob der Auftrag
+ * schon ein angenommenes Hauptangebot hat, prüft nur die Datenbank.
+ */
+export function linkableOrders<T extends { status: string; customer_id: string | null }>(
+  orders: readonly T[],
+  customerId: string | null,
+): T[] {
+  return orders.filter(
+    (order) =>
+      order.status !== 'finished' &&
+      (!customerId || !order.customer_id || order.customer_id === customerId),
+  );
+}
+
 /** Schlüssel des Verlaufs je Ereignis; Probelauf heißt anders als echter Versand. */
 export function quoteEventKey(event: { event_type: string; payload: unknown }): string {
   const mode = (event.payload as { mode?: unknown } | null)?.mode;

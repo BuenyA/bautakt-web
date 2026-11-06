@@ -34,7 +34,7 @@ import {
 import { CheckmarkCircleRegular, SaveRegular } from '@fluentui/react-icons';
 import { type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useBlocker, useNavigate, useParams } from 'react-router';
+import { useBlocker, useNavigate, useParams, useSearchParams } from 'react-router';
 
 import { DiscardChangesDialog } from '@/components/common/DiscardChangesDialog';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -155,6 +155,10 @@ function stateFromDraft(data: QuoteDraftData, isSmallBusiness: boolean): QuoteEd
 export function QuoteEditorPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  // Vom Auftrag aus: Auftrag und Art vorbelegt, Kunde folgt dem Auftrag.
+  const presetOrderId = id ? null : searchParams.get('auftrag');
+  const presetKind: QuoteKind = searchParams.get('art') === 'nachtrag' ? 'addendum' : 'main';
   const navigate = useNavigate();
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
@@ -181,12 +185,18 @@ export function QuoteEditorPage() {
 
   // Erst füllen, wenn Betrieb und ggf. Entwurf geladen sind; sonst stünde kurz
   // `standard` statt § 19 im Formular. Danach gehört der Zustand dem Formular.
-  if (state === null && taxProfile.data) {
+  if (state === null && taxProfile.data && (!presetOrderId || orders.data)) {
+    const presetOrder = (orders.data ?? []).find((row) => row.id === presetOrderId);
     const start = id
       ? draft.data
         ? stateFromDraft(draft.data, isSmallBusiness)
         : null
-      : emptyState(isSmallBusiness ? 'small_business' : 'standard');
+      : {
+          ...emptyState(isSmallBusiness ? 'small_business' : 'standard'),
+          ...(presetOrder
+            ? { kind: presetKind, orderId: presetOrder.id, customerId: presetOrder.customer_id }
+            : {}),
+        };
     if (start) {
       setState(start);
       setBaseline(JSON.stringify(start));

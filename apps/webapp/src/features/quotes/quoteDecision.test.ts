@@ -5,9 +5,11 @@ import { describe, it } from 'node:test';
 import {
   currentEvidence,
   decidedAtIso,
+  defaultOrderMode,
   evidencePath,
   isConsumer,
   isInFuture,
+  linkableOrders,
   localDateTimeParts,
   needsEvidence,
   quoteEventDetail,
@@ -103,6 +105,30 @@ describe('Nachweis', () => {
       ['neu'],
     );
     assert.deepEqual(currentEvidence(rows, null), []);
+  });
+});
+
+describe('Auftrag', () => {
+  it('neuer Auftrag nur mit Recht', () => {
+    assert.equal(defaultOrderMode(true), 'new');
+    assert.equal(defaultOrderMode(false), 'none');
+  });
+
+  it('nur offene Aufträge desselben Kunden', () => {
+    const orders = [
+      { id: 'eigen', status: 'active', customer_id: 'k1' },
+      { id: 'ohne', status: 'active', customer_id: null },
+      { id: 'fremd', status: 'active', customer_id: 'k2' },
+      { id: 'fertig', status: 'finished', customer_id: 'k1' },
+    ];
+    assert.deepEqual(
+      linkableOrders(orders, 'k1').map((order) => order.id),
+      ['eigen', 'ohne'],
+    );
+    assert.deepEqual(
+      linkableOrders(orders, null).map((order) => order.id),
+      ['eigen', 'ohne', 'fremd'],
+    );
   });
 });
 

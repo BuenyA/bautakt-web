@@ -203,7 +203,9 @@
       "documents": "Angebote und Rechnungen",
       "noDocuments": "Noch keine Belege zu diesem Auftrag.",
       "quotes": "Angebote und Nachträge",
-      "noQuotes": "Noch kein Angebot zu diesem Auftrag."
+      "noQuotes": "Noch kein Angebot zu diesem Auftrag.",
+      "newQuote": "Angebot",
+      "newAddendum": "Nachtrag"
     },
     "documents": {
       "title": "Dokumente",
@@ -1059,7 +1061,23 @@
       "decidedAt": "Entschieden am",
       "recordedAt": "Erfasst am",
       "evidence": "Nachweis",
-      "evidenceOpen": "Öffnen (hochgeladen {{date}})"
+      "evidenceOpen": "Öffnen (hochgeladen {{date}})",
+      "acceptedWithNewOrder": "Annahme gespeichert, Auftrag angelegt",
+      "order": {
+        "label": "Auftrag",
+        "mode": {
+          "new": "Neuen Auftrag anlegen",
+          "existing": "Bestehenden Auftrag wählen",
+          "none": "Ohne Auftrag annehmen"
+        },
+        "newHint": "Der Auftrag übernimmt Betreff, Kunde, Objektadresse und Abrechnungsart des Angebots.",
+        "select": "Bestehender Auftrag",
+        "placeholder": "Auftrag wählen",
+        "option": "{{name}}, {{customer}}",
+        "noneAvailable": "Es gibt keinen offenen Auftrag für diesen Kunden.",
+        "missing": "Bitte wähle den Auftrag.",
+        "linked": "Das Angebot wird für den Auftrag „{{name}}“ angenommen."
+      }
     }
   },
   "receivables": {

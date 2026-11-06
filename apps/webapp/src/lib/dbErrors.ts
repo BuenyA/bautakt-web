@@ -158,6 +158,16 @@ const MESSAGES: Record<string, string> = {
   QUOTE_EVIDENCE_TYPE: 'Der Nachweis muss eine PDF, PNG oder JPG sein.',
   QUOTE_SELECTION_INVALID: 'Gewählt werden können nur Alternativ- und Bedarfspositionen.',
   QUOTE_ALTERNATIVE_CONFLICT: 'Je Position gilt höchstens eine Alternative.',
+  QUOTE_ORDER_MODE: 'Bitte wähle, was mit dem Auftrag passieren soll.',
+  QUOTE_ORDER_REQUIRED: 'Bitte wähle den Auftrag.',
+  QUOTE_ORDER_NOT_FOUND: 'Diesen Auftrag gibt es nicht mehr. Bitte lade die Seite neu.',
+  QUOTE_ORDER_FINISHED: 'Der Auftrag ist abgeschlossen. Wähle einen offenen Auftrag.',
+  QUOTE_ORDER_CUSTOMER_MISMATCH: 'Der Auftrag gehört zu einem anderen Kunden.',
+  QUOTE_ORDER_HAS_MAIN:
+    'Der Auftrag hat schon ein angenommenes Angebot. Weitere Leistungen erfasst du als Nachtrag.',
+  QUOTE_ORDER_ALREADY_LINKED:
+    'Das Angebot gehört schon zu einem Auftrag. Bitte lade die Seite neu.',
+  QUOTE_ORDER_LOCKED: 'Das Angebot bleibt bei seinem Auftrag.',
   QUOTE_REVERT_REASON_REQUIRED: 'Bitte gib eine Begründung an.',
   QUOTE_DECIDED: 'Über dieses Angebot ist entschieden, es lässt sich nicht mehr ändern.',
   QUOTE_NO_DRAFT:
