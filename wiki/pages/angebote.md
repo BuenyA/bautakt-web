@@ -8,8 +8,7 @@ Neuer Angebotsbereich, Umsetzungsplan in `bautakt-app` unter
 
 - **1b Liste und Detailseite** (web#291).
 - **2a Entscheidung** (bautakt-app#186), siehe unten.
-- **2b Auftrag und Nachtrag** (bautakt-app#187), siehe unten. Auftragsbestätigung als PDF
-  folgt in einem eigenen Schritt auf 1d.
+- **2b Auftrag, Nachtrag und Auftragsbestätigung** (bautakt-app#187), siehe unten.
 - **1d PDF und Versand** (bautakt-app#183), siehe unten.
 - **1c Editor und Umschalten** (web#292): Der Bereich steht in der Leiste vor „Aufträge“
   (`canViewQuotes`). Routen: `/angebote` Liste, `/angebote/neu` (`canCreateQuotes`),
@@ -57,6 +56,29 @@ an wie die Entscheidung; Regeln im App-Wiki.
   einen Knopf: „Angebot“, solange kein Hauptangebot angenommen ist, danach „Nachtrag“. Er
   öffnet `/angebote/neu?auftrag=<id>` (mit `&art=nachtrag`), der Editor belegt Auftrag, Art
   und Kunden vor (`routes.quoteNewForOrder`). Abgeschlossene Aufträge bekommen keinen Knopf.
+
+## Auftragsbestätigung (2b)
+
+Stand 2026-11-07, bautakt-app#187, Server-Teil (Tabelle `quote_confirmations`, Nummer aus
+dem AB-Kreis, eine je Annahme) im
+[Wiki der App](https://github.com/BuenyA/bautakt-app/blob/main/wiki/pages/angebote.md).
+
+- **Wo.** Karte „Entscheidung“ eines angenommenen Angebots, Zeile „Auftragsbestätigung“.
+  „Auftragsbestätigung erstellen“ vergibt die Nummer und öffnet das PDF, danach steht dort
+  „AB… vom …“ zum Öffnen. „Auftragsbestätigung versenden“ erstellt sie bei Bedarf und öffnet
+  den bekannten Versanddialog mit der AB als Anhang (`purpose = quote`, Bezug auf die
+  angenommene Version). Beides nur mit `canIssueQuotes`.
+- **Welche gilt.** `currentConfirmation`: angenommene Version und nach der Erfassung der
+  Annahme entstanden. Ältere aus zurückgenommenen Annahmen bleiben mit dem Zusatz „aus einer
+  früheren Annahme“ zum Öffnen stehen.
+- **Keine Vorschau.** Die Function rendert die AB nur als Original. Zweimal klicken legt nichts
+  doppelt an, die Function liefert dieselbe Zeile.
+- **Verlauf.** „Auftragsbestätigung erstellt“ mit Nummer; beim Versand steht die Nummer unter
+  „Per E-Mail versendet“ bzw. „Probelauf“.
+- **Rechnungen.** Die Belegart „Auftragsbestätigung“ steht nicht mehr in der Liste
+  `/rechnungen` (`FINANCE_LIST_TYPES`). Unter Nummernkreise bleibt der AB-Kreis: Er zählt
+  jetzt die Bestätigungen und ist gesperrt, sobald eine existiert (auch beim AG-Kreis zählen
+  jetzt `quotes`, nicht nur `sales_documents`).
 
 ## Editor
 

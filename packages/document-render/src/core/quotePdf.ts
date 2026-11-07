@@ -188,13 +188,14 @@ type SumRow = { label: string; value: string; total?: boolean };
 export function quoteSumRows(data: InvoiceData, quote: QuoteInfo): SumRow[] {
   const c = (cents: number) => formatCents(cents, data.currency);
   const rows: SumRow[] = [];
+  const totalLabel = quote.confirmation ? "Auftragssumme" : "Angebotssumme";
   if (quote.discountCents !== 0) {
     rows.push({ label: "Summe der Positionen", value: c(quote.positionsNetCents) });
     rows.push({ label: `abzüglich ${vatText(quote.discountPercent)} % Nachlass`, value: c(-quote.discountCents) });
   }
   const onlyExempt = data.taxMode !== "standard";
   if (onlyExempt) {
-    rows.push({ label: "Angebotssumme", value: c(data.totals.grandTotalCents), total: true });
+    rows.push({ label: totalLabel, value: c(data.totals.grandTotalCents), total: true });
     return rows;
   }
   rows.push({ label: "Nettobetrag", value: c(data.totals.taxBasisTotalCents) });
@@ -207,7 +208,7 @@ export function quoteSumRows(data: InvoiceData, quote: QuoteInfo): SumRow[] {
       value: c(group.taxCents),
     });
   }
-  rows.push({ label: "Angebotssumme", value: c(data.totals.grandTotalCents), total: true });
+  rows.push({ label: totalLabel, value: c(data.totals.grandTotalCents), total: true });
   return rows;
 }
 
@@ -257,11 +258,17 @@ function paragraph(ctx: Ctx, frame: QuoteFrame, title: string | null, body: stri
   }
 }
 
-/** Zusätzliche Kennzahlen im Kopf: Gültig bis, Version, Ausführung. */
+/** Zusätzliche Kennzahlen im Kopf: Gültig bis, Version, Ausführung; bei der Bestätigung das Angebot. */
 export function quoteMetaRows(quote: QuoteInfo): [string, string][] {
   const rows: [string, string][] = [];
+  const conf = quote.confirmation;
+  if (conf) {
+    const version = quote.versionNo > 1 ? ` V${quote.versionNo}` : "";
+    if (conf.quoteNumber) rows.push(["Zu Angebot", `${conf.quoteNumber}${version}`]);
+    if (conf.acceptedOn) rows.push(["Angenommen am", formatGermanDate(conf.acceptedOn)]);
+  }
   if (quote.validUntil) rows.push(["Gültig bis", formatGermanDate(quote.validUntil)]);
-  if (quote.versionNo > 1) rows.push(["Version", String(quote.versionNo)]);
+  if (!conf && quote.versionNo > 1) rows.push(["Version", String(quote.versionNo)]);
   if (quote.execFrom && quote.execTo) {
     rows.push(["Ausführung", `${formatGermanDate(quote.execFrom)} bis ${formatGermanDate(quote.execTo)}`]);
   } else if (quote.execFrom) {
@@ -313,7 +320,7 @@ export function drawQuoteBody(ctx: Ctx, frame: QuoteFrame): void {
   }
   if (quote.laborShareCents > 0) {
     terms.push(
-      `Im Angebotspreis sind Arbeitskosten von ${formatCents(quote.laborShareCents, data.currency)} netto enthalten (§ 35a EStG).`,
+      `Im ${quote.confirmation ? "Auftragspreis" : "Angebotspreis"} sind Arbeitskosten von ${formatCents(quote.laborShareCents, data.currency)} netto enthalten (§ 35a EStG).`,
     );
   }
   if (terms.length > 0) paragraph(ctx, frame, null, terms.join("\n"), 12);

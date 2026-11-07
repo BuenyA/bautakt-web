@@ -13,6 +13,7 @@ import { sha256Hex } from '@/features/finance/originalIntegrity';
 import { supabase } from '@/lib/supabase';
 
 import {
+  currentConfirmation,
   currentEvidence,
   type DecisionKind,
   evidencePath,
@@ -30,7 +31,7 @@ export function useQuoteDecisionDetail(quoteId: string | undefined) {
     queryKey: [companyId, 'quotes', 'decision', quoteId],
     enabled: Boolean(companyId && quoteId),
     queryFn: async () => {
-      const [quote, platform, selection, evidence] = await Promise.all([
+      const [quote, platform, selection, evidence, confirmations] = await Promise.all([
         supabase
           .from('quotes')
           .select(
@@ -55,8 +56,17 @@ export function useQuoteDecisionDetail(quoteId: string | undefined) {
           .eq('quote_id', quoteId!)
           .eq('kind', 'signed_acceptance')
           .order('created_at', { ascending: false }),
+        // Auftragsbestätigungen aller Annahmen, neueste zuerst (bautakt-app#187).
+        supabase
+          .from('quote_confirmations')
+          .select(
+            'id, version_id, document_number, confirmation_date, storage_path, content_hash, created_at',
+          )
+          .eq('company_id', companyId!)
+          .eq('quote_id', quoteId!)
+          .order('created_at', { ascending: false }),
       ]);
-      for (const result of [quote, platform, selection, evidence]) {
+      for (const result of [quote, platform, selection, evidence, confirmations]) {
         if (result.error) throw result.error;
       }
       if (!quote.data) return null;
@@ -66,6 +76,8 @@ export function useQuoteDecisionDetail(quoteId: string | undefined) {
         consumerAcceptanceEnabled: platform.data?.consumer_acceptance_enabled ?? false,
         selected: (selection.data ?? []).flatMap((row) => (row.item ? [row.item] : [])),
         evidence: currentEvidence(evidence.data ?? [], quote.data.decision_recorded_at),
+        confirmations: confirmations.data ?? [],
+        confirmation: currentConfirmation(confirmations.data ?? [], quote.data),
       };
     },
   });

@@ -134,6 +134,12 @@ export type QuoteInfo = {
   discountCents: number;
   /** Lohnanteil nach Nachlass (§ 35a EStG), wie `labor_share_total`. */
   laborShareCents: number;
+  /** Nur bei der Auftragsbestätigung (bautakt-app#187): das bestätigte Angebot. */
+  confirmation?: {
+    quoteNumber: string;
+    quoteDate: string | null;
+    acceptedOn: string | null;
+  };
 };
 
 /** BG-23 — USt-Aufschlüsselung je Kategorie/Satz. */
