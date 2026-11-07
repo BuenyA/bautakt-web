@@ -132,6 +132,19 @@ export type QuoteRenderInput = {
   contactPersonName?: string | null;
   template?: InvoiceTemplateRow | null;
   today?: string;
+  /** Auftragsbestätigung statt Angebot (bautakt-app#187). Fehlt beim Angebot. */
+  confirmation?: OrderConfirmationInput;
+};
+
+export type OrderConfirmationInput = {
+  /** Nummer aus `quote_confirmations`, `null` rendert einen Entwurf ohne Nummer. */
+  documentNumber: string | null;
+  /** Datum der Bestätigung (`confirmation_date`). */
+  date: string;
+  /** Tag der Annahme durch den Kunden (`accepted_on`). */
+  acceptedOn: string | null;
+  /** Bei der Annahme gewählte Alternativ- und Bedarfspositionen. */
+  selectedItemIds: string[];
 };
 
 function clean(value: string | null | undefined): string {
@@ -160,6 +173,57 @@ export function longTextToPlain(html: string | null | undefined): string {
     .replace(/&#39;/g, "'")
     .replace(/&amp;/g, "&");
   return clean(text).replace(/\n{3,}/g, "\n\n");
+}
+
+/**
+ * Beauftragter Umfang, wie `private.quote_accepted_net`: normale Positionen und
+ * Pauschalen, außer eine gewählte Alternative ersetzt sie; gewählte Alternativen
+ * und gewählte Bedarfspositionen. Nicht gewählte Alternativ- und
+ * Bedarfspositionen fallen weg. Gewählte Positionen zählen wie normale, nur eine
+ * Bedarfsposition „nur Einheitspreis“ bleibt ohne Betrag.
+ */
+export function acceptedScope(
+  items: QuoteItemRow[],
+  selectedItemIds: string[],
+): { items: QuoteItemRow[]; notes: Map<string, string> } {
+  const chosen = new Set(selectedItemIds);
+  const byId = new Map(items.map((i) => [i.id, i]));
+  const replaced = new Set(
+    items
+      .filter((i) => i.position_type === "alternative" && chosen.has(i.id) && i.alternative_to_id)
+      .map((i) => i.alternative_to_id as string),
+  );
+  const notes = new Map<string, string>();
+  const out: QuoteItemRow[] = [];
+  for (const item of items) {
+    if (item.node_type !== "position") {
+      out.push(item);
+      continue;
+    }
+    if (item.position_type === "alternative") {
+      if (!chosen.has(item.id)) continue;
+      const targetOz = clean(item.alternative_to_id ? byId.get(item.alternative_to_id)?.oz : null);
+      notes.set(item.id, targetOz ? `Gewählte Alternative statt ${targetOz}` : "Gewählte Alternative");
+      out.push({ ...item, position_type: "normal", alternative_to_id: null });
+    } else if (item.position_type === "contingency") {
+      if (!chosen.has(item.id)) continue;
+      if (item.contingency_mode === "unit_price_only") {
+        out.push(item);
+      } else {
+        notes.set(item.id, "Bedarfsposition, beauftragt");
+        out.push({ ...item, position_type: "normal", contingency_mode: null });
+      }
+    } else if (!replaced.has(item.id)) {
+      out.push(item);
+    }
+  }
+  return { items: out, notes };
+}
+
+/** `YYYY-MM-DD` als `TT.MM.JJJJ`, sonst unverändert. */
+function germanDate(iso: string | null): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso ?? "");
+  return m ? `${m[3]}.${m[2]}.${m[1]}` : (iso ?? "");
 }
 
 /** Prozent mit höchstens zwei Stellen als Ganzzahl in Hundertsteln (10,5 % = 1050). */
@@ -249,6 +313,9 @@ function siteLine(street: string, postal: string, city: string): string {
 
 export function buildQuoteData(input: QuoteRenderInput): InvoiceData {
   const { quote, version, company, customer } = input;
+  const conf = input.confirmation;
+  const scope = conf ? acceptedScope(input.items, conf.selectedItemIds) : null;
+  const items = scope ? scope.items : input.items;
   const issued = Boolean(version.issued_at);
   const today = input.today ?? new Date().toISOString().slice(0, 10);
   const taxMode = toTaxMode(version.tax_mode);
@@ -259,9 +326,9 @@ export function buildQuoteData(input: QuoteRenderInput): InvoiceData {
   const doc: SalesDocRow = {
     id: version.id,
     company_id: version.company_id,
-    type: "quote",
-    status: issued ? "issued" : "draft",
-    document_number: issued ? quote.document_number : null,
+    type: conf ? "order_confirmation" : "quote",
+    status: (conf ? Boolean(conf.documentNumber) : issued) ? "issued" : "draft",
+    document_number: conf ? conf.documentNumber : issued ? quote.document_number : null,
     customer_id: quote.customer_id,
     subject: issued ? version.subject : quote.subject,
     invoice_template_id: version.invoice_template_id,
@@ -324,8 +391,8 @@ export function buildQuoteData(input: QuoteRenderInput): InvoiceData {
   if (!issued && contactPerson) buyer.contactName = contactPerson;
 
   // --- Gliederung ------------------------------------------------------------
-  const tree = orderedTree(input.items);
-  const byId = new Map(input.items.map((i) => [i.id, i]));
+  const tree = orderedTree(items);
+  const byId = new Map(items.map((i) => [i.id, i]));
   const rates = new Set(
     tree.filter(({ item }) => item.node_type === "position").map(({ item }) =>
       taxMode === "standard" ? toNumber(item.tax_rate_percent) : 0
@@ -375,6 +442,8 @@ export function buildQuoteData(input: QuoteRenderInput): InvoiceData {
           : "Bedarfsposition, nicht in der Summe",
       );
     }
+    const scopeNote = scope?.notes.get(item.id);
+    if (scopeNote) notes.push(scopeNote);
     if (showRate) notes.push(`USt ${String(ratePercent).replace(".", ",")} %`);
 
     if (counts(item)) {
@@ -466,7 +535,8 @@ export function buildQuoteData(input: QuoteRenderInput): InvoiceData {
   };
 
   const warnings: string[] = [];
-  if (issued) {
+  // Die Bestätigung kann durch die Auswahl vom gespeicherten Angebotsbetrag abweichen.
+  if (issued && !conf) {
     const storedNet = toCents(version.net_total);
     const storedGross = toCents(version.gross_total);
     if (storedNet !== totals.taxBasisTotalCents || storedGross !== totals.grandTotalCents) {
@@ -479,13 +549,22 @@ export function buildQuoteData(input: QuoteRenderInput): InvoiceData {
     warnings.push("Anschrift des Kunden unvollständig (Straße/PLZ/Ort).");
   }
   if (positions.size === 0) warnings.push("Das Angebot hat keine Position.");
+  if (conf && !issued) warnings.push("Auftragsbestätigung zu einer Version, die nicht festgeschrieben ist.");
 
   const subject = clean(doc.subject);
   const site = issued
     ? siteLine(clean(version.site_street), clean(version.site_postal_code), clean(version.site_city))
     : siteLine(clean(quote.site_street), clean(quote.site_postal_code), clean(quote.site_city));
 
-  const title = quote.kind === "addendum" ? "Nachtragsangebot" : "Angebot";
+  const quoteTitle = quote.kind === "addendum" ? "Nachtragsangebot" : "Angebot";
+  const title = conf ? "Auftragsbestätigung" : quoteTitle;
+  // Die Bestätigung nennt das Angebot, dessen Einleitung und Schluss passen nicht.
+  const introText = conf
+    ? `Vielen Dank für Ihren Auftrag. Wir bestätigen ihn zu den Bedingungen unseres ${quoteTitle}s ${
+      clean(quote.document_number)
+    } vom ${germanDate(normalizeDate(version.quote_date))} mit folgendem Leistungsumfang.`
+    : clean(version.intro_text);
+  const footerText = conf ? "Wir freuen uns auf die Zusammenarbeit." : clean(version.closing_text);
 
   return {
     ...(subject ? { subject } : {}),
@@ -501,11 +580,11 @@ export function buildQuoteData(input: QuoteRenderInput): InvoiceData {
     precedingInvoices: [],
     settlement: null,
     documentTitle: title,
-    numberLabel: "Angebotsnr.",
-    documentType: "quote",
+    numberLabel: conf ? base.numberLabel : "Angebotsnr.",
+    documentType: conf ? "order_confirmation" : "quote",
     isInvoiceLike: false,
-    isDraft: !issued,
-    issueDate: normalizeDate(version.quote_date) ?? today,
+    isDraft: conf ? !conf.documentNumber : !issued,
+    issueDate: conf ? normalizeDate(conf.date) ?? today : normalizeDate(version.quote_date) ?? today,
     serviceDate: null,
     currency: base.currency,
     taxMode,
@@ -523,8 +602,8 @@ export function buildQuoteData(input: QuoteRenderInput): InvoiceData {
       skontoAmountCents: null,
       skontoGrossCents: null,
     },
-    introText: clean(version.intro_text),
-    footerText: clean(version.closing_text),
+    introText,
+    footerText,
     notes: "",
     // Nur die Texte zur Steuerart. Aufbewahrungspflicht und Bauabzugsteuer
     // gehören auf die Rechnung, der Lohnanteil steht im Angebotsteil.
@@ -540,7 +619,7 @@ export function buildQuoteData(input: QuoteRenderInput): InvoiceData {
     warnings,
     quote: {
       versionNo: version.version_no,
-      validUntil: normalizeDate(version.valid_until),
+      validUntil: conf ? null : normalizeDate(version.valid_until),
       execFrom: normalizeDate(version.exec_from),
       execTo: normalizeDate(version.exec_to),
       contractBasis: version.contract_basis === "vob_b" ? "vob_b" : "bgb",
@@ -550,6 +629,15 @@ export function buildQuoteData(input: QuoteRenderInput): InvoiceData {
       positionsNetCents,
       discountCents: positionsNetCents - netCents,
       laborShareCents: applyDiscountCents(laborCents, discountPercent),
+      ...(conf
+        ? {
+          confirmation: {
+            quoteNumber: clean(quote.document_number),
+            quoteDate: normalizeDate(version.quote_date),
+            acceptedOn: normalizeDate(conf.acceptedOn),
+          },
+        }
+        : {}),
     },
   };
 }

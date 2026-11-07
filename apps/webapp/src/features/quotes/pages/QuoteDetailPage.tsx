@@ -8,6 +8,7 @@ import {
   EditRegular,
   MailRegular,
 } from '@fluentui/react-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
@@ -31,7 +32,13 @@ import { routes } from '@/lib/routes';
 
 import { isConsumer, quoteEventDetail, quoteEventKey } from '../quoteDecision';
 import { QuoteDecisionActions } from '../QuoteDecisionActions';
-import { ensureQuoteOriginal, openQuotePdf, quoteMailChannel } from '../quoteOutput';
+import {
+  ensureOrderConfirmation,
+  ensureQuoteOriginal,
+  openOrderConfirmationPdf,
+  openQuotePdf,
+  quoteMailChannel,
+} from '../quoteOutput';
 import { QuoteStatusBadge } from '../QuoteStatusBadge';
 import { evidenceUrl, useQuoteDecisionDetail } from '../useQuoteDecision';
 import { useCreateQuoteVersion, useDeleteQuoteDraft } from '../useQuoteEditor';
@@ -171,10 +178,10 @@ export function QuoteDetailPage() {
         {decision?.quote.decision ? (
           <DecisionCard
             detail={decision}
-            versionNo={
-              versions.find((version) => version.id === decision.quote.accepted_version_id)
-                ?.version_no ?? null
+            acceptedVersion={
+              versions.find((version) => version.id === decision.quote.accepted_version_id) ?? null
             }
+            customerLabel={customerLabel}
           />
         ) : null}
 
@@ -498,9 +505,18 @@ function QuoteOutputActions({
 type DecisionDetail = NonNullable<ReturnType<typeof useQuoteDecisionDetail>['data']>;
 
 /** Wer wann wie entschieden hat. Gerätezeit und Erfassung stehen beide da (A8). */
-function DecisionCard({ detail, versionNo }: { detail: DecisionDetail; versionNo: number | null }) {
+function DecisionCard({
+  detail,
+  acceptedVersion,
+  customerLabel,
+}: {
+  detail: DecisionDetail;
+  acceptedVersion: OutputVersion | null;
+  customerLabel: string;
+}) {
   const { t } = useTranslation();
   const { quote, selected, evidence } = detail;
+  const versionNo = acceptedVersion?.version_no ?? null;
 
   async function openEvidence(path: string) {
     try {
@@ -571,7 +587,162 @@ function DecisionCard({ detail, versionNo }: { detail: DecisionDetail; versionNo
             }
           />
         ) : null}
+        {quote.decision === 'accepted' && acceptedVersion ? (
+          <ConfirmationRow
+            detail={detail}
+            acceptedVersion={acceptedVersion}
+            customerLabel={customerLabel}
+          />
+        ) : null}
       </dl>
     </SectionCard>
+  );
+}
+
+/**
+ * Auftragsbestätigung (bautakt-app#187). Je Annahme eine, mit Nummer aus dem
+ * AB-Kreis. Erstellen und Versenden darf, wer festschreiben darf; ältere
+ * Bestätigungen aus zurückgenommenen Annahmen bleiben zum Öffnen stehen.
+ */
+function ConfirmationRow({
+  detail,
+  acceptedVersion,
+  customerLabel,
+}: {
+  detail: DecisionDetail;
+  acceptedVersion: OutputVersion;
+  customerLabel: string;
+}) {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const { data: membership } = useMembership();
+  const companyId = membership?.companyId;
+  const canIssue = usePermission('canIssueQuotes');
+  const [busy, setBusy] = useState(false);
+  const [sending, setSending] = useState<{ id: string; number: string; path: string } | null>(null);
+  const { confirmations, confirmation } = detail;
+
+  async function refresh() {
+    await queryClient.invalidateQueries({ queryKey: [companyId, 'quotes'] });
+  }
+
+  async function open(row: { storage_path: string | null; content_hash: string | null }) {
+    setBusy(true);
+    try {
+      await openOrderConfirmationPdf({
+        versionId: acceptedVersion.id,
+        storagePath: row.content_hash ? row.storage_path : null,
+      });
+    } catch {
+      toast.error(t('domain:quotes.decision.confirmationError'));
+    } finally {
+      setBusy(false);
+      void refresh();
+    }
+  }
+
+  async function create() {
+    setBusy(true);
+    try {
+      await openOrderConfirmationPdf({ versionId: acceptedVersion.id, storagePath: null });
+    } catch {
+      toast.error(t('domain:quotes.decision.confirmationError'));
+    } finally {
+      setBusy(false);
+      void refresh();
+    }
+  }
+
+  async function startSend() {
+    setBusy(true);
+    try {
+      const result = await ensureOrderConfirmation(acceptedVersion.id);
+      setSending({
+        id: result.confirmation_id,
+        number: result.document_number,
+        path: result.storage_path,
+      });
+    } catch {
+      toast.error(t('domain:quotes.decision.confirmationError'));
+    } finally {
+      setBusy(false);
+      void refresh();
+    }
+  }
+
+  const sendable: SendableDocument | null = sending
+    ? {
+        id: sending.id,
+        type: 'order_confirmation',
+        document_number: sending.number,
+        customer_label: customerLabel,
+        buyer_email: acceptedVersion.buyer_email || null,
+        due_date: null,
+        gross_total: acceptedVersion.gross_total,
+        credited_total: 0,
+        e_invoice: false,
+        einvoice_format: 'zugferd',
+      }
+    : null;
+
+  return (
+    <DetailRow
+      label={t('domain:quotes.decision.confirmation')}
+      value={
+        <span className="flex flex-col items-start gap-2">
+          {confirmations.map((row) => (
+            <span key={row.id} className="flex flex-wrap items-baseline gap-2">
+              <FluentLink as="button" disabled={busy} onClick={() => void open(row)}>
+                {t('domain:quotes.decision.confirmationEntry', {
+                  number: row.document_number,
+                  date: formatDate(row.confirmation_date),
+                })}
+              </FluentLink>
+              {row.id === confirmation?.id ? null : (
+                <span className="text-muted-foreground text-sm">
+                  {t('domain:quotes.decision.confirmationEarlier')}
+                </span>
+              )}
+            </span>
+          ))}
+          {canIssue ? (
+            <span className="flex flex-wrap gap-2">
+              {confirmation ? null : (
+                <Button
+                  size="small"
+                  icon={<DocumentPdfRegular />}
+                  disabled={busy}
+                  onClick={() => void create()}
+                >
+                  {t('domain:quotes.decision.confirmationCreate')}
+                </Button>
+              )}
+              <Button
+                size="small"
+                icon={<MailRegular />}
+                disabled={busy}
+                onClick={() => void startSend()}
+              >
+                {t('domain:quotes.decision.confirmationSend')}
+              </Button>
+            </span>
+          ) : null}
+          {sendable && sending && companyId ? (
+            <SendDialog
+              open
+              document={sendable}
+              onClose={() => setSending(null)}
+              channel={quoteMailChannel({
+                companyId,
+                versionId: acceptedVersion.id,
+                storagePath: sending.path,
+                fileName: `${documentFileBaseName(sending.number, customerLabel)}.pdf`,
+                invalidateKeys: [[companyId, 'quotes']],
+              })}
+            />
+          ) : null}
+        </span>
+      }
+    />
   );
 }

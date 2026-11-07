@@ -15,15 +15,14 @@ export const INVOICE_TYPE_LIST = ['invoice', 'partial_invoice', 'final_invoice']
 
 /**
  * Belege der Liste `/rechnungen`: Rechnungen, Gutschriften, Stornos,
- * Auftragsbestätigungen, Lieferscheine. Angebote bleiben auf der eigenen
- * Seite. Gutschrift und Storno gehören dazu wie bei sevDesk (#78); offene
+ * Lieferscheine. Angebote und ihre Auftragsbestätigungen bleiben auf der
+ * Angebotsseite (bautakt-app#187). Gutschrift und Storno gehören dazu wie bei sevDesk (#78); offene
  * Posten und Mahnwesen bleiben bei `INVOICE_TYPE_LIST`.
  */
 export const FINANCE_LIST_TYPES = [
   ...INVOICE_TYPE_LIST,
   'credit_note',
   'cancellation',
-  'order_confirmation',
   'delivery_note',
 ] as const;
 

@@ -4541,6 +4541,83 @@ export type Database = {
           },
         ]
       }
+      quote_confirmations: {
+        Row: {
+          acceptance_event_id: string
+          accepted_on: string | null
+          company_id: string
+          confirmation_date: string
+          content_hash: string | null
+          created_at: string
+          created_by: string | null
+          document_number: string
+          id: string
+          quote_id: string
+          selected_item_ids: string[]
+          storage_path: string | null
+          version_id: string
+        }
+        Insert: {
+          acceptance_event_id: string
+          accepted_on?: string | null
+          company_id: string
+          confirmation_date: string
+          content_hash?: string | null
+          created_at?: string
+          created_by?: string | null
+          document_number: string
+          id?: string
+          quote_id: string
+          selected_item_ids?: string[]
+          storage_path?: string | null
+          version_id: string
+        }
+        Update: {
+          acceptance_event_id?: string
+          accepted_on?: string | null
+          company_id?: string
+          confirmation_date?: string
+          content_hash?: string | null
+          created_at?: string
+          created_by?: string | null
+          document_number?: string
+          id?: string
+          quote_id?: string
+          selected_item_ids?: string[]
+          storage_path?: string | null
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_confirmations_acceptance_event_id_fkey"
+            columns: ["acceptance_event_id"]
+            isOneToOne: true
+            referencedRelation: "quote_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_confirmations_quote_fkey"
+            columns: ["quote_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "quote_overview"
+            referencedColumns: ["id", "company_id"]
+          },
+          {
+            foreignKeyName: "quote_confirmations_quote_fkey"
+            columns: ["quote_id", "company_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id", "company_id"]
+          },
+          {
+            foreignKeyName: "quote_confirmations_version_fkey"
+            columns: ["version_id", "quote_id"]
+            isOneToOne: false
+            referencedRelation: "quote_versions"
+            referencedColumns: ["id", "quote_id"]
+          },
+        ]
+      }
       quote_events: {
         Row: {
           company_id: string
@@ -6943,6 +7020,7 @@ export type Database = {
         Args: { p_company_id: string; p_permission: string; p_user_id: string }
         Returns: boolean
       }
+      purge_expired_logs: { Args: { p_now?: string }; Returns: Json }
       quote_decision_check_time: {
         Args: { p_decided_at: string; p_quote_id: string }
         Returns: undefined
@@ -7043,6 +7121,30 @@ export type Database = {
       request_company_termination: {
         Args: { p_company_id: string; p_export_notice_confirmed: boolean }
         Returns: Json
+      }
+      reserve_quote_confirmation: {
+        Args: { p_quote_id: string; p_user_id: string }
+        Returns: {
+          acceptance_event_id: string
+          accepted_on: string | null
+          company_id: string
+          confirmation_date: string
+          content_hash: string | null
+          created_at: string
+          created_by: string | null
+          document_number: string
+          id: string
+          quote_id: string
+          selected_item_ids: string[]
+          storage_path: string | null
+          version_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "quote_confirmations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       resolve_inbound_mail_file: {
         Args: { p_decision: string; p_file_id: string }

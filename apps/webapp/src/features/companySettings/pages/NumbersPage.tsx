@@ -56,7 +56,33 @@ function formatDocumentNumber(prefix: string, next: number): string {
  * Nummernkreise je Belegart und ob dort schon eine Nummer vergeben ist. Nur
  * dann ist der Kreis gesperrt: `set_document_number_start` lehnt sonst ab
  * (GoBD, § 14 UStG — keine Lücken, keine Dubletten).
+ *
+ * Angebote und Auftragsbestätigungen vergeben ihre Nummern in `quotes` und
+ * `quote_confirmations` (bautakt-app#187), nicht in `sales_documents`. Ohne
+ * `canViewQuotes` sieht die Seite dort nichts; dann lehnt die Datenbank ab.
  */
+function issuedCount(companyId: string, type: DocType) {
+  if (type === 'quote') {
+    return supabase
+      .from('quotes')
+      .select('id', { count: 'exact', head: true })
+      .eq('company_id', companyId)
+      .not('document_number', 'is', null);
+  }
+  if (type === 'order_confirmation') {
+    return supabase
+      .from('quote_confirmations')
+      .select('id', { count: 'exact', head: true })
+      .eq('company_id', companyId);
+  }
+  return supabase
+    .from('sales_documents')
+    .select('id', { count: 'exact', head: true })
+    .eq('company_id', companyId)
+    .eq('type', type)
+    .not('document_number', 'is', null);
+}
+
 function useDocumentSequences() {
   const { data: membership } = useMembership();
   const companyId = membership?.companyId;
@@ -70,14 +96,7 @@ function useDocumentSequences() {
           .from('document_number_sequences')
           .select('doc_type, prefix, next_number')
           .eq('company_id', companyId!),
-        ...DOC_TYPES.map((type) =>
-          supabase
-            .from('sales_documents')
-            .select('id', { count: 'exact', head: true })
-            .eq('company_id', companyId!)
-            .eq('type', type)
-            .not('document_number', 'is', null),
-        ),
+        ...DOC_TYPES.map((type) => issuedCount(companyId!, type)),
       ]);
       if (sequences.error) throw sequences.error;
       const failed = issued.find((result) => result.error);

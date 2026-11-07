@@ -6,8 +6,12 @@
  * (`finance-documents/{company}/sales/quotes/…`), das genau einmal entsteht;
  * ein Entwurf bekommt nur eine Vorschau, die nirgends gespeichert wird.
  *
- * Versendet wird über `mail-send` mit Zweck `quote`. Anhang ist immer das
- * Original der Version, Absender und Modus bestimmt der Server.
+ * Versendet wird über `mail-send` mit Zweck `quote`. Anhang ist das Original
+ * der Version oder eine Auftragsbestätigung dazu, Absender und Modus bestimmt
+ * der Server.
+ *
+ * Auftragsbestätigung (bautakt-app#187): Die Function vergibt die Nummer und
+ * schreibt das PDF genau einmal je Annahme; ein zweiter Aufruf liefert dieselbe.
  */
 
 import { supabase } from '@/lib/supabase';
@@ -18,6 +22,12 @@ const RENDER_FUNCTION = 'quote-document-render';
 
 type ArchiveResult = { ok: true; storage_path: string; content_hash: string };
 type PreviewResult = { ok: true; pdf_base64: string; fingerprint: string };
+type ConfirmationResult = {
+  ok: true;
+  confirmation_id: string;
+  document_number: string;
+  storage_path: string;
+};
 
 async function invokeRender<T>(body: Record<string, unknown>): Promise<T> {
   const { data, error } = await supabase.functions.invoke(RENDER_FUNCTION, { body });
@@ -41,6 +51,49 @@ export async function ensureQuoteOriginal(versionId: string): Promise<string> {
   return result.storage_path;
 }
 
+/** Auftragsbestätigung der angenommenen Version sicherstellen. */
+export async function ensureOrderConfirmation(versionId: string): Promise<ConfirmationResult> {
+  return invokeRender<ConfirmationResult>({
+    version_id: versionId,
+    mode: 'archive',
+    document: 'order_confirmation',
+  });
+}
+
+/** Datei aus dem Archiv als PDF. */
+async function archivedBlob(path: string): Promise<Blob> {
+  const { data, error } = await supabase.storage.from('finance-documents').download(path);
+  if (error || !data) throw error ?? new Error('ARCHIVE_MISSING');
+  return new Blob([await data.arrayBuffer()], { type: 'application/pdf' });
+}
+
+/** PDF in einem Tab, der sofort aufgeht und die Datei übernimmt, sobald sie da ist. */
+async function showInTab(load: () => Promise<Blob>): Promise<void> {
+  const tab = window.open('', '_blank');
+  try {
+    const url = URL.createObjectURL(await load());
+    if (tab) tab.location.href = url;
+    else window.open(url, '_blank', 'noopener,noreferrer');
+    // Der Tab hat die Datei dann übernommen.
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  } catch (cause) {
+    tab?.close();
+    throw cause;
+  }
+}
+
+/** Auftragsbestätigung öffnen; fehlt sie noch, entsteht sie jetzt. */
+export async function openOrderConfirmationPdf(input: {
+  versionId: string;
+  storagePath: string | null;
+}): Promise<void> {
+  await showInTab(async () =>
+    archivedBlob(
+      input.storagePath ?? (await ensureOrderConfirmation(input.versionId)).storage_path,
+    ),
+  );
+}
+
 function base64ToBytes(base64: string): Uint8Array {
   const binary = atob(base64);
   const bytes = new Uint8Array(binary.length);
@@ -57,30 +110,13 @@ export async function openQuotePdf(version: {
   issued_at: string | null;
   storage_path: string | null;
 }): Promise<void> {
-  const tab = window.open('', '_blank');
-  try {
-    let blob: Blob;
+  await showInTab(async () => {
     if (version.issued_at) {
-      const path = version.storage_path ?? (await ensureQuoteOriginal(version.id));
-      const { data, error } = await supabase.storage.from('finance-documents').download(path);
-      if (error || !data) throw error ?? new Error('ARCHIVE_MISSING');
-      blob = new Blob([await data.arrayBuffer()], { type: 'application/pdf' });
-    } else {
-      const preview = await invokeRender<PreviewResult>({
-        version_id: version.id,
-        mode: 'preview',
-      });
-      blob = new Blob([base64ToBytes(preview.pdf_base64).slice()], { type: 'application/pdf' });
+      return archivedBlob(version.storage_path ?? (await ensureQuoteOriginal(version.id)));
     }
-    const url = URL.createObjectURL(blob);
-    if (tab) tab.location.href = url;
-    else window.open(url, '_blank', 'noopener,noreferrer');
-    // Der Tab hat die Datei dann übernommen.
-    setTimeout(() => URL.revokeObjectURL(url), 60_000);
-  } catch (cause) {
-    tab?.close();
-    throw cause;
-  }
+    const preview = await invokeRender<PreviewResult>({ version_id: version.id, mode: 'preview' });
+    return new Blob([base64ToBytes(preview.pdf_base64).slice()], { type: 'application/pdf' });
+  });
 }
 
 const ESCAPES: Record<string, string> = {

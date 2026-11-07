@@ -219,7 +219,9 @@ export function SendDialog({
         ? 'creditNote'
         : document.type === 'quote'
           ? 'quote'
-          : 'invoice';
+          : document.type === 'order_confirmation'
+            ? 'orderConfirmation'
+            : 'invoice';
     return {
       to: document.buyer_email ?? '',
       subject: t(`domain:send.template.${kind}.subject`, values),

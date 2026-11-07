@@ -831,6 +831,7 @@
         "declined": "Abgelehnt",
         "withdrawn": "Zurückgezogen",
         "decision_reverted": "Entscheidung zurückgenommen",
+        "confirmation_created": "Auftragsbestätigung erstellt",
         "other": "Änderung"
       },
       "attachments": "Anhänge",
@@ -1062,6 +1063,12 @@
       "recordedAt": "Erfasst am",
       "evidence": "Nachweis",
       "evidenceOpen": "Öffnen (hochgeladen {{date}})",
+      "confirmation": "Auftragsbestätigung",
+      "confirmationCreate": "Auftragsbestätigung erstellen",
+      "confirmationSend": "Auftragsbestätigung versenden",
+      "confirmationEntry": "{{number}} vom {{date}}",
+      "confirmationEarlier": "aus einer früheren Annahme",
+      "confirmationError": "Die Auftragsbestätigung konnte nicht erstellt werden. Bitte versuche es erneut.",
       "acceptedWithNewOrder": "Annahme gespeichert, Auftrag angelegt",
       "order": {
         "label": "Auftrag",
@@ -2932,6 +2939,11 @@
         "subject": "Gutschrift {{number}} von {{company}}",
         "text": "Guten Tag,\n\nanbei erhalten Sie unsere Gutschrift {{number}} über {{amount}}.\n\nMit freundlichen Grüßen\n{{company}}",
         "textWithDue": "Guten Tag,\n\nanbei erhalten Sie unsere Gutschrift {{number}} über {{amount}}.\n\nMit freundlichen Grüßen\n{{company}}"
+      },
+      "orderConfirmation": {
+        "subject": "Auftragsbestätigung {{number}} von {{company}}",
+        "text": "Guten Tag,\n\nvielen Dank für Ihren Auftrag. Anbei erhalten Sie unsere Auftragsbestätigung {{number}}.\n\nBei Fragen sind wir gern für Sie da.\n\nMit freundlichen Grüßen\n{{company}}",
+        "textWithDue": "Guten Tag,\n\nvielen Dank für Ihren Auftrag. Anbei erhalten Sie unsere Auftragsbestätigung {{number}}.\n\nBei Fragen sind wir gern für Sie da.\n\nMit freundlichen Grüßen\n{{company}}"
       },
       "quote": {
         "subject": "Angebot {{number}} von {{company}}",

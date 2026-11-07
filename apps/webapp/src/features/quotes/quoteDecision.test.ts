@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
+  currentConfirmation,
   currentEvidence,
   decidedAtIso,
   defaultOrderMode,
@@ -141,5 +142,44 @@ describe('Verlauf', () => {
       'Versehen',
     );
     assert.equal(quoteEventDetail({ event_type: 'accepted', payload: { reason: 'x' } }), '');
+  });
+});
+
+describe('Auftragsbestätigung', () => {
+  it('Nummer im Verlauf', () => {
+    assert.equal(
+      quoteEventDetail({
+        event_type: 'confirmation_created',
+        payload: { document_number: 'AB00007' },
+      }),
+      'AB00007',
+    );
+    assert.equal(
+      quoteEventDetail({
+        event_type: 'sent',
+        payload: { mode: 'live', confirmation_number: 'AB00007' },
+      }),
+      'AB00007',
+    );
+    assert.equal(quoteEventDetail({ event_type: 'sent', payload: { mode: 'live' } }), '');
+  });
+
+  const quote = {
+    decision: 'accepted',
+    accepted_version_id: 'v2',
+    decision_recorded_at: '2026-11-07T10:00:00Z',
+  };
+  const old = { id: 'a', version_id: 'v2', created_at: '2026-11-06T09:00:00Z', content_hash: 'x' };
+  const now = { id: 'b', version_id: 'v2', created_at: '2026-11-07T10:05:00Z', content_hash: null };
+
+  it('nur die der laufenden Annahme', () => {
+    assert.equal(currentConfirmation([now, old], quote)?.id, 'b');
+    assert.equal(currentConfirmation([old], quote), null);
+    assert.equal(currentConfirmation([{ ...now, version_id: 'v1' }], quote), null);
+  });
+
+  it('ohne Annahme keine', () => {
+    assert.equal(currentConfirmation([now], { ...quote, decision: 'declined' }), null);
+    assert.equal(currentConfirmation([now], { ...quote, decision: null }), null);
   });
 });

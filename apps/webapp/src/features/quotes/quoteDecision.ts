@@ -155,11 +155,52 @@ export function quoteEventKey(event: { event_type: string; payload: unknown }): 
   return event.event_type === 'sent' && mode === 'dry_run' ? 'sentDryRun' : event.event_type;
 }
 
-/** Zusatz im Verlauf: Begründung der Zurücknahme oder Grund der Ablehnung. */
+/**
+ * Zusatz im Verlauf: Begründung der Zurücknahme, Grund der Ablehnung oder die
+ * Nummer der Auftragsbestätigung (erstellt oder versendet, bautakt-app#187).
+ */
 export function quoteEventDetail(event: { event_type: string; payload: unknown }): string {
-  const payload = (event.payload ?? {}) as { reason?: unknown };
+  const payload = (event.payload ?? {}) as {
+    reason?: unknown;
+    document_number?: unknown;
+    confirmation_number?: unknown;
+  };
   if (event.event_type === 'decision_reverted' || event.event_type === 'declined') {
     return typeof payload.reason === 'string' ? payload.reason : '';
   }
+  if (event.event_type === 'confirmation_created') {
+    return typeof payload.document_number === 'string' ? payload.document_number : '';
+  }
+  if (event.event_type === 'sent') {
+    return typeof payload.confirmation_number === 'string' ? payload.confirmation_number : '';
+  }
   return '';
+}
+
+/**
+ * Auftragsbestätigung der laufenden Annahme (bautakt-app#187). Je Annahme gibt
+ * es höchstens eine; sie gehört zur angenommenen Version und ist nach der
+ * Erfassung der Annahme entstanden. Ältere stammen aus einer zurückgenommenen
+ * Annahme und bleiben nur zur Ansicht.
+ */
+export function currentConfirmation<
+  T extends { version_id: string; created_at: string; content_hash: string | null },
+>(
+  rows: readonly T[],
+  quote: {
+    decision: string | null;
+    accepted_version_id: string | null;
+    decision_recorded_at: string | null;
+  },
+): T | null {
+  if (quote.decision !== 'accepted' || !quote.accepted_version_id || !quote.decision_recorded_at) {
+    return null;
+  }
+  const since = new Date(quote.decision_recorded_at).getTime();
+  return (
+    rows.find(
+      (row) =>
+        row.version_id === quote.accepted_version_id && new Date(row.created_at).getTime() >= since,
+    ) ?? null
+  );
 }
